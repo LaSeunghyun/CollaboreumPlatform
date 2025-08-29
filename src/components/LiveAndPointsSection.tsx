@@ -1,0 +1,173 @@
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Play, Radio, Eye } from "lucide-react";
+import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { liveStreamAPI } from "../services/api";
+
+export function LiveAndPointsSection() {
+  const [liveStreams, setLiveStreams] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        try {
+          const response = await liveStreamAPI.getLiveStreams() as any;
+          if (response.success && response.data?.streams) {
+            setLiveStreams(response.data.streams);
+          }
+        } catch (apiError) {
+          console.error('API 호출 실패:', apiError);
+          setError('서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.');
+          setLiveStreams([]);
+          return;
+        }
+      } catch (error) {
+        console.error('Failed to fetch live stream data:', error);
+        setError('라이브 스트림 데이터를 불러오는데 실패했습니다.');
+        setLiveStreams([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">라이브 스트림 데이터를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500">{error}</p>
+          <Button onClick={() => window.location.reload()} className="mt-4">
+            다시 시도
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <section id="live" className="py-20 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">라이브 스트리밍</h2>
+          <p className="text-xl text-gray-600">실시간 창작 과정을 지켜보고 함께 소통하세요</p>
+        </div>
+
+        <div className="max-w-4xl mx-auto">
+          {/* Live Streaming Section */}
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-900">현재 라이브 중</h3>
+              <Button variant="outline">
+                <Radio className="w-4 h-4 mr-2" />
+                라이브 시작하기
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {liveStreams.length === 0 ? (
+                <div className="text-center py-12 bg-white rounded-lg border-2 border-dashed border-gray-300">
+                  <Radio className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h4 className="text-lg font-medium text-gray-900 mb-2">현재 라이브 중인 스트림이 없습니다</h4>
+                  <p className="text-gray-600 mb-4">첫 번째 라이브를 시작해보세요!</p>
+                  <Button>라이브 시작하기</Button>
+                </div>
+              ) : (
+                liveStreams.map((stream: any) => (
+                  <Card key={stream.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                    <CardContent className="p-4">
+                      <div className="flex gap-4">
+                        <div className="relative">
+                          <ImageWithFallback
+                            src={stream.thumbnail}
+                            alt={stream.title}
+                            className="w-32 h-20 object-cover rounded-lg"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${stream.status === 'live' ? 'bg-red-500' : 'bg-gray-500'
+                              }`}>
+                              <Play className="w-4 h-4 text-white fill-current" />
+                            </div>
+                          </div>
+                          {stream.status === 'live' && (
+                            <Badge className="absolute top-1 left-1 bg-red-500 text-white text-xs px-1">
+                              LIVE
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-2">
+                            <Badge
+                              className={
+                                stream.category === "음악" ? "bg-blue-100 text-blue-800" :
+                                  stream.category === "미술" ? "bg-purple-100 text-purple-800" :
+                                    stream.category === "문학" ? "bg-green-100 text-green-800" :
+                                      stream.category === "공연" ? "bg-orange-100 text-orange-800" :
+                                        stream.category === "사진" ? "bg-pink-100 text-pink-800" :
+                                          "bg-gray-100 text-gray-800"
+                              }
+                            >
+                              {stream.category}
+                            </Badge>
+                            {stream.status === 'scheduled' && (
+                              <span className="text-sm text-gray-500">{stream.scheduledTime} 시작 예정</span>
+                            )}
+                          </div>
+
+                          <h4 className="font-medium text-gray-900 mb-1 line-clamp-1">
+                            {stream.title}
+                          </h4>
+
+                          <p className="text-sm text-gray-600 mb-2">by {stream.artist}</p>
+
+                          {stream.status === 'live' && (
+                            <div className="flex items-center gap-1 text-sm text-gray-600">
+                              <Eye className="w-4 h-4" />
+                              <span>{stream.viewers}명 시청 중</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+
+            <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-1">라이브 스케줄 알림</h4>
+                  <p className="text-sm text-gray-600">관심 아티스트의 라이브를 놓치지 마세요!</p>
+                </div>
+                <Button variant="outline" size="sm">
+                  알림 설정
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
