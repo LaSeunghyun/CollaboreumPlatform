@@ -36,11 +36,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const storedToken = localStorage.getItem('authToken');
         const storedUser = localStorage.getItem('authUser');
-        
+
         if (storedToken && storedUser) {
           // 토큰 유효성 검증
           const isValid = await validateToken(storedToken);
-          
+
           if (isValid) {
             setToken(storedToken);
             setUser(JSON.parse(storedUser));
@@ -68,7 +68,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // 토큰 유효성 검증 함수
   const validateToken = async (token: string): Promise<boolean> => {
     try {
-      const API_BASE_URL = process.env.REACT_APP_API_URL || 
+      const API_BASE_URL = process.env.REACT_APP_API_URL ||
         (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
       const response = await fetch(`${API_BASE_URL}/auth/verify`, {
         method: 'GET',
@@ -77,7 +77,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           'Content-Type': 'application/json',
         },
       });
-      
+
       return response.ok;
     } catch (error) {
       console.error('토큰 검증 오류:', error);
@@ -89,11 +89,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = (newToken: string, newUser: User) => {
     setToken(newToken);
     setUser(newUser);
-    
+
     // 로컬 스토리지에 저장
     localStorage.setItem('authToken', newToken);
     localStorage.setItem('authUser', JSON.stringify(newUser));
-    
+
     console.log('🔑 로그인 완료, 토큰 저장됨');
   };
 
@@ -101,11 +101,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     setToken(null);
     setUser(null);
-    
+
     // 로컬 스토리지에서 제거
     localStorage.removeItem('authToken');
     localStorage.removeItem('authUser');
-    
+
     console.log('🔓 로그아웃 완료, 토큰 제거됨');
   };
 
@@ -114,10 +114,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (user) {
       const updatedUser = { ...user, ...userData };
       setUser(updatedUser);
-      
+
       // 로컬 스토리지 업데이트
       localStorage.setItem('authUser', JSON.stringify(updatedUser));
-      
+
       console.log('👤 사용자 정보 업데이트됨');
     }
   };

@@ -7,13 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+
 import { communityPostAPI, communityCommentAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import {
   Search,
-  Filter,
   Plus,
   ThumbsUp,
   ThumbsDown,
@@ -22,11 +20,9 @@ import {
   Flag,
   MoreHorizontal,
   Calendar,
-  User,
-  Tag
+  User
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
 
 // Types
 interface CommunityPost {
@@ -95,11 +91,54 @@ export const PostCreationForm: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      // TODO: API 호출하여 게시글 생성
-      console.log('게시글 생성:', formData);
+      try {
+        const API_BASE_URL = process.env.REACT_APP_API_URL ||
+          (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
+
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+          alert('로그인이 필요합니다.');
+          return;
+        }
+
+        const postData = {
+          title: formData.title,
+          content: formData.content,
+          category: formData.category,
+          tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : []
+        };
+
+        const response = await fetch(`${API_BASE_URL}/community/posts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(postData)
+        });
+
+        if (response.ok) {
+          alert('게시글이 성공적으로 작성되었습니다.');
+          // 폼 초기화
+          setFormData({
+            title: '',
+            content: '',
+            category: '',
+            tags: ''
+          });
+          // 페이지 새로고침 또는 게시글 목록으로 이동
+          window.location.reload();
+        } else {
+          const errorData = await response.json();
+          alert(`게시글 작성 실패: ${errorData.message || '알 수 없는 오류가 발생했습니다.'}`);
+        }
+      } catch (error) {
+        console.error('게시글 작성 실패:', error);
+        alert('게시글 작성 중 오류가 발생했습니다.');
+      }
     }
   };
 
@@ -353,7 +392,7 @@ export const PostList: React.FC = () => {
                           )}
                           <Badge variant="outline">{getCategoryLabel(post.category)}</Badge>
                           <span className="text-sm text-gray-500">
-                            {format(post.createdAt, 'MM/dd HH:mm', { locale: ko })}
+                            {format(post.createdAt, 'MM/dd HH:mm')}
                           </span>
                         </div>
                         <h3 className="text-lg font-semibold hover:text-blue-600 cursor-pointer">
@@ -570,7 +609,7 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
                   )}
                   <Badge variant="outline">{getCategoryLabel(post.category)}</Badge>
                   <span className="text-sm text-gray-500">
-                    {format(post.createdAt, 'PPP', { locale: ko })}
+                    {format(post.createdAt, 'PPP')}
                   </span>
                 </div>
                 <h1 className="text-2xl font-bold mb-3">{post.title}</h1>
@@ -664,7 +703,7 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
                       <span className="font-medium">{comment.author.username}</span>
                       <Badge variant="outline" className="text-xs">{comment.author.role}</Badge>
                       <span className="text-sm text-gray-500">
-                        {format(comment.createdAt, 'MM/dd HH:mm', { locale: ko })}
+                        {format(comment.createdAt, 'MM/dd HH:mm')}
                       </span>
                     </div>
 
