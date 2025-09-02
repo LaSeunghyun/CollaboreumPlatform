@@ -2,13 +2,10 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(
-      process.env.MONGODB_URI || 'mongodb://localhost:27017/collaboreum',
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
-    );
+    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/collaboreum';
+    console.log('Connecting to MongoDB:', mongoURI.replace(/\/\/.*@/, '//***:***@')); // 비밀번호 숨김
+    
+    const conn = await mongoose.connect(mongoURI);
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     
