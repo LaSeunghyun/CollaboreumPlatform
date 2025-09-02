@@ -72,19 +72,8 @@ export function Header({
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo and Back Button */}
+          {/* Logo */}
           <div className="flex items-center space-x-4">
-            {canGoBack && onGoBack && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onGoBack}
-                className="flex items-center"
-              >
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                뒤로
-              </Button>
-            )}
             <button
               onClick={() => handleNavigation('home')}
               className="text-xl font-bold text-primary hover:text-blue-600 transition-colors"

@@ -15,29 +15,31 @@ export function ImageWithFallback(props: React.ImgHTMLAttributes<HTMLImageElemen
 
   const { src, alt, style, className, ...rest } = props
 
-  // 로딩 중일 때 검은색 배경 표시
+  // 로딩 중일 때 그라데이션 배경 표시
   if (isLoading && src) {
     return (
       <div
-        className={`inline-block bg-black text-center align-middle ${className ?? ''}`}
+        className={`inline-block bg-gradient-to-br from-gray-200 to-gray-300 text-center align-middle ${className ?? ''}`}
         style={style}
       >
         <div className="flex items-center justify-center w-full h-full">
-          <div className="animate-pulse bg-gray-800 w-full h-full"></div>
+          <div className="animate-pulse bg-gray-400 w-full h-full"></div>
         </div>
       </div>
     )
   }
 
-  // 에러 발생 시 검은색 배경에 기본 이미지 표시
+  // 에러 발생 시 기본 아바타 이미지 표시
   if (didError) {
     return (
       <div
-        className={`inline-block bg-black text-center align-middle ${className ?? ''}`}
+        className={`inline-block bg-gradient-to-br from-blue-500 to-purple-600 text-center align-middle ${className ?? ''}`}
         style={style}
       >
         <div className="flex items-center justify-center w-full h-full">
-          <div className="text-white text-sm">이미지 없음</div>
+          <div className="text-white text-2xl font-bold">
+            {alt ? alt.charAt(0).toUpperCase() : '?'}
+          </div>
         </div>
       </div>
     )

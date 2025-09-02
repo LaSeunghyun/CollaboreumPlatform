@@ -25,7 +25,8 @@ interface CommunityPostListProps {
   onPostClick: (postId: string) => void;
 }
 
-const CATEGORIES = [
+// 기본 카테고리 (API 실패 시 사용)
+const DEFAULT_CATEGORIES = [
   { value: '전체', label: '전체' },
   { value: '음악', label: '음악' },
   { value: '미술', label: '미술' },
@@ -47,6 +48,25 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
   const [totalPosts, setTotalPosts] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [sortBy, setSortBy] = useState<'latest' | 'popular'>('latest');
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
+
+  // 카테고리 목록 가져오기
+  const fetchCategories = async () => {
+    try {
+      const response = await authAPI.get('/categories') as ApiResponse<any[]>;
+      if (response.success && response.data && Array.isArray(response.data)) {
+        const categoryLabels = response.data.map((cat: any) => ({
+          value: cat.label || cat.name,
+          label: cat.label || cat.name
+        }));
+        setCategories([{ value: '전체', label: '전체' }, ...categoryLabels]);
+      }
+    } catch (error) {
+      console.error('카테고리 로드 실패:', error);
+      // 오류 시 기본 카테고리 사용
+      setCategories(DEFAULT_CATEGORIES);
+    }
+  };
 
   const fetchPosts = async (page: number = 1, category: string = selectedCategory) => {
     setIsLoading(true);
@@ -97,6 +117,7 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
   };
 
   useEffect(() => {
+    fetchCategories();
     fetchPosts(1, selectedCategory);
   }, [selectedCategory, searchQuery]);
 
@@ -153,7 +174,7 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
       <div className="bg-white rounded-lg p-4 shadow-sm">
         <h3 className="text-lg font-semibold mb-3">카테고리</h3>
         <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((category) => (
+          {categories.map((category) => (
             <button
               key={category.value}
               onClick={() => handleCategoryChange(category.value)}
