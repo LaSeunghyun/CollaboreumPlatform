@@ -22,7 +22,7 @@ const liveStreamRoutes = require('./routes/live-streams');
 const categoryRoutes = require('./routes/categories');
 const statsRoutes = require('./routes/stats');
 const constantsRoutes = require('./routes/constants');
-const notificationRoutes = require('./routes/notifications');
+const { router: notificationRoutes } = require('./routes/notifications');
 
 // Middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -102,11 +102,6 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/constants', constantsRoutes);
 app.use('/api/notifications', notificationRoutes);
-
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
 
 // Error handling middleware
 app.use(errorHandler);

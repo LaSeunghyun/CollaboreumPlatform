@@ -50,29 +50,35 @@ router.get('/', async (req, res) => {
     ]);
 
     // 응답 데이터 포맷팅
-    const formattedArtists = artists.map(user => ({
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      avatar: user.avatar || null,
-      bio: user.bio || '',
-      role: user.role,
-      category: '기타', // 기본값
-      location: '미설정', // 기본값
-      rating: 0, // 기본값
-      followers: 0, // 기본값
-      completedProjects: 0, // 기본값
-      activeProjects: 0, // 기본값
-      totalEarned: 0, // 기본값
-      isVerified: false, // 기본값
-      featured: false, // 기본값
-      createdAt: user.createdAt,
-      lastActivityAt: user.lastActivityAt
-    }));
+    // 아티스트 프로필 정보와 함께 조회
+    const artistsWithProfiles = await Promise.all(
+      artists.map(async (user) => {
+        const artistProfile = await Artist.findOne({ userId: user._id });
+        return {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar || null,
+          bio: user.bio || '',
+          role: user.role,
+          category: artistProfile?.category || '기타',
+          location: artistProfile?.location || '미설정',
+          rating: artistProfile?.rating || 0,
+          followers: artistProfile?.followers || 0,
+          completedProjects: artistProfile?.completedProjects || 0,
+          activeProjects: artistProfile?.activeProjects || 0,
+          totalEarned: artistProfile?.totalEarned || 0,
+          isVerified: artistProfile?.isVerified || false,
+          featured: artistProfile?.featured || false,
+          createdAt: user.createdAt,
+          lastActivityAt: user.lastActivityAt
+        };
+      })
+    );
 
     res.json({
       success: true,
-      data: formattedArtists,
+      data: artistsWithProfiles,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
@@ -102,28 +108,34 @@ router.get('/featured/popular', async (req, res) => {
     .limit(6)
     .lean();
 
-    const formattedArtists = artists.map(user => ({
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      avatar: user.avatar || null,
-      bio: user.bio || '',
-      role: user.role,
-      category: '기타',
-      location: '미설정',
-      rating: 0,
-      followers: 0,
-      completedProjects: 0,
-      activeProjects: 0,
-      totalEarned: 0,
-      isVerified: false,
-      featured: false,
-      createdAt: user.createdAt
-    }));
+    // 아티스트 프로필 정보와 함께 조회
+    const artistsWithProfiles = await Promise.all(
+      artists.map(async (user) => {
+        const artistProfile = await Artist.findOne({ userId: user._id });
+        return {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar || null,
+          bio: user.bio || '',
+          role: user.role,
+          category: artistProfile?.category || '기타',
+          location: artistProfile?.location || '미설정',
+          rating: artistProfile?.rating || 0,
+          followers: artistProfile?.followers || 0,
+          completedProjects: artistProfile?.completedProjects || 0,
+          activeProjects: artistProfile?.activeProjects || 0,
+          totalEarned: artistProfile?.totalEarned || 0,
+          isVerified: artistProfile?.isVerified || false,
+          featured: artistProfile?.featured || false,
+          createdAt: user.createdAt
+        };
+      })
+    );
 
     res.json({
       success: true,
-      data: formattedArtists
+      data: artistsWithProfiles
     });
   } catch (error) {
     console.error('인기 아티스트 조회 오류:', error);
@@ -142,7 +154,7 @@ router.get('/new', async (req, res) => {
     
     // 최근 30일 내에 가입한 아티스트들 조회
     const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 7);
     
     const newArtists = await User.find({ 
       role: 'artist', 
@@ -154,31 +166,37 @@ router.get('/new', async (req, res) => {
     .limit(parseInt(limit))
     .lean();
 
-    const formattedArtists = newArtists.map(user => ({
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      avatar: user.avatar || null,
-      bio: user.bio || '',
-      role: user.role,
-      category: '기타',
-      location: '미설정',
-      rating: 0,
-      followers: 0,
-      completedProjects: 0,
-      activeProjects: 0,
-      totalEarned: 0,
-      isVerified: false,
-      featured: false,
-      isNew: true, // 새로 가입한 아티스트 표시
-      createdAt: user.createdAt
-    }));
+    // 아티스트 프로필 정보와 함께 조회
+    const newArtistsWithProfiles = await Promise.all(
+      newArtists.map(async (user) => {
+        const artistProfile = await Artist.findOne({ userId: user._id });
+        return {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar || null,
+          bio: user.bio || '',
+          role: user.role,
+          category: artistProfile?.category || '기타',
+          location: artistProfile?.location || '미설정',
+          rating: artistProfile?.rating || 0,
+          followers: artistProfile?.followers || 0,
+          completedProjects: artistProfile?.completedProjects || 0,
+          activeProjects: artistProfile?.activeProjects || 0,
+          totalEarned: artistProfile?.totalEarned || 0,
+          isVerified: artistProfile?.isVerified || false,
+          featured: artistProfile?.featured || false,
+          isNew: true, // 새로 가입한 아티스트 표시
+          createdAt: user.createdAt
+        };
+      })
+    );
 
     res.json({
       success: true,
       data: {
-        artists: formattedArtists,
-        count: formattedArtists.length
+        artists: newArtistsWithProfiles,
+        count: newArtistsWithProfiles.length
       }
     });
   } catch (error) {
@@ -271,6 +289,20 @@ router.get('/:id/dashboard', async (req, res) => {
       });
     }
 
+    // 실제 프로젝트 통계 조회
+    const totalProjects = await Project.countDocuments({ artist: id });
+    const completedProjects = await Project.countDocuments({ 
+      artist: id, 
+      status: '완료' 
+    });
+    const activeProjects = await Project.countDocuments({ 
+      artist: id, 
+      status: { $in: ['진행중', '계획중'] } 
+    });
+
+    // 실제 아티스트 프로필 정보 조회
+    const artistProfile = await Artist.findOne({ userId: id });
+    
     // 대시보드 데이터 구성
     const dashboardData = {
       artist: {
@@ -280,45 +312,29 @@ router.get('/:id/dashboard', async (req, res) => {
         avatar: artist.avatar || null,
         bio: artist.bio || '',
         role: artist.role,
-        category: '기타',
-        location: '미설정',
-        rating: 4.5,
-        followers: 128,
-        completedProjects: 12,
-        activeProjects: 3,
-        totalEarned: 2500000,
-        isVerified: true,
-        featured: false,
+        category: artistProfile?.category || '기타',
+        location: artistProfile?.location || '미설정',
+        rating: artistProfile?.rating || 0,
+        followers: artistProfile?.followers || 0,
+        completedProjects: completedProjects,
+        activeProjects: activeProjects,
+        totalEarned: artistProfile?.totalEarned || 0,
+        isVerified: artistProfile?.isVerified || false,
+        featured: artistProfile?.featured || false,
         createdAt: artist.createdAt,
         lastActivityAt: artist.lastActivityAt
       },
       stats: {
-        totalProjects: 15,
-        completedProjects: 12,
-        activeProjects: 3,
-        totalEarnings: 2500000,
-        monthlyEarnings: 180000,
-        followers: 128,
-        following: 45,
-        rating: 4.5
+        totalProjects: totalProjects,
+        completedProjects: completedProjects,
+        activeProjects: activeProjects,
+        totalEarnings: artistProfile?.totalEarned || 0,
+        monthlyEarnings: 0, // TODO: 월별 수익 계산 로직 추가
+        followers: artistProfile?.followers || 0,
+        following: 0, // TODO: 팔로잉 수 계산 로직 추가
+        rating: artistProfile?.rating || 0
       },
-      recentActivity: [
-        {
-          id: 1,
-          type: 'project_completed',
-          title: '프로젝트 완료',
-          description: '바다의 노래 프로젝트가 완료되었습니다.',
-          date: new Date().toISOString(),
-          amount: 500000
-        },
-        {
-          id: 2,
-          type: 'new_follower',
-          title: '새 팔로워',
-          description: '김팬닉님이 팔로우했습니다.',
-          date: new Date(Date.now() - 86400000).toISOString()
-        }
-      ]
+      recentActivity: [] // TODO: 실제 최근 활동 데이터 조회 로직 추가
     };
 
     console.log(`✅ 아티스트 대시보드 조회 성공: ${artist.name} (${artist.email})`);

@@ -60,8 +60,8 @@ router.post('/images', auth, upload.array('images', 5), async (req, res) => {
       path: `/uploads/images/${file.filename}` // 클라이언트에서 접근할 수 있는 경로
     }));
 
-    // 실제 서버 URL 구성 (프로덕션에서는 환경변수 사용)
-    const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+    // 실제 서버 URL 구성 (환경변수 사용)
+    const baseUrl = process.env.BASE_URL || `http://${process.env.HOST || 'localhost'}:${process.env.PORT || 5000}`;
     const urls = uploadedFiles.map(file => baseUrl + file.path);
 
     res.json({
