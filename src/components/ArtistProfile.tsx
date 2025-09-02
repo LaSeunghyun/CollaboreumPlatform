@@ -17,8 +17,8 @@ export function ArtistProfile({ artistId, onBack }: ArtistProfileProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [artistData, setArtistData] = useState<any>(null);
-  const [artistPosts, setArtistPosts] = useState<any[]>([]);
-  const [portfolio, setPortfolio] = useState<any[]>([]);
+  const [artistPosts] = useState<any[]>([]);
+  const [portfolio] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchArtistData = async () => {

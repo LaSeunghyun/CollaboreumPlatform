@@ -21,7 +21,7 @@ export function ArtistGallery({ onBack, onSelectArtwork }: ArtistGalleryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [artworks, setArtworks] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
-  const [sortOptions, setSortOptions] = useState<string[]>(["최신순", "인기순", "조회수순"]);
+  const [sortOptions] = useState<string[]>(["최신순", "인기순", "조회수순"]);
   const [loading, setLoading] = useState(true);
 
   // 이전 페이지로 돌아가기

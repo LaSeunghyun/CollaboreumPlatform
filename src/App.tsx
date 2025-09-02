@@ -31,7 +31,7 @@ function AppContent() {
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const [selectedEventId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const [selectedPostId] = useState<string | null>(null);
   const { user, isAuthenticated, login } = useAuth();
 
   // 해시 변경 감지

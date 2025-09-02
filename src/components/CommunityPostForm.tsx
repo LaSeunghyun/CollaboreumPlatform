@@ -13,14 +13,7 @@ interface CommunityPostFormProps {
   onBack: () => void;
 }
 
-const CATEGORIES = [
-  { value: '음악', label: '음악' },
-  { value: '미술', label: '미술' },
-  { value: '문학', label: '문학' },
-  { value: '공연', label: '공연' },
-  { value: '사진', label: '사진' },
-  { value: '기타', label: '기타' }
-];
+// 카테고리는 API에서 동적으로 가져옴
 
 export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
   onBack
@@ -30,11 +23,62 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    category: '음악',
+    category: '',
     images: [] as File[]
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [categories, setCategories] = useState<Array<{ id: string, label: string }>>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+
+  // 카테고리 목록 가져오기
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const API_BASE_URL = process.env.REACT_APP_API_URL ||
+          (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
+
+        const response = await fetch(`${API_BASE_URL}/categories`);
+        if (response.ok) {
+          const categoriesData = await response.json();
+          setCategories(categoriesData);
+          // 첫 번째 카테고리를 기본값으로 설정
+          if (categoriesData.length > 0) {
+            setFormData(prev => ({ ...prev, category: categoriesData[0].id }));
+          }
+        } else {
+          // API 실패 시 기본 카테고리 사용
+          const defaultCategories = [
+            { id: 'music', label: '음악' },
+            { id: 'art', label: '미술' },
+            { id: 'literature', label: '문학' },
+            { id: 'performance', label: '공연' },
+            { id: 'photo', label: '사진' },
+            { id: 'other', label: '기타' }
+          ];
+          setCategories(defaultCategories);
+          setFormData(prev => ({ ...prev, category: 'music' }));
+        }
+      } catch (error) {
+        console.error('카테고리 로드 실패:', error);
+        // 오류 시 기본 카테고리 사용
+        const defaultCategories = [
+          { id: 'music', label: '음악' },
+          { id: 'art', label: '미술' },
+          { id: 'literature', label: '문학' },
+          { id: 'performance', label: '공연' },
+          { id: 'photo', label: '사진' },
+          { id: 'other', label: '기타' }
+        ];
+        setCategories(defaultCategories);
+        setFormData(prev => ({ ...prev, category: 'music' }));
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -98,7 +142,7 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
 
         // 이미지 업로드는 FormData를 직접 fetch로 처리
         const token = localStorage.getItem('authToken');
-        const API_BASE_URL = process.env.REACT_APP_API_URL || 
+        const API_BASE_URL = process.env.REACT_APP_API_URL ||
           (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
         const imageResponse = await fetch(`${API_BASE_URL}/upload/images`, {
           method: 'POST',
@@ -165,11 +209,15 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
                 <SelectValue placeholder="카테고리를 선택하세요" />
               </SelectTrigger>
               <SelectContent>
-                {CATEGORIES.map((category) => (
-                  <SelectItem key={category.value} value={category.value}>
-                    {category.label}
-                  </SelectItem>
-                ))}
+                {isLoadingCategories ? (
+                  <SelectItem value="" disabled>카테고리 로딩 중...</SelectItem>
+                ) : (
+                  categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.label}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
