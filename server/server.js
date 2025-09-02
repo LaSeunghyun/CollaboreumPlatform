@@ -43,12 +43,36 @@ connectDB();
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: [
-    process.env.CLIENT_URL || 'http://localhost:3000',
-    'https://collaboreum-mvp-platform.vercel.app',
-    'https://collaboreum-mvp-platform-git-main.vercel.app',
-    'https://collaboreum-mvp-platform-git-develop.vercel.app'
-  ],
+  origin: function (origin, callback) {
+    // 개발 환경에서는 모든 origin 허용
+    if (process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
+    // 허용된 origin 목록
+    const allowedOrigins = [
+      process.env.CLIENT_URL || 'http://localhost:3000',
+      'https://collaboreum-mvp-platform.vercel.app',
+      'https://collaboreum-mvp-platform-git-main.vercel.app',
+      'https://collaboreum-mvp-platform-git-develop.vercel.app',
+      /^https:\/\/.*\.vercel\.app$/, // 모든 Vercel 도메인 허용
+      /^https:\/\/.*\.railway\.app$/  // 모든 Railway 도메인 허용
+    ];
+    
+    // origin이 없거나 허용된 목록에 있으면 허용
+    if (!origin || allowedOrigins.some(allowed => {
+      if (typeof allowed === 'string') {
+        return allowed === origin;
+      } else if (allowed instanceof RegExp) {
+        return allowed.test(origin);
+      }
+      return false;
+    })) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS 정책에 의해 차단됨'));
+    }
+  },
   credentials: true
 }));
 app.use(morgan('combined'));
