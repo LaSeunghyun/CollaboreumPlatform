@@ -43,7 +43,12 @@ connectDB();
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: [
+    process.env.CLIENT_URL || 'http://localhost:3000',
+    'https://collaboreum-mvp-platform.vercel.app',
+    'https://collaboreum-mvp-platform-git-main.vercel.app',
+    'https://collaboreum-mvp-platform-git-develop.vercel.app'
+  ],
   credentials: true
 }));
 app.use(morgan('combined'));
