@@ -11,6 +11,12 @@ import { Heart, Calendar, MapPin, Search, Filter, Star, Target, Eye, MessageCirc
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { fundingAPI, communityAPI } from '../services/api';
 import { PaymentModal } from './PaymentModal';
+import {
+  CATEGORIES,
+  CATEGORY_LABELS,
+  getCategoryColor,
+  KOREAN_CATEGORIES
+} from '../constants/categories';
 
 interface FundingProjectsProps {
   onViewProject?: (projectId: number) => void;
@@ -77,7 +83,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
           } else {
             console.warn('Categories response structure:', categoriesResponse);
             // API 실패 시 기본 카테고리 사용
-            setCategories(["전체", "음악", "미술", "문학", "공연"]);
+            setCategories(KOREAN_CATEGORIES);
           }
         } catch (apiError) {
           console.error('API 호출 실패:', apiError);
@@ -191,17 +197,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
     return Math.round((current / target) * 100);
   };
 
-  const getCategoryColor = (category: string) => {
-    const colorMap: { [key: string]: string } = {
-      "음악": "bg-blue-100 text-blue-800",
-      "미술": "bg-purple-100 text-purple-800",
-      "문학": "bg-green-100 text-green-800",
-      "공연": "bg-red-100 text-red-800",
-      "사진": "bg-pink-100 text-pink-800",
-      "도서": "bg-indigo-100 text-indigo-800"
-    };
-    return colorMap[category] || "bg-gray-100 text-gray-800";
-  };
+
 
   const ProjectCard = ({ project }: { project: any }) => (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer">

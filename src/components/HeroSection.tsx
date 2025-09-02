@@ -33,16 +33,34 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
 
         // 플랫폼 통계 데이터 가져오기
         try {
-          // TODO: 실제 API 연동
-          // const statsResponse = await apiService.getPlatformStats();
-          // setPlatformStats(statsResponse);
+          const statsResponse = await fetch('/api/stats/platform');
+          if (statsResponse.ok) {
+            const statsData = await statsResponse.json();
+            setPlatformStats(statsData.data || {
+              totalArtists: 0,
+              totalProjects: 0,
+              totalFunding: 0,
+              totalUsers: 0
+            });
+          }
         } catch (error) {
           console.error('플랫폼 통계 데이터를 가져오는데 실패했습니다:', error);
           // API 실패 시 기본값 유지
         }
 
-        // API에서 데이터 가져오기 (아직 구현되지 않음)
-        setWeeklyNewcomers([]);
+        // 주간 신규 아티스트 데이터 가져오기
+        try {
+          const newcomersResponse = await fetch('/api/artists/weekly-newcomers');
+          if (newcomersResponse.ok) {
+            const newcomersData = await newcomersResponse.json();
+            setWeeklyNewcomers(newcomersData.data || []);
+          } else {
+            setWeeklyNewcomers([]);
+          }
+        } catch (error) {
+          console.error('주간 신규 아티스트 데이터를 가져오는데 실패했습니다:', error);
+          setWeeklyNewcomers([]);
+        }
 
         // 카테고리 데이터 가져오기
         try {
@@ -132,10 +150,19 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
               신뢰 기반의 펀딩과 수익 공유 시스템으로 건강한 예술 생태계를 만들어갑니다.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="text-lg px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+              <Button
+                size="lg"
+                className="text-lg px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                onClick={() => window.location.href = '/signup?type=artist'}
+              >
                 아티스트로 시작하기
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-3 border-purple-300 text-purple-600 hover:bg-purple-50">
+              <Button
+                variant="outline"
+                size="lg"
+                className="text-lg px-8 py-3 border-purple-300 text-purple-600 hover:bg-purple-50"
+                onClick={() => window.location.href = '/#artists'}
+              >
                 <Play className="w-5 h-5 mr-2" />
                 플랫폼 둘러보기
               </Button>

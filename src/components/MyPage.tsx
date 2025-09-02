@@ -72,9 +72,22 @@ export function MyPage() {
           }
         }
 
-        // TODO: 투자 내역과 팔로우 아티스트 API 연동
-        // const investmentsResponse = await apiService.getUserInvestments();
-        // const followingResponse = await apiService.getUserFollowing();
+        // 투자 내역과 팔로우 아티스트 API 연동
+        try {
+          const investmentsResponse = await fetch('/api/users/investments');
+          if (investmentsResponse.ok) {
+            const investmentsData = await investmentsResponse.json();
+            setInvestmentHistory(investmentsData.data || []);
+          }
+
+          const followingResponse = await fetch('/api/users/following');
+          if (followingResponse.ok) {
+            const followingData = await followingResponse.json();
+            setFollowingArtists(followingData.data || []);
+          }
+        } catch (error) {
+          console.error('투자 내역 및 팔로우 아티스트 데이터 로드 실패:', error);
+        }
 
       } catch (error) {
         console.error('사용자 데이터 로드 실패:', error);

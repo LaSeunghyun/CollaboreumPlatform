@@ -88,10 +88,41 @@ export const EventCreationForm: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      // TODO: API 호출하여 이벤트 생성
+      // API 호출하여 이벤트 생성
+      try {
+        const response = await fetch('/api/events', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+          alert('이벤트가 성공적으로 생성되었습니다.');
+          setFormData({
+            title: '',
+            description: '',
+            category: '',
+            tags: '',
+            startDate: new Date(),
+            endDate: new Date(),
+            location: '',
+            maxParticipants: 0,
+            image: ''
+          });
+        } else {
+          const errorData = await response.json();
+          alert(`이벤트 생성 실패: ${errorData.message || '알 수 없는 오류가 발생했습니다.'}`);
+        }
+      } catch (error) {
+        console.error('이벤트 생성 실패:', error);
+        alert('이벤트 생성 중 오류가 발생했습니다.');
+      }
       console.log('이벤트 생성:', formData);
     }
   };
@@ -263,23 +294,26 @@ export const EventList: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState('');
 
   useEffect(() => {
-    // TODO: API에서 이벤트 목록 가져오기
-    // const fetchEvents = async () => {
-    //   try {
-    //     const response = await eventAPI.getEvents();
-    //     if (response.success) {
-    //       setEvents(response.data);
-    //       setFilteredEvents(response.data);
-    //     }
-    //   } catch (error) {
-    //     console.error('이벤트 목록 조회 실패:', error);
-    //   }
-    // };
-    // fetchEvents();
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('/api/events');
+        if (response.ok) {
+          const data = await response.json();
+          setEvents(data.data || []);
+          setFilteredEvents(data.data || []);
+        } else {
+          console.error('이벤트 목록 조회 실패');
+          setEvents([]);
+          setFilteredEvents([]);
+        }
+      } catch (error) {
+        console.error('이벤트 목록 조회 실패:', error);
+        setEvents([]);
+        setFilteredEvents([]);
+      }
+    };
 
-    // 임시로 빈 배열 설정
-    setEvents([]);
-    setFilteredEvents([]);
+    fetchEvents();
   }, []);
 
   useEffect(() => {

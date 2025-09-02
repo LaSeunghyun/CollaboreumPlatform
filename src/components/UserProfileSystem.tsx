@@ -197,10 +197,38 @@ export const PasswordChangeForm: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      // TODO: API 호출하여 비밀번호 변경
+      // API 호출하여 비밀번호 변경
+      try {
+        const response = await fetch('/api/users/change-password', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          },
+          body: JSON.stringify({
+            currentPassword: formData.currentPassword,
+            newPassword: formData.newPassword
+          })
+        });
+
+        if (response.ok) {
+          alert('비밀번호가 성공적으로 변경되었습니다.');
+          setFormData({
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: ''
+          });
+        } else {
+          const errorData = await response.json();
+          alert(`비밀번호 변경 실패: ${errorData.message || '알 수 없는 오류가 발생했습니다.'}`);
+        }
+      } catch (error) {
+        console.error('비밀번호 변경 실패:', error);
+        alert('비밀번호 변경 중 오류가 발생했습니다.');
+      }
       console.log('비밀번호 변경:', formData);
     }
   };
@@ -267,46 +295,52 @@ export const ArtistMyPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
-    // TODO: API에서 프로젝트 및 수익 정보 가져오기
-    const mockProjects: Project[] = [
-      {
-        id: '1',
-        title: '첫 번째 앨범 프로젝트',
-        category: 'music',
-        goalAmount: 1000000,
-        currentAmount: 750000,
-        status: 'active',
-        createdAt: new Date('2024-01-01'),
-        endDate: new Date('2024-03-01')
-      },
-      {
-        id: '2',
-        title: '전시회 개최',
-        category: 'art',
-        goalAmount: 500000,
-        currentAmount: 500000,
-        status: 'completed',
-        createdAt: new Date('2023-10-01'),
-        endDate: new Date('2023-12-01')
-      }
-    ];
-    setProjects(mockProjects);
+    const fetchArtistData = async () => {
+      try {
+        // API에서 프로젝트 정보 가져오기
+        const projectsResponse = await fetch('/api/projects/artist');
+        if (projectsResponse.ok) {
+          const projectsData = await projectsResponse.json();
+          setProjects(projectsData.data || []);
+        }
 
-    const mockRevenues: Revenue[] = [
-      {
-        id: '1',
-        projectTitle: '전시회 개최',
-        amount: 45000,
-        distributedAt: new Date('2024-01-10'),
-        status: 'completed'
+        // API에서 수익 정보 가져오기
+        const revenuesResponse = await fetch('/api/revenues/artist');
+        if (revenuesResponse.ok) {
+          const revenuesData = await revenuesResponse.json();
+          setRevenues(revenuesData.data || []);
+        }
+      } catch (error) {
+        console.error('아티스트 데이터 로드 실패:', error);
+        setProjects([]);
+        setRevenues([]);
       }
-    ];
-    setRevenues(mockRevenues);
+    };
+
+    fetchArtistData();
   }, []);
 
-  const handleProfileSave = (data: Partial<UserProfile>) => {
-    setProfile(prev => ({ ...prev, ...data }));
-    // TODO: API 호출하여 프로필 업데이트
+  const handleProfileSave = async (data: Partial<UserProfile>) => {
+    try {
+      const response = await fetch('/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        setProfile(prev => ({ ...prev, ...data }));
+        alert('프로필이 성공적으로 업데이트되었습니다.');
+      } else {
+        alert('프로필 업데이트에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('프로필 업데이트 실패:', error);
+      alert('프로필 업데이트 중 오류가 발생했습니다.');
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -527,26 +561,45 @@ export const FanMyPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
-    // TODO: API에서 백킹 정보 가져오기
-    // const fetchBackings = async () => {
-    //   try {
-    //     const response = await backingAPI.getUserBackings();
-    //     if (response.success) {
-    //       setBackings(response.data);
-    //     }
-    //   } catch (error) {
-    //     console.error('백킹 정보 조회 실패:', error);
-    //   }
-    // };
-    // fetchBackings();
+    // API에서 백킹 정보 가져오기
+    const fetchBackingInfo = async () => {
+      try {
+        const response = await fetch('/api/users/backing-info');
+        if (response.ok) {
+          const data = await response.json();
+          setBackings(data.data || []);
+        }
+      } catch (error) {
+        console.error('백킹 정보 로드 실패:', error);
+        setBackings([]);
+      }
+    };
 
-    // 임시로 빈 배열 설정
-    setBackings([]);
+    fetchBackingInfo();
   }, []);
 
-  const handleProfileSave = (data: Partial<UserProfile>) => {
+  const handleProfileSave = async (data: Partial<UserProfile>) => {
     setProfile(prev => ({ ...prev, ...data }));
-    // TODO: API 호출하여 프로필 업데이트
+    // API 호출하여 프로필 업데이트
+    try {
+      const response = await fetch('/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        alert('프로필이 성공적으로 업데이트되었습니다.');
+      } else {
+        alert('프로필 업데이트에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('프로필 업데이트 실패:', error);
+      alert('프로필 업데이트 중 오류가 발생했습니다.');
+    }
   };
 
   return (
@@ -716,9 +769,28 @@ export const AdminMyPage: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState('profile');
 
-  const handleProfileSave = (data: Partial<UserProfile>) => {
+  const handleProfileSave = async (data: Partial<UserProfile>) => {
     setProfile(prev => ({ ...prev, ...data }));
-    // TODO: API 호출하여 프로필 업데이트
+    // API 호출하여 프로필 업데이트
+    try {
+      const response = await fetch('/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        alert('프로필이 성공적으로 업데이트되었습니다.');
+      } else {
+        alert('프로필 업데이트에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('프로필 업데이트 실패:', error);
+      alert('프로필 업데이트 중 오류가 발생했습니다.');
+    }
   };
 
   return (

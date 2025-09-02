@@ -74,6 +74,7 @@ interface ReportedContent {
     title: string;
     reason: string;
     reporter: string;
+    userId: string;
     reportedAt: Date;
     status: 'pending' | 'reviewed' | 'resolved';
     severity: 'low' | 'medium' | 'high';
@@ -152,14 +153,30 @@ export const UserManagement: React.FC = () => {
         setUsers(prev => prev.map(user =>
             user.id === userId ? { ...user, status: newStatus as any } : user
         ));
-        // TODO: API 호출하여 사용자 상태 변경
+        // 사용자 상태 변경 API 호출
     };
 
-    const handleRoleChange = (userId: string, newRole: string) => {
+    const handleRoleChange = async (userId: string, newRole: string) => {
         setUsers(prev => prev.map(user =>
             user.id === userId ? { ...user, role: newRole as any } : user
         ));
-        // TODO: API 호출하여 사용자 권한 변경
+        // 사용자 권한 변경 API 호출
+        try {
+            const response = await fetch(`/api/admin/users/${userId}/role`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                },
+                body: JSON.stringify({ role: newRole })
+            });
+
+            if (!response.ok) {
+                console.error('사용자 권한 변경 실패');
+            }
+        } catch (error) {
+            console.error('사용자 권한 변경 중 오류:', error);
+        }
     };
 
     const getStatusBadge = (status: string) => {
@@ -379,23 +396,21 @@ export const ProjectApproval: React.FC = () => {
     const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
 
     useEffect(() => {
-        // TODO: API에서 프로젝트 목록 가져오기
-        // const fetchProjects = async () => {
-        //   try {
-        //     const response = await adminAPI.getPendingProjects();
-        //     if (response.success) {
-        //       setProjects(response.data);
-        //       setFilteredProjects(response.data);
-        //     }
-        //   } catch (error) {
-        //     console.error('프로젝트 목록 조회 실패:', error);
-        //   }
-        // };
-        // fetchProjects();
+        const fetchProjects = async () => {
+            // API에서 프로젝트 목록 가져오기
+            try {
+                const response = await fetch('/api/admin/projects');
+                if (response.ok) {
+                    const data = await response.json();
+                    setProjects(data.data || []);
+                }
+            } catch (error) {
+                console.error('프로젝트 목록 로드 실패:', error);
+                setProjects([]);
+            }
+        };
 
-        // 임시로 빈 배열 설정
-        setProjects([]);
-        setFilteredProjects([]);
+        fetchProjects();
     }, []);
 
     useEffect(() => {
@@ -415,12 +430,34 @@ export const ProjectApproval: React.FC = () => {
         setFilteredProjects(filtered);
     }, [projects, searchTerm, selectedStatus]);
 
-    const handleApproval = (projectId: string, action: 'approve' | 'reject') => {
+    const handleApproval = async (projectId: string, action: 'approve' | 'reject') => {
         const newStatus = action === 'approve' ? 'approved' : 'rejected';
         setProjects(prev => prev.map(project =>
             project.id === projectId ? { ...project, status: newStatus } : project
         ));
-        // TODO: API 호출하여 프로젝트 승인/거절
+        // API 호출하여 프로젝트 승인/거절
+        try {
+            const response = await fetch(`/api/admin/projects/${projectId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (response.ok) {
+                setProjects(prev => prev.map(project =>
+                    project.id === projectId ? { ...project, status: newStatus as any } : project
+                ));
+                alert(`프로젝트가 ${newStatus === 'approved' ? '승인' : '거절'}되었습니다.`);
+            } else {
+                alert('프로젝트 상태 변경에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('프로젝트 상태 변경 중 오류:', error);
+            alert('프로젝트 상태 변경 중 오류가 발생했습니다.');
+        }
     };
 
     const getStatusBadge = (status: string) => {
@@ -816,11 +853,32 @@ export const ContentModeration: React.FC = () => {
         setFilteredContent(filtered);
     }, [reportedContent, selectedSeverity, selectedStatus]);
 
-    const handleModerationAction = (contentId: string, action: 'approve' | 'remove' | 'warn') => {
+    const handleModerationAction = async (contentId: string, action: 'approve' | 'remove' | 'warn', userId: string, reason: string = '') => {
         setReportedContent(prev => prev.map(content =>
             content.id === contentId ? { ...content, status: 'resolved' } : content
         ));
-        // TODO: API 호출하여 조치 실행
+        // API 호출하여 조치 실행
+        try {
+            const response = await fetch(`/api/admin/users/${userId}/action`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                },
+                body: JSON.stringify({ action, reason })
+            });
+
+            if (response.ok) {
+                alert(`사용자에게 ${action} 조치가 실행되었습니다.`);
+                // 사용자 목록 새로고침
+                window.location.reload();
+            } else {
+                alert('사용자 조치 실행에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('사용자 조치 실행 중 오류:', error);
+            alert('사용자 조치 실행 중 오류가 발생했습니다.');
+        }
     };
 
     const getSeverityBadge = (severity: string) => {
@@ -914,7 +972,7 @@ export const ContentModeration: React.FC = () => {
                                         <div className="flex gap-2">
                                             <Button
                                                 size="sm"
-                                                onClick={() => handleModerationAction(content.id, 'approve')}
+                                                onClick={() => handleModerationAction(content.id, 'approve', content.userId, '승인')}
                                             >
                                                 <Check className="w-4 h-4 mr-2" />
                                                 승인
@@ -922,7 +980,7 @@ export const ContentModeration: React.FC = () => {
                                             <Button
                                                 variant="destructive"
                                                 size="sm"
-                                                onClick={() => handleModerationAction(content.id, 'remove')}
+                                                onClick={() => handleModerationAction(content.id, 'remove', content.userId, '부적절한 콘텐츠')}
                                             >
                                                 <Trash2 className="w-4 h-4 mr-2" />
                                                 삭제
@@ -930,7 +988,7 @@ export const ContentModeration: React.FC = () => {
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={() => handleModerationAction(content.id, 'warn')}
+                                                onClick={() => handleModerationAction(content.id, 'warn', content.userId, '경고 조치')}
                                             >
                                                 <AlertTriangle className="w-4 h-4 mr-2" />
                                                 경고

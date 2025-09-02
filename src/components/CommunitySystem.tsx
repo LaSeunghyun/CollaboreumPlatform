@@ -11,6 +11,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { communityPostAPI, communityCommentAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import {
+  CATEGORIES,
+  CATEGORY_LABELS,
+  getCategoryLabel,
+  DEFAULT_CATEGORIES
+} from '../constants/categories';
+import {
   Search,
   Plus,
   ThumbsUp,
@@ -177,14 +183,11 @@ export const PostCreationForm: React.FC = () => {
                 <SelectValue placeholder="카테고리 선택" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="general">일반</SelectItem>
-                <SelectItem value="artist">아티스트</SelectItem>
-                <SelectItem value="fan">팬</SelectItem>
-                <SelectItem value="music">음악</SelectItem>
-                <SelectItem value="art">예술</SelectItem>
-                <SelectItem value="technology">기술</SelectItem>
-                <SelectItem value="culture">문화</SelectItem>
-                <SelectItem value="other">기타</SelectItem>
+                {DEFAULT_CATEGORIES.map(category => (
+                  <SelectItem key={category} value={category}>
+                    {CATEGORY_LABELS[category]}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
@@ -303,19 +306,7 @@ export const PostList: React.FC = () => {
     setFilteredPosts(filtered);
   }, [posts, searchTerm, selectedCategory, sortBy]);
 
-  const getCategoryLabel = (category: string) => {
-    const categoryLabels: Record<string, string> = {
-      general: '일반',
-      artist: '아티스트',
-      fan: '팬',
-      music: '음악',
-      art: '예술',
-      technology: '기술',
-      culture: '문화',
-      other: '기타'
-    };
-    return categoryLabels[category] || category;
-  };
+
 
   return (
     <div className="space-y-6">
@@ -339,14 +330,11 @@ export const PostList: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">전체</SelectItem>
-              <SelectItem value="general">일반</SelectItem>
-              <SelectItem value="artist">아티스트</SelectItem>
-              <SelectItem value="fan">팬</SelectItem>
-              <SelectItem value="music">음악</SelectItem>
-              <SelectItem value="art">예술</SelectItem>
-              <SelectItem value="technology">기술</SelectItem>
-              <SelectItem value="culture">문화</SelectItem>
-              <SelectItem value="other">기타</SelectItem>
+              {DEFAULT_CATEGORIES.map(category => (
+                <SelectItem key={category} value={category}>
+                  {CATEGORY_LABELS[category]}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select value={sortBy} onValueChange={setSortBy}>
@@ -581,19 +569,7 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
     );
   }
 
-  const getCategoryLabel = (category: string) => {
-    const categoryLabels: Record<string, string> = {
-      general: '일반',
-      artist: '아티스트',
-      fan: '팬',
-      music: '음악',
-      art: '예술',
-      technology: '기술',
-      culture: '문화',
-      other: '기타'
-    };
-    return categoryLabels[category] || category;
-  };
+
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
