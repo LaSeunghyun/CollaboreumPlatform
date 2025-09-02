@@ -21,6 +21,7 @@ import { EventDetail } from './components/EventDetail';
 import { SearchResults } from './components/SearchResults';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { HistoryProvider, useHistory } from './contexts/HistoryContext';
 import { isSpecialPage, scrollToSection } from './utils/navigation';
 import { CommunityPostDetail } from './components/CommunityPostDetail';
 import { CommunityPostForm } from './components/CommunityPostForm';
@@ -33,19 +34,33 @@ function AppContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const { user, isAuthenticated, login } = useAuth();
+  const { history, currentIndex, navigateTo, goBack, canGoBack } = useHistory();
+
+  // 히스토리 변경 감지 및 상태 업데이트
+  useEffect(() => {
+    const currentEntry = history[currentIndex];
+    if (currentEntry) {
+      setCurrentView(currentEntry.view);
+      if (currentEntry.params) {
+        setSelectedArtistId(currentEntry.params.selectedArtistId || null);
+        setSelectedProjectId(currentEntry.params.selectedProjectId || null);
+        setSearchQuery(currentEntry.params.searchQuery || '');
+        setSelectedPostId(currentEntry.params.selectedPostId || null);
+      }
+    }
+  }, [history, currentIndex]);
 
   // 해시 변경 감지
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1);
       if (hash === 'login') {
-        setCurrentView('login');
+        navigateTo('login');
       } else if (hash === 'signup') {
-        setCurrentView('signup');
+        navigateTo('signup');
       } else if (hash.startsWith('search=')) {
         const query = decodeURIComponent(hash.split('=')[1]);
-        setCurrentView('search');
-        setSearchQuery(query);
+        navigateTo('search', { searchQuery: query });
       }
     };
 
@@ -55,15 +70,14 @@ function AppContent() {
     // 해시 변경 이벤트 리스너
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+  }, [navigateTo]);
 
   const handleNavigation = (section: string) => {
-    setCurrentView(section);
-    setSelectedArtistId(null);
-
     if (!isSpecialPage(section)) {
       scrollToSection(section);
-      setCurrentView('home');
+      navigateTo('home');
+    } else {
+      navigateTo(section);
     }
   };
 
@@ -73,7 +87,7 @@ function AppContent() {
       if (data && data.user && data.token) {
         // AuthContext를 통해 로그인 처리
         login(data.token, data.user);
-        setCurrentView('home');
+        navigateTo('home');
       } else {
         // 에러 처리는 LoginPage에서 이미 하고 있음
       }
@@ -84,50 +98,48 @@ function AppContent() {
 
   const handleSignup = (data: any) => {
     // 회원가입 완료 후 홈으로 이동
-    setCurrentView('home');
+    navigateTo('home');
   };
 
   const handleSocialSignup = (provider: string, userType: string) => {
     // 소셜 회원가입은 현재 지원하지 않음
   };
 
-  const handleViewAllCommunity = () => setCurrentView('community-main');
+  const handleViewAllCommunity = () => navigateTo('community-main');
   const handleSelectArtist = (artistId: number) => {
-    setSelectedArtistId(artistId);
-    setCurrentView('artist-profile');
+    navigateTo('artist-profile', { selectedArtistId: artistId });
   };
 
   const handleViewProject = (projectId: number) => {
-    setSelectedProjectId(projectId);
-    setCurrentView('project-detail');
+    navigateTo('project-detail', { selectedProjectId: projectId });
   };
 
   const handlePostClick = (postId: string) => {
-    setSelectedPostId(postId);
-    setCurrentView('post-detail');
+    navigateTo('post-detail', { selectedPostId: postId });
   };
 
   const handleCreatePost = () => {
     // 로그인 체크 후 새글 작성 페이지로 이동
     if (!isAuthenticated) {
-      setCurrentView('login');
+      navigateTo('login');
     } else {
-      setCurrentView('create-post');
+      navigateTo('create-post');
     }
   };
   const handleViewArtistCommunity = (artistId: number) => {
-    setSelectedArtistId(artistId);
-    setCurrentView('artist-profile');
+    navigateTo('artist-profile', { selectedArtistId: artistId });
   };
-  const handleBackToCommunity = () => setCurrentView('community-full');
-  const handleBackToHome = () => setCurrentView('home');
+  const handleBackToCommunity = () => navigateTo('community-full');
+  const handleBackToHome = () => navigateTo('home');
 
   const headerProps = {
     activeSection: currentView,
     onNavigate: handleNavigation,
     isLoggedIn: isAuthenticated,
     userRole: user?.role || 'fan',
-    onLogin: () => setCurrentView('login')
+    onLogin: () => navigateTo('login'),
+    onGoBack: goBack,
+    canGoBack: canGoBack
   };
 
   // 디버깅: 인증 상태 로그
@@ -139,7 +151,7 @@ function AppContent() {
       <LoginPage
         onBack={handleBackToHome}
         onLogin={handleLogin}
-        onSignupClick={() => setCurrentView('signup')}
+        onSignupClick={() => navigateTo('signup')}
       />
     );
   }
@@ -150,7 +162,7 @@ function AppContent() {
         onBack={handleBackToHome}
         onSignup={handleSignup}
         onSocialSignup={handleSocialSignup}
-        onLoginClick={() => setCurrentView('login')}
+        onLoginClick={() => navigateTo('login')}
       />
     );
   }
@@ -169,8 +181,8 @@ function AppContent() {
       <AppLayout>
         <ProtectedRoute
           requiredRole="artist"
-          onNavigateToLogin={() => setCurrentView('login')}
-          onNavigateToSignup={() => setCurrentView('signup')}
+          onNavigateToLogin={() => navigateTo('login')}
+          onNavigateToSignup={() => navigateTo('signup')}
         >
           <ArtistDashboard />
         </ProtectedRoute>
@@ -182,8 +194,8 @@ function AppContent() {
     return (
       <AppLayout>
         <ProtectedRoute
-          onNavigateToLogin={() => setCurrentView('login')}
-          onNavigateToSignup={() => setCurrentView('signup')}
+          onNavigateToLogin={() => navigateTo('login')}
+          onNavigateToSignup={() => navigateTo('signup')}
         >
           {user?.role === 'artist' ? <ArtistMyPage /> : <FanMyPage />}
         </ProtectedRoute>
@@ -196,8 +208,8 @@ function AppContent() {
       <AppLayout>
         <ProtectedRoute
           requiredRole="admin"
-          onNavigateToLogin={() => setCurrentView('login')}
-          onNavigateToSignup={() => setCurrentView('signup')}
+          onNavigateToLogin={() => navigateTo('login')}
+          onNavigateToSignup={() => navigateTo('signup')}
         >
           <AdminDashboard onBack={handleBackToHome} />
         </ProtectedRoute>
@@ -210,8 +222,8 @@ function AppContent() {
       <AppLayout>
         <ProtectedRoute
           requiredRole="artist"
-          onNavigateToLogin={() => setCurrentView('login')}
-          onNavigateToSignup={() => setCurrentView('signup')}
+          onNavigateToLogin={() => navigateTo('login')}
+          onNavigateToSignup={() => navigateTo('signup')}
         >
           <ArtistGallery onBack={handleBackToHome} />
         </ProtectedRoute>
@@ -234,8 +246,8 @@ function AppContent() {
     return (
       <AppLayout>
         <ProtectedRoute
-          onNavigateToLogin={() => setCurrentView('login')}
-          onNavigateToSignup={() => setCurrentView('signup')}
+          onNavigateToLogin={() => navigateTo('login')}
+          onNavigateToSignup={() => navigateTo('signup')}
         >
           <CommunityMain onBack={handleBackToHome} />
         </ProtectedRoute>
@@ -329,7 +341,9 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <HistoryProvider>
+        <AppContent />
+      </HistoryProvider>
     </AuthProvider>
   );
 }

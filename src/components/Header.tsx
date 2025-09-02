@@ -1,5 +1,5 @@
 import { Button } from "./ui/button";
-import { Menu, Search, Bell } from "lucide-react";
+import { Menu, Search, Bell, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import { UserMenu } from "./Header/UserMenu";
 import { MobileMenu } from "./Header/MobileMenu";
@@ -14,6 +14,8 @@ interface HeaderProps {
   isLoggedIn?: boolean;
   userRole?: UserRole;
   onLogin?: () => void;
+  onGoBack?: () => void;
+  canGoBack?: boolean;
 }
 
 export function Header({
@@ -21,7 +23,9 @@ export function Header({
   onNavigate,
   isLoggedIn = false,
   userRole = 'fan',
-  onLogin
+  onLogin,
+  onGoBack,
+  canGoBack = false
 }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -68,8 +72,19 @@ export function Header({
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center">
+          {/* Logo and Back Button */}
+          <div className="flex items-center space-x-4">
+            {canGoBack && onGoBack && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onGoBack}
+                className="flex items-center"
+              >
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                뒤로
+              </Button>
+            )}
             <button
               onClick={() => handleNavigation('home')}
               className="text-xl font-bold text-primary hover:text-blue-600 transition-colors"

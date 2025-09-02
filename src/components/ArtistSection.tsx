@@ -17,15 +17,26 @@ export function ArtistSection() {
       setLoading(true);
       setError(null);
 
-      // API 사용 시도
+      // API 사용 시도 - 새로 가입한 아티스트 우선 조회
       try {
-        const response = await artistAPI.getPopularArtists(20) as any;
+        const response = await artistAPI.getNewArtists(20) as any;
         if (response.success && response.data?.artists) {
           setArtists(response.data.artists);
           return;
         }
       } catch (apiError) {
-        console.error('API 호출 실패:', apiError);
+        console.error('새 아티스트 API 호출 실패:', apiError);
+        // 새 아티스트 API 실패 시 인기 아티스트로 폴백
+        try {
+          const fallbackResponse = await artistAPI.getPopularArtists(20) as any;
+          if (fallbackResponse.success && fallbackResponse.data?.artists) {
+            setArtists(fallbackResponse.data.artists);
+            return;
+          }
+        } catch (fallbackError) {
+          console.error('인기 아티스트 API 호출도 실패:', fallbackError);
+        }
+
         setError('서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.');
         setArtists([]);
         return;
@@ -117,8 +128,8 @@ export function ArtistSection() {
     <section id="artists" className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">주목받는 아티스트</h2>
-          <p className="text-xl text-gray-600">재능 있는 독립 아티스트들을 만나보세요</p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">새롭게 합류한 아티스트</h2>
+          <p className="text-xl text-gray-600">최근에 가입한 재능 있는 독립 아티스트들을 만나보세요</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -143,6 +154,13 @@ export function ArtistSection() {
                   <div className="absolute top-2 left-2">
                     <Badge variant="default" className="bg-yellow-600">
                       추천
+                    </Badge>
+                  </div>
+                )}
+                {(artist as any).isNew && (
+                  <div className="absolute top-2 left-2">
+                    <Badge variant="default" className="bg-green-600">
+                      신규
                     </Badge>
                   </div>
                 )}

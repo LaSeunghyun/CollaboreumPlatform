@@ -74,6 +74,12 @@ export const artistAPI = {
         return apiCall(`/artists/featured/popular${queryParams}`);
     },
 
+    // 새로 가입한 아티스트 조회
+    getNewArtists: (limit?: number) => {
+        const queryParams = limit ? `?limit=${limit}` : '';
+        return apiCall(`/artists/new${queryParams}`);
+    },
+
     // 아티스트 팔로우/언팔로우
     followArtist: (artistId: string, action: 'follow' | 'unfollow') =>
         apiCall(`/artists/${artistId}/follow`, {

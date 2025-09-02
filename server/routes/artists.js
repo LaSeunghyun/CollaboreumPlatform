@@ -134,6 +134,62 @@ router.get('/featured/popular', async (req, res) => {
   }
 });
 
+// 새로 가입한 아티스트 조회
+router.get('/new', async (req, res) => {
+  try {
+    const { limit = 12 } = req.query;
+    
+    // 최근 30일 내에 가입한 아티스트들 조회
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const newArtists = await User.find({ 
+      role: 'artist', 
+      isActive: true,
+      createdAt: { $gte: thirtyDaysAgo }
+    })
+    .select('name email avatar bio role createdAt')
+    .sort({ createdAt: -1 })
+    .limit(parseInt(limit))
+    .lean();
+
+    const formattedArtists = newArtists.map(user => ({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar || null,
+      bio: user.bio || '',
+      role: user.role,
+      category: '기타',
+      location: '미설정',
+      rating: 0,
+      followers: 0,
+      completedProjects: 0,
+      activeProjects: 0,
+      totalEarned: 0,
+      isVerified: false,
+      featured: false,
+      isNew: true, // 새로 가입한 아티스트 표시
+      createdAt: user.createdAt
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        artists: formattedArtists,
+        count: formattedArtists.length
+      }
+    });
+  } catch (error) {
+    console.error('새 아티스트 조회 오류:', error);
+    res.status(500).json({
+      success: false,
+      message: '새 아티스트 조회 중 오류가 발생했습니다.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
 // 특정 아티스트 조회
 router.get('/:id', async (req, res) => {
   try {
