@@ -84,7 +84,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         return () => {
             window.removeEventListener('popstate', handlePopState);
         };
-    }, [postId]);
+    }, [postId, fetchPostDetail, handleBack]);
 
     const fetchPostDetail = async () => {
         try {

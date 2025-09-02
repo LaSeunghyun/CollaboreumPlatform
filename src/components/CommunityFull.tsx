@@ -1,13 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { SelectTrigger, SelectValue } from "./ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Search, Filter, MessageCircle, Heart, Calendar, Users, ArrowLeft } from "lucide-react";
+import { Search, Filter, MessageCircle, Heart, ArrowLeft } from "lucide-react";
 
-const categories = ["전체", "음악", "미술", "문학", "공연", "사진"];
+// 카테고리는 API에서 동적으로 가져옴
 
 // 기본 데이터 (API에서 가져올 예정)
 const defaultArtists: any[] = [];
@@ -22,8 +21,38 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedArtist, setSelectedArtist] = useState<number | null>(null);
-  const [artists, setArtists] = useState(defaultArtists);
-  const [forumPosts, setForumPosts] = useState(defaultForumPosts);
+  const [artists] = useState(defaultArtists);
+  const [forumPosts] = useState(defaultForumPosts);
+  const [categories, setCategories] = useState<string[]>(["전체"]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+
+  // 카테고리 목록 가져오기
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const API_BASE_URL = process.env.REACT_APP_API_URL ||
+          (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
+
+        const response = await fetch(`${API_BASE_URL}/categories`);
+        if (response.ok) {
+          const categoriesData = await response.json();
+          const categoryLabels = ["전체", ...categoriesData.map((cat: any) => cat.label)];
+          setCategories(categoryLabels);
+        } else {
+          // API 실패 시 기본 카테고리 사용
+          setCategories(["전체", "음악", "미술", "문학", "공연", "사진"]);
+        }
+      } catch (error) {
+        console.error('카테고리 로드 실패:', error);
+        // 오류 시 기본 카테고리 사용
+        setCategories(["전체", "음악", "미술", "문학", "공연", "사진"]);
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const filteredArtists = artists.filter(artist => {
     const categoryMatch = selectedCategory === "전체" || artist.category === selectedCategory;
@@ -61,21 +90,25 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {categories.map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => {
-                        setSelectedCategory(category);
-                        setSelectedArtist(null);
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedCategory === category
+                  {isLoadingCategories ? (
+                    <div className="text-sm text-gray-500">카테고리 로딩 중...</div>
+                  ) : (
+                    categories.map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => {
+                          setSelectedCategory(category);
+                          setSelectedArtist(null);
+                        }}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedCategory === category
                           ? "bg-blue-100 text-blue-800 font-medium"
                           : "text-gray-600 hover:bg-gray-100"
-                        }`}
-                    >
-                      {category}
-                    </button>
-                  ))}
+                          }`}
+                      >
+                        {category}
+                      </button>
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -101,8 +134,8 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
                     <button
                       onClick={() => setSelectedArtist(null)}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedArtist === null
-                          ? "bg-blue-100 text-blue-800 font-medium"
-                          : "text-gray-600 hover:bg-gray-100"
+                        ? "bg-blue-100 text-blue-800 font-medium"
+                        : "text-gray-600 hover:bg-gray-100"
                         }`}
                     >
                       전체 아티스트
@@ -112,8 +145,8 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
                         key={artist.id}
                         onClick={() => setSelectedArtist(artist.id)}
                         className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-3 ${selectedArtist === artist.id
-                            ? "bg-blue-100 text-blue-800 font-medium"
-                            : "text-gray-600 hover:bg-gray-100"
+                          ? "bg-blue-100 text-blue-800 font-medium"
+                          : "text-gray-600 hover:bg-gray-100"
                           }`}
                       >
                         <Avatar className="w-8 h-8">

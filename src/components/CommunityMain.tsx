@@ -3,7 +3,7 @@ import { Button } from './ui/button';
 import { CommunityPostForm } from './CommunityPostForm';
 import { CommunityPostList } from './CommunityPostList';
 import { CommunityPostDetail } from './CommunityPostDetail';
-import { ArrowLeft, Plus, List } from 'lucide-react';
+import { ArrowLeft, Plus } from 'lucide-react';
 
 interface CommunityMainProps {
   onBack?: () => void;
@@ -25,11 +25,7 @@ export const CommunityMain: React.FC<CommunityMainProps> = ({ onBack }) => {
     sessionStorage.setItem('currentPage', currentPage);
   }, []);
 
-  const handlePostCreated = () => {
-    setShowForm(false);
-    // 포스트 목록을 새로고침하기 위해 key를 변경하거나 다른 방법 사용
-    window.location.reload(); // 간단한 방법으로 새로고침
-  };
+
 
   const handleCancelForm = () => {
     setShowForm(false);
