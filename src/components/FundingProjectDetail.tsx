@@ -241,7 +241,7 @@ export const FundingProjectDetail: React.FC = () => {
 
     const canBack = project.status === '진행중';
     const isArtist = user && user.id === project.artist;
-    const hasBacked = project.backers > 0; // 실제로는 사용자별 후원 여부 확인 필요
+    const hasBacked = user && Array.isArray(project.backers) && project.backers.some((backer: any) => backer.userId === user.id);
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">

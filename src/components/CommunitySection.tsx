@@ -49,9 +49,7 @@ export function CommunitySection({ onViewAllCommunity, onPostClick, onCreatePost
             communityAPI.getCategories()
           ]) as any[];
 
-          console.log('Posts response:', postsResponse);
-          console.log('Events response:', eventsResponse);
-          console.log('Categories response:', categoriesResponse);
+
 
           if (postsResponse.success && postsResponse.data) {
             // 서버 응답 구조에 맞게 수정
@@ -331,7 +329,7 @@ export function CommunitySection({ onViewAllCommunity, onPostClick, onCreatePost
                 upcomingEvents.map((event, index) => (
                   <Card
                     key={event.id || `event-${index}`}
-                    className="hover:shadow-xl transition-all duration-300 cursor-pointer border-0 bg-white shadow-sm hover:shadow-lg"
+                    className="hover:shadow-xl transition-all duration-300 cursor-pointer border-0 bg-white shadow-sm"
                   >
                     <CardContent className="p-6">
                       {/* 이벤트 헤더 */}

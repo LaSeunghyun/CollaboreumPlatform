@@ -35,30 +35,51 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
         try {
           const statsResponse = await fetch('/api/stats/platform');
           if (statsResponse.ok) {
-            const statsData = await statsResponse.json();
-            setPlatformStats(statsData.data || {
-              totalArtists: 0,
-              totalProjects: 0,
-              totalFunding: 0,
-              totalUsers: 0
-            });
+            const contentType = statsResponse.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+              const statsData = await statsResponse.json();
+              setPlatformStats(statsData.data || {
+                totalArtists: 0,
+                totalProjects: 0,
+                totalFunding: 0,
+                totalUsers: 0
+              });
+            } else {
+              // HTML 응답인 경우 기본값 유지
+              setPlatformStats({
+                totalArtists: 0,
+                totalProjects: 0,
+                totalFunding: 0,
+                totalUsers: 0
+              });
+            }
           }
         } catch (error) {
-          console.error('플랫폼 통계 데이터를 가져오는데 실패했습니다:', error);
           // API 실패 시 기본값 유지
+          setPlatformStats({
+            totalArtists: 0,
+            totalProjects: 0,
+            totalFunding: 0,
+            totalUsers: 0
+          });
         }
 
         // 주간 신규 아티스트 데이터 가져오기
         try {
           const newcomersResponse = await fetch('/api/artists/weekly-newcomers');
           if (newcomersResponse.ok) {
-            const newcomersData = await newcomersResponse.json();
-            setWeeklyNewcomers(newcomersData.data || []);
+            const contentType = newcomersResponse.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+              const newcomersData = await newcomersResponse.json();
+              setWeeklyNewcomers(newcomersData.data || []);
+            } else {
+              // HTML 응답인 경우 빈 배열로 설정
+              setWeeklyNewcomers([]);
+            }
           } else {
             setWeeklyNewcomers([]);
           }
         } catch (error) {
-          console.error('주간 신규 아티스트 데이터를 가져오는데 실패했습니다:', error);
           setWeeklyNewcomers([]);
         }
 
@@ -69,11 +90,10 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
           const artistCategories = Object.values(enums.ARTIST_CATEGORIES || {});
           setCategories(["전체", ...(artistCategories as string[])]);
         } catch (error) {
-          console.error('카테고리 데이터를 가져오는데 실패했습니다:', error);
           // 기본값 유지
+          setCategories(["전체"]);
         }
       } catch (error) {
-        console.error('Failed to fetch data:', error);
         // 에러 발생 시 기본값으로 설정
         setWeeklyNewcomers([]);
       } finally {

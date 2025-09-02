@@ -80,7 +80,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return response.ok;
     } catch (error) {
-      console.error('토큰 검증 오류:', error);
       return false;
     }
   };
@@ -94,7 +93,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.setItem('authToken', newToken);
     localStorage.setItem('authUser', JSON.stringify(newUser));
 
-    console.log('🔑 로그인 완료, 토큰 저장됨');
+
   };
 
   // 로그아웃 함수
@@ -106,7 +105,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('authUser');
 
-    console.log('🔓 로그아웃 완료, 토큰 제거됨');
+
   };
 
   // 사용자 정보 업데이트 함수
@@ -118,7 +117,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // 로컬 스토리지 업데이트
       localStorage.setItem('authUser', JSON.stringify(updatedUser));
 
-      console.log('👤 사용자 정보 업데이트됨');
+
     }
   };
 
@@ -129,11 +128,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
           const isValid = await validateToken(token);
           if (!isValid) {
-            console.log('🔄 토큰이 만료되어 자동 로그아웃');
             logout();
           }
         } catch (error) {
-          console.error('토큰 자동 검증 오류:', error);
+          // 토큰 자동 검증 오류
         }
       }, 60 * 60 * 1000); // 1시간마다 검증
 

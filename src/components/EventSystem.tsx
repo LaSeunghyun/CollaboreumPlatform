@@ -61,6 +61,45 @@ export const EventCreationForm: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [categories, setCategories] = useState<Array<{ id: string, label: string }>>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const response = await fetch('/api/categories');
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data.data || []);
+        } else {
+          // API 실패 시 기본 카테고리 사용
+          setCategories([
+            { id: 'music', label: '음악' },
+            { id: 'art', label: '예술' },
+            { id: 'technology', label: '기술' },
+            { id: 'culture', label: '문화' },
+            { id: 'sports', label: '스포츠' },
+            { id: 'other', label: '기타' }
+          ]);
+        }
+      } catch (error) {
+        // 에러 시 기본 카테고리 사용
+        setCategories([
+          { id: 'music', label: '음악' },
+          { id: 'art', label: '예술' },
+          { id: 'technology', label: '기술' },
+          { id: 'culture', label: '문화' },
+          { id: 'sports', label: '스포츠' },
+          { id: 'other', label: '기타' }
+        ]);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -120,10 +159,8 @@ export const EventCreationForm: React.FC = () => {
           alert(`이벤트 생성 실패: ${errorData.message || '알 수 없는 오류가 발생했습니다.'}`);
         }
       } catch (error) {
-        console.error('이벤트 생성 실패:', error);
         alert('이벤트 생성 중 오류가 발생했습니다.');
       }
-      console.log('이벤트 생성:', formData);
     }
   };
 
@@ -171,16 +208,19 @@ export const EventCreationForm: React.FC = () => {
             <div>
               <label className="block text-sm font-medium mb-2">카테고리 *</label>
               <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-                <SelectTrigger className={errors.category ? 'border-red-500' : ''}>
+                <SelectTrigger className={`h-10 ${errors.category ? 'border-red-500' : ''}`}>
                   <SelectValue placeholder="카테고리 선택" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="music">음악</SelectItem>
-                  <SelectItem value="art">예술</SelectItem>
-                  <SelectItem value="technology">기술</SelectItem>
-                  <SelectItem value="culture">문화</SelectItem>
-                  <SelectItem value="sports">스포츠</SelectItem>
-                  <SelectItem value="other">기타</SelectItem>
+                  {loadingCategories ? (
+                    <SelectItem value="loading" disabled>카테고리 로딩 중...</SelectItem>
+                  ) : (
+                    categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.label}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
               {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
@@ -292,28 +332,54 @@ export const EventList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [categories, setCategories] = useState<Array<{ id: string, label: string }>>([]);
 
   useEffect(() => {
-    const fetchEvents = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('/api/events');
-        if (response.ok) {
-          const data = await response.json();
-          setEvents(data.data || []);
-          setFilteredEvents(data.data || []);
+        const [eventsResponse, categoriesResponse] = await Promise.all([
+          fetch('/api/events'),
+          fetch('/api/categories')
+        ]);
+
+        if (eventsResponse.ok) {
+          const eventsData = await eventsResponse.json();
+          setEvents(eventsData.data || []);
+          setFilteredEvents(eventsData.data || []);
         } else {
-          console.error('이벤트 목록 조회 실패');
           setEvents([]);
           setFilteredEvents([]);
         }
+
+        if (categoriesResponse.ok) {
+          const categoriesData = await categoriesResponse.json();
+          setCategories(categoriesData.data || []);
+        } else {
+          // 기본 카테고리 설정
+          setCategories([
+            { id: 'music', label: '음악' },
+            { id: 'art', label: '예술' },
+            { id: 'technology', label: '기술' },
+            { id: 'culture', label: '문화' },
+            { id: 'sports', label: '스포츠' },
+            { id: 'other', label: '기타' }
+          ]);
+        }
       } catch (error) {
-        console.error('이벤트 목록 조회 실패:', error);
         setEvents([]);
         setFilteredEvents([]);
+        setCategories([
+          { id: 'music', label: '음악' },
+          { id: 'art', label: '예술' },
+          { id: 'technology', label: '기술' },
+          { id: 'culture', label: '문화' },
+          { id: 'sports', label: '스포츠' },
+          { id: 'other', label: '기타' }
+        ]);
       }
     };
 
-    fetchEvents();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -327,11 +393,11 @@ export const EventList: React.FC = () => {
       );
     }
 
-    if (selectedCategory) {
+    if (selectedCategory && selectedCategory !== 'all') {
       filtered = filtered.filter(event => event.category === selectedCategory);
     }
 
-    if (selectedStatus) {
+    if (selectedStatus && selectedStatus !== 'all') {
       filtered = filtered.filter(event => event.status === selectedStatus);
     }
 
@@ -373,31 +439,30 @@ export const EventList: React.FC = () => {
               placeholder="이벤트 검색..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-10"
             />
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-end">
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger className="w-32 h-10">
               <SelectValue placeholder="카테고리" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">전체</SelectItem>
-              <SelectItem value="music">음악</SelectItem>
-              <SelectItem value="art">예술</SelectItem>
-              <SelectItem value="technology">기술</SelectItem>
-              <SelectItem value="culture">문화</SelectItem>
-              <SelectItem value="sports">스포츠</SelectItem>
-              <SelectItem value="other">기타</SelectItem>
+              <SelectItem value="all">전체</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger className="w-32 h-10">
               <SelectValue placeholder="상태" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">전체</SelectItem>
+              <SelectItem value="all">전체</SelectItem>
               <SelectItem value="upcoming">예정</SelectItem>
               <SelectItem value="ongoing">진행중</SelectItem>
               <SelectItem value="completed">완료</SelectItem>
@@ -514,7 +579,6 @@ export const EventDetail: React.FC<{ eventId: string }> = ({ eventId }) => {
         }
 
       } catch (err) {
-        console.error('데이터 로딩 실패:', err);
         setError('데이터를 불러오는데 실패했습니다.');
       } finally {
         setLoading(false);
@@ -537,7 +601,6 @@ export const EventDetail: React.FC<{ eventId: string }> = ({ eventId }) => {
       setParticipants(updatedParticipants);
 
     } catch (err) {
-      console.error('이벤트 참가 실패:', err);
       setError('이벤트 참가에 실패했습니다.');
     }
   };
@@ -555,7 +618,6 @@ export const EventDetail: React.FC<{ eventId: string }> = ({ eventId }) => {
       setParticipants(updatedParticipants);
 
     } catch (err) {
-      console.error('이벤트 참가 취소 실패:', err);
       setError('이벤트 참가 취소에 실패했습니다.');
     }
   };
@@ -779,6 +841,122 @@ const getCategoryLabel = (category: string) => {
   return categoryLabels[category] || category;
 };
 
+// My Events List Component
+export const MyEventsList: React.FC = () => {
+  const { user } = useAuth();
+  const [myEvents, setMyEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMyEvents = async () => {
+      if (!user?.id) return;
+
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/events/my-events?userId=${user.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setMyEvents(data.data || []);
+        }
+      } catch (error) {
+        setMyEvents([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMyEvents();
+  }, [user?.id]);
+
+  if (loading) {
+    return (
+      <div className="text-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">내 이벤트를 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  if (myEvents.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500">참가한 이벤트가 없습니다.</p>
+        <Button
+          className="mt-4"
+          onClick={() => window.location.reload()}
+        >
+          이벤트 목록 보기
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4">
+        {myEvents.map(event => (
+          <Card key={event.id} className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex flex-col lg:flex-row gap-4">
+                {event.image && (
+                  <div className="w-full lg:w-48 h-32 bg-gray-200 rounded-lg flex-shrink-0">
+                    <img src={event.image} alt={event.title} className="w-full h-full object-cover rounded-lg" />
+                  </div>
+                )}
+                <div className="flex-1 space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="text-xl font-semibold">{event.title}</h3>
+                      <p className="text-gray-600 mt-1">{event.description}</p>
+                    </div>
+                    {getStatusBadge(event.status)}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline">{getCategoryLabel(event.category)}</Badge>
+                    {event.tags.map(tag => (
+                      <Badge key={tag} variant="secondary">{tag}</Badge>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      {event.location}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <CalendarIcon className="w-4 h-4" />
+                      {format(event.startDate, 'MM/dd', { locale: ko })} - {format(event.endDate, 'MM/dd', { locale: ko })}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Users className="w-4 h-4" />
+                      {event.currentParticipants}/{event.maxParticipants}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2">
+                    <div className="text-sm text-gray-500">
+                      주최: {event.organizer.username}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">
+                        상세보기
+                      </Button>
+                      <Button size="sm">
+                        참가 취소
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Main Event System Component
 export const EventSystem: React.FC = () => {
   const [activeTab, setActiveTab] = useState('list');
@@ -806,9 +984,7 @@ export const EventSystem: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="my-events" className="mt-6">
-          <div className="text-center py-12">
-            <p className="text-gray-500">내 이벤트 기능은 곧 추가될 예정입니다.</p>
-          </div>
+          <MyEventsList />
         </TabsContent>
       </Tabs>
     </div>

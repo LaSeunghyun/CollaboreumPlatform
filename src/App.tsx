@@ -31,7 +31,7 @@ function AppContent() {
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const [selectedEventId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPostId] = useState<string | null>(null);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const { user, isAuthenticated, login } = useAuth();
 
   // 해시 변경 감지
@@ -75,11 +75,9 @@ function AppContent() {
         login(data.token, data.user);
         setCurrentView('home');
       } else {
-        console.error('로그인 데이터 형식 오류:', data);
         // 에러 처리는 LoginPage에서 이미 하고 있음
       }
     } catch (error) {
-      console.error('로그인 오류:', error);
       // 에러 처리는 LoginPage에서 이미 하고 있음
     }
   };
@@ -105,9 +103,8 @@ function AppContent() {
   };
 
   const handlePostClick = (postId: string) => {
-    // 포스트 상세 페이지로 이동 (향후 구현)
-    console.log('포스트 클릭:', postId);
-    // setCurrentView('post-detail');
+    setSelectedPostId(postId);
+    setCurrentView('post-detail');
   };
 
   const handleCreatePost = () => {
@@ -115,9 +112,7 @@ function AppContent() {
     if (!isAuthenticated) {
       setCurrentView('login');
     } else {
-      // 새글 작성 페이지로 이동 (향후 구현)
-      console.log('새글 작성 페이지로 이동');
-      // setCurrentView('create-post');
+      setCurrentView('create-post');
     }
   };
   const handleViewArtistCommunity = (artistId: number) => {

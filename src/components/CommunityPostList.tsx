@@ -4,7 +4,7 @@ import { Input } from './ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { useAuth } from '../contexts/AuthContext';
-import { authAPI } from '../services/api';
+import { authAPI, communityAPI } from '../services/api';
 import { ApiResponse, CommunityPostResponse } from '../types';
 
 interface Post {
@@ -114,17 +114,30 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
     fetchPosts(currentPage + 1, selectedCategory);
   };
 
-  const handleSortChange = (sort: 'latest' | 'popular') => {
+  const handleSortChange = async (sort: 'latest' | 'popular') => {
     setSortBy(sort);
-    // 서버에서 정렬된 데이터를 받아오도록 수정 필요
-    // 현재는 클라이언트 사이드 정렬
-    const sortedPosts = [...posts];
-    if (sort === 'popular') {
-      sortedPosts.sort((a, b) => b.likes - a.likes);
-    } else {
-      // 최신순은 서버에서 이미 정렬되어 옴
+    setIsLoading(true);
+
+    try {
+      // 서버에서 정렬된 데이터를 받아오기
+      const response = await communityAPI.getForumPosts(selectedCategory === "전체" ? undefined : selectedCategory, {
+        sort: sort === 'popular' ? 'likes' : 'createdAt',
+        order: 'desc'
+      });
+
+      if ((response as any).success && (response as any).data) {
+        setPosts((response as any).data);
+      }
+    } catch (error) {
+      // 에러 발생 시 클라이언트 사이드 정렬로 폴백
+      const sortedPosts = [...posts];
+      if (sort === 'popular') {
+        sortedPosts.sort((a, b) => b.likes - a.likes);
+      }
+      setPosts(sortedPosts);
+    } finally {
+      setIsLoading(false);
     }
-    setPosts(sortedPosts);
   };
 
   const formatContent = (content: string) => {

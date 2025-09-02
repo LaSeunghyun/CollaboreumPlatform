@@ -39,7 +39,6 @@ export function ArtistGallery({ onBack, onSelectArtwork }: ArtistGalleryProps) {
           window.location.href = '/';
         }
       } catch (error) {
-        console.error('뒤로가기 실패:', error);
         // 에러 발생 시 홈으로 이동
         window.location.href = '/';
       }
@@ -63,7 +62,6 @@ export function ArtistGallery({ onBack, onSelectArtwork }: ArtistGalleryProps) {
         setCategories(categories);
         // 기본 정렬 옵션 사용 (API에서 제공되지 않는 경우)
       } catch (error) {
-        console.error('Failed to fetch gallery data:', error);
         // API 실패 시 빈 데이터로 설정
         setArtworks([]);
         setCategories([]);
@@ -250,16 +248,16 @@ export function ArtistGallery({ onBack, onSelectArtwork }: ArtistGalleryProps) {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="작품명이나 아티스트명으로 검색..."
-                className="pl-10"
+                className="pl-10 h-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-end">
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-32 h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -269,12 +267,12 @@ export function ArtistGallery({ onBack, onSelectArtwork }: ArtistGalleryProps) {
               </SelectContent>
             </Select>
 
-            <div className="flex border border-gray-200 rounded-lg p-1">
+            <div className="flex border border-gray-200 rounded-lg p-1 h-10">
               <Button
                 variant={viewMode === "grid" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("grid")}
-                className="px-3"
+                className="px-3 h-8"
               >
                 <Grid3X3 className="w-4 h-4" />
               </Button>
@@ -282,7 +280,7 @@ export function ArtistGallery({ onBack, onSelectArtwork }: ArtistGalleryProps) {
                 variant={viewMode === "list" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("list")}
-                className="px-3"
+                className="px-3 h-8"
               >
                 <List className="w-4 h-4" />
               </Button>

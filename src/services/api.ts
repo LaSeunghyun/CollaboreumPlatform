@@ -224,9 +224,16 @@ export const profileAPI = {
 
 // Community APIs
 export const communityAPI = {
-    getForumPosts: (category?: string) => {
-        const queryParams = category ? `?category=${category}` : '';
-        return apiCall(`/community/posts${queryParams}`);
+    getForumPosts: (category?: string, options?: { sort?: string; order?: string; page?: number; limit?: number }) => {
+        const params = new URLSearchParams();
+        if (category && category !== "전체") params.append('category', category);
+        if (options?.sort) params.append('sort', options.sort);
+        if (options?.order) params.append('order', options.order);
+        if (options?.page) params.append('page', options.page.toString());
+        if (options?.limit) params.append('limit', options.limit.toString());
+
+        const queryString = params.toString();
+        return apiCall(`/community/posts${queryString ? `?${queryString}` : ''}`);
     },
     getEvents: () => apiCall('/events'), // 올바른 경로로 수정
     getCategories: () => apiCall('/categories'), // 카테고리 API 추가

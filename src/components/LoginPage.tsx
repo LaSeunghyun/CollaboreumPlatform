@@ -36,15 +36,12 @@ export function LoginPage({ onBack, onLogin, onSignupClick }: LoginPageProps) {
       const response = await authAPI.login(formData) as any;
 
       if (response.success) {
-        console.log('로그인 성공:', response.data);
         onLogin(response.data);
       } else {
-        console.error('로그인 실패:', response.message);
         setErrorMessage(response.message);
         setShowErrorModal(true);
       }
     } catch (error: any) {
-      console.error('로그인 오류:', error);
       // 서버에서 반환된 오류 메시지가 있으면 사용, 없으면 기본 메시지
       const errorMsg = error.message || '로그인 중 오류가 발생했습니다.';
       setErrorMessage(errorMsg);

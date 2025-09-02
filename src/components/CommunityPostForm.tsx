@@ -205,12 +205,12 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
               value={formData.category}
               onValueChange={(value) => handleInputChange('category', value)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-10">
                 <SelectValue placeholder="카테고리를 선택하세요" />
               </SelectTrigger>
               <SelectContent>
                 {isLoadingCategories ? (
-                  <SelectItem value="" disabled>카테고리 로딩 중...</SelectItem>
+                  <SelectItem value="loading" disabled>카테고리 로딩 중...</SelectItem>
                 ) : (
                   categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>

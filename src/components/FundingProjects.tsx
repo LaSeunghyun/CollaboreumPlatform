@@ -81,19 +81,16 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
             const categoryLabels = categoriesResponse.data.map((cat: any) => cat.label || cat.name);
             setCategories(["전체", ...categoryLabels]);
           } else {
-            console.warn('Categories response structure:', categoriesResponse);
             // API 실패 시 기본 카테고리 사용
             setCategories(KOREAN_CATEGORIES);
           }
         } catch (apiError) {
-          console.error('API 호출 실패:', apiError);
           setError('서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.');
           setProjects([]);
           return;
         }
 
       } catch (error) {
-        console.error('Failed to fetch funding projects:', error);
         setError('펀딩 프로젝트를 불러오는데 실패했습니다.');
         setProjects([]);
       } finally {
@@ -127,7 +124,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
         setSelectedProjectForPayment(null);
       }
     } catch (error) {
-      console.error('후원 처리 실패:', error);
+      // 후원 처리 실패
     }
   };
 
@@ -330,7 +327,6 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
                 }
                 setSelectedProject(project.id);
               } catch (error) {
-                console.error('프로젝트 선택 실패:', error);
                 // 에러 시에도 팝업창으로 표시
                 const errorPopup = window.open('', '_blank', 'width=400,height=200');
                 if (errorPopup) {
@@ -374,7 +370,6 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
                   }
                 }
               } catch (error) {
-                console.error('좋아요 처리 실패:', error);
                 // 에러 시 팝업창으로 표시
                 const errorPopup = window.open('', '_blank', 'width=400,height=200');
                 if (errorPopup) {
@@ -425,18 +420,18 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="프로젝트나 아티스트 이름으로 검색..."
-                className="pl-10"
+                className="pl-10 h-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-end">
             <div className="space-y-2">
               <Label htmlFor="category" className="text-sm font-medium">카테고리</Label>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger id="category" className="w-32">
+                <SelectTrigger id="category" className="w-32 h-10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -450,7 +445,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
             <div className="space-y-2">
               <Label htmlFor="sort" className="text-sm font-medium">정렬</Label>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger id="sort" className="w-32">
+                <SelectTrigger id="sort" className="w-32 h-10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -463,9 +458,9 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
 
             <Button
               variant="outline"
+              className="h-10"
               onClick={() => {
                 // 고급 필터 모달 또는 패널 표시
-                console.log('고급 필터 열기');
               }}
             >
               <Filter className="w-4 h-4 mr-2" />
@@ -618,7 +613,6 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
                   setProjects(prev => [...prev, ...response.data.projects]);
                 }
               } catch (error) {
-                console.error('더 많은 프로젝트 로드 실패:', error);
                 // 에러 시 팝업창으로 표시
                 const errorPopup = window.open('', '_blank', 'width=400,height=200');
                 if (errorPopup) {
