@@ -22,6 +22,6 @@
     }
   ],
   "env": {
-    "REACT_APP_API_URL": "https://collaboreumplatform-production.up.railway.app/api"
+    "REACT_APP_API_URL": "https://collaboreum-backend.onrender.com/api"
   }
 }
