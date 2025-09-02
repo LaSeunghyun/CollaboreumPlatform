@@ -98,7 +98,9 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
 
         // 이미지 업로드는 FormData를 직접 fetch로 처리
         const token = localStorage.getItem('authToken');
-        const imageResponse = await fetch('http://localhost:5000/api/upload/images', {
+        const API_BASE_URL = process.env.REACT_APP_API_URL || 
+          (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
+        const imageResponse = await fetch(`${API_BASE_URL}/upload/images`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`

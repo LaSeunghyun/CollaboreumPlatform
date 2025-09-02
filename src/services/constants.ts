@@ -6,7 +6,8 @@ import {
     ConstantsResponse
 } from '../types/constants';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL ||
+    (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
 
 class ConstantsService {
     private enumsCache: Enums | null = null;

@@ -68,7 +68,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // 토큰 유효성 검증 함수
   const validateToken = async (token: string): Promise<boolean> => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/verify', {
+      const API_BASE_URL = process.env.REACT_APP_API_URL || 
+        (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
+      const response = await fetch(`${API_BASE_URL}/auth/verify`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
