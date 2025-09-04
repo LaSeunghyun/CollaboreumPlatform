@@ -266,6 +266,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
               <Button
                 variant="outline"
                 size="lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600 hover:border-blue-700"
                 onClick={async () => {
                   try {
                     const response = await interactionAPI.followArtist(project.artistId || project.artist.id) as any;

@@ -105,8 +105,10 @@ router.get('/posts/:id', async (req, res) => {
 // 포스트 생성 (인증 필요)
 router.post('/posts', auth, async (req, res) => {
   try {
-    const { title, content, category, tags } = req.body;
+    const { title, content, category, tags, images, authorName } = req.body;
     const author = req.user.id;
+
+    console.log('포스트 생성 요청 데이터:', { title, content, category, tags, images, authorName, author });
 
     if (!title || !content || !category) {
       return res.status(400).json({
@@ -120,7 +122,9 @@ router.post('/posts', auth, async (req, res) => {
       content,
       category,
       tags: tags || [],
-      author
+      images: images || [],
+      author,
+      authorName: authorName || '사용자'
     });
 
     await post.save();
@@ -137,7 +141,8 @@ router.post('/posts', auth, async (req, res) => {
     console.error('포스트 생성 실패:', error);
     res.status(500).json({
       success: false,
-      message: '포스트를 생성할 수 없습니다.'
+      message: '포스트를 생성할 수 없습니다.',
+      error: error.message
     });
   }
 });

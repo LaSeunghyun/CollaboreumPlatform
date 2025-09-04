@@ -75,7 +75,7 @@ export const RetryDemo: React.FC = () => {
 
               {error && (
                 <div className="p-3 bg-red-50 rounded-lg">
-                  <p className="text-red-800 text-sm">에러: {error.message}</p>
+                  <p className="text-red-800 text-sm">에러: {error}</p>
                   <Button onClick={retry} disabled={isLoading} className="mt-2" size="sm">
                     재시도 ({retryCount}/3)
                   </Button>
@@ -103,7 +103,7 @@ export const RetryDemo: React.FC = () => {
 
               {errorError && (
                 <div className="p-3 bg-red-50 rounded-lg">
-                  <p className="text-red-800 text-sm">에러: {errorError.message}</p>
+                  <p className="text-red-800 text-sm">에러: {errorError}</p>
                   <Button onClick={retryError} disabled={errorLoading} className="mt-2" size="sm">
                     재시도 ({errorRetryCount}/3)
                   </Button>

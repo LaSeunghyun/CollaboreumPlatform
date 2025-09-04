@@ -454,22 +454,22 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col lg:flex-row gap-6 mb-12">
+        <div className="flex flex-col lg:flex-row gap-4 mb-12">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="프로젝트나 아티스트 이름으로 검색..."
-                className="pl-12 h-12 rounded-2xl bg-input-background/80 backdrop-blur-sm"
+                className="pl-10 h-10 rounded-lg bg-white border border-gray-300"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-3">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-40 h-12 rounded-2xl bg-input-background/80 backdrop-blur-sm">
+              <SelectTrigger className="w-24 h-10 rounded-lg bg-white border border-gray-300">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -480,7 +480,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
             </Select>
 
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-40 h-12 rounded-2xl bg-input-background/80 backdrop-blur-sm">
+              <SelectTrigger className="w-24 h-10 rounded-lg bg-white border border-gray-300">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -490,7 +490,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
               </SelectContent>
             </Select>
 
-            <Button variant="outline" className="h-12 px-6 rounded-2xl bg-input-background/80 backdrop-blur-sm">
+            <Button variant="outline" className="h-10 px-4 rounded-lg bg-white border border-gray-300">
               <Filter className="w-4 h-4 mr-2" />
               필터
             </Button>

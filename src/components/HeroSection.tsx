@@ -199,7 +199,7 @@ export function HeroSection({ onViewArtistCommunity, onNavigate }: HeroSectionPr
               { number: platformStats.totalUsers.toLocaleString(), label: "활성 후원자", icon: "❤️" }
             ].map((stat, index) => (
               <div key={index} className="group">
-                <div className="glass-morphism rounded-3xl p-6 lg:p-8 transition-all duration-300 hover:shadow-apple-lg hover:scale-105">
+                <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-8 transition-all duration-300 hover:shadow-apple-lg hover:scale-105">
                   <div className="text-2xl mb-3 group-hover:scale-110 transition-transform duration-300">
                     {stat.icon}
                   </div>
@@ -215,12 +215,6 @@ export function HeroSection({ onViewArtistCommunity, onNavigate }: HeroSectionPr
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-muted-foreground rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-muted-foreground rounded-full mt-2 animate-pulse"></div>
-          </div>
-        </div>
       </section>
 
       {/* Featured Artists Section */}

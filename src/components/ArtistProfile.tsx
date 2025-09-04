@@ -152,7 +152,7 @@ export function ArtistProfile({ artistId, onBack }: ArtistProfileProps) {
 
                 {/* Action Buttons */}
                 <div className="flex gap-3">
-                  <Button className="flex-1 md:flex-initial">
+                  <Button className="flex-1 md:flex-initial bg-blue-600 hover:bg-blue-700 text-white">
                     <Users className="w-4 h-4 mr-2" />
                     팔로우
                   </Button>

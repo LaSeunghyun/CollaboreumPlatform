@@ -212,7 +212,7 @@ export function ArtistSection() {
                   {/* Action Buttons */}
                   <div className="flex gap-3">
                     <Button
-                      className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl"
                       onClick={() => handleFollow(artist.id)}
                     >
                       <Users className="w-4 h-4 mr-2" />

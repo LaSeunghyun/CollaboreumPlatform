@@ -45,7 +45,9 @@ if (missingEnvVars.length > 0) {
     console.warn('⚠️ Using default values for missing environment variables');
     // Railway 환경에서 기본값 설정
     if (!process.env.MONGODB_URI) {
-      process.env.MONGODB_URI = 'mongodb+srv://rmwl2356_db_user:<db_password>@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster';
+      console.error('❌ MONGODB_URI 환경변수가 설정되지 않았습니다.');
+      console.error('❌ Railway에서 MongoDB 연결 정보를 확인해주세요.');
+      process.exit(1);
     }
     if (!process.env.JWT_SECRET) {
       process.env.JWT_SECRET = 'default-jwt-secret-for-railway';

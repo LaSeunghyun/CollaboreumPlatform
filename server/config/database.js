@@ -6,7 +6,7 @@ const connectDB = async () => {
 
   const connectWithRetry = async () => {
     try {
-      const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/collaboreum';
+      const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://rmwl2356_db_user:<db_password>@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster';
       console.log(`🔄 Connecting to MongoDB (attempt ${retryCount + 1}/${maxRetries}):`, mongoURI.replace(/\/\/.*@/, '//***:***@'));
       
       const conn = await mongoose.connect(mongoURI, {

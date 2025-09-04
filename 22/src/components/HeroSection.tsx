@@ -1,9 +1,9 @@
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Star, MessageCircle, ChevronLeft, ChevronRight, Users } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { useState } from "react";
 
 const weeklyNewcomers = [
   {
@@ -66,8 +66,8 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const filteredNewcomers = selectedCategory === "전체" 
-    ? weeklyNewcomers 
+  const filteredNewcomers = selectedCategory === "전체"
+    ? weeklyNewcomers
     : weeklyNewcomers.filter(artist => artist.category === selectedCategory);
 
   const nextSlide = () => {
@@ -87,8 +87,8 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
           <div className="absolute inset-0 bg-gradient-to-br from-background via-secondary/20 to-muted/30"></div>
           {/* Animated Background Elements */}
           <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float" style={{animationDelay: '1s'}}></div>
-          <div className="absolute top-3/4 left-1/2 w-48 h-48 bg-primary/8 rounded-full blur-2xl animate-float" style={{animationDelay: '2s'}}></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-3/4 left-1/2 w-48 h-48 bg-primary/8 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }}></div>
           {/* Yellow gradient highlight behind hero text */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-radial from-yellow-400/30 via-yellow-300/15 to-transparent rounded-full blur-3xl opacity-60"></div>
         </div>
@@ -100,15 +100,15 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
               새로운 창작 생태계가 시작됩니다
             </div>
-            
+
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-8 tracking-tight">
               <span className="block mb-2">아티스트와 팬이</span>
               <span className="block mb-2">함께 만드는</span>
-              <span className="block text-primary bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent font-extrabold">
+              <span className="block bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent font-extrabold">
                 크리에이티브 생태계
               </span>
             </h1>
-            
+
             <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground mb-12 max-w-4xl mx-auto leading-relaxed">
               독립 아티스트의 꿈을 현실로 만들고, 팬들과 함께 성장하는 새로운 플랫폼.<br />
               <span className="text-foreground font-medium">신뢰와 투명성</span>을 바탕으로 건강한 예술 생태계를 구축합니다.
@@ -126,7 +126,7 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
               { number: "15,432", label: "활성 후원자", icon: "❤️" }
             ].map((stat, index) => (
               <div key={index} className="group">
-                <div className="glass-morphism rounded-3xl p-6 lg:p-8 border border-border/30 hover:border-primary/20 transition-all duration-300 hover:shadow-apple-lg hover:scale-105">
+                <div className="glass-morphism rounded-3xl p-6 lg:p-8 hover:shadow-apple-lg hover:scale-105 transition-all duration-300">
                   <div className="text-2xl mb-3 group-hover:scale-110 transition-transform duration-300">
                     {stat.icon}
                   </div>
@@ -142,12 +142,6 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-muted-foreground rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-muted-foreground rounded-full mt-2 animate-pulse"></div>
-          </div>
-        </div>
       </section>
 
       {/* Featured Artists Section */}
@@ -168,7 +162,7 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
 
           {/* Category Filter */}
           <div className="flex justify-center mb-12">
-            <div className="flex gap-1 p-2 glass-morphism rounded-2xl border-border/30">
+            <div className="flex gap-1 p-2 glass-morphism rounded-2xl">
               {categories.map((category) => (
                 <button
                   key={category}
@@ -176,11 +170,10 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
                     setSelectedCategory(category);
                     setCurrentIndex(0);
                   }}
-                  className={`px-6 py-3 rounded-xl font-medium transition-all cursor-pointer ${
-                    selectedCategory === category
-                      ? "bg-primary text-primary-foreground shadow-apple"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                  }`}
+                  className={`px-6 py-3 rounded-xl font-medium transition-all cursor-pointer ${selectedCategory === category
+                    ? "bg-primary text-primary-foreground shadow-apple"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                    }`}
                 >
                   {category}
                 </button>
@@ -191,26 +184,25 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
           {/* Artists Carousel */}
           <div className="relative">
             <div className="overflow-hidden">
-              <div 
+              <div
                 className="flex transition-transform duration-300 ease-in-out gap-6"
                 style={{ transform: `translateX(-${currentIndex * (100 / Math.min(filteredNewcomers.length, 3))}%)` }}
               >
                 {filteredNewcomers.map((artist) => (
                   <div key={artist.id} className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3">
-                    <Card className="overflow-hidden hover:shadow-apple-lg transition-all duration-300 group cursor-pointer border-border/50 rounded-3xl">
+                    <Card className="overflow-hidden hover:shadow-apple-lg transition-all duration-300 group cursor-pointer rounded-3xl">
                       <div className="relative h-48">
-                        <ImageWithFallback 
-                          src={artist.coverImage} 
+                        <ImageWithFallback
+                          src={artist.coverImage}
                           alt={`${artist.name} cover`}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        <Badge 
-                          className={`absolute top-4 left-4 rounded-xl font-medium ${
-                            artist.category === "음악" ? "bg-primary text-primary-foreground" :
+                        <Badge
+                          className={`absolute top-4 left-4 rounded-xl font-medium ${artist.category === "음악" ? "bg-primary text-primary-foreground" :
                             artist.category === "미술" ? "bg-chart-5 text-white" :
-                            artist.category === "문학" ? "bg-chart-2 text-white" : "bg-destructive text-white"
-                          }`}
+                              artist.category === "문학" ? "bg-chart-2 text-white" : "bg-destructive text-white"
+                            }`}
                         >
                           {artist.category}
                         </Badge>
@@ -218,9 +210,9 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
 
                       <CardContent className="p-6">
                         <div className="flex items-center gap-4 mb-4">
-                          <div className="w-14 h-14 rounded-full border-3 border-background shadow-apple overflow-hidden relative -mt-10 bg-background">
-                            <ImageWithFallback 
-                              src={artist.profileImage} 
+                          <div className="w-14 h-14 rounded-full shadow-apple overflow-hidden relative -mt-10 bg-background">
+                            <ImageWithFallback
+                              src={artist.profileImage}
                               alt={artist.name}
                               className="w-full h-full object-cover"
                             />
@@ -246,18 +238,18 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
                         </div>
 
                         <div className="flex gap-3">
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl"
                             onClick={() => onViewArtistCommunity?.(artist.id)}
                           >
                             <MessageCircle className="w-4 h-4 mr-2" />
                             커뮤니티
                           </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            title="아티스트 프로필 보기" 
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            title="아티스트 프로필 보기"
                             className="cursor-pointer border-border hover:bg-secondary/50 rounded-xl px-4"
                           >
                             <Users className="w-4 h-4" />
@@ -275,14 +267,14 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
               <>
                 <button
                   onClick={prevSlide}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 glass-morphism rounded-full p-3 shadow-apple hover:shadow-apple-lg transition-all z-10 cursor-pointer border-border/30"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 glass-morphism rounded-full p-3 shadow-apple hover:shadow-apple-lg transition-all z-10 cursor-pointer"
                   disabled={currentIndex === 0}
                 >
                   <ChevronLeft className="w-5 h-5 text-foreground" />
                 </button>
                 <button
                   onClick={nextSlide}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 glass-morphism rounded-full p-3 shadow-apple hover:shadow-apple-lg transition-all z-10 cursor-pointer border-border/30"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 glass-morphism rounded-full p-3 shadow-apple hover:shadow-apple-lg transition-all z-10 cursor-pointer"
                   disabled={currentIndex >= filteredNewcomers.length - 3}
                 >
                   <ChevronRight className="w-5 h-5 text-foreground" />
@@ -293,10 +285,10 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
 
           {/* More Artists Button */}
           <div className="text-center mt-12">
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="border-border bg-background/80 backdrop-blur-sm text-foreground hover:bg-secondary/50 cursor-pointer font-medium px-8 py-4 rounded-2xl"
+            <Button
+              variant="outline"
+              size="lg"
+              className="bg-background/80 backdrop-blur-sm text-foreground hover:bg-secondary/50 cursor-pointer font-medium px-8 py-4 rounded-2xl"
             >
               더 많은 신인 아티스트 보기
             </Button>

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 interface UseRetryOptions {
     maxRetries?: number;
@@ -123,7 +123,7 @@ export function useNetworkStatus() {
     const [isOnline, setIsOnline] = useState(navigator.onLine);
     const [wasOffline, setWasOffline] = useState(false);
 
-    useState(() => {
+    useEffect(() => {
         const handleOnline = () => {
             setIsOnline(true);
             if (wasOffline) {
@@ -144,7 +144,7 @@ export function useNetworkStatus() {
             window.removeEventListener('online', handleOnline);
             window.removeEventListener('offline', handleOffline);
         };
-    });
+    }, [wasOffline]);
 
     return { isOnline, wasOffline };
 }
@@ -158,7 +158,7 @@ export function useAutoRetry<T = any>(
     const { isOnline, wasOffline } = useNetworkStatus();
     const retryHook = useRetry(asyncFunction, retryOptions);
 
-    useState(() => {
+    useEffect(() => {
         if (autoRetryOnNetworkRecovery && isOnline && wasOffline && retryHook.error) {
             // 네트워크가 복구되고 에러가 있으면 자동 재시도
             retryHook.retry();
