@@ -224,7 +224,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
 
 
   const ProjectCard = ({ project }: { project: any }) => (
-    <Card className="overflow-hidden hover:shadow-apple-lg transition-all duration-300 group cursor-pointer border-border/50 rounded-3xl">
+    <Card className="overflow-hidden hover:shadow-apple-lg transition-all duration-300 group cursor-pointer rounded-3xl">
       <div className="relative aspect-video">
         <ImageWithFallback
           src={project.image}
@@ -243,7 +243,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
           {project.category}
         </Badge>
         <div className="absolute bottom-4 left-4 right-4">
-          <div className="glass-morphism rounded-2xl p-4 text-white border border-white/20">
+          <div className="glass-morphism rounded-2xl p-4 text-white">
             <div className="flex justify-between text-sm mb-2">
               <span className="font-medium">₩{(project.currentAmount || 0).toLocaleString()}</span>
               <span className="font-medium">{getProgressPercentage(project.currentAmount || 0, project.targetAmount).toFixed(1)}%</span>
@@ -322,7 +322,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
           <Button
             variant="outline"
             size="sm"
-            className="cursor-pointer border-border hover:bg-secondary/50 rounded-xl px-4"
+            className="cursor-pointer hover:bg-secondary/50 rounded-xl px-4"
             onClick={() => {
               try {
                 // 팝업창으로 프로젝트 상세 정보 표시
@@ -390,7 +390,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
           <Button
             variant="outline"
             size="sm"
-            className="cursor-pointer border-border hover:bg-secondary/50 rounded-xl px-4"
+            className="cursor-pointer hover:bg-secondary/50 rounded-xl px-4"
             onClick={async () => {
               try {
                 const response = await fundingAPI.likeProject(project.id.toString()) as any;
@@ -441,7 +441,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-20">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-primary/5 text-primary px-6 py-3 rounded-full text-sm font-semibold mb-8 border border-primary/20">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-primary/5 text-primary px-6 py-3 rounded-full text-sm font-semibold mb-8">
             <span className="text-lg">🎯</span>
             활발한 펀딩 프로젝트
           </div>
@@ -460,7 +460,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
               <Input
                 placeholder="프로젝트나 아티스트 이름으로 검색..."
-                className="pl-12 h-12 rounded-2xl border-border/50 bg-input-background/80 backdrop-blur-sm"
+                className="pl-12 h-12 rounded-2xl bg-input-background/80 backdrop-blur-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -469,7 +469,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
 
           <div className="flex gap-4">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-40 h-12 rounded-2xl border-border/50 bg-input-background/80 backdrop-blur-sm">
+              <SelectTrigger className="w-40 h-12 rounded-2xl bg-input-background/80 backdrop-blur-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -480,7 +480,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
             </Select>
 
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-40 h-12 rounded-2xl border-border/50 bg-input-background/80 backdrop-blur-sm">
+              <SelectTrigger className="w-40 h-12 rounded-2xl bg-input-background/80 backdrop-blur-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -490,7 +490,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
               </SelectContent>
             </Select>
 
-            <Button variant="outline" className="h-12 px-6 rounded-2xl border-border/50 bg-input-background/80 backdrop-blur-sm">
+            <Button variant="outline" className="h-12 px-6 rounded-2xl bg-input-background/80 backdrop-blur-sm">
               <Filter className="w-4 h-4 mr-2" />
               필터
             </Button>
@@ -505,7 +505,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
 
         {filteredProjects.length === 0 && !loading && (
           <div className="text-center py-20">
-            <div className="glass-morphism rounded-3xl p-12 border border-border/30">
+            <div className="glass-morphism rounded-3xl p-12">
               <Target className="w-20 h-20 text-muted-foreground mx-auto mb-6" />
               <h3 className="text-2xl font-semibold text-foreground mb-4">검색 결과가 없습니다</h3>
               <p className="text-muted-foreground text-lg">다른 검색어나 카테고리를 시도해보세요</p>
@@ -518,7 +518,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
           <Button
             variant="outline"
             size="lg"
-            className="border-border bg-background/80 backdrop-blur-sm text-foreground hover:bg-secondary/50 cursor-pointer font-medium px-8 py-4 rounded-2xl"
+            className="bg-background/80 backdrop-blur-sm text-foreground hover:bg-secondary/50 cursor-pointer font-medium px-8 py-4 rounded-2xl"
           >
             더 많은 프로젝트 보기
           </Button>

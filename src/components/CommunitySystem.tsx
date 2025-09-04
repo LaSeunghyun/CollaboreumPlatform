@@ -172,7 +172,7 @@ export const PostCreationForm: React.FC = () => {
               value={formData.title}
               onChange={(e) => handleInputChange('title', e.target.value)}
               placeholder="게시글 제목을 입력하세요"
-              className={errors.title ? 'border-red-500' : ''}
+              className={errors.title ? 'ring-2 ring-red-500' : ''}
             />
             {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
           </div>
@@ -180,7 +180,7 @@ export const PostCreationForm: React.FC = () => {
           <div>
             <label className="block text-sm font-medium mb-2">카테고리 *</label>
             <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-              <SelectTrigger className={errors.category ? 'border-red-500' : ''}>
+              <SelectTrigger className={errors.category ? 'ring-2 ring-red-500' : ''}>
                 <SelectValue placeholder="카테고리 선택" />
               </SelectTrigger>
               <SelectContent>
@@ -201,7 +201,7 @@ export const PostCreationForm: React.FC = () => {
               onChange={(e) => handleInputChange('content', e.target.value)}
               placeholder="게시글 내용을 입력하세요"
               rows={8}
-              className={errors.content ? 'border-red-500' : ''}
+              className={errors.content ? 'ring-2 ring-red-500' : ''}
             />
             {errors.content && <p className="text-red-500 text-sm mt-1">{errors.content}</p>}
           </div>
@@ -624,7 +624,7 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
               <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{post.content}</p>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t">
+            <div className="flex items-center justify-between pt-4">
               <div className="flex items-center gap-4">
                 <Button variant="ghost" className="flex items-center gap-2">
                   <ThumbsUp className="w-4 h-4" />

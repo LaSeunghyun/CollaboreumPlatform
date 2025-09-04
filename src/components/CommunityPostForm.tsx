@@ -285,7 +285,7 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
                     <img
                       src={URL.createObjectURL(image)}
                       alt={`미리보기 ${index + 1}`}
-                      className="w-full h-24 object-cover rounded border"
+                      className="w-full h-24 object-cover rounded"
                     />
                     <button
                       type="button"

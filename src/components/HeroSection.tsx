@@ -199,7 +199,7 @@ export function HeroSection({ onViewArtistCommunity, onNavigate }: HeroSectionPr
               { number: platformStats.totalUsers.toLocaleString(), label: "활성 후원자", icon: "❤️" }
             ].map((stat, index) => (
               <div key={index} className="group">
-                <div className="glass-morphism rounded-3xl p-6 lg:p-8 border border-border/30 hover:border-primary/20 transition-all duration-300 hover:shadow-apple-lg hover:scale-105">
+                <div className="glass-morphism rounded-3xl p-6 lg:p-8 transition-all duration-300 hover:shadow-apple-lg hover:scale-105">
                   <div className="text-2xl mb-3 group-hover:scale-110 transition-transform duration-300">
                     {stat.icon}
                   </div>
