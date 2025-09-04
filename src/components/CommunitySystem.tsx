@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { ErrorRetry, LoadingRetry } from './ui/retry-button';
 
 import { communityPostAPI, communityCommentAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -551,10 +552,13 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
   if (error) {
     return (
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <p className="text-red-600 mb-4">{error}</p>
-          <Button onClick={() => window.location.reload()}>다시 시도</Button>
-        </div>
+        <ErrorRetry
+          error={error}
+          onRetry={() => window.location.reload()}
+          isLoading={loading}
+          retryCount={0}
+          maxRetries={3}
+        />
       </div>
     );
   }

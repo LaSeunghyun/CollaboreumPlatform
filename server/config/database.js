@@ -13,7 +13,10 @@ const connectDB = async () => {
         serverSelectionTimeoutMS: 5000, // 5초 타임아웃
         socketTimeoutMS: 45000, // 45초 소켓 타임아웃
         bufferCommands: false, // 버퍼링 비활성화
-        bufferMaxEntries: 0 // 버퍼 최대 엔트리 0
+        maxPoolSize: 10, // 최대 연결 풀 크기
+        minPoolSize: 5, // 최소 연결 풀 크기
+        maxIdleTimeMS: 30000, // 30초 후 유휴 연결 종료
+        connectTimeoutMS: 10000 // 10초 연결 타임아웃
       });
 
       console.log(`✅ MongoDB Connected: ${conn.connection.host}`);

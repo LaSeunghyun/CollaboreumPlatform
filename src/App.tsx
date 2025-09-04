@@ -20,6 +20,7 @@ import { ProjectDetail } from './components/ProjectDetail';
 import { EventDetail } from './components/EventDetail';
 import { SearchResults } from './components/SearchResults';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { HistoryProvider, useHistory } from './contexts/HistoryContext';
 import { isSpecialPage, scrollToSection } from './utils/navigation';
@@ -368,10 +369,12 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <HistoryProvider>
-        <AppContent />
-      </HistoryProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <HistoryProvider>
+          <AppContent />
+        </HistoryProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }

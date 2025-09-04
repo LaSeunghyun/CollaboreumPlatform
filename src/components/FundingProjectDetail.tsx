@@ -7,6 +7,7 @@ import { Progress } from './ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Separator } from './ui/separator';
+import { RetryButton, ErrorRetry, LoadingRetry } from './ui/retry-button';
 import {
     ArrowLeft,
     Heart,
@@ -29,6 +30,7 @@ import { PaymentModal } from './PaymentModal';
 import { ExecutionStatus } from './ExecutionStatus';
 import { ExpenseRecords } from './ExpenseRecords';
 import { RevenueDistribution } from './RevenueDistribution';
+import { useRetry } from '../hooks/useRetry';
 
 interface FundingProject {
     id: string;
@@ -109,21 +111,49 @@ export const FundingProjectDetail: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
 
-    const [project, setProject] = useState<FundingProject | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [activeTab, setActiveTab] = useState('overview');
-    const [retryCount, setRetryCount] = useState(0);
+
+    // useRetry 훅을 사용하여 프로젝트 데이터 관리
+    const {
+        data: project,
+        error,
+        isLoading,
+        retryCount,
+        isMaxRetriesReached,
+        execute: fetchProjectDetail,
+        retry,
+    } = useRetry<FundingProject>(
+        async () => {
+            if (!projectId) {
+                throw new Error('프로젝트 ID가 없습니다.');
+            }
+
+            const response = await fundingAPI.getProjectDetail(projectId);
+
+            if ((response as any).success && (response as any).data) {
+                return validateAndSanitizeProjectData((response as any).data);
+            } else {
+                throw new Error('프로젝트를 불러올 수 없습니다.');
+            }
+        },
+        {
+            maxRetries: 3,
+            retryDelay: 1000,
+            onRetry: (attempt) => {
+                console.log(`프로젝트 상세 조회 재시도: ${attempt + 1}번째 시도`);
+            },
+            onMaxRetriesReached: () => {
+                console.error('프로젝트 상세 조회 최대 재시도 횟수 도달');
+            },
+        }
+    );
 
     useEffect(() => {
         if (projectId) {
             fetchProjectDetail();
-        } else {
-            setError('프로젝트 ID가 없습니다.');
-            setIsLoading(false);
         }
-    }, [projectId]);
+    }, [projectId, fetchProjectDetail]);
 
     // projectId가 없으면 에러 표시
     if (!projectId) {
@@ -141,31 +171,6 @@ export const FundingProjectDetail: React.FC = () => {
         );
     }
 
-    const fetchProjectDetail = async () => {
-        try {
-            setIsLoading(true);
-            setError(null);
-
-            const response = await fundingAPI.getProjectDetail(projectId!);
-
-            if ((response as any).success && (response as any).data) {
-                const validatedData = validateAndSanitizeProjectData((response as any).data);
-                setProject(validatedData);
-            } else {
-                setError('프로젝트를 불러올 수 없습니다.');
-            }
-        } catch (error) {
-            console.error('프로젝트 상세 조회 오류:', error);
-            setError('프로젝트 조회 중 오류가 발생했습니다.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleRetry = () => {
-        setRetryCount(prev => prev + 1);
-        fetchProjectDetail();
-    };
 
     const handleBack = () => {
         navigate(-1);
@@ -204,11 +209,11 @@ export const FundingProjectDetail: React.FC = () => {
     if (isLoading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">프로젝트를 불러오는 중...</p>
-                    <Progress value={undefined} className="mt-4 w-48 mx-auto" />
-                </div>
+                <LoadingRetry
+                    message="프로젝트를 불러오는 중..."
+                    showRetryButton={true}
+                    onRetry={() => window.location.reload()}
+                />
             </div>
         );
     }
@@ -216,24 +221,20 @@ export const FundingProjectDetail: React.FC = () => {
     if (error || !project) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <AlertCircle className="w-8 h-8 text-red-600" />
-                    </div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2">오류가 발생했습니다</h2>
-                    <p className="text-gray-600 mb-4">{error || '프로젝트를 찾을 수 없습니다.'}</p>
-                    <div className="flex gap-3 justify-center">
-                        <Button onClick={handleRetry} variant="outline">
-                            <RefreshCw className="w-4 h-4 mr-2" />
-                            다시 시도
+                <div className="max-w-md w-full">
+                    <ErrorRetry
+                        error={error || '프로젝트를 찾을 수 없습니다.'}
+                        onRetry={retry}
+                        isLoading={isLoading}
+                        retryCount={retryCount}
+                        maxRetries={3}
+                    />
+                    <div className="mt-4 flex justify-center">
+                        <Button onClick={handleBack} variant="outline" size="sm">
+                            <ArrowLeft className="w-4 h-4 mr-2" />
+                            뒤로 가기
                         </Button>
-                        <Button onClick={handleBack} variant="outline">
-                            ← 목록으로 돌아가기
-                        </Button>
                     </div>
-                    {retryCount > 0 && (
-                        <p className="text-sm text-gray-500 mt-2">재시도 횟수: {retryCount}</p>
-                    )}
                 </div>
             </div>
         );

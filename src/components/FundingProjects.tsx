@@ -8,9 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Input } from "./ui/input";
 import { Heart, Calendar, MapPin, Search, Filter, Star, Target, Eye, MessageCircle } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ErrorRetry, LoadingRetry } from "./ui/retry-button";
 import { fundingAPI, communityAPI } from '../services/api';
 import { PaymentModal } from './PaymentModal';
 import { dynamicConstantsService } from '../services/constantsService';
+import { useRetry } from '../hooks/useRetry';
 import {
   CATEGORIES,
   CATEGORY_LABELS,

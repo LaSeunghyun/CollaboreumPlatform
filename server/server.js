@@ -38,11 +38,18 @@ const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {
   console.error('❌ Missing required environment variables:', missingEnvVars);
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' && !process.env.RAILWAY_ENVIRONMENT) {
     console.error('💥 Production environment requires all environment variables');
     process.exit(1);
   } else {
-    console.warn('⚠️ Development mode: using default values for missing environment variables');
+    console.warn('⚠️ Using default values for missing environment variables');
+    // Railway 환경에서 기본값 설정
+    if (!process.env.MONGODB_URI) {
+      process.env.MONGODB_URI = 'mongodb+srv://rmwl2356_db_user:<db_password>@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster';
+    }
+    if (!process.env.JWT_SECRET) {
+      process.env.JWT_SECRET = 'default-jwt-secret-for-railway';
+    }
   }
 }
 
@@ -55,8 +62,11 @@ const connectDB = require('./config/database');
 // Connect to MongoDB
 connectDB().catch((error) => {
   console.error('Failed to connect to database:', error);
-  if (process.env.NODE_ENV !== 'production') {
+  // Railway 환경에서는 데이터베이스 연결 실패 시에도 서버를 계속 실행
+  if (process.env.NODE_ENV !== 'production' && !process.env.RAILWAY_ENVIRONMENT) {
     process.exit(1);
+  } else {
+    console.log('🔄 Server will continue running without database connection');
   }
 });
 
