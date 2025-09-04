@@ -60,7 +60,24 @@ const PORT = process.env.PORT || 5000;
 const connectDB = require('./config/database');
 
 // Connect to MongoDB
-connectDB().catch((error) => {
+connectDB().then(async () => {
+  // 데이터베이스 연결 후 카테고리 초기화
+  try {
+    const Category = require('./models/Category');
+    const categoryCount = await Category.countDocuments();
+    
+    if (categoryCount === 0) {
+      console.log('📂 카테고리가 없습니다. 기본 카테고리를 생성합니다...');
+      const { seedCategories } = require('./scripts/seed-categories');
+      await seedCategories();
+      console.log('✅ 기본 카테고리 생성 완료');
+    } else {
+      console.log(`📂 기존 카테고리 ${categoryCount}개 확인됨`);
+    }
+  } catch (error) {
+    console.error('❌ 카테고리 초기화 실패:', error);
+  }
+}).catch((error) => {
   console.error('Failed to connect to database:', error);
   // Railway 환경에서는 데이터베이스 연결 실패 시에도 서버를 계속 실행
   if (process.env.NODE_ENV !== 'production' && !process.env.RAILWAY_ENVIRONMENT) {

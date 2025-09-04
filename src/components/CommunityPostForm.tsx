@@ -47,6 +47,7 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
             setFormData(prev => ({ ...prev, category: categoriesData[0].id }));
           }
         } else {
+          console.warn('카테고리 API 응답 실패, 기본 카테고리 사용');
           // API 실패 시 기본 카테고리 사용
           const defaultCategories = [
             { id: 'music', label: '음악' },
@@ -54,6 +55,9 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
             { id: 'literature', label: '문학' },
             { id: 'performance', label: '공연' },
             { id: 'photo', label: '사진' },
+            { id: 'video', label: '영상' },
+            { id: 'design', label: '디자인' },
+            { id: 'craft', label: '공예' },
             { id: 'other', label: '기타' }
           ];
           setCategories(defaultCategories);
@@ -68,6 +72,9 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
           { id: 'literature', label: '문학' },
           { id: 'performance', label: '공연' },
           { id: 'photo', label: '사진' },
+          { id: 'video', label: '영상' },
+          { id: 'design', label: '디자인' },
+          { id: 'craft', label: '공예' },
           { id: 'other', label: '기타' }
         ];
         setCategories(defaultCategories);

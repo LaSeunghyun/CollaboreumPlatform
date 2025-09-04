@@ -103,14 +103,25 @@ const createCategories = async () => {
 // 메인 실행 함수
 const seedCategories = async () => {
   try {
-    await connectDB();
+    // 이미 데이터베이스에 연결되어 있다면 연결하지 않음
+    if (mongoose.connection.readyState !== 1) {
+      await connectDB();
+    }
     await createCategories();
     
     console.log('🎉 카테고리 시드 완료!');
-    process.exit(0);
+    
+    // 스크립트로 직접 실행된 경우에만 프로세스 종료
+    if (require.main === module) {
+      process.exit(0);
+    }
   } catch (error) {
     console.error('❌ 카테고리 시드 실패:', error);
-    process.exit(1);
+    if (require.main === module) {
+      process.exit(1);
+    } else {
+      throw error;
+    }
   }
 };
 

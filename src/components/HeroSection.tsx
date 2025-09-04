@@ -35,17 +35,32 @@ export function HeroSection({ onViewArtistCommunity, onNavigate }: HeroSectionPr
 
         // 플랫폼 통계 데이터 가져오기
         try {
-          const statsResponse = await fetch('/api/stats/platform');
+          const API_BASE_URL = process.env.REACT_APP_API_URL ||
+            (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
+          
+          const statsResponse = await fetch(`${API_BASE_URL}/stats/platform`);
           if (statsResponse.ok) {
             const contentType = statsResponse.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
               const statsData = await statsResponse.json();
-              setPlatformStats(statsData.data || {
-                totalArtists: 0,
-                totalProjects: 0,
-                totalFunding: 0,
-                totalUsers: 0
-              });
+              console.log('플랫폼 통계 데이터:', statsData);
+              
+              if (statsData.success && statsData.data) {
+                setPlatformStats({
+                  totalArtists: statsData.data.registeredArtists || 0,
+                  totalProjects: statsData.data.successfulProjects || 0,
+                  totalFunding: statsData.data.totalFunding || 0,
+                  totalUsers: statsData.data.activeSupporters || 0
+                });
+              } else {
+                // API 응답이 실패한 경우 기본값 사용
+                setPlatformStats({
+                  totalArtists: 0,
+                  totalProjects: 0,
+                  totalFunding: 0,
+                  totalUsers: 0
+                });
+              }
             } else {
               // HTML 응답인 경우 기본값 유지
               setPlatformStats({
@@ -55,8 +70,17 @@ export function HeroSection({ onViewArtistCommunity, onNavigate }: HeroSectionPr
                 totalUsers: 0
               });
             }
+          } else {
+            console.warn('통계 API 응답 실패:', statsResponse.status);
+            setPlatformStats({
+              totalArtists: 0,
+              totalProjects: 0,
+              totalFunding: 0,
+              totalUsers: 0
+            });
           }
         } catch (error) {
+          console.error('통계 API 호출 실패:', error);
           // API 실패 시 기본값 유지
           setPlatformStats({
             totalArtists: 0,
