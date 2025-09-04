@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { CheckCircle, AlertTriangle } from 'lucide-react';
 import { useRetry } from '../hooks/useRetry';
 import { RetryButton } from './ui/retry-button';
-import { LoadingSpinner, ErrorRetry, EmptyState } from './ui/loading-states';
+import { LoadingSpinner, EmptyState } from './ui/loading-states';
 
 export const RetryDemo: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
@@ -18,12 +18,12 @@ export const RetryDemo: React.FC = () => {
     { maxRetries: 3 }
   );
 
-  const { 
-    data: errorData, 
-    error: errorError, 
-    isLoading: errorLoading, 
-    retry: retryError, 
-    retryCount: errorRetryCount 
+  const {
+    data: errorData,
+    error: errorError,
+    isLoading: errorLoading,
+    retry: retryError,
+    retryCount: errorRetryCount
   } = useRetry(
     async () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -74,13 +74,12 @@ export const RetryDemo: React.FC = () => {
               )}
 
               {error && (
-                <ErrorRetry
-                  error={error}
-                  onRetry={retry}
-                  isLoading={isLoading}
-                  retryCount={retryCount}
-                  maxRetries={3}
-                />
+                <div className="p-3 bg-red-50 rounded-lg">
+                  <p className="text-red-800 text-sm">에러: {error.message}</p>
+                  <Button onClick={retry} disabled={isLoading} className="mt-2" size="sm">
+                    재시도 ({retryCount}/3)
+                  </Button>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -103,13 +102,12 @@ export const RetryDemo: React.FC = () => {
               )}
 
               {errorError && (
-                <ErrorRetry
-                  error={errorError}
-                  onRetry={retryError}
-                  isLoading={errorLoading}
-                  retryCount={errorRetryCount}
-                  maxRetries={3}
-                />
+                <div className="p-3 bg-red-50 rounded-lg">
+                  <p className="text-red-800 text-sm">에러: {errorError.message}</p>
+                  <Button onClick={retryError} disabled={errorLoading} className="mt-2" size="sm">
+                    재시도 ({errorRetryCount}/3)
+                  </Button>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -168,12 +166,12 @@ export const RetryDemo: React.FC = () => {
 
               <div className="space-y-2">
                 <p className="text-sm font-medium">에러 상태:</p>
-                <ErrorRetry
-                  error={new Error('테스트 에러')}
-                  onRetry={() => console.log('재시도')}
-                  retryCount={1}
-                  maxRetries={3}
-                />
+                <div className="p-3 bg-red-50 rounded-lg">
+                  <p className="text-red-800 text-sm">테스트 에러</p>
+                  <Button onClick={() => console.log('재시도')} className="mt-2" size="sm">
+                    재시도 (1/3)
+                  </Button>
+                </div>
               </div>
 
               <div className="space-y-2">

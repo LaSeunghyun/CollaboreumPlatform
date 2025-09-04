@@ -2,7 +2,7 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "build",
-  "installCommand": "npm install",
+  "installCommand": "npm ci",
   "routes": [
     {
       "src": "/static/(.*)",
@@ -17,5 +17,10 @@
   ],
   "env": {
     "REACT_APP_API_URL": "https://collaboreumplatform-production.up.railway.app/api"
+  },
+  "build": {
+    "env": {
+      "REACT_APP_API_URL": "https://collaboreumplatform-production.up.railway.app/api"
+    }
   }
 }
