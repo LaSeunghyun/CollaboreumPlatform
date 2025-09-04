@@ -106,7 +106,7 @@ router.get('/posts/:id', async (req, res) => {
 router.post('/posts', auth, async (req, res) => {
   try {
     const { title, content, category, tags, images, authorName } = req.body;
-    const author = req.user.id;
+    const author = req.user._id;
 
     console.log('포스트 생성 요청 데이터:', { title, content, category, tags, images, authorName, author });
 
@@ -152,7 +152,7 @@ router.put('/posts/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content, category, tags } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const post = await CommunityPost.findById(id);
     if (!post) {
@@ -198,7 +198,7 @@ router.put('/posts/:id', auth, async (req, res) => {
 router.delete('/posts/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const post = await CommunityPost.findById(id);
     if (!post) {
@@ -238,7 +238,7 @@ router.post('/posts/:id/reaction', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const { type } = req.body; // 'like' 또는 'dislike'
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     if (!['like', 'dislike'].includes(type)) {
       return res.status(400).json({
@@ -298,7 +298,7 @@ router.post('/posts/:id/report', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     if (!reason) {
       return res.status(400).json({

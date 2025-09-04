@@ -215,12 +215,12 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
               <SelectTrigger className="h-10">
                 <SelectValue placeholder="카테고리를 선택하세요" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 {isLoadingCategories ? (
-                  <SelectItem value="loading" disabled>카테고리 로딩 중...</SelectItem>
+                  <SelectItem value="loading" disabled className="bg-white">카테고리 로딩 중...</SelectItem>
                 ) : (
                   categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
+                    <SelectItem key={category.id} value={category.id} className="bg-white hover:bg-gray-50">
                       {category.label}
                     </SelectItem>
                   ))

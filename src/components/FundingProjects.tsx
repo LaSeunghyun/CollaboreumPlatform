@@ -106,13 +106,6 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
         console.error('Failed to fetch funding data:', error);
         setError('서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.');
         setProjects([]);
-        setCategories(KOREAN_CATEGORIES);
-        setSortOptions([
-          { value: 'popular', label: '인기순' },
-          { value: 'latest', label: '최신순' },
-          { value: 'deadline', label: '마감임박' },
-          { value: 'progress', label: '달성률' }
-        ]);
       } finally {
         setLoading(false);
       }
@@ -152,36 +145,8 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
 
   const filteredProjects = useMemo(() => {
     if (!projects || projects.length === 0) return [];
-
-    let filtered = projects.filter((project: any) => {
-      const categoryMatch = selectedCategory === "전체" || project.category === selectedCategory;
-      const searchMatch = project.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.artist?.toLowerCase().includes(searchQuery.toLowerCase());
-      return categoryMatch && searchMatch;
-    });
-
-    // 정렬 적용
-    switch (sortBy) {
-      case "인기순":
-        filtered.sort((a: any, b: any) => (b.backers || 0) - (a.backers || 0));
-        break;
-      case "최신순":
-        filtered.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-        break;
-      case "마감임박":
-        filtered.sort((a: any, b: any) => (a.daysLeft || 0) - (b.daysLeft || 0));
-        break;
-      case "달성률":
-        filtered.sort((a: any, b: any) => {
-          const aRate = getProgressPercentage(a.currentAmount || 0, a.targetAmount || 1);
-          const bRate = getProgressPercentage(b.currentAmount || 0, b.targetAmount || 1);
-          return bRate - aRate;
-        });
-        break;
-    }
-
-    return filtered;
-  }, [projects, selectedCategory, searchQuery, sortBy]);
+    return projects;
+  }, [projects]);
 
   if (loading) {
     return (
@@ -489,11 +454,6 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
                 ))}
               </SelectContent>
             </Select>
-
-            <Button variant="outline" className="h-10 px-4 rounded-lg bg-white border border-gray-300">
-              <Filter className="w-4 h-4 mr-2" />
-              필터
-            </Button>
           </div>
         </div>
 
