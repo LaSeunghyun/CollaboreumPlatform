@@ -37,14 +37,14 @@ export function HeroSection({ onViewArtistCommunity, onNavigate }: HeroSectionPr
         try {
           const API_BASE_URL = process.env.REACT_APP_API_URL ||
             (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
-          
+
           const statsResponse = await fetch(`${API_BASE_URL}/stats/platform`);
           if (statsResponse.ok) {
             const contentType = statsResponse.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
               const statsData = await statsResponse.json();
               console.log('플랫폼 통계 데이터:', statsData);
-              
+
               if (statsData.success && statsData.data) {
                 setPlatformStats({
                   totalArtists: statsData.data.registeredArtists || 0,
