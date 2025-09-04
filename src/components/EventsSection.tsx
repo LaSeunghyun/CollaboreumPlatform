@@ -5,7 +5,8 @@ import { Button } from "./ui/button";
 import { Calendar, MapPin, Clock, Users, Filter, Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { communityAPI } from '../services/api';
+import { communityAPI, categoryAPI } from '../services/api';
+import { getCategoryBadgeColor, KOREAN_CATEGORIES } from '../constants/categories';
 
 export function EventsSection() {
   const [events, setEvents] = useState<any[]>([]);
@@ -13,6 +14,7 @@ export function EventsSection() {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<string[]>(KOREAN_CATEGORIES);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,6 +22,21 @@ export function EventsSection() {
         setLoading(true);
         setError(null);
 
+        // 카테고리 데이터 가져오기
+        try {
+          const categoriesResponse = await categoryAPI.getAllCategories() as any;
+          if (categoriesResponse.success) {
+            const categoryLabels = ["전체", ...categoriesResponse.data.map((cat: any) => cat.label || cat.name)];
+            setCategories(categoryLabels);
+          } else {
+            setCategories(KOREAN_CATEGORIES);
+          }
+        } catch (categoryError) {
+          console.warn("Failed to fetch categories:", categoryError);
+          setCategories(KOREAN_CATEGORIES);
+        }
+
+        // 이벤트 데이터 가져오기
         try {
           const response = await communityAPI.getEvents() as any;
           if (response.success && response.data?.events) {
@@ -79,13 +96,11 @@ export function EventsSection() {
               <SelectValue placeholder="카테고리 선택" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">전체</SelectItem>
-              <SelectItem value="music">음악</SelectItem>
-              <SelectItem value="art">미술</SelectItem>
-              <SelectItem value="literature">문학</SelectItem>
-              <SelectItem value="performance">공연</SelectItem>
-              <SelectItem value="photography">사진</SelectItem>
-              <SelectItem value="networking">네트워킹</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category} value={category === "전체" ? "all" : category}>
+                  {category}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Button variant="outline" className="md:w-auto">
@@ -107,13 +122,7 @@ export function EventsSection() {
                   />
                 </div>
                 <Badge
-                  className={`absolute top-3 left-3 ${event.category === "음악" ? "bg-blue-500" :
-                    event.category === "미술" ? "bg-purple-500" :
-                      event.category === "문학" ? "bg-green-500" :
-                        event.category === "공연" ? "bg-red-500" :
-                          event.category === "사진" ? "bg-yellow-500" :
-                            "bg-gray-500"
-                    }`}
+                  className={`absolute top-3 left-3 ${getCategoryBadgeColor(event.category)}`}
                 >
                   {event.category}
                 </Badge>

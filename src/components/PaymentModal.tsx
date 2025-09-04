@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -7,17 +7,18 @@ import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
 import { Checkbox } from './ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { 
-  X, 
-  CreditCard, 
-  Smartphone, 
-  Building2, 
-  Lock, 
-  Shield, 
+import {
+  X,
+  CreditCard,
+  Smartphone,
+  Building2,
+  Lock,
+  Shield,
   AlertCircle,
   Loader2
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { dynamicConstantsService } from '../services/constantsService';
 import { fundingAPI } from '../services/api';
 
 interface PaymentModalProps {
@@ -52,7 +53,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+  const [paymentMethods, setPaymentMethods] = useState<Array<{ id: string, label: string, icon: string }>>([]);
+
   const [formData, setFormData] = useState<PaymentForm>({
     amount: 0,
     rewardId: null,
@@ -72,6 +74,24 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 
   const totalSteps = 4;
   const progressPercentage = (currentStep / totalSteps) * 100;
+
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      try {
+        const methods = await dynamicConstantsService.getPaymentMethods();
+        setPaymentMethods(methods);
+      } catch (error) {
+        console.error('결제 방법을 가져오는 중 오류 발생:', error);
+        setPaymentMethods([
+          { id: 'card', label: '신용카드', icon: '💳' },
+          { id: 'phone', label: '휴대폰 결제', icon: '📱' },
+          { id: 'bank', label: '계좌이체', icon: '🏦' }
+        ]);
+      }
+    };
+
+    fetchPaymentMethods();
+  }, []);
 
   const handleInputChange = (field: keyof PaymentForm, value: any) => {
     setFormData(prev => ({
@@ -184,7 +204,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold mb-4">후원 금액 및 리워드 선택</h3>
-              
+
               {/* 리워드 옵션 */}
               {project.rewards && project.rewards.length > 0 && (
                 <div className="space-y-3 mb-6">
@@ -192,9 +212,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                   {project.rewards.map((reward: any, index: number) => (
                     <div
                       key={index}
-                      className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                        formData.rewardId === reward.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-                      }`}
+                      className={`p-4 border rounded-lg cursor-pointer transition-colors ${formData.rewardId === reward.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                        }`}
                       onClick={() => handleRewardSelect(reward.id, reward.amount)}
                     >
                       <div className="flex justify-between items-start mb-2">
@@ -249,7 +268,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold mb-4">후원자 정보</h3>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Checkbox
@@ -294,7 +313,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold mb-4">결제 방법 선택</h3>
-              
+
               <div className="space-y-4">
                 <Label htmlFor="paymentMethod" className="text-sm font-medium">결제 방법</Label>
                 <Select
@@ -305,24 +324,14 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                     <SelectValue placeholder="결제 방법을 선택하세요" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="card">
-                      <div className="flex items-center gap-2">
-                        <CreditCard className="w-4 h-4" />
-                        신용카드
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="phone">
-                      <div className="flex items-center gap-2">
-                        <Smartphone className="w-4 h-4" />
-                        휴대폰 결제
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="bank">
-                      <div className="flex items-center gap-2">
-                        <Building2 className="w-4 h-4" />
-                        계좌이체
-                      </div>
-                    </SelectItem>
+                    {paymentMethods.map((method) => (
+                      <SelectItem key={method.id} value={method.id}>
+                        <div className="flex items-center gap-2">
+                          <span>{method.icon}</span>
+                          {method.label}
+                        </div>
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
 
@@ -433,7 +442,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold mb-4">약관 동의 및 확인</h3>
-              
+
               <div className="space-y-4">
                 {/* 후원 요약 */}
                 <div className="p-4 bg-gray-50 rounded-lg">
@@ -474,7 +483,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                       </a>에 동의합니다
                     </Label>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="privacy"
@@ -545,7 +554,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
-            
+
             {renderStepContent()}
           </div>
         </div>
@@ -566,8 +575,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 다음
               </Button>
             ) : (
-              <Button 
-                onClick={handleSubmit} 
+              <Button
+                onClick={handleSubmit}
                 disabled={!validateStep(currentStep) || isProcessing}
                 className="min-w-[100px]"
               >

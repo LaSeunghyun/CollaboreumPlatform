@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { Play, Radio, Eye } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { liveStreamAPI } from "../services/api";
+import { getCategoryColor } from "../constants/categories";
 
 export function LiveAndPointsSection() {
   const [liveStreams, setLiveStreams] = useState<any[]>([]);
@@ -118,14 +119,7 @@ export function LiveAndPointsSection() {
                         <div className="flex-1">
                           <div className="flex justify-between items-start mb-2">
                             <Badge
-                              className={
-                                stream.category === "음악" ? "bg-blue-100 text-blue-800" :
-                                  stream.category === "미술" ? "bg-purple-100 text-purple-800" :
-                                    stream.category === "문학" ? "bg-green-100 text-green-800" :
-                                      stream.category === "공연" ? "bg-orange-100 text-orange-800" :
-                                        stream.category === "사진" ? "bg-pink-100 text-pink-800" :
-                                          "bg-gray-100 text-gray-800"
-                              }
+                              className={getCategoryColor(stream.category)}
                             >
                               {stream.category}
                             </Badge>

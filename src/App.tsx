@@ -25,6 +25,9 @@ import { HistoryProvider, useHistory } from './contexts/HistoryContext';
 import { isSpecialPage, scrollToSection } from './utils/navigation';
 import { CommunityPostDetail } from './components/CommunityPostDetail';
 import { CommunityPostForm } from './components/CommunityPostForm';
+import { QuickLinksSection } from './components/QuickLinksSection';
+import { About } from './components/About';
+import { EventsSection } from './components/EventsSection';
 
 function AppContent() {
   const [currentView, setCurrentView] = useState('home');
@@ -323,15 +326,40 @@ function AppContent() {
     );
   }
 
+  if (currentView === 'about') {
+    return (
+      <AppLayout>
+        <About onBack={handleBackToHome} />
+      </AppLayout>
+    );
+  }
+
+  if (currentView === 'events') {
+    return (
+      <AppLayout>
+        <EventsSection />
+      </AppLayout>
+    );
+  }
+
   // Main Home Page
   return (
     <AppLayout>
       <main>
-        <HeroSection onViewArtistCommunity={handleViewArtistCommunity} />
-        <div id="artists"><ArtistSection /></div>
-        <div id="community"><CommunitySection onViewAllCommunity={handleViewAllCommunity} onPostClick={handlePostClick} onCreatePost={handleCreatePost} /></div>
-        <div id="live"><LiveAndPointsSection /></div>
-        <div id="projects"><FundingProjects onViewProject={handleViewProject} /></div>
+        <HeroSection onViewArtistCommunity={handleViewArtistCommunity} onNavigate={handleNavigation} />
+        <div id="projects">
+          <FundingProjects onViewProject={handleViewProject} />
+        </div>
+        <div id="artists">
+          <ArtistSection />
+        </div>
+        <div id="live">
+          <LiveAndPointsSection />
+        </div>
+        <div id="community">
+          <CommunitySection onViewAllCommunity={handleViewAllCommunity} onPostClick={handlePostClick} onCreatePost={handleCreatePost} onNavigate={handleNavigation} />
+        </div>
+        <QuickLinksSection onNavigate={handleNavigation} />
         <Footer />
       </main>
     </AppLayout>

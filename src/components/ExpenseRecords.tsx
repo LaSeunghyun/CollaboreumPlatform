@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
@@ -21,6 +21,7 @@ import {
     PieChart,
     TrendingUp
 } from 'lucide-react';
+import { dynamicConstantsService } from '../services/constantsService';
 import { fundingAPI } from '../services/api';
 
 interface ExpenseRecord {
@@ -66,11 +67,32 @@ export const ExpenseRecords: React.FC<ExpenseRecordsProps> = ({
     const [editingExpense, setEditingExpense] = useState<ExpenseRecord | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [expenseCategories, setExpenseCategories] = useState<Array<{ id: string, label: string, icon: string }>>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>('전체');
     const [selectedStage, setSelectedStage] = useState<string>('전체');
 
     const canEdit = isArtist && projectStatus === '집행중';
     const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+
+    useEffect(() => {
+        const fetchExpenseCategories = async () => {
+            try {
+                const categories = await dynamicConstantsService.getExpenseCategories();
+                setExpenseCategories(categories);
+            } catch (error) {
+                console.error('비용 카테고리를 가져오는 중 오류 발생:', error);
+                setExpenseCategories([
+                    { id: 'labor', label: '인건비', icon: '👥' },
+                    { id: 'material', label: '재료비', icon: '🧱' },
+                    { id: 'equipment', label: '장비비', icon: '⚙️' },
+                    { id: 'marketing', label: '마케팅비', icon: '📢' },
+                    { id: 'other', label: '기타', icon: '📋' }
+                ]);
+            }
+        };
+
+        fetchExpenseCategories();
+    }, []);
     const remainingBudget = executionPlan.totalBudget - totalExpenses;
 
     // 카테고리별 비용 통계
@@ -457,11 +479,11 @@ export const ExpenseRecords: React.FC<ExpenseRecordsProps> = ({
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="전체">전체</SelectItem>
-                            <SelectItem value="인건비">인건비</SelectItem>
-                            <SelectItem value="재료비">재료비</SelectItem>
-                            <SelectItem value="장비비">장비비</SelectItem>
-                            <SelectItem value="마케팅비">마케팅비</SelectItem>
-                            <SelectItem value="기타">기타</SelectItem>
+                            {expenseCategories.map((category) => (
+                                <SelectItem key={category.id} value={category.id}>
+                                    {category.icon} {category.label}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>

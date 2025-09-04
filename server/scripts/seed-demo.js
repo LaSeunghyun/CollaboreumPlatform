@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+yconst mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const FundingProject = require('../models/FundingProject');
 const CommunityPost = require('../models/CommunityPost');
@@ -21,7 +21,6 @@ const seedDemoData = async () => {
     await Category.deleteMany({});
 
     console.log('기존 데이터 삭제 완료');
-
     // 카테고리 데이터 추가
     const categories = [
       { id: 'music', label: '음악', icon: '🎵', order: 1, isActive: true },

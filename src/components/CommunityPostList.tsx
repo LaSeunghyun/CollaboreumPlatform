@@ -4,7 +4,8 @@ import { Input } from './ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { useAuth } from '../contexts/AuthContext';
-import { authAPI, communityAPI } from '../services/api';
+import { authAPI, communityAPI, categoryAPI } from '../services/api';
+import { KOREAN_CATEGORIES } from '../constants/categories';
 import { ApiResponse, CommunityPostResponse } from '../types';
 
 interface Post {
@@ -26,15 +27,10 @@ interface CommunityPostListProps {
 }
 
 // 기본 카테고리 (API 실패 시 사용)
-const DEFAULT_CATEGORIES = [
-  { value: '전체', label: '전체' },
-  { value: '음악', label: '음악' },
-  { value: '미술', label: '미술' },
-  { value: '문학', label: '문학' },
-  { value: '공연', label: '공연' },
-  { value: '사진', label: '사진' },
-  { value: '기타', label: '기타' }
-];
+const DEFAULT_CATEGORIES = KOREAN_CATEGORIES.map(category => ({
+  value: category,
+  label: category
+}));
 
 export const CommunityPostList: React.FC<CommunityPostListProps> = ({
   onWritePost,

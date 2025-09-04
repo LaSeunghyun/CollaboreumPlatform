@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -7,33 +7,61 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Progress } from "./ui/progress";
 import { DollarSign, TrendingUp, Users, BarChart3, Eye, Edit, Plus, MessageCircle, Heart, Target } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-
-// 기본 아티스트 데이터 (API에서 가져올 예정)
-const defaultArtistData = {
-  name: "아티스트",
-  email: "artist@example.com",
-  avatar: "",
-  category: "아티스트",
-  joinDate: "",
-  followers: 0,
-  totalFunding: 0,
-  completedProjects: 0,
-  activeProjects: 0,
-  successRate: 0
-};
-
-// 기본 데이터 (API에서 가져올 예정)
-const defaultProjects: any[] = [];
-const defaultCommunityStats = {
-  totalPosts: 0,
-  totalLikes: 0,
-  totalComments: 0,
-  monthlyGrowth: 0
-};
-const defaultRecentActivities: any[] = [];
+import { useAuth } from "../contexts/AuthContext";
+import { userAPI, fundingAPI, communityAPI } from "../services/api";
 
 export function ArtistMyPage() {
+  const { user } = useAuth();
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
+  const [artistData, setArtistData] = useState<any>(null);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [communityStats, setCommunityStats] = useState<any>(null);
+  const [recentActivities, setRecentActivities] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchArtistData = async () => {
+      if (!user) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        // 아티스트 프로필 데이터 가져오기
+        const profileResponse = await userAPI.getUserProfile(user.id) as any;
+        if (profileResponse.success) {
+          setArtistData(profileResponse.data);
+        }
+
+        // 프로젝트 데이터 가져오기
+        const projectsResponse = await fundingAPI.getProjects({ artistId: user.id }) as any;
+        if (projectsResponse.success) {
+          setProjects(projectsResponse.data || []);
+        }
+
+        // 커뮤니티 통계 가져오기
+        const statsResponse = await communityAPI.getForumPosts(undefined, { page: 1, limit: 10 }) as any;
+        if (statsResponse.success) {
+          setCommunityStats(statsResponse.data);
+        }
+
+        // 최근 활동 가져오기
+        const activitiesResponse = await communityAPI.getForumPosts(undefined, { page: 1, limit: 5 }) as any;
+        if (activitiesResponse.success) {
+          setRecentActivities(activitiesResponse.data || []);
+        }
+
+      } catch (err) {
+        console.error('Failed to fetch artist data:', err);
+        setError('데이터를 불러오는데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArtistData();
+  }, [user]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -45,6 +73,30 @@ export function ArtistMyPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">데이터를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-500 text-lg mb-4">{error}</div>
+          <Button onClick={() => window.location.reload()}>
+            다시 시도
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -52,16 +104,16 @@ export function ArtistMyPage() {
         <div className="mb-8">
           <div className="flex items-center gap-6 mb-6">
             <Avatar className="w-24 h-24">
-              <AvatarImage src={defaultArtistData.avatar} alt={defaultArtistData.name} />
-              <AvatarFallback className="text-xl">{defaultArtistData.name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={artistData?.avatar || user?.avatar} alt={artistData?.name || user?.name} />
+              <AvatarFallback className="text-xl">{(artistData?.name || user?.name || 'A').charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{defaultArtistData.name}</h1>
-              <p className="text-gray-600 mb-2">{defaultArtistData.email}</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{artistData?.name || user?.name || '아티스트'}</h1>
+              <p className="text-gray-600 mb-2">{artistData?.email || user?.email}</p>
               <div className="flex items-center gap-4 text-sm text-gray-500">
-                <span>가입일: {defaultArtistData.joinDate}</span>
+                <span>가입일: {artistData?.joinDate || user?.createdAt || '알 수 없음'}</span>
                 <Badge className="bg-purple-100 text-purple-800">아티스트</Badge>
-                <Badge variant="outline">{defaultArtistData.category}</Badge>
+                <Badge variant="outline">{artistData?.category || '일반'}</Badge>
               </div>
             </div>
             <div className="ml-auto">
@@ -77,35 +129,35 @@ export function ArtistMyPage() {
             <Card>
               <CardContent className="p-4 text-center">
                 <DollarSign className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-gray-900">₩{defaultArtistData.totalFunding.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-gray-900">₩{(artistData?.totalFunding || 0).toLocaleString()}</p>
                 <p className="text-sm text-gray-600">총 펀딩액</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <Target className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-gray-900">{defaultArtistData.completedProjects}</p>
+                <p className="text-2xl font-bold text-gray-900">{artistData?.completedProjects || 0}</p>
                 <p className="text-sm text-gray-600">완료 프로젝트</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <BarChart3 className="w-8 h-8 text-purple-500 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-gray-900">{defaultArtistData.activeProjects}</p>
+                <p className="text-2xl font-bold text-gray-900">{artistData?.activeProjects || 0}</p>
                 <p className="text-sm text-gray-600">진행중 프로젝트</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <Users className="w-8 h-8 text-pink-500 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-gray-900">{defaultArtistData.followers}</p>
+                <p className="text-2xl font-bold text-gray-900">{artistData?.followers || 0}</p>
                 <p className="text-sm text-gray-600">팔로워</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <TrendingUp className="w-8 h-8 text-orange-500 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-gray-900">{defaultArtistData.successRate}%</p>
+                <p className="text-2xl font-bold text-gray-900">{artistData?.successRate || 0}%</p>
                 <p className="text-sm text-gray-600">성공률</p>
               </CardContent>
             </Card>
@@ -133,79 +185,94 @@ export function ArtistMyPage() {
             <div className="grid lg:grid-cols-3 gap-6">
               {/* Project List */}
               <div className="lg:col-span-2 space-y-4">
-                {defaultProjects.map((project) => (
-                  <Card
-                    key={project.id}
-                    className={`cursor-pointer transition-all ${selectedProject === project.id ? 'ring-2 ring-purple-500 shadow-lg' : 'hover:shadow-md'
-                      }`}
-                    onClick={() => setSelectedProject(project.id)}
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex gap-4">
-                        <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                          <ImageWithFallback
-                            src={project.image}
-                            alt={project.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <h3 className="font-medium text-gray-900 mb-1">{project.title}</h3>
-                              <p className="text-sm text-gray-600">{project.description}</p>
-                            </div>
-                            <Badge className={getStatusColor(project.status)}>
-                              {project.status}
-                            </Badge>
-                          </div>
-
-                          {project.status === "진행중" && (
-                            <div className="space-y-2 mb-3">
-                              <div className="flex justify-between text-sm">
-                                <span>₩{project.currentAmount.toLocaleString()} / ₩{project.targetAmount.toLocaleString()}</span>
-                                <span>{Math.round((project.currentAmount / project.targetAmount) * 100)}%</span>
-                              </div>
-                              <Progress value={(project.currentAmount / project.targetAmount) * 100} className="h-2" />
-                              <div className="flex justify-between text-sm text-gray-600">
-                                <span>{project.backers}명 후원</span>
-                                <span>{project.daysLeft}일 남음</span>
-                              </div>
-                            </div>
-                          )}
-
-                          {project.status === "완료" && project.finalReport && (
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div>
-                                <span className="text-gray-600">총 수익:</span>
-                                <span className="font-semibold ml-2">₩{project.finalReport.totalRevenue.toLocaleString()}</span>
-                              </div>
-                              <div>
-                                <span className="text-gray-600">투자자 배분:</span>
-                                <span className="font-semibold ml-2">₩{project.finalReport.distributedAmount.toLocaleString()}</span>
-                              </div>
-                            </div>
-                          )}
-
-                          <div className="flex justify-between items-center mt-3 pt-3 border-t">
-                            <span className="text-sm text-gray-600">{project.startDate} - {project.endDate}</span>
-                            <div className="flex gap-2">
-                              <Button variant="outline" size="sm">
-                                <Eye className="w-4 h-4 mr-1" />
-                                보기
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                <Edit className="w-4 h-4 mr-1" />
-                                편집
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
+                {projects.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-8 text-center">
+                      <div className="text-gray-500 mb-4">
+                        <Plus className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                        <p>아직 등록된 프로젝트가 없습니다.</p>
                       </div>
+                      <Button>
+                        <Plus className="w-4 h-4 mr-2" />
+                        첫 프로젝트 만들기
+                      </Button>
                     </CardContent>
                   </Card>
-                ))}
+                ) : (
+                  projects.map((project) => (
+                    <Card
+                      key={project.id}
+                      className={`cursor-pointer transition-all ${selectedProject === project.id ? 'ring-2 ring-purple-500 shadow-lg' : 'hover:shadow-md'
+                        }`}
+                      onClick={() => setSelectedProject(project.id)}
+                    >
+                      <CardContent className="p-6">
+                        <div className="flex gap-4">
+                          <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                            <ImageWithFallback
+                              src={project.image}
+                              alt={project.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <h3 className="font-medium text-gray-900 mb-1">{project.title}</h3>
+                                <p className="text-sm text-gray-600">{project.description}</p>
+                              </div>
+                              <Badge className={getStatusColor(project.status)}>
+                                {project.status}
+                              </Badge>
+                            </div>
+
+                            {project.status === "진행중" && (
+                              <div className="space-y-2 mb-3">
+                                <div className="flex justify-between text-sm">
+                                  <span>₩{project.currentAmount.toLocaleString()} / ₩{project.targetAmount.toLocaleString()}</span>
+                                  <span>{Math.round((project.currentAmount / project.targetAmount) * 100)}%</span>
+                                </div>
+                                <Progress value={(project.currentAmount / project.targetAmount) * 100} className="h-2" />
+                                <div className="flex justify-between text-sm text-gray-600">
+                                  <span>{project.backers}명 후원</span>
+                                  <span>{project.daysLeft}일 남음</span>
+                                </div>
+                              </div>
+                            )}
+
+                            {project.status === "완료" && project.finalReport && (
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                  <span className="text-gray-600">총 수익:</span>
+                                  <span className="font-semibold ml-2">₩{project.finalReport.totalRevenue.toLocaleString()}</span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-600">투자자 배분:</span>
+                                  <span className="font-semibold ml-2">₩{project.finalReport.distributedAmount.toLocaleString()}</span>
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="flex justify-between items-center mt-3 pt-3 border-t">
+                              <span className="text-sm text-gray-600">{project.startDate} - {project.endDate}</span>
+                              <div className="flex gap-2">
+                                <Button variant="outline" size="sm">
+                                  <Eye className="w-4 h-4 mr-1" />
+                                  보기
+                                </Button>
+                                <Button variant="outline" size="sm">
+                                  <Edit className="w-4 h-4 mr-1" />
+                                  편집
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </div>
 
               {/* Project Details */}
@@ -214,7 +281,8 @@ export function ArtistMyPage() {
                 {selectedProject ? (
                   <div className="space-y-4">
                     {(() => {
-                      const project = defaultProjects.find(p => p.id === selectedProject)!;
+                      const project = projects.find(p => p.id === selectedProject);
+                      if (!project) return <div>프로젝트를 찾을 수 없습니다.</div>;
                       return (
                         <>
                           <Card>
@@ -276,7 +344,7 @@ export function ArtistMyPage() {
                             </CardHeader>
                             <CardContent>
                               <div className="space-y-3">
-                                {defaultRecentActivities.map((activity) => (
+                                {(recentActivities.length > 0 ? recentActivities : []).map((activity: any) => (
                                   <div key={activity.id} className="flex items-start gap-3">
                                     <div className={`w-2 h-2 rounded-full mt-2 ${activity.type === 'funding' ? 'bg-green-500' :
                                       activity.type === 'comment' ? 'bg-blue-500' : 'bg-purple-500'
@@ -317,28 +385,28 @@ export function ArtistMyPage() {
               <Card>
                 <CardContent className="p-4 text-center">
                   <MessageCircle className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">{defaultCommunityStats.totalPosts}</p>
+                  <p className="text-2xl font-bold text-gray-900">{communityStats?.totalPosts || 0}</p>
                   <p className="text-sm text-gray-600">총 게시물</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4 text-center">
                   <Heart className="w-8 h-8 text-red-500 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">{defaultCommunityStats.totalLikes}</p>
+                  <p className="text-2xl font-bold text-gray-900">{communityStats?.totalLikes || 0}</p>
                   <p className="text-sm text-gray-600">받은 좋아요</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4 text-center">
                   <MessageCircle className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">{defaultCommunityStats.totalComments}</p>
+                  <p className="text-2xl font-bold text-gray-900">{communityStats?.totalComments || 0}</p>
                   <p className="text-sm text-gray-600">댓글 수</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4 text-center">
                   <TrendingUp className="w-8 h-8 text-purple-500 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-green-600">+{defaultCommunityStats.monthlyGrowth}%</p>
+                  <p className="text-2xl font-bold text-green-600">+{communityStats?.monthlyGrowth || 0}%</p>
                   <p className="text-sm text-gray-600">월 성장률</p>
                 </CardContent>
               </Card>
@@ -347,14 +415,31 @@ export function ArtistMyPage() {
             <div className="grid lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>최근 게시물</CardTitle>
+                  <CardTitle>최근 활동</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-8 text-gray-500">
-                    <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>최근 게시물이 없습니다.</p>
-                    <Button className="mt-4">새 게시물 작성</Button>
-                  </div>
+                  {recentActivities.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>최근 활동이 없습니다.</p>
+                      <Button className="mt-4">새 게시물 작성</Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {recentActivities.map((activity, index) => (
+                        <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
+                          <div className={`w-2 h-2 rounded-full ${activity.type === 'post' ? 'bg-blue-500' :
+                            activity.type === 'comment' ? 'bg-green-500' :
+                              activity.type === 'like' ? 'bg-red-500' : 'bg-gray-500'
+                            }`} />
+                          <div className="flex-1">
+                            <p className="text-sm text-gray-900">{activity.message}</p>
+                            <p className="text-xs text-gray-600">{activity.time}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -384,10 +469,146 @@ export function ArtistMyPage() {
 
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-6">
-            <div className="text-center py-12 text-gray-500">
-              <BarChart3 className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-medium mb-2">상세 분석 기능 준비 중</h3>
-              <p>프로젝트 성과와 팬 참여도 분석 기능이 곧 추가됩니다.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">총 조회수</p>
+                      <p className="text-2xl font-bold text-gray-900">12,847</p>
+                    </div>
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <Eye className="w-6 h-6 text-blue-600" />
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <div className="flex items-center text-sm text-green-600">
+                      <TrendingUp className="w-4 h-4 mr-1" />
+                      +12.5% 이번 달
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">팬 참여도</p>
+                      <p className="text-2xl font-bold text-gray-900">89%</p>
+                    </div>
+                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                      <Users className="w-6 h-6 text-green-600" />
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <div className="flex items-center text-sm text-green-600">
+                      <TrendingUp className="w-4 h-4 mr-1" />
+                      +5.2% 이번 주
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">평균 후원금</p>
+                      <p className="text-2xl font-bold text-gray-900">₩45,200</p>
+                    </div>
+                    <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <DollarSign className="w-6 h-6 text-purple-600" />
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <div className="flex items-center text-sm text-green-600">
+                      <TrendingUp className="w-4 h-4 mr-1" />
+                      +8.1% 이번 달
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">성공률</p>
+                      <p className="text-2xl font-bold text-gray-900">94%</p>
+                    </div>
+                    <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <Target className="w-6 h-6 text-orange-600" />
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <div className="flex items-center text-sm text-green-600">
+                      <TrendingUp className="w-4 h-4 mr-1" />
+                      +2.3% 이번 달
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5" />
+                    월별 수익 추이
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64 flex items-center justify-center text-gray-500">
+                    <div className="text-center">
+                      <BarChart3 className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                      <p>차트 데이터 준비 중</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    팬 참여 분석
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">댓글 참여도</span>
+                      <div className="flex items-center gap-2">
+                        <Progress value={75} className="w-20" />
+                        <span className="text-sm font-medium">75%</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">공유 참여도</span>
+                      <div className="flex items-center gap-2">
+                        <Progress value={60} className="w-20" />
+                        <span className="text-sm font-medium">60%</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">후원 참여도</span>
+                      <div className="flex items-center gap-2">
+                        <Progress value={45} className="w-20" />
+                        <span className="text-sm font-medium">45%</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">이벤트 참여도</span>
+                      <div className="flex items-center gap-2">
+                        <Progress value={30} className="w-20" />
+                        <span className="text-sm font-medium">30%</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 

@@ -5,12 +5,8 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Search, Filter, MessageCircle, Heart, ArrowLeft } from "lucide-react";
-
-// 카테고리는 API에서 동적으로 가져옴
-
-// 기본 데이터 (API에서 가져올 예정)
-const defaultArtists: any[] = [];
-const defaultForumPosts: any[] = [];
+import { communityAPI, userAPI, categoryAPI } from "../services/api";
+import { KOREAN_CATEGORIES, getCategoryColor } from "../constants/categories";
 
 interface CommunityFullProps {
   onBack: () => void;
@@ -21,37 +17,52 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedArtist, setSelectedArtist] = useState<number | null>(null);
-  const [artists] = useState(defaultArtists);
-  const [forumPosts] = useState(defaultForumPosts);
+  const [artists, setArtists] = useState<any[]>([]);
+  const [forumPosts, setForumPosts] = useState<any[]>([]);
   const [categories, setCategories] = useState<string[]>(["전체"]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // 카테고리 목록 가져오기
+  // 데이터 로딩
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
-        const API_BASE_URL = process.env.REACT_APP_API_URL ||
-          (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
+        setLoading(true);
+        setError(null);
 
-        const response = await fetch(`${API_BASE_URL}/categories`);
-        if (response.ok) {
-          const categoriesData = await response.json();
-          const categoryLabels = ["전체", ...categoriesData.map((cat: any) => cat.label)];
+        // 카테고리 목록 가져오기
+        const categoriesResponse = await communityAPI.getCategories() as any;
+        if (categoriesResponse.success) {
+          const categoryLabels = ["전체", ...categoriesResponse.data.map((cat: any) => cat.label)];
           setCategories(categoryLabels);
         } else {
-          // API 실패 시 기본 카테고리 사용
-          setCategories(["전체", "음악", "미술", "문학", "공연", "사진"]);
+          setCategories(KOREAN_CATEGORIES);
         }
-      } catch (error) {
-        console.error('카테고리 로드 실패:', error);
-        // 오류 시 기본 카테고리 사용
-        setCategories(["전체", "음악", "미술", "문학", "공연", "사진"]);
+
+        // 아티스트 목록 가져오기
+        const artistsResponse = await userAPI.getFollowingArtists('current-user') as any;
+        if (artistsResponse.success) {
+          setArtists(artistsResponse.data || []);
+        }
+
+        // 포럼 게시물 가져오기
+        const postsResponse = await communityAPI.getForumPosts() as any;
+        if (postsResponse.success) {
+          setForumPosts(postsResponse.data || []);
+        }
+
+      } catch (err) {
+        console.error('Failed to fetch community data:', err);
+        setError('데이터를 불러오는데 실패했습니다.');
+        setCategories(KOREAN_CATEGORIES);
       } finally {
+        setLoading(false);
         setIsLoadingCategories(false);
       }
     };
 
-    fetchCategories();
+    fetchData();
   }, []);
 
   const filteredArtists = artists.filter(artist => {
@@ -65,6 +76,30 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
     const artistMatch = selectedArtist === null || post.artistId === selectedArtist;
     return categoryMatch && artistMatch;
   });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">커뮤니티 데이터를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-500 text-lg mb-4">{error}</div>
+          <Button onClick={() => window.location.reload()}>
+            다시 시도
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -231,12 +266,7 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex items-center gap-3">
                         <Badge
-                          className={
-                            post.category === "음악" ? "bg-blue-100 text-blue-800" :
-                              post.category === "미술" ? "bg-purple-100 text-purple-800" :
-                                post.category === "문학" ? "bg-green-100 text-green-800" :
-                                  "bg-red-100 text-red-800"
-                          }
+                          className={getCategoryColor(post.category)}
                         >
                           {post.category}
                         </Badge>

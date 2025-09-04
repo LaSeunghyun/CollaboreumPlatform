@@ -1,6 +1,7 @@
 export const SPECIAL_PAGES = [
-  'home', 'dashboard', 'mypage', 'community-full', 
-  'artist-profile', 'gallery', 'admin', 'login', 'signup'
+  'home', 'dashboard', 'mypage', 'community-full',
+  'artist-profile', 'gallery', 'admin', 'login', 'signup',
+  'about', 'events'
 ] as const;
 
 export const isSpecialPage = (section: string): boolean => {

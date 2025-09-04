@@ -9,6 +9,9 @@ import {
 const API_BASE_URL = process.env.REACT_APP_API_URL ||
     (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
 
+// 디버깅을 위한 로그
+console.log('Constants API_BASE_URL:', API_BASE_URL);
+
 class ConstantsService {
     private enumsCache: Enums | null = null;
     private csvHeadersCache: CsvHeaders | null = null;

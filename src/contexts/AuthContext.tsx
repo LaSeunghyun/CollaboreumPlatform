@@ -8,6 +8,8 @@ interface User {
   avatar?: string;
   bio?: string;
   isVerified?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface AuthContextType {

@@ -12,6 +12,7 @@ import { Label } from "./ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { ArrowLeft, MessageSquare, Users, DollarSign, Clock, Search, Filter, Eye, Edit, Trash2, Plus, Image, Palette, CheckCircle2, XCircle } from "lucide-react";
 import { adminAPI } from '../services/api';
+import { dynamicConstantsService } from '../services/constantsService';
 
 interface AdminDashboardProps {
   onBack?: () => void;
@@ -59,6 +60,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
     tags: "",
     imageUrl: ""
   });
+  const [artworkCategories, setArtworkCategories] = useState<Array<{ id: string, label: string, icon: string }>>([]);
 
   // 이전 페이지로 돌아가기
   const handleBack = () => {
@@ -86,16 +88,18 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [inquiriesData, matchingData, financialData] = await Promise.all([
+        const [inquiriesData, matchingData, financialData, categoriesData] = await Promise.all([
           adminAPI.getInquiries(),
           adminAPI.getMatchingRequests(),
-          adminAPI.getFinancialData()
+          adminAPI.getFinancialData(),
+          dynamicConstantsService.getArtworkCategories()
         ]);
 
         setInquiries(inquiriesData as any[]);
         setMatchingRequests(matchingData as any[]);
         setFinancialData(financialData as any[]);
         setArtworks([]);
+        setArtworkCategories(categoriesData);
       } catch (error) {
         console.error('Failed to fetch admin data:', error);
         // API 실패 시 빈 데이터로 설정
@@ -103,6 +107,13 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
         setMatchingRequests([]);
         setFinancialData([]);
         setArtworks([]);
+        setArtworkCategories([
+          { id: 'painting', label: '회화', icon: '🎨' },
+          { id: 'sculpture', label: '조각', icon: '🗿' },
+          { id: 'photography', label: '사진', icon: '📸' },
+          { id: 'digital', label: '디지털아트', icon: '💻' },
+          { id: 'craft', label: '공예', icon: '🛠️' }
+        ]);
       } finally {
         setLoading(false);
       }
@@ -675,11 +686,11 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                           <SelectValue placeholder="카테고리 선택" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="회화">회화</SelectItem>
-                          <SelectItem value="조각">조각</SelectItem>
-                          <SelectItem value="사진">사진</SelectItem>
-                          <SelectItem value="디지털아트">디지털아트</SelectItem>
-                          <SelectItem value="공예">공예</SelectItem>
+                          {artworkCategories.map((category) => (
+                            <SelectItem key={category.id} value={category.id}>
+                              {category.icon} {category.label}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>

@@ -125,52 +125,39 @@ export function ArtistSection() {
   }
 
   return (
-    <section id="artists" className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">새롭게 합류한 아티스트</h2>
-          <p className="text-xl text-gray-600">최근에 가입한 재능 있는 독립 아티스트들을 만나보세요</p>
+    <section id="artists" className="py-24 lg:py-32 bg-gradient-to-b from-background to-secondary/10">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-primary/5 text-primary px-6 py-3 rounded-full text-sm font-semibold mb-8 border border-primary/20">
+            <span className="text-lg">👨‍🎨</span>
+            주목받는 아티스트
+          </div>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 tracking-tight">
+            창의적인 <span className="text-primary">아티스트</span>들을 만나보세요
+          </h2>
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            다양한 장르의 독립 아티스트들과 함께 새로운 창작의 세계를 탐험하세요
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {artists.map((artist) => (
-            <Card key={artist.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <Card key={artist.id} className="overflow-hidden hover:shadow-apple-lg transition-all duration-300 group border-border/50 rounded-3xl">
               {/* Cover Image */}
-              <div className="relative h-32">
+              <div className="relative h-48">
                 <ImageWithFallback
                   src={artist.coverImage}
                   alt={`${artist.name} cover`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-20" />
-                {artist.isVerified && (
-                  <div className="absolute top-2 right-2">
-                    <Badge variant="default" className="bg-blue-600">
-                      인증됨
-                    </Badge>
-                  </div>
-                )}
-                {artist.featured && (
-                  <div className="absolute top-2 left-2">
-                    <Badge variant="default" className="bg-yellow-600">
-                      추천
-                    </Badge>
-                  </div>
-                )}
-                {(artist as any).isNew && (
-                  <div className="absolute top-2 left-2">
-                    <Badge variant="default" className="bg-green-600">
-                      신규
-                    </Badge>
-                  </div>
-                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               </div>
 
               {/* Profile Section */}
               <div className="relative px-6 pb-6">
                 {/* Profile Image */}
-                <div className="absolute -top-12 left-6 z-10">
-                  <div className="w-24 h-24 rounded-full border-4 border-white overflow-hidden shadow-lg">
+                <div className="absolute -top-12 left-6">
+                  <div className="w-24 h-24 rounded-full border-4 border-background overflow-hidden shadow-apple">
                     <ImageWithFallback
                       src={artist.profileImage || (artist as any).avatar}
                       alt={artist.name}
@@ -181,68 +168,68 @@ export function ArtistSection() {
 
                 {/* Artist Info */}
                 <div className="pt-16">
-                  <div className="flex justify-between items-start mb-2">
+                  <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900">{artist.name}</h3>
-                      <p className="text-gray-600">{artist.category}</p>
-                      <p className="text-sm text-gray-500">{artist.location}</p>
+                      <h3 className="text-xl font-bold text-foreground">{artist.name}</h3>
+                      <p className="text-muted-foreground font-medium">{artist.category}</p>
+                      <p className="text-sm text-muted-foreground">{artist.location}</p>
                     </div>
-                    <div className="flex items-center">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
-                      <span className="text-sm font-medium">{artist.rating || 0}</span>
+                    <div className="flex items-center bg-primary/10 px-3 py-1 rounded-full">
+                      <Star className="w-4 h-4 text-primary fill-current mr-1" />
+                      <span className="text-sm font-medium text-primary">{artist.rating || 0}</span>
                     </div>
                   </div>
 
-                  <p className="text-gray-700 text-sm mb-4 line-clamp-2">{artist.bio}</p>
+                  <p className="text-foreground/80 text-sm mb-4 line-clamp-2 leading-relaxed">{artist.bio}</p>
 
                   {/* Tags */}
-                  <div className="flex flex-wrap gap-1 mb-4">
+                  <div className="flex flex-wrap gap-2 mb-6">
                     {artist.tags?.map((tag, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
+                      <Badge key={index} variant="secondary" className="text-xs bg-secondary/80 text-foreground rounded-lg px-3 py-1">
                         {tag}
                       </Badge>
                     )) || []}
                   </div>
 
                   {/* Stats */}
-                  <div className="grid grid-cols-3 gap-4 text-center py-4 border-t border-gray-200">
+                  <div className="grid grid-cols-3 gap-4 text-center py-4 border-t border-border/50 mb-6">
                     <div>
-                      <div className="text-lg font-bold text-gray-900">{artist.followers || 0}</div>
-                      <div className="text-xs text-gray-600">팔로워</div>
+                      <div className="text-lg font-bold text-foreground">{artist.followers || 0}</div>
+                      <div className="text-xs text-muted-foreground font-medium">팔로워</div>
                     </div>
                     <div>
-                      <div className="text-lg font-bold text-gray-900">{artist.completedProjects || 0}</div>
-                      <div className="text-xs text-gray-600">완료 프로젝트</div>
+                      <div className="text-lg font-bold text-foreground">{artist.completedProjects || 0}</div>
+                      <div className="text-xs text-muted-foreground font-medium">완료 프로젝트</div>
                     </div>
                     <div>
-                      <div className="text-lg font-bold text-gray-900">
+                      <div className="text-lg font-bold text-foreground">
                         {artist.totalEarned ? `₩${artist.totalEarned.toLocaleString()}` : '₩0'}
                       </div>
-                      <div className="text-xs text-gray-600">총 펀딩</div>
+                      <div className="text-xs text-muted-foreground font-medium">총 펀딩</div>
                     </div>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <Button
-                      className="flex-1"
+                      className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl"
                       onClick={() => handleFollow(artist.id)}
                     >
                       <Users className="w-4 h-4 mr-2" />
                       팔로우
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="border-border hover:bg-secondary/50 rounded-xl px-4">
                       <ExternalLink className="w-4 h-4" />
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="border-border hover:bg-secondary/50 rounded-xl px-4">
                       <Play className="w-4 h-4" />
                     </Button>
                   </div>
 
                   {/* Active Project Notice */}
                   {(artist.activeProjects || 0) > 0 && (
-                    <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-center">
-                      <span className="text-sm text-blue-800">
+                    <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-2xl text-center">
+                      <span className="text-sm text-primary font-medium">
                         현재 진행 중인 프로젝트 {artist.activeProjects}개
                       </span>
                     </div>
@@ -253,8 +240,12 @@ export function ArtistSection() {
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <Button variant="outline" size="lg">
+        <div className="text-center mt-16">
+          <Button
+            variant="outline"
+            size="lg"
+            className="border-border bg-background/80 backdrop-blur-sm text-foreground hover:bg-secondary/50 cursor-pointer font-medium px-8 py-4 rounded-2xl"
+          >
             더 많은 아티스트 보기
           </Button>
         </div>

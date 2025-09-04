@@ -104,3 +104,4 @@ export const getUserRole = (): string | null => {
   const user = getCurrentUser();
   return user?.role || null;
 };
+

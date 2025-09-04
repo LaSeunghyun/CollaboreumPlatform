@@ -32,6 +32,7 @@ import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { useAuth } from '../contexts/AuthContext';
 import { userProfileAPI } from '../services/api';
+import { dynamicConstantsService } from '../services/constantsService';
 
 // Types
 interface UserProfile {
@@ -293,6 +294,7 @@ export const ArtistMyPage: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [revenues, setRevenues] = useState<Revenue[]>([]);
   const [activeTab, setActiveTab] = useState('profile');
+  const [statusConfig, setStatusConfig] = useState<Record<string, { label: string; variant: any }>>({});
 
   useEffect(() => {
     const fetchArtistData = async () => {
@@ -310,10 +312,21 @@ export const ArtistMyPage: React.FC = () => {
           const revenuesData = await revenuesResponse.json();
           setRevenues(revenuesData.data || []);
         }
+
+        // API에서 상태 설정 가져오기
+        const statusConfigData = await dynamicConstantsService.getProjectStatusConfig();
+        setStatusConfig(statusConfigData);
       } catch (error) {
         console.error('아티스트 데이터 로드 실패:', error);
         setProjects([]);
         setRevenues([]);
+        // 기본 상태 설정 사용
+        setStatusConfig({
+          pending: { label: '승인 대기', variant: 'secondary' },
+          active: { label: '진행중', variant: 'default' },
+          completed: { label: '완료', variant: 'outline' },
+          failed: { label: '실패', variant: 'destructive' }
+        });
       }
     };
 
@@ -344,14 +357,7 @@ export const ArtistMyPage: React.FC = () => {
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      pending: { label: '승인 대기', variant: 'secondary' as const },
-      active: { label: '진행중', variant: 'default' as const },
-      completed: { label: '완료', variant: 'outline' as const },
-      failed: { label: '실패', variant: 'destructive' as const }
-    };
-
-    const config = statusConfig[status as keyof typeof statusConfig];
+    const config = statusConfig[status] || { label: status, variant: 'secondary' };
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
