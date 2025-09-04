@@ -6,6 +6,7 @@ const Project = require('../models/Project');
 const FundingProject = require('../models/FundingProject');
 const CommunityPost = require('../models/CommunityPost');
 const Event = require('../models/Event');
+const LiveStream = require('../models/LiveStream');
 const Track = require('../models/Track');
 
 // 데이터베이스 연결
@@ -28,6 +29,7 @@ const clearDatabase = async () => {
     await FundingProject.deleteMany({});
     await CommunityPost.deleteMany({});
     await Event.deleteMany({});
+    await LiveStream.deleteMany({});
     await Track.deleteMany({});
     console.log('🗑️ 기존 데이터 삭제 완료');
   } catch (error) {
@@ -559,6 +561,208 @@ const createTestCommunityPosts = async (users) => {
   }
 };
 
+// 테스트 라이브 스트림 생성
+const createTestLiveStreams = async (users) => {
+  try {
+    const liveStreams = [
+      {
+        title: '인디 록 라이브 공연',
+        description: '새로운 곡들을 선보이는 인디 록 밴드의 라이브 공연입니다. 팬들과 함께하는 특별한 시간이 될 예정입니다.',
+        artist: users[0]._id,
+        artistName: users[0].name,
+        category: '음악',
+        thumbnail: '/thumbnails/live1.jpg',
+        streamUrl: 'https://stream.example.com/live1',
+        isLive: true,
+        status: '라이브',
+        scheduledAt: new Date('2024-01-15T20:00:00Z'),
+        startedAt: new Date('2024-01-15T20:00:00Z'),
+        viewerCount: 1250,
+        maxViewers: 1500,
+        tags: ['인디', '록', '라이브'],
+        isActive: true,
+        chatEnabled: true,
+        recordingEnabled: true
+      },
+      {
+        title: '현대미술 작품 제작 과정',
+        description: '현대미술 작가가 작품을 제작하는 과정을 실시간으로 보여주는 라이브 스트림입니다.',
+        artist: users[1]._id,
+        artistName: users[1].name,
+        category: '공연',
+        thumbnail: '/thumbnails/live2.jpg',
+        streamUrl: 'https://stream.example.com/live2',
+        isLive: false,
+        status: '예정',
+        scheduledAt: new Date('2024-01-20T15:00:00Z'),
+        viewerCount: 0,
+        maxViewers: 500,
+        tags: ['미술', '제작과정', '워크샵'],
+        isActive: true,
+        chatEnabled: true,
+        recordingEnabled: false
+      },
+      {
+        title: '음악 이론 강의',
+        description: '기초 음악 이론부터 고급 테크닉까지 배울 수 있는 교육용 라이브 스트림입니다.',
+        artist: users[0]._id,
+        artistName: users[0].name,
+        category: '워크샵',
+        thumbnail: '/thumbnails/live3.jpg',
+        streamUrl: 'https://stream.example.com/live3',
+        isLive: false,
+        status: '종료',
+        scheduledAt: new Date('2024-01-10T19:00:00Z'),
+        startedAt: new Date('2024-01-10T19:00:00Z'),
+        endedAt: new Date('2024-01-10T21:00:00Z'),
+        duration: 120,
+        viewerCount: 0,
+        maxViewers: 800,
+        tags: ['음악이론', '교육', '강의'],
+        isActive: true,
+        chatEnabled: true,
+        recordingEnabled: true,
+        recordingUrl: 'https://recordings.example.com/live3'
+      }
+    ];
+
+    const createdLiveStreams = await LiveStream.insertMany(liveStreams);
+    console.log('📺 테스트 라이브 스트림 생성 완료');
+    return createdLiveStreams;
+  } catch (error) {
+    console.error('❌ 라이브 스트림 생성 실패:', error);
+    throw error;
+  }
+};
+
+// 테스트 이벤트 생성
+const createTestEvents = async (users) => {
+  try {
+    const events = [
+      {
+        title: '인디 음악 페스티벌 2024',
+        description: '다양한 인디 아티스트들이 참여하는 대규모 음악 페스티벌입니다. 새로운 사운드와 재능을 발견할 수 있는 특별한 기회입니다.',
+        category: '축제',
+        startDate: new Date('2024-06-15T10:00:00Z'),
+        endDate: new Date('2024-06-16T22:00:00Z'),
+        time: '10:00 - 22:00',
+        location: '올림픽공원',
+        address: '서울특별시 송파구 올림픽로 300',
+        maxAttendees: 5000,
+        currentAttendees: 3200,
+        image: '/events/festival1.jpg',
+        status: '예정',
+        isActive: true,
+        createdBy: users[4]._id, // 관리자
+        tags: ['인디', '페스티벌', '음악'],
+        tickets: [
+          {
+            type: '일반',
+            price: 50000,
+            available: 1000,
+            sold: 2000
+          },
+          {
+            type: 'VIP',
+            price: 100000,
+            available: 200,
+            sold: 300
+          },
+          {
+            type: '얼리버드',
+            price: 35000,
+            available: 0,
+            sold: 900
+          }
+        ],
+        performers: [
+          {
+            name: '김아티스트',
+            genre: '인디록',
+            description: '독창적인 사운드로 주목받는 신예 아티스트'
+          },
+          {
+            name: '이아티스트',
+            genre: '포크',
+            description: '감성적인 가사와 멜로디로 유명한 아티스트'
+          }
+        ]
+      },
+      {
+        title: '현대미술 전시회 개막식',
+        description: '신진 작가들의 현대미술 작품을 전시하는 갤러리 전시회입니다. 작가와의 만남도 함께 진행됩니다.',
+        category: '공연',
+        startDate: new Date('2024-03-01T18:00:00Z'),
+        endDate: new Date('2024-03-01T21:00:00Z'),
+        time: '18:00 - 21:00',
+        location: '갤러리 현대',
+        address: '서울특별시 강남구 압구정로 165',
+        maxAttendees: 200,
+        currentAttendees: 150,
+        image: '/events/exhibition1.jpg',
+        status: '예정',
+        isActive: true,
+        createdBy: users[4]._id, // 관리자
+        tags: ['현대미술', '전시회', '갤러리'],
+        tickets: [
+          {
+            type: '일반',
+            price: 20000,
+            available: 50,
+            sold: 150
+          }
+        ],
+        performers: [
+          {
+            name: '이아티스트',
+            genre: '현대미술',
+            description: '추상화와 현대미술 작품으로 유명한 작가'
+          }
+        ]
+      },
+      {
+        title: '음악 제작 워크샵',
+        description: '프로 음악 제작자가 직접 가르치는 음악 제작 워크샵입니다. 실습 위주의 교육으로 구성되어 있습니다.',
+        category: '워크샵',
+        startDate: new Date('2024-02-15T14:00:00Z'),
+        endDate: new Date('2024-02-15T17:00:00Z'),
+        time: '14:00 - 17:00',
+        location: '음악 스튜디오',
+        address: '서울특별시 홍대입구역 근처',
+        maxAttendees: 30,
+        currentAttendees: 25,
+        image: '/events/workshop1.jpg',
+        status: '예정',
+        isActive: true,
+        createdBy: users[0]._id, // 아티스트
+        tags: ['음악제작', '워크샵', '교육'],
+        tickets: [
+          {
+            type: '일반',
+            price: 80000,
+            available: 5,
+            sold: 25
+          }
+        ],
+        performers: [
+          {
+            name: '김아티스트',
+            genre: '음악제작',
+            description: '다양한 장르의 음악 제작 경험을 가진 프로듀서'
+          }
+        ]
+      }
+    ];
+
+    const createdEvents = await Event.insertMany(events);
+    console.log('🎪 테스트 이벤트 생성 완료');
+    return createdEvents;
+  } catch (error) {
+    console.error('❌ 이벤트 생성 실패:', error);
+    throw error;
+  }
+};
+
 // 메인 실행 함수
 const seedDatabase = async () => {
   try {
@@ -570,6 +774,8 @@ const seedDatabase = async () => {
     const projects = await createTestProjects(users, artists);
     const fundingProjects = await createTestFundingProjects(users, artists);
     const communityPosts = await createTestCommunityPosts(users);
+    const liveStreams = await createTestLiveStreams(users);
+    const events = await createTestEvents(users);
     
     console.log('🎉 모든 테스트 데이터 생성 완료!');
     console.log(`📊 생성된 데이터:`);
@@ -578,6 +784,8 @@ const seedDatabase = async () => {
     console.log(`   - 프로젝트: ${projects.length}개`);
     console.log(`   - 펀딩 프로젝트: ${fundingProjects.length}개`);
     console.log(`   - 커뮤니티 포스트: ${communityPosts.length}개`);
+    console.log(`   - 라이브 스트림: ${liveStreams.length}개`);
+    console.log(`   - 이벤트: ${events.length}개`);
     
     process.exit(0);
   } catch (error) {
