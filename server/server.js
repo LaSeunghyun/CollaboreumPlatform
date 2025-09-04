@@ -117,9 +117,9 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/funding', fundingRoutes);
 app.use('/api/live-streams', liveStreamRoutes);
+app.use('/api/constants', constantsRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/stats', statsRoutes);
-app.use('/api/constants', constantsRoutes);
 app.use('/api/notifications', notificationRoutes);
 
 // Error handling middleware
