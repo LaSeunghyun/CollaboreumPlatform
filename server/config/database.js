@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { logger } = require('../src/logger');
 
 const connectDB = async () => {
   const maxRetries = 5;
@@ -7,7 +8,11 @@ const connectDB = async () => {
   const connectWithRetry = async () => {
     try {
       const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://rmwl2356_db_user:<db_password>@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster';
-      console.log(`🔄 Connecting to MongoDB (attempt ${retryCount + 1}/${maxRetries}):`, mongoURI.replace(/\/\/.*@/, '//***:***@'));
+      logger.info({ 
+        attempt: retryCount + 1, 
+        maxRetries,
+        mongoURI: mongoURI.replace(/\/\/.*@/, '//***:***@')
+      }, 'Connecting to MongoDB');
       
       const conn = await mongoose.connect(mongoURI, {
         serverSelectionTimeoutMS: 5000, // 5초 타임아웃
@@ -19,33 +24,37 @@ const connectDB = async () => {
         connectTimeoutMS: 10000 // 10초 연결 타임아웃
       });
 
-      console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+      logger.info({ host: conn.connection.host }, 'MongoDB Connected');
       
       // 연결 이벤트 리스너
       mongoose.connection.on('error', (err) => {
-        console.error('❌ MongoDB connection error:', err);
+        logger.error({ error: err }, 'MongoDB connection error');
       });
 
       mongoose.connection.on('disconnected', () => {
-        console.log('⚠️ MongoDB disconnected');
+        logger.warn('MongoDB disconnected');
       });
 
       mongoose.connection.on('reconnected', () => {
-        console.log('🔄 MongoDB reconnected');
+        logger.info('MongoDB reconnected');
       });
 
       return conn;
 
     } catch (error) {
       retryCount++;
-      console.error(`❌ MongoDB connection failed (attempt ${retryCount}/${maxRetries}):`, error.message);
+      logger.error({ 
+        attempt: retryCount, 
+        maxRetries, 
+        error: error.message 
+      }, 'MongoDB connection failed');
       
       if (retryCount < maxRetries) {
-        console.log(`⏳ Retrying in 5 seconds...`);
+        logger.info('Retrying in 5 seconds...');
         await new Promise(resolve => setTimeout(resolve, 5000));
         return connectWithRetry();
       } else {
-        console.error('💥 MongoDB connection failed after all retries');
+        logger.error('MongoDB connection failed after all retries');
         throw error;
       }
     }
@@ -54,10 +63,10 @@ const connectDB = async () => {
   try {
     await connectWithRetry();
   } catch (error) {
-    console.error('💥 Final MongoDB connection failed:', error);
+    logger.error({ error }, 'Final MongoDB connection failed');
     // 프로덕션에서는 서버를 종료하지 않고 계속 시도
     if (process.env.NODE_ENV === 'production') {
-      console.log('🔄 Running in production mode, will retry connection...');
+      logger.info('Running in production mode, will retry connection...');
       setTimeout(connectDB, 10000); // 10초 후 재시도
     } else {
       process.exit(1);

@@ -1,4 +1,4 @@
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res, _next) => {
   let error = { ...err };
   error.message = err.message;
 
@@ -55,14 +55,18 @@ const errorHandler = (err, req, res, next) => {
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   };
 
-  console.error('Error:', {
-    message: err.message,
-    stack: err.stack,
+  // Pino 로거로 에러 기록
+  const { logger } = require('../src/logger');
+  logger.error({
+    err,
+    reqId: req.reqId,
+    userId: req.userId,
+    statusCode,
     url: req.url,
     method: req.method,
     ip: req.ip,
     userAgent: req.get('User-Agent')
-  });
+  }, 'Unhandled error');
 
   res.status(statusCode).json(response);
 };

@@ -1,9 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const morgan = require('morgan');
 const dotenv = require('dotenv');
-const mongoose = require('mongoose');
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -27,26 +25,29 @@ const { router: notificationRoutes } = require('./routes/notifications');
 // Middleware
 const errorHandler = require('./middleware/errorHandler');
 const authMiddleware = require('./middleware/auth');
-const logger = require('./middleware/logger');
+const loggerMiddleware = require('./middleware/logger');
 
 // Load environment variables
 dotenv.config();
+
+// Pino 로거 초기화
+const { logger } = require('./src/logger');
 
 // Validate required environment variables
 const requiredEnvVars = ['MONGODB_URI', 'JWT_SECRET'];
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {
-  console.error('❌ Missing required environment variables:', missingEnvVars);
+  logger.error({ missingEnvVars }, 'Missing required environment variables');
   if (process.env.NODE_ENV === 'production' && !process.env.RAILWAY_ENVIRONMENT) {
-    console.error('💥 Production environment requires all environment variables');
+    logger.error('Production environment requires all environment variables');
     process.exit(1);
   } else {
-    console.warn('⚠️ Using default values for missing environment variables');
+    logger.warn('Using default values for missing environment variables');
     // Railway 환경에서 기본값 설정
     if (!process.env.MONGODB_URI) {
-      console.error('❌ MONGODB_URI 환경변수가 설정되지 않았습니다.');
-      console.error('❌ Railway에서 MongoDB 연결 정보를 확인해주세요.');
+      logger.error('MONGODB_URI 환경변수가 설정되지 않았습니다.');
+      logger.error('Railway에서 MongoDB 연결 정보를 확인해주세요.');
       process.exit(1);
     }
     if (!process.env.JWT_SECRET) {
@@ -69,23 +70,23 @@ connectDB().then(async () => {
     const categoryCount = await Category.countDocuments();
     
     if (categoryCount === 0) {
-      console.log('📂 카테고리가 없습니다. 기본 카테고리를 생성합니다...');
+      logger.info('카테고리가 없습니다. 기본 카테고리를 생성합니다...');
       const { seedCategories } = require('./scripts/seed-categories');
       await seedCategories();
-      console.log('✅ 기본 카테고리 생성 완료');
+      logger.info('기본 카테고리 생성 완료');
     } else {
-      console.log(`📂 기존 카테고리 ${categoryCount}개 확인됨`);
+      logger.info({ categoryCount }, '기존 카테고리 확인됨');
     }
   } catch (error) {
-    console.error('❌ 카테고리 초기화 실패:', error);
+    logger.error({ error }, '카테고리 초기화 실패');
   }
 }).catch((error) => {
-  console.error('Failed to connect to database:', error);
+  logger.error({ error }, 'Failed to connect to database');
   // Railway 환경에서는 데이터베이스 연결 실패 시에도 서버를 계속 실행
   if (process.env.NODE_ENV !== 'production' && !process.env.RAILWAY_ENVIRONMENT) {
     process.exit(1);
   } else {
-    console.log('🔄 Server will continue running without database connection');
+    logger.info('Server will continue running without database connection');
   }
 });
 
@@ -124,8 +125,7 @@ app.use(cors({
   },
   credentials: true
 }));
-app.use(morgan('combined'));
-app.use(logger); // 커스텀 로거 미들웨어
+app.use(loggerMiddleware); // Pino 기반 로거 미들웨어
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -170,38 +170,40 @@ app.use('*', (req, res) => {
 
 // Graceful shutdown handling
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
+  logger.info('SIGTERM received, shutting down gracefully');
   process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully');
+  logger.info('SIGINT received, shutting down gracefully');
   process.exit(0);
 });
 
 // Start server
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+  logger.info({ 
+    port: PORT, 
+    environment: process.env.NODE_ENV || 'development',
+    healthCheck: `http://localhost:${PORT}/api/health`
+  }, 'Server started successfully');
 });
 
 // Handle server errors
 server.on('error', (error) => {
-  console.error('❌ Server error:', error);
+  logger.error({ error, port: PORT }, 'Server error');
   if (error.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is already in use`);
+    logger.error({ port: PORT }, 'Port is already in use');
   }
   process.exit(1);
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
-  console.error('❌ Uncaught Exception:', error);
+  logger.error({ error }, 'Uncaught Exception');
   process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  logger.error({ reason, promise }, 'Unhandled Rejection');
   process.exit(1);
 });

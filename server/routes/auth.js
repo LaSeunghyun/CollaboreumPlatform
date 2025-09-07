@@ -2,9 +2,10 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const Artist = require('../models/Artist');
 const router = express.Router();
 const authMiddleware = require('../middleware/auth');
+const { logger } = require('../src/logger');
+const { userEvents } = require('../src/logger/event');
 
 // 회원가입
 router.post('/signup', async (req, res) => {
@@ -74,8 +75,8 @@ router.post('/signup', async (req, res) => {
     await newUser.save();
     
     // 회원가입 성공 로그
-    console.log('🎉 회원가입 성공:', {
-      timestamp: new Date().toISOString(),
+    userEvents.registered(newUser._id.toString(), newUser.email, newUser.role);
+    logger.info({
       userId: newUser._id,
       name: newUser.name,
       email: newUser.email,
@@ -84,7 +85,7 @@ router.post('/signup', async (req, res) => {
       agreeTerms,
       agreePrivacy,
       agreeMarketing
-    });
+    }, 'User registration successful');
 
     // 아티스트인 경우 추가 정보 설정 (User 모델에만 저장)
     if (userType === 'artist') {
@@ -93,12 +94,11 @@ router.post('/signup', async (req, res) => {
       await newUser.save();
       
       // 아티스트 프로필 생성 로그
-      console.log('🎨 아티스트 프로필 생성:', {
-        timestamp: new Date().toISOString(),
+      logger.info({
         userId: newUser._id,
         name: newUser.name,
         role: newUser.role
-      });
+      }, 'Artist profile created');
     }
 
     // JWT 토큰 생성
@@ -113,14 +113,13 @@ router.post('/signup', async (req, res) => {
     );
     
     // 토큰 발급 로그
-    console.log('🔑 JWT 토큰 발급:', {
-      timestamp: new Date().toISOString(),
+    logger.info({
       userId: newUser._id,
       email: newUser.email,
       role: newUser.role,
       tokenExpiry: '24h',
       tokenPreview: token.substring(0, 20) + '...'
-    });
+    }, 'JWT token issued');
 
     res.status(201).json({
       success: true,
@@ -137,8 +136,7 @@ router.post('/signup', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ 회원가입 오류:', {
-      timestamp: new Date().toISOString(),
+    logger.error({
       error: error.message,
       stack: error.stack,
       requestData: { 
@@ -149,7 +147,7 @@ router.post('/signup', async (req, res) => {
         agreePrivacy: req.body?.agreePrivacy, 
         agreeMarketing: req.body?.agreeMarketing 
       }
-    });
+    }, 'User registration error');
     res.status(500).json({
       success: false,
       message: '회원가입 중 오류가 발생했습니다.',
@@ -163,11 +161,11 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    console.log(`🔐 로그인 시도: ${email}`);
+    logger.info({ email }, 'Login attempt');
     
     // 이메일과 비밀번호 검증
     if (!email || !password) {
-      console.log(`❌ 로그인 실패: 이메일 또는 비밀번호 누락`);
+      logger.warn('Login failed: missing email or password');
       return res.status(400).json({
         success: false,
         message: '이메일과 비밀번호를 모두 입력해주세요.'
@@ -177,7 +175,7 @@ router.post('/login', async (req, res) => {
     // 사용자 찾기
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      console.log(`❌ 로그인 실패: 사용자를 찾을 수 없음 - ${email}`);
+      logger.warn({ email }, 'Login failed: user not found');
       return res.status(401).json({
         success: false,
         message: '이메일 또는 비밀번호가 올바르지 않습니다.'
@@ -187,7 +185,7 @@ router.post('/login', async (req, res) => {
     // 비밀번호 확인
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
-      console.log(`❌ 로그인 실패: 비밀번호 불일치 - ${email}`);
+      logger.warn({ email }, 'Login failed: invalid password');
       return res.status(401).json({
         success: false,
         message: '이메일 또는 비밀번호가 올바르지 않습니다.'
@@ -196,7 +194,7 @@ router.post('/login', async (req, res) => {
 
     // 계정 활성화 확인
     if (!user.isActive) {
-      console.log(`❌ 로그인 실패: 비활성 계정 - ${email}`);
+      logger.warn({ email }, 'Login failed: inactive account');
       return res.status(403).json({
         success: false,
         message: '계정이 비활성화되었습니다. 관리자에게 문의하세요.'
@@ -218,8 +216,12 @@ router.post('/login', async (req, res) => {
     user.lastLogin = new Date();
     await user.save();
 
-    console.log(`✅ 로그인 성공: ${email} (${user.role})`);
-    console.log(`🔑 토큰 생성 완료, 만료시간: 24시간`);
+    userEvents.login(user._id.toString(), user.email);
+    logger.info({
+      userId: user._id,
+      email: user.email,
+      role: user.role
+    }, 'Login successful');
 
     res.json({
       success: true,
@@ -238,7 +240,7 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error(`💥 로그인 오류: ${error.message}`);
+    logger.error({ error: error.message }, 'Login error');
     res.status(500).json({
       success: false,
       message: '로그인 중 오류가 발생했습니다.',
@@ -256,7 +258,7 @@ router.post('/logout', async (req, res) => {
       message: '로그아웃되었습니다.'
     });
   } catch (error) {
-    console.error('Logout error:', error);
+    logger.error({ error }, 'Logout error');
     res.status(500).json({
       success: false,
       message: '로그아웃 중 오류가 발생했습니다.'
