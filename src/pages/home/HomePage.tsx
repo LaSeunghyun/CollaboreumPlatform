@@ -15,6 +15,7 @@ import { ArtistCard } from '../../components/molecules/ArtistCard';
 import { FundingProjectCard } from '../../components/molecules/FundingProjectCard';
 import { NoticePost } from '../../components/organisms/NoticePost';
 import { CommunityBoardPost } from '../../components/organisms/CommunityBoardPost';
+import { StatCard } from '../../components/ui/StatCard';
 import { usePopularArtists } from '../../lib/api/useArtists';
 import { useProjects } from '../../lib/api/useProjects';
 import { useNotices } from '../../lib/api/useNotices';
@@ -98,27 +99,24 @@ export const HomePage: React.FC = () => {
 
                     {/* Stats */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 pt-8 md:pt-12 max-w-4xl mx-auto">
-                        <div className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl bg-white/50 backdrop-blur-sm border border-indigo/10">
-                            <div className="flex items-center gap-2">
-                                <Users2 className="w-5 h-5 text-indigo" />
-                                <span className="text-sm text-muted-foreground">아티스트</span>
-                            </div>
-                            <span className="text-2xl md:text-3xl font-bold text-indigo tabular-nums">1,200+</span>
-                        </div>
-                        <div className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl bg-white/50 backdrop-blur-sm border border-sky/10">
-                            <div className="flex items-center gap-2">
-                                <TrendingUp className="w-5 h-5 text-sky" />
-                                <span className="text-sm text-muted-foreground">진행 프로젝트</span>
-                            </div>
-                            <span className="text-2xl md:text-3xl font-bold text-sky tabular-nums">340+</span>
-                        </div>
-                        <div className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl bg-white/50 backdrop-blur-sm border border-red-100">
-                            <div className="flex items-center gap-2">
-                                <Heart className="w-5 h-5 text-red-500" />
-                                <span className="text-sm text-muted-foreground">총 후원금액</span>
-                            </div>
-                            <span className="text-2xl md:text-3xl font-bold text-red-500 tabular-nums">12억원+</span>
-                        </div>
+                        <StatCard
+                            label="아티스트"
+                            value="1,200+"
+                            icon={Users2}
+                            iconColor="text-indigo"
+                        />
+                        <StatCard
+                            label="진행 프로젝트"
+                            value="340+"
+                            icon={TrendingUp}
+                            iconColor="text-sky"
+                        />
+                        <StatCard
+                            label="총 후원금액"
+                            value="12억원+"
+                            icon={Heart}
+                            iconColor="text-red-500"
+                        />
                     </div>
                 </div>
             </section>

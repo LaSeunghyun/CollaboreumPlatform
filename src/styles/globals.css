@@ -34,6 +34,12 @@
   --font-weight-semibold: 500;
   --ring: rgba(74, 85, 104, 0.3);
 
+  /* Collaboreum brand colors */
+  --indigo: #4f46e5;
+  --indigo-hover: #4338ca;
+  --sky: #0ea5e9;
+  --surface: #f8fafc;
+
   /* Apple system colors for charts - 차분한 색상으로 조정 */
   --chart-1: #4a5568;
   --chart-2: #38a169;
@@ -321,6 +327,23 @@ html {
 
   .animate-float {
     animation: float 3s ease-in-out infinite;
+  }
+
+  /* Collaboreum UI Design utilities */
+  .hover-scale {
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+
+  .transition-button {
+    transition: all 0.2s ease-in-out;
+  }
+
+  .transition-button:hover {
+    transform: scale(1.02);
   }
 
   /* iPhone SE (375px) 반응형 디자인 */

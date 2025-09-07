@@ -1,8 +1,9 @@
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Users, Star, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Users, Star, MessageCircle, ChevronLeft, ChevronRight, Users2, Target, DollarSign, Heart } from "lucide-react";
 import { ImageWithFallback } from "./atoms/ImageWithFallback";
+import { StatCard } from "./ui/StatCard";
 import { useState, useEffect } from "react";
 
 interface HeroSectionProps {
@@ -188,26 +189,30 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
 
           {/* Enhanced Stats Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 max-w-5xl mx-auto">
-            {[
-              { number: platformStats.totalArtists.toLocaleString(), label: "등록 아티스트", icon: "👨‍🎨" },
-              { number: platformStats.totalProjects.toLocaleString(), label: "성공 프로젝트", icon: "🎯" },
-              { number: `₩${(platformStats.totalFunding / 100000000).toFixed(1)}억`, label: "총 펀딩 금액", icon: "💰" },
-              { number: platformStats.totalUsers.toLocaleString(), label: "활성 후원자", icon: "❤️" }
-            ].map((stat, index) => (
-              <div key={index} className="group">
-                <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-8 transition-all duration-300 hover:shadow-apple-lg hover:scale-105">
-                  <div className="text-2xl mb-3 group-hover:scale-110 transition-transform duration-300">
-                    {stat.icon}
-                  </div>
-                  <div className="text-2xl lg:text-4xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">
-                    {stat.number}
-                  </div>
-                  <div className="text-sm lg:text-base text-muted-foreground font-medium">
-                    {stat.label}
-                  </div>
-                </div>
-              </div>
-            ))}
+            <StatCard
+              label="등록 아티스트"
+              value={platformStats.totalArtists.toLocaleString()}
+              icon={Users2}
+              iconColor="text-indigo"
+            />
+            <StatCard
+              label="성공 프로젝트"
+              value={platformStats.totalProjects.toLocaleString()}
+              icon={Target}
+              iconColor="text-sky"
+            />
+            <StatCard
+              label="총 펀딩 금액"
+              value={`₩${(platformStats.totalFunding / 100000000).toFixed(1)}억`}
+              icon={DollarSign}
+              iconColor="text-green-500"
+            />
+            <StatCard
+              label="활성 후원자"
+              value={platformStats.totalUsers.toLocaleString()}
+              icon={Heart}
+              iconColor="text-red-500"
+            />
           </div>
         </div>
 

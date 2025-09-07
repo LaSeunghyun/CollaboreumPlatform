@@ -1,6 +1,7 @@
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { TrendingUp, Award, Users, ChevronLeft, ArrowRight } from "lucide-react";
+import { TrendingUp, Award, Users, ChevronLeft, ArrowRight, Users2, Target, DollarSign, Heart } from "lucide-react";
+import { StatCard } from "./ui/StatCard";
 
 interface AboutProps {
     onBack?: () => void;
@@ -147,22 +148,30 @@ export function About({ onBack }: AboutProps) {
                     <div className="text-center">
                         <h3 className="text-3xl lg:text-4xl font-bold text-foreground mb-12">성장하는 커뮤니티</h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                            <div className="rounded-2xl p-6 border border-border/30">
-                                <div className="text-4xl font-bold text-foreground mb-2">1,247</div>
-                                <div className="text-muted-foreground font-medium">등록 아티스트</div>
-                            </div>
-                            <div className="rounded-2xl p-6 border border-border/30">
-                                <div className="text-4xl font-bold text-foreground mb-2">89</div>
-                                <div className="text-muted-foreground font-medium">성공 프로젝트</div>
-                            </div>
-                            <div className="rounded-2xl p-6 border border-border/30">
-                                <div className="text-4xl font-bold text-foreground mb-2">₩2.1억</div>
-                                <div className="text-muted-foreground font-medium">총 펀딩 금액</div>
-                            </div>
-                            <div className="rounded-2xl p-6 border border-border/30">
-                                <div className="text-4xl font-bold text-foreground mb-2">15,432</div>
-                                <div className="text-muted-foreground font-medium">활성 후원자</div>
-                            </div>
+                            <StatCard
+                                label="등록 아티스트"
+                                value="1,247"
+                                icon={Users2}
+                                iconColor="text-indigo"
+                            />
+                            <StatCard
+                                label="성공 프로젝트"
+                                value="89"
+                                icon={Target}
+                                iconColor="text-sky"
+                            />
+                            <StatCard
+                                label="총 펀딩 금액"
+                                value="₩2.1억"
+                                icon={DollarSign}
+                                iconColor="text-green-500"
+                            />
+                            <StatCard
+                                label="활성 후원자"
+                                value="15,432"
+                                icon={Heart}
+                                iconColor="text-red-500"
+                            />
                         </div>
                     </div>
 

@@ -27,7 +27,7 @@
 
 #### 프론트엔드 (Vercel)
 ```bash
-REACT_APP_API_URL=https://your-backend.railway.app/api
+REACT_APP_API_URL=https://collaboreumplatform-production.up.railway.app/api
 REACT_APP_ENVIRONMENT=production
 ```
 
@@ -54,7 +54,7 @@ PAYMENT_GATEWAY_API_KEY=your-payment-key
 EMAIL_SERVICE_API_KEY=your-email-key
 
 # 보안
-CORS_ORIGIN=https://your-frontend.vercel.app
+CORS_ORIGIN=https://collaboreum-platform.vercel.app/
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
 
@@ -266,7 +266,7 @@ const permissions = {
 ```javascript
 const corsOptions = {
   origin: [
-    'https://collaboreum.vercel.app',
+    'https://collaboreum-platform.vercel.app/',
     'https://*.vercel.app'
   ],
   credentials: true,

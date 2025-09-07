@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
+const path = require('path');
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -132,6 +133,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Static files
 app.use('/uploads', express.static('uploads'));
 
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, '../build')));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', authMiddleware, userRoutes);
@@ -163,9 +167,9 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+// Catch all handler: send back React's index.html file for client-side routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../build', 'index.html'));
 });
 
 // Graceful shutdown handling

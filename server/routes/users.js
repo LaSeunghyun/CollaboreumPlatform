@@ -1,6 +1,5 @@
 const express = require('express');
 const User = require('../models/User');
-
 const router = express.Router();
 
 // 현재 사용자 프로필 조회

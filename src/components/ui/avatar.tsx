@@ -36,20 +36,17 @@ function AvatarImage({
 
 function AvatarFallback({
   className,
-  children,
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
   return (
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
       className={cn(
-        "bg-gradient-to-br from-blue-500 to-purple-600 text-white flex size-full items-center justify-center rounded-full font-semibold",
+        "bg-muted flex size-full items-center justify-center rounded-full",
         className,
       )}
       {...props}
-    >
-      {children}
-    </AvatarPrimitive.Fallback>
+    />
   );
 }
 

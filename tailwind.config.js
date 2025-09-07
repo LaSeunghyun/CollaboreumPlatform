@@ -41,11 +41,29 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        indigo: "var(--indigo)",
+        "indigo-hover": "var(--indigo-hover)",
+        sky: "var(--sky)",
+        surface: "var(--surface)",
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      animation: {
+        "hover-scale": "hover-scale 0.2s ease-in-out",
+        "transition-button": "transition-button 0.2s ease-in-out",
+      },
+      keyframes: {
+        "hover-scale": {
+          "0%": { transform: "scale(1)" },
+          "100%": { transform: "scale(1.05)" },
+        },
+        "transition-button": {
+          "0%": { transform: "scale(1)" },
+          "100%": { transform: "scale(1.02)" },
+        },
       },
     },
   },
