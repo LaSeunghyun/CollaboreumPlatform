@@ -18,14 +18,39 @@ import { CommunityBoardPost } from '../../components/organisms/CommunityBoardPos
 import { useUserProfile, useUserProjects, useUserBackings } from '../../lib/api/useUser';
 import { LoadingState, ErrorState, SkeletonGrid } from '../../components/organisms/States';
 
+// 타입 정의 (간단하게 any 대신 명확하게)
+type UserProfile = {
+    avatar?: string;
+    name?: string;
+    email?: string;
+    followers?: number;
+    following?: number;
+};
+
+type UserProjects = {
+    data?: {
+        projects?: Array<any>;
+    };
+    projects?: Array<any>;
+};
+
+type UserBackings = {
+    backings?: Array<any>;
+};
+
 export const AccountPage: React.FC = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(true); // 실제로는 인증 상태에서 가져와야 함
     const [activeTab, setActiveTab] = useState("my-projects");
 
     // API 훅들
-    const { data: userProfile, isLoading: profileLoading, error: profileError } = useUserProfile("current-user");
-    const { data: userProjects, isLoading: projectsLoading, error: projectsError } = useUserProjects("current-user");
-    const { data: userBackings, isLoading: backingsLoading, error: backingsError } = useUserBackings("current-user");
+    const { data: userProfileRaw, isLoading: profileLoading, error: profileError } = useUserProfile("current-user");
+    const { data: userProjectsRaw, isLoading: projectsLoading, error: projectsError } = useUserProjects("current-user");
+    const { data: userBackingsRaw, isLoading: backingsLoading, error: backingsError } = useUserBackings("current-user");
+
+    // 안전하게 데이터 구조 분해
+    const userProfile: UserProfile = userProfileRaw as UserProfile || {};
+    const userProjects: UserProjects = userProjectsRaw as UserProjects || {};
+    const userBackings: UserBackings = userBackingsRaw as UserBackings || {};
 
     const handleLogout = () => {
         setIsLoggedIn(false);
@@ -88,15 +113,15 @@ export const AccountPage: React.FC = () => {
                     ) : (
                         <div className="flex items-center gap-4">
                             <Avatar className="w-16 h-16">
-                                <AvatarImage src={(userProfile as any)?.data?.avatar} />
-                                <AvatarFallback>{(userProfile as any)?.data?.name?.[0] || 'U'}</AvatarFallback>
+                                <AvatarImage src={userProfile.avatar} />
+                                <AvatarFallback>{userProfile.name?.[0] || 'U'}</AvatarFallback>
                             </Avatar>
                             <div className="space-y-1">
-                                <h3 className="text-xl font-semibold">{(userProfile as any)?.data?.name || '사용자'}</h3>
-                                <p className="text-sm text-muted-foreground">{(userProfile as any)?.data?.email || 'user@example.com'}</p>
+                                <h3 className="text-xl font-semibold">{userProfile.name || '사용자'}</h3>
+                                <p className="text-sm text-muted-foreground">{userProfile.email || 'user@example.com'}</p>
                                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                    <span>팔로워 {(userProfile as any)?.data?.followers || 0}명</span>
-                                    <span>팔로잉 {(userProfile as any)?.data?.following || 0}명</span>
+                                    <span>팔로워 {userProfile.followers ?? 0}명</span>
+                                    <span>팔로잉 {userProfile.following ?? 0}명</span>
                                 </div>
                             </div>
                         </div>
@@ -112,7 +137,9 @@ export const AccountPage: React.FC = () => {
                             <BarChart3 className="w-4 h-4 text-indigo" />
                             <span className="text-sm text-muted-foreground">진행 중인 프로젝트</span>
                         </div>
-                        <p className="text-2xl font-bold">{userProjects?.data?.projects?.filter((p: any) => p.status === 'ongoing').length || 0}개</p>
+                        <p className="text-2xl font-bold">
+                            {(userProjects.data?.projects || userProjects.projects)?.filter((p: any) => p.status === 'ongoing').length ?? 0}개
+                        </p>
                     </CardContent>
                 </Card>
 
@@ -122,7 +149,9 @@ export const AccountPage: React.FC = () => {
                             <Heart className="w-4 h-4 text-red-500" />
                             <span className="text-sm text-muted-foreground">후원한 프로젝트</span>
                         </div>
-                        <p className="text-2xl font-bold">{userBackings?.data?.backings?.length || 0}개</p>
+                        <p className="text-2xl font-bold">
+                            {userBackings.backings?.length ?? 0}개
+                        </p>
                     </CardContent>
                 </Card>
 
@@ -173,7 +202,7 @@ export const AccountPage: React.FC = () => {
                         <ErrorState title="프로젝트 정보를 불러올 수 없습니다" />
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {userProjects?.data?.projects?.map((project: any) => (
+                            {(userProjects.data?.projects || userProjects.projects)?.map((project: any) => (
                                 <FundingProjectCard key={project.id} {...project} />
                             ))}
 
@@ -207,7 +236,7 @@ export const AccountPage: React.FC = () => {
                         <ErrorState title="후원 정보를 불러올 수 없습니다" />
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {userBackings?.data?.backings?.map((backing: any) => (
+                            {userBackings.backings?.map((backing: any) => (
                                 <FundingProjectCard key={backing.project.id} {...backing.project} />
                             ))}
                         </div>
@@ -236,7 +265,7 @@ export const AccountPage: React.FC = () => {
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">이메일</label>
-                                <Input defaultValue={userProfile?.data?.email || "user@example.com"} />
+                                <Input defaultValue={userProfile.email || "user@example.com"} />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">알림 설정</label>
