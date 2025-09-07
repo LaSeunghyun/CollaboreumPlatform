@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Input } from "./ui/input";
 import { Heart, Calendar, MapPin, Search, Filter, Star, Target, Eye, MessageCircle } from "lucide-react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "./atoms/ImageWithFallback";
 import { ErrorRetry, LoadingRetry } from "./ui/retry-button";
 import { fundingAPI, communityAPI } from '../services/api';
 import { PaymentModal } from './PaymentModal';

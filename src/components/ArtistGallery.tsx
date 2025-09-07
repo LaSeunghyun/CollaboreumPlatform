@@ -6,7 +6,7 @@ import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { ArrowLeft, Search, Play, Heart, Eye, Share, Grid3X3, List, Music, Palette, BookOpen, Mic, Video, Camera, Building } from "lucide-react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "./atoms/ImageWithFallback";
 import { galleryAPI } from '../services/api';
 
 interface ArtistGalleryProps {

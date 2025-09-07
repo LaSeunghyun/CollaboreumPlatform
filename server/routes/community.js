@@ -102,6 +102,47 @@ router.get('/posts/:id', async (req, res) => {
   }
 });
 
+// 포스트 조회수 증가 (별도 엔드포인트)
+router.post('/posts/:id/views', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const post = await CommunityPost.findById(id);
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: '포스트를 찾을 수 없습니다.'
+      });
+    }
+
+    if (!post.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: '삭제된 포스트입니다.'
+      });
+    }
+
+    // 조회수 증가
+    post.views += 1;
+    await post.save();
+
+    res.json({
+      success: true,
+      message: '조회수가 증가되었습니다.',
+      data: {
+        views: post.views
+      }
+    });
+  } catch (error) {
+    console.error('조회수 증가 실패:', error);
+    res.status(500).json({
+      success: false,
+      message: '조회수 증가에 실패했습니다.'
+    });
+  }
+});
+
 // 포스트 생성 (인증 필요)
 router.post('/posts', auth, async (req, res) => {
   try {
@@ -346,6 +387,381 @@ router.post('/posts/:id/report', auth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: '포스트를 신고할 수 없습니다.'
+    });
+  }
+});
+
+// 댓글 목록 조회
+router.get('/posts/:id/comments', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { page = 1, limit = 20, sortBy = 'createdAt', order = 'desc' } = req.query;
+
+    // 포스트 존재 확인
+    const post = await CommunityPost.findById(id);
+    if (!post || !post.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: '포스트를 찾을 수 없습니다.'
+      });
+    }
+
+    // 정렬 옵션
+    const sortOption = {};
+    sortOption[sortBy] = order === 'desc' ? -1 : 1;
+
+    // 페이지네이션
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // 댓글 조회 (대댓글 포함)
+    const comments = await CommunityPost.findById(id)
+      .select('comments')
+      .populate('comments.author', 'name role avatar')
+      .populate('comments.replies.author', 'name role avatar')
+      .lean();
+
+    if (!comments) {
+      return res.json({
+        success: true,
+        data: [],
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total: 0,
+          pages: 0
+        }
+      });
+    }
+
+    // 댓글 정렬 및 페이지네이션
+    const sortedComments = comments.comments
+      .sort((a, b) => {
+        if (sortBy === 'createdAt') {
+          return order === 'desc' ? new Date(b.createdAt) - new Date(a.createdAt) : new Date(a.createdAt) - new Date(b.createdAt);
+        }
+        return 0;
+      })
+      .slice(skip, skip + parseInt(limit));
+
+    res.json({
+      success: true,
+      data: sortedComments,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: comments.comments.length,
+        pages: Math.ceil(comments.comments.length / parseInt(limit))
+      }
+    });
+
+  } catch (error) {
+    console.error('댓글 조회 실패:', error);
+    res.status(500).json({
+      success: false,
+      message: '댓글을 불러올 수 없습니다.'
+    });
+  }
+});
+
+// 댓글 작성
+router.post('/posts/:id/comments', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { content, parentId } = req.body;
+    const userId = req.user._id;
+
+    if (!content || content.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: '댓글 내용을 입력해주세요.'
+      });
+    }
+
+    // 포스트 존재 확인
+    const post = await CommunityPost.findById(id);
+    if (!post || !post.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: '포스트를 찾을 수 없습니다.'
+      });
+    }
+
+    const newComment = {
+      author: userId,
+      content: content.trim(),
+      parentId: parentId || null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      likes: [],
+      dislikes: [],
+      replies: []
+    };
+
+    if (parentId) {
+      // 대댓글인 경우
+      const parentComment = post.comments.id(parentId);
+      if (!parentComment) {
+        return res.status(404).json({
+          success: false,
+          message: '상위 댓글을 찾을 수 없습니다.'
+        });
+      }
+      parentComment.replies.push(newComment);
+    } else {
+      // 일반 댓글인 경우
+      post.comments.push(newComment);
+    }
+
+    await post.save();
+
+    // 작성된 댓글 정보와 함께 반환
+    const populatedPost = await CommunityPost.findById(id)
+      .populate('comments.author', 'name role avatar')
+      .populate('comments.replies.author', 'name role avatar');
+
+    const savedComment = parentId 
+      ? populatedPost.comments.id(parentId).replies[populatedPost.comments.id(parentId).replies.length - 1]
+      : populatedPost.comments[populatedPost.comments.length - 1];
+
+    res.status(201).json({
+      success: true,
+      message: '댓글이 작성되었습니다.',
+      data: savedComment
+    });
+
+  } catch (error) {
+    console.error('댓글 작성 실패:', error);
+    res.status(500).json({
+      success: false,
+      message: '댓글 작성에 실패했습니다.'
+    });
+  }
+});
+
+// 댓글 수정
+router.put('/posts/:id/comments/:commentId', authMiddleware, async (req, res) => {
+  try {
+    const { id, commentId } = req.params;
+    const { content } = req.body;
+    const userId = req.user._id;
+
+    if (!content || content.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: '댓글 내용을 입력해주세요.'
+      });
+    }
+
+    // 포스트 존재 확인
+    const post = await CommunityPost.findById(id);
+    if (!post || !post.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: '포스트를 찾을 수 없습니다.'
+      });
+    }
+
+    // 댓글 찾기 (일반 댓글 또는 대댓글)
+    let comment = post.comments.id(commentId);
+    let isReply = false;
+
+    if (!comment) {
+      // 대댓글인지 확인
+      for (let parentComment of post.comments) {
+        comment = parentComment.replies.id(commentId);
+        if (comment) {
+          isReply = true;
+          break;
+        }
+      }
+    }
+
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: '댓글을 찾을 수 없습니다.'
+      });
+    }
+
+    // 권한 확인 (작성자 또는 관리자)
+    if (comment.author.toString() !== userId && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: '댓글을 수정할 권한이 없습니다.'
+      });
+    }
+
+    // 댓글 수정
+    comment.content = content.trim();
+    comment.updatedAt = new Date();
+
+    await post.save();
+
+    res.json({
+      success: true,
+      message: '댓글이 수정되었습니다.',
+      data: comment
+    });
+
+  } catch (error) {
+    console.error('댓글 수정 실패:', error);
+    res.status(500).json({
+      success: false,
+      message: '댓글 수정에 실패했습니다.'
+    });
+  }
+});
+
+// 댓글 삭제
+router.delete('/posts/:id/comments/:commentId', authMiddleware, async (req, res) => {
+  try {
+    const { id, commentId } = req.params;
+    const userId = req.user._id;
+
+    // 포스트 존재 확인
+    const post = await CommunityPost.findById(id);
+    if (!post || !post.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: '포스트를 찾을 수 없습니다.'
+      });
+    }
+
+    // 댓글 찾기 (일반 댓글 또는 대댓글)
+    let comment = post.comments.id(commentId);
+    let isReply = false;
+    let parentComment = null;
+
+    if (!comment) {
+      // 대댓글인지 확인
+      for (let pc of post.comments) {
+        comment = pc.replies.id(commentId);
+        if (comment) {
+          isReply = true;
+          parentComment = pc;
+          break;
+        }
+      }
+    }
+
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: '댓글을 찾을 수 없습니다.'
+      });
+    }
+
+    // 권한 확인 (작성자 또는 관리자)
+    if (comment.author.toString() !== userId && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: '댓글을 삭제할 권한이 없습니다.'
+      });
+    }
+
+    // 댓글 삭제
+    if (isReply && parentComment) {
+      parentComment.replies.pull(commentId);
+    } else {
+      post.comments.pull(commentId);
+    }
+
+    await post.save();
+
+    res.json({
+      success: true,
+      message: '댓글이 삭제되었습니다.'
+    });
+
+  } catch (error) {
+    console.error('댓글 삭제 실패:', error);
+    res.status(500).json({
+      success: false,
+      message: '댓글 삭제에 실패했습니다.'
+    });
+  }
+});
+
+// 댓글 반응 (좋아요/싫어요)
+router.post('/posts/:id/comments/:commentId/reactions', authMiddleware, async (req, res) => {
+  try {
+    const { id, commentId } = req.params;
+    const { reaction } = req.body; // 'like' 또는 'dislike'
+    const userId = req.user._id;
+
+    if (!['like', 'dislike'].includes(reaction)) {
+      return res.status(400).json({
+        success: false,
+        message: '유효하지 않은 반응 타입입니다.'
+      });
+    }
+
+    // 포스트 존재 확인
+    const post = await CommunityPost.findById(id);
+    if (!post || !post.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: '포스트를 찾을 수 없습니다.'
+      });
+    }
+
+    // 댓글 찾기 (일반 댓글 또는 대댓글)
+    let comment = post.comments.id(commentId);
+    let isReply = false;
+
+    if (!comment) {
+      // 대댓글인지 확인
+      for (let parentComment of post.comments) {
+        comment = parentComment.replies.id(commentId);
+        if (comment) {
+          isReply = true;
+          break;
+        }
+      }
+    }
+
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: '댓글을 찾을 수 없습니다.'
+      });
+    }
+
+    // 반응 처리
+    if (reaction === 'like') {
+      // 좋아요 처리
+      if (comment.likes.includes(userId)) {
+        comment.likes.pull(userId);
+      } else {
+        comment.likes.push(userId);
+        comment.dislikes.pull(userId); // 싫어요에서 제거
+      }
+    } else {
+      // 싫어요 처리
+      if (comment.dislikes.includes(userId)) {
+        comment.dislikes.pull(userId);
+      } else {
+        comment.dislikes.push(userId);
+        comment.likes.pull(userId); // 좋아요에서 제거
+      }
+    }
+
+    await post.save();
+
+    res.json({
+      success: true,
+      message: '반응이 업데이트되었습니다.',
+      data: {
+        likes: comment.likes.length,
+        dislikes: comment.dislikes.length
+      }
+    });
+
+  } catch (error) {
+    console.error('댓글 반응 실패:', error);
+    res.status(500).json({
+      success: false,
+      message: '반응 처리에 실패했습니다.'
     });
   }
 });

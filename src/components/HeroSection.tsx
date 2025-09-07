@@ -1,18 +1,15 @@
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Play, TrendingUp, Users, Award, Star, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { Users, Star, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { ImageWithFallback } from "./atoms/ImageWithFallback";
 import { useState, useEffect } from "react";
-import { userAPI, statsAPI } from '../services/api';
-import { getCategoryBadgeColor } from '../constants/categories';
 
 interface HeroSectionProps {
   onViewArtistCommunity?: (artistId: number) => void;
-  onNavigate?: (section: string) => void;
 }
 
-export function HeroSection({ onViewArtistCommunity, onNavigate }: HeroSectionProps) {
+export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
   const [weeklyNewcomers, setWeeklyNewcomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("전체");
@@ -43,7 +40,6 @@ export function HeroSection({ onViewArtistCommunity, onNavigate }: HeroSectionPr
             const contentType = statsResponse.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
               const statsData = await statsResponse.json();
-              console.log('플랫폼 통계 데이터:', statsData);
 
               if (statsData.success && statsData.data) {
                 setPlatformStats({

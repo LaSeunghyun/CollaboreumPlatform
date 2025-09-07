@@ -265,6 +265,11 @@ export const communityAPI = {
             method: 'POST',
             body: JSON.stringify({ content })
         }),
+    // 공지사항 조회수 증가
+    incrementNoticeViews: (noticeId: string) =>
+        apiCall(`/community/posts/${noticeId}/views`, {
+            method: 'POST'
+        }),
 };
 
 // Funding Projects APIs

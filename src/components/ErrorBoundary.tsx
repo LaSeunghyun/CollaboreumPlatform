@@ -89,7 +89,6 @@ export class ErrorBoundary extends Component<Props, State> {
                 alert('버그 리포트가 클립보드에 복사되었습니다. 개발팀에 전달해주세요.');
             })
             .catch(() => {
-                console.log('Bug Report:', bugReport);
                 alert('버그 리포트가 콘솔에 출력되었습니다.');
             });
     };

@@ -23,10 +23,7 @@ import {
   Star,
   TrendingUp,
   Shield,
-  LogOut,
-  Camera,
-  Save,
-  X
+  LogOut
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -230,7 +227,6 @@ export const PasswordChangeForm: React.FC = () => {
         console.error('비밀번호 변경 실패:', error);
         alert('비밀번호 변경 중 오류가 발생했습니다.');
       }
-      console.log('비밀번호 변경:', formData);
     }
   };
 

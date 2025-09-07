@@ -10,7 +10,7 @@ jobs:
   deploy-frontend:
     name: Deploy Frontend to Vercel
     runs-on: ubuntu-latest
-    if: ${{ secrets.VERCEL_TOKEN != '' }}
+    if: ${{ secrets.VERCEL_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
           REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL || 'https://collaboreumplatform-production.up.railway.app/api' }}
 
       - name: Deploy to Vercel
-        if: ${{ secrets.VERCEL_TOKEN != '' }}
+        if: ${{ secrets.VERCEL_TOKEN }}
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
@@ -39,26 +39,26 @@ jobs:
           vercel-args: '--prod'
 
       - name: Skip Vercel deployment (no token)
-        if: ${{ secrets.VERCEL_TOKEN == '' }}
+        if: ${{ !secrets.VERCEL_TOKEN }}
         run: echo "⚠️ VERCEL_TOKEN이 설정되지 않아 Vercel 배포를 건너뜁니다. GitHub Secrets에서 VERCEL_TOKEN을 설정해주세요."
 
   deploy-backend:
     name: Deploy Backend to Railway
     runs-on: ubuntu-latest
-    if: ${{ secrets.RAILWAY_TOKEN != '' }}
+    if: ${{ secrets.RAILWAY_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Deploy to Railway
-        if: ${{ secrets.RAILWAY_TOKEN != '' }}
+        if: ${{ secrets.RAILWAY_TOKEN }}
         uses: railwayapp/railway-deploy@v1
         with:
           railway-token: ${{ secrets.RAILWAY_TOKEN }}
           service: ${{ secrets.RAILWAY_SERVICE_NAME }}
 
       - name: Skip Railway deployment (no token)
-        if: ${{ secrets.RAILWAY_TOKEN == '' }}
+        if: ${{ !secrets.RAILWAY_TOKEN }}
         run: echo "⚠️ RAILWAY_TOKEN이 설정되지 않아 Railway 배포를 건너뜁니다. GitHub Secrets에서 RAILWAY_TOKEN을 설정해주세요."
 
   notify:

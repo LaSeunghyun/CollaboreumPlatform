@@ -141,7 +141,6 @@ export const FundingProjectDetail: React.FC = () => {
             maxRetries: 3,
             retryDelay: 1000,
             onRetry: (attempt) => {
-                console.log(`프로젝트 상세 조회 재시도: ${attempt + 1}번째 시도`);
             },
             onMaxRetriesReached: () => {
                 console.error('프로젝트 상세 조회 최대 재시도 횟수 도달');

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Star, ExternalLink, Play, Users, RefreshCw } from "lucide-react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { Star, ExternalLink, Users, RefreshCw } from "lucide-react";
+import { ImageWithFallback } from "./atoms/ImageWithFallback";
 import { artistAPI } from '../services/api';
 import { Artist } from '../types';
 
@@ -220,9 +220,6 @@ export function ArtistSection() {
                     </Button>
                     <Button variant="outline" size="sm" className="border-border hover:bg-secondary/50 rounded-xl px-4">
                       <ExternalLink className="w-4 h-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" className="border-border hover:bg-secondary/50 rounded-xl px-4">
-                      <Play className="w-4 h-4" />
                     </Button>
                   </div>
 

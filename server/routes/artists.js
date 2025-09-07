@@ -585,4 +585,183 @@ router.get('/stats', auth, async (req, res) => {
   }
 });
 
+// 아티스트 팔로우/언팔로우
+router.post('/:id/follow', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { action } = req.body; // 'follow' 또는 'unfollow'
+    const userId = req.user.id;
+
+    // 아티스트 존재 확인
+    const artist = await User.findOne({ 
+      _id: id, 
+      role: 'artist', 
+      isActive: true 
+    });
+
+    if (!artist) {
+      return res.status(404).json({
+        success: false,
+        message: '아티스트를 찾을 수 없습니다.'
+      });
+    }
+
+    // 본인 팔로우 방지
+    if (id === userId) {
+      return res.status(400).json({
+        success: false,
+        message: '본인을 팔로우할 수 없습니다.'
+      });
+    }
+
+    // 사용자 팔로우 목록 조회/업데이트
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: '사용자를 찾을 수 없습니다.'
+      });
+    }
+
+    if (action === 'follow') {
+      // 이미 팔로우 중인지 확인
+      if (user.following && user.following.includes(id)) {
+        return res.status(400).json({
+          success: false,
+          message: '이미 팔로우 중인 아티스트입니다.'
+        });
+      }
+
+      // 팔로우 추가
+      if (!user.following) user.following = [];
+      user.following.push(id);
+      await user.save();
+
+      // 아티스트 팔로워 수 증가
+      await User.findByIdAndUpdate(id, { $inc: { followers: 1 } });
+
+      res.json({
+        success: true,
+        message: '아티스트를 팔로우했습니다.',
+        data: { isFollowing: true }
+      });
+    } else if (action === 'unfollow') {
+      // 팔로우 중인지 확인
+      if (!user.following || !user.following.includes(id)) {
+        return res.status(400).json({
+          success: false,
+          message: '팔로우하지 않은 아티스트입니다.'
+        });
+      }
+
+      // 팔로우 제거
+      user.following = user.following.filter(followId => followId.toString() !== id);
+      await user.save();
+
+      // 아티스트 팔로워 수 감소
+      await User.findByIdAndUpdate(id, { $inc: { followers: -1 } });
+
+      res.json({
+        success: true,
+        message: '아티스트 팔로우를 취소했습니다.',
+        data: { isFollowing: false }
+      });
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: '유효하지 않은 액션입니다. (follow 또는 unfollow)'
+      });
+    }
+
+  } catch (error) {
+    console.error('아티스트 팔로우/언팔로우 오류:', error);
+    res.status(500).json({
+      success: false,
+      message: '팔로우 처리 중 오류가 발생했습니다.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// 아티스트 프로필 업데이트
+router.put('/:id', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+    const userId = req.user.id;
+
+    // 본인 프로필만 수정 가능
+    if (id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: '본인의 프로필만 수정할 수 있습니다.'
+      });
+    }
+
+    // 아티스트 권한 확인
+    if (req.user.role !== 'artist') {
+      return res.status(403).json({
+        success: false,
+        message: '아티스트만 프로필을 수정할 수 있습니다.'
+      });
+    }
+
+    // 업데이트 가능한 필드들
+    const allowedFields = [
+      'name', 'bio', 'avatar', 'location', 'category', 'genre', 
+      'socialLinks', 'portfolio', 'skills', 'experience'
+    ];
+
+    const filteredData = {};
+    allowedFields.forEach(field => {
+      if (updateData[field] !== undefined) {
+        filteredData[field] = updateData[field];
+      }
+    });
+
+    // 사용자 정보 업데이트
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { ...filteredData, updatedAt: new Date() },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: '사용자를 찾을 수 없습니다.'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: '프로필이 성공적으로 업데이트되었습니다.',
+      data: {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        avatar: updatedUser.avatar,
+        bio: updatedUser.bio,
+        role: updatedUser.role,
+        category: updatedUser.category,
+        location: updatedUser.location,
+        genre: updatedUser.genre,
+        socialLinks: updatedUser.socialLinks,
+        portfolio: updatedUser.portfolio,
+        skills: updatedUser.skills,
+        experience: updatedUser.experience,
+        updatedAt: updatedUser.updatedAt
+      }
+    });
+
+  } catch (error) {
+    console.error('아티스트 프로필 업데이트 오류:', error);
+    res.status(500).json({
+      success: false,
+      message: '프로필 업데이트 중 오류가 발생했습니다.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
 module.exports = router;

@@ -1,0 +1,117 @@
+{
+  "totalPages": 7,
+  "orphanPages": [],
+  "safePages": [
+    {
+      "filePath": "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\pages\\projects\\ProjectsPage.tsx",
+      "componentName": "ProjectsPage",
+      "isInRoutes": true,
+      "importReferences": [
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx",
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx"
+      ],
+      "linkReferences": [
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx:118"
+      ],
+      "testReferences": [],
+      "isOrphan": false,
+      "reasons": []
+    },
+    {
+      "filePath": "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\pages\\notices\\NoticesPage.tsx",
+      "componentName": "NoticesPage",
+      "isInRoutes": true,
+      "importReferences": [
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx",
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx"
+      ],
+      "linkReferences": [
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx:119"
+      ],
+      "testReferences": [],
+      "isOrphan": false,
+      "reasons": []
+    },
+    {
+      "filePath": "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\pages\\home\\HomePage.tsx",
+      "componentName": "HomePage",
+      "isInRoutes": true,
+      "importReferences": [
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx",
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx"
+      ],
+      "linkReferences": [
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx:117",
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\components\\Header.tsx:61"
+      ],
+      "testReferences": [],
+      "isOrphan": false,
+      "reasons": []
+    },
+    {
+      "filePath": "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\pages\\events\\EventsPage.tsx",
+      "componentName": "EventsPage",
+      "isInRoutes": true,
+      "importReferences": [
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx",
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx"
+      ],
+      "linkReferences": [],
+      "testReferences": [],
+      "isOrphan": false,
+      "reasons": [
+        "링크 참조가 없음"
+      ]
+    },
+    {
+      "filePath": "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\pages\\artists\\ArtistsPage.tsx",
+      "componentName": "ArtistsPage",
+      "isInRoutes": true,
+      "importReferences": [
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx",
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx"
+      ],
+      "linkReferences": [],
+      "testReferences": [],
+      "isOrphan": false,
+      "reasons": [
+        "링크 참조가 없음"
+      ]
+    },
+    {
+      "filePath": "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\pages\\community\\CommunityPage.tsx",
+      "componentName": "CommunityPage",
+      "isInRoutes": true,
+      "importReferences": [
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx",
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx"
+      ],
+      "linkReferences": [],
+      "testReferences": [],
+      "isOrphan": false,
+      "reasons": [
+        "링크 참조가 없음"
+      ]
+    },
+    {
+      "filePath": "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\pages\\account\\AccountPage.tsx",
+      "componentName": "AccountPage",
+      "isInRoutes": true,
+      "importReferences": [
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx",
+        "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\App.tsx"
+      ],
+      "linkReferences": [],
+      "testReferences": [],
+      "isOrphan": false,
+      "reasons": [
+        "링크 참조가 없음"
+      ]
+    }
+  ],
+  "summary": {
+    "canDelete": 0,
+    "shouldKeep": 7,
+    "warnings": []
+  }
+}

@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Progress } from "./ui/progress";
 import { DollarSign, TrendingUp, Users, BarChart3, Eye, Edit, Plus, MessageCircle, Heart, Target } from "lucide-react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "./atoms/ImageWithFallback";
 import { useAuth } from "../contexts/AuthContext";
 import { userAPI, fundingAPI, communityAPI } from "../services/api";
 

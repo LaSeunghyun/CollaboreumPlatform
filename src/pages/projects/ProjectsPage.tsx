@@ -1,0 +1,136 @@
+import React, { useState } from 'react';
+import { Button } from '../../components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { Badge } from '../../components/ui/badge';
+import { Plus, Clock, Star, TrendingUp } from 'lucide-react';
+import { FundingProjectCard } from '../../components/molecules/FundingProjectCard';
+import { useProjects } from '../../lib/api/useProjects';
+import { LoadingState, ErrorState, EmptyProjectsState, SkeletonGrid } from '../../components/organisms/States';
+
+export const ProjectsPage: React.FC = () => {
+    const [activeTab, setActiveTab] = useState("ongoing");
+    const [projectSort, setProjectSort] = useState("deadline");
+    const [isLoggedIn] = useState(true); // 실제로는 인증 상태에서 가져와야 함
+
+    // API 훅들
+    const { data: ongoingProjects, isLoading: ongoingLoading, error: ongoingError } = useProjects({
+        status: 'ongoing',
+        sortBy: projectSort,
+        order: projectSort === 'deadline' ? 'asc' : 'desc',
+    });
+
+    const { data: allProjects, isLoading: allLoading, error: allError } = useProjects({
+        sortBy: projectSort,
+        order: projectSort === 'deadline' ? 'asc' : 'desc',
+    });
+
+    const handleCreateProject = () => {
+        // 프로젝트 생성 로직
+    };
+
+    const renderProjects = (projects: any[], loading: boolean, error: any) => {
+        if (loading) {
+            return <SkeletonGrid count={6} cols={3} />;
+        }
+
+        if (error) {
+            return (
+                <ErrorState
+                    title="프로젝트 정보를 불러올 수 없습니다"
+                    description="잠시 후 다시 시도해주세요."
+                />
+            );
+        }
+
+        if (!projects || projects.length === 0) {
+            return (
+                <EmptyProjectsState
+                    action={isLoggedIn ? {
+                        label: "새 프로젝트 만들기",
+                        onClick: handleCreateProject
+                    } : undefined}
+                />
+            );
+        }
+
+        return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {projects.map((project: any) => (
+                    <FundingProjectCard key={project.id} {...project} />
+                ))}
+            </div>
+        );
+    };
+
+    return (
+        <div className="space-y-8">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold">펀딩 프로젝트</h1>
+                    <p className="text-muted-foreground">아티스트의 꿈을 응원하고 함께 성장하세요</p>
+                </div>
+                {isLoggedIn && (
+                    <Button
+                        className="bg-indigo hover:bg-indigo-hover hover-scale transition-button shadow-sm"
+                        onClick={handleCreateProject}
+                    >
+                        <Plus className="w-4 h-4 mr-2" />
+                        프로젝트 등록
+                    </Button>
+                )}
+            </div>
+
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+                <TabsList className="grid w-full grid-cols-2 max-w-md">
+                    <TabsTrigger value="ongoing">진행 중인 펀딩</TabsTrigger>
+                    <TabsTrigger value="all">전체 프로젝트</TabsTrigger>
+                </TabsList>
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <Select value={projectSort} onValueChange={setProjectSort}>
+                        <SelectTrigger className="w-[200px]">
+                            <SelectValue placeholder="정렬 방식" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="deadline">마감임박순</SelectItem>
+                            <SelectItem value="amount">후원액순</SelectItem>
+                            <SelectItem value="new">신규등록순</SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <div className="flex gap-2">
+                        <Badge variant="secondary" className="bg-red-50 text-red-700 border-red-200">
+                            <Clock className="w-3 h-3 mr-1" />
+                            마감임박
+                        </Badge>
+                        <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200">
+                            <Star className="w-3 h-3 mr-1" />
+                            추천
+                        </Badge>
+                        <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
+                            <TrendingUp className="w-3 h-3 mr-1" />
+                            인기
+                        </Badge>
+                    </div>
+                </div>
+
+                <TabsContent value="ongoing" className="space-y-6">
+                    {renderProjects(
+                        ongoingProjects?.data?.projects || [],
+                        ongoingLoading,
+                        ongoingError
+                    )}
+                </TabsContent>
+
+                <TabsContent value="all" className="space-y-6">
+                    {renderProjects(
+                        allProjects?.data?.projects || [],
+                        allLoading,
+                        allError
+                    )}
+                </TabsContent>
+            </Tabs>
+        </div>
+    );
+};

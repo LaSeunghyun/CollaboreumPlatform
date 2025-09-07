@@ -24,6 +24,41 @@ jest.mock('../services/api', () => ({
         distributeRevenue: jest.fn(),
         createProject: jest.fn(),
     },
+    constantsAPI: {
+        getPaymentMethods: jest.fn(),
+        getCategories: jest.fn(),
+    },
+    communityAPI: {
+        getCategories: jest.fn().mockResolvedValue({
+            success: true,
+            data: [
+                { id: 'music', label: '음악' },
+                { id: 'art', label: '미술' },
+                { id: 'dance', label: '댄스' }
+            ]
+        }),
+    },
+}));
+
+// Mock dynamicConstantsService
+jest.mock('../services/constantsService', () => ({
+    dynamicConstantsService: {
+        getPaymentMethods: jest.fn().mockResolvedValue([
+            { id: 'card', label: '신용카드', icon: '💳' },
+            { id: 'phone', label: '휴대폰 결제', icon: '📱' },
+            { id: 'bank', label: '계좌이체', icon: '🏦' }
+        ]),
+        getCategories: jest.fn().mockResolvedValue([
+            { id: 'music', label: '음악' },
+            { id: 'art', label: '미술' },
+            { id: 'dance', label: '댄스' }
+        ]),
+    },
+}));
+
+// Mock useRetry hook
+jest.mock('../hooks/useRetry', () => ({
+    useRetry: jest.fn()
 }));
 
 // Test wrapper component
@@ -40,6 +75,16 @@ describe('펀딩 시스템 기본 테스트', () => {
         jest.clearAllMocks();
         // 기본 projectId 설정
         (useParams as jest.Mock).mockReturnValue({ projectId: 'test-project-1' });
+
+        // useRetry 모킹 설정
+        const { useRetry } = require('../hooks/useRetry');
+        (useRetry as jest.Mock).mockReturnValue({
+            data: null,
+            error: null,
+            isLoading: false,
+            retry: jest.fn(),
+            retryCount: 0
+        });
     });
 
     describe('FundingProjectDetail 컴포넌트', () => {
@@ -739,6 +784,8 @@ describe('실제 컴포넌트 테스트', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         localStorage.clear();
+        // 기본 projectId 설정
+        (useParams as jest.Mock).mockReturnValue({ projectId: 'test-project-1' });
     });
 
     describe('FundingProjectDetail 컴포넌트 상호작용', () => {

@@ -46,12 +46,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           if (isValid) {
             setToken(storedToken);
             setUser(JSON.parse(storedUser));
-            console.log('🔑 저장된 토큰으로 인증 상태 복원됨');
           } else {
             // 유효하지 않은 토큰 제거
             localStorage.removeItem('authToken');
             localStorage.removeItem('authUser');
-            console.log('❌ 저장된 토큰이 유효하지 않아 제거됨');
           }
         }
       } catch (error) {

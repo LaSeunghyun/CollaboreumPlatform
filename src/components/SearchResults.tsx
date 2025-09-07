@@ -5,7 +5,7 @@ import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Search, ArrowLeft, Star, Users, Calendar, MapPin } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { ImageWithFallback } from './atoms/ImageWithFallback';
 import { interactionAPI } from '../services/api';
 
 interface SearchResultsProps {

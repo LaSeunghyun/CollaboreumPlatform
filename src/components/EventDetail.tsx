@@ -5,7 +5,7 @@ import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Calendar, MapPin, Clock, Users, Star, Heart, Share2, Bookmark } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { ImageWithFallback } from './atoms/ImageWithFallback';
 import { eventManagementAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 

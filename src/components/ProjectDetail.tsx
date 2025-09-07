@@ -6,7 +6,7 @@ import { Progress } from './ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Heart, Star, MessageCircle, Share2, Bookmark } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { ImageWithFallback } from './atoms/ImageWithFallback';
 import { PaymentModal } from './PaymentModal';
 import { fundingAPI, interactionAPI } from '../services/api';
 

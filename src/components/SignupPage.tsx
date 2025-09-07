@@ -165,7 +165,6 @@ export function SignupPage({ onBack, onSignup, onSocialSignup, onLoginClick }: S
         }) as any;
 
         if (response.success) {
-          console.log('회원가입 성공:', response.data);
           setShowSuccessPage(true);
         } else {
           console.error('회원가입 실패:', response.message);

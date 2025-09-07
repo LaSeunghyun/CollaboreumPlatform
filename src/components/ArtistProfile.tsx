@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { ArrowLeft, Users, Play, ExternalLink, MessageCircle, Heart, TrendingUp } from "lucide-react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "./atoms/ImageWithFallback";
 import { useEffect, useState } from "react";
 import { artistAPI } from '../services/api';
 
