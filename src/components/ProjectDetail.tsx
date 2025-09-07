@@ -9,6 +9,8 @@ import { Heart, Star, MessageCircle, Share2, Bookmark } from 'lucide-react';
 import { ImageWithFallback } from './atoms/ImageWithFallback';
 import { PaymentModal } from './PaymentModal';
 import { fundingAPI, interactionAPI } from '../services/api';
+import { useCategories } from '../lib/api/useCategories';
+import { getCategoryColor } from '../constants/categories';
 
 interface ProjectDetailProps {
   projectId: number;
@@ -22,6 +24,9 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+
+  // 카테고리 API 훅 사용
+  const { data: categoriesData } = useCategories();
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -145,16 +150,19 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
     return Math.min((current / target) * 100, 100);
   };
 
-  const getCategoryColor = (category: string) => {
-    const colorMap: { [key: string]: string } = {
-      "음악": "bg-blue-100 text-blue-800",
-      "미술": "bg-purple-100 text-purple-800",
-      "문학": "bg-green-100 text-green-800",
-      "공연": "bg-red-100 text-red-800",
-      "사진": "bg-pink-100 text-pink-800",
-      "도서": "bg-indigo-100 text-indigo-800"
-    };
-    return colorMap[category] || "bg-gray-100 text-gray-800";
+  const getCategoryColorClass = (category: string) => {
+    // API에서 카테고리 데이터를 가져왔다면 해당 색상 사용
+    if (categoriesData?.data?.categories) {
+      const categoryData = categoriesData.data.categories.find((cat: any) =>
+        cat.name === category || cat.label === category
+      );
+      if (categoryData?.color) {
+        return categoryData.color;
+      }
+    }
+
+    // API 데이터가 없거나 해당 카테고리가 없으면 상수 파일의 색상 사용
+    return getCategoryColor(category);
   };
 
   return (
@@ -178,7 +186,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
                 주목 프로젝트
               </Badge>
             )}
-            <Badge className={`absolute top-4 right-4 ${getCategoryColor(project.category)}`}>
+            <Badge className={`absolute top-4 right-4 ${getCategoryColorClass(project.category)}`}>
               {project.category}
             </Badge>
           </div>

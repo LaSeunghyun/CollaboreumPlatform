@@ -20,8 +20,8 @@ export function LiveAndPointsSection() {
 
         try {
           const response = await liveStreamAPI.getLiveStreams() as any;
-          if (response.success && response.data?.streams) {
-            setLiveStreams(response.data.streams);
+          if (response.success && (response.data?.streams || response.streams)) {
+            setLiveStreams(response.data?.streams || response.streams);
           }
         } catch (apiError) {
           console.error('API 호출 실패:', apiError);

@@ -20,8 +20,8 @@ export function ArtistSection() {
       // API 사용 시도 - 새로 가입한 아티스트 우선 조회
       try {
         const response = await artistAPI.getNewArtists(20) as any;
-        if (response.success && response.data?.artists) {
-          setArtists(response.data.artists);
+        if (response.success && (response.data?.artists || response.artists)) {
+          setArtists(response.data?.artists || response.artists);
           return;
         }
       } catch (apiError) {
@@ -29,8 +29,8 @@ export function ArtistSection() {
         // 새 아티스트 API 실패 시 인기 아티스트로 폴백
         try {
           const fallbackResponse = await artistAPI.getPopularArtists(20) as any;
-          if (fallbackResponse.success && fallbackResponse.data?.artists) {
-            setArtists(fallbackResponse.data.artists);
+          if (fallbackResponse.success && (fallbackResponse.data?.artists || fallbackResponse.artists)) {
+            setArtists(fallbackResponse.data?.artists || fallbackResponse.artists);
             return;
           }
         } catch (fallbackError) {

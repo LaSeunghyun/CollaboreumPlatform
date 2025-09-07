@@ -38,7 +38,7 @@ export const NoticesPage: React.FC = () => {
             );
         }
 
-        if (!notices?.data?.posts || notices.data.posts.length === 0) {
+        if (!((notices as any)?.data?.posts || (notices as any)?.posts) || ((notices as any)?.data?.posts || (notices as any)?.posts || []).length === 0) {
             return (
                 <EmptyNoticesState
                     action={{

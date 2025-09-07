@@ -73,8 +73,8 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
         ]) as any[];
 
         // 프로젝트 데이터 처리
-        if (projectsResponse.success && projectsResponse.data?.projects) {
-          setProjects(projectsResponse.data.projects);
+        if (projectsResponse.success && (projectsResponse.data?.projects || projectsResponse.projects)) {
+          setProjects(projectsResponse.data?.projects || projectsResponse.projects);
         } else {
           setProjects([]);
         }
@@ -130,8 +130,8 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
       if (response.success) {
         // 프로젝트 목록 새로고침
         const updatedResponse = await fundingAPI.getProjects() as any;
-        if (updatedResponse.success && updatedResponse.data?.projects) {
-          setProjects(updatedResponse.data.projects);
+        if (updatedResponse.success && (updatedResponse.data?.projects || updatedResponse.projects)) {
+          setProjects(updatedResponse.data?.projects || updatedResponse.projects);
         }
         setShowPaymentModal(false);
         setSelectedProjectForPayment(null);
@@ -362,8 +362,8 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
                 if (response.success) {
                   // 프로젝트 목록 새로고침
                   const updatedResponse = await fundingAPI.getProjects() as any;
-                  if (updatedResponse.success && updatedResponse.data?.projects) {
-                    setProjects(updatedResponse.data.projects);
+                  if (updatedResponse.success && (updatedResponse.data?.projects || updatedResponse.projects)) {
+                    setProjects(updatedResponse.data?.projects || updatedResponse.projects);
                   }
                 }
               } catch (error) {

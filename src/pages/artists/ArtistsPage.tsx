@@ -109,7 +109,7 @@ export const ArtistsPage: React.FC = () => {
 
                 <TabsContent value="hot" className="space-y-6">
                     {renderArtists(
-                        popularArtists?.data?.artists || [],
+                        (popularArtists as any)?.data?.artists || (popularArtists as any)?.artists || [],
                         popularLoading,
                         popularError
                     )}
@@ -117,7 +117,7 @@ export const ArtistsPage: React.FC = () => {
 
                 <TabsContent value="new" className="space-y-6">
                     {renderArtists(
-                        newArtists?.data?.artists || [],
+                        (newArtists as any)?.data?.artists || (newArtists as any)?.artists || [],
                         newLoading,
                         newError
                     )}
@@ -125,7 +125,7 @@ export const ArtistsPage: React.FC = () => {
 
                 <TabsContent value="all" className="space-y-6">
                     {renderArtists(
-                        allArtists?.data?.artists || [],
+                        (allArtists as any)?.data?.artists || (allArtists as any)?.artists || [],
                         allArtistsLoading,
                         allArtistsError
                     )}

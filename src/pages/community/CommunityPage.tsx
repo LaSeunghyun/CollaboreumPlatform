@@ -140,7 +140,7 @@ export const CommunityPage: React.FC = () => {
 
                 <TabsContent value="question" className="space-y-6">
                     {renderPosts(
-                        questionPosts?.data?.posts || [],
+                        (questionPosts as any)?.data?.posts || (questionPosts as any)?.posts || [],
                         questionLoading,
                         questionError,
                         'question'
@@ -149,7 +149,7 @@ export const CommunityPage: React.FC = () => {
 
                 <TabsContent value="review" className="space-y-6">
                     {renderPosts(
-                        reviewPosts?.data?.posts || [],
+                        (reviewPosts as any)?.data?.posts || (reviewPosts as any)?.posts || [],
                         reviewLoading,
                         reviewError,
                         'review'
@@ -158,7 +158,7 @@ export const CommunityPage: React.FC = () => {
 
                 <TabsContent value="free" className="space-y-6">
                     {renderPosts(
-                        freePosts?.data?.posts || [],
+                        (freePosts as any)?.data?.posts || (freePosts as any)?.posts || [],
                         freeLoading,
                         freeError,
                         'free'
@@ -167,7 +167,7 @@ export const CommunityPage: React.FC = () => {
 
                 <TabsContent value="all" className="space-y-6">
                     {renderPosts(
-                        allPosts?.data?.posts || [],
+                        (allPosts as any)?.data?.posts || (allPosts as any)?.posts || [],
                         allLoading,
                         allError,
                         'all'

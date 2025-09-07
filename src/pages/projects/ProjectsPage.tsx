@@ -117,7 +117,7 @@ export const ProjectsPage: React.FC = () => {
 
                 <TabsContent value="ongoing" className="space-y-6">
                     {renderProjects(
-                        ongoingProjects?.data?.projects || [],
+                        (ongoingProjects as any)?.data?.projects || (ongoingProjects as any)?.projects || [],
                         ongoingLoading,
                         ongoingError
                     )}
@@ -125,7 +125,7 @@ export const ProjectsPage: React.FC = () => {
 
                 <TabsContent value="all" className="space-y-6">
                     {renderProjects(
-                        allProjects?.data?.projects || [],
+                        (allProjects as any)?.data?.projects || (allProjects as any)?.projects || [],
                         allLoading,
                         allError
                     )}

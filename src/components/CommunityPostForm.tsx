@@ -192,7 +192,7 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
       }
     } catch (error: any) {
       console.error('포스트 생성 오류:', error);
-      setError(error.response?.data?.message || '포스트 생성 중 오류가 발생했습니다.');
+      setError((error.response as any)?.data?.message || error.message || '포스트 생성 중 오류가 발생했습니다.');
     } finally {
       setIsSubmitting(false);
     }

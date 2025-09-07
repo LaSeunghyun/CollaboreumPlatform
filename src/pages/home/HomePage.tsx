@@ -141,7 +141,7 @@ export const HomePage: React.FC = () => {
                     />
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                        {popularArtists?.data?.artists?.slice(0, 3).map((artist: any) => (
+                        {(popularArtists as any)?.data?.artists || (popularArtists as any)?.artists || []).slice(0, 3).map((artist: any) => (
                             <ArtistCard key={artist.id} {...artist} />
                         ))}
                     </div>
@@ -173,7 +173,7 @@ export const HomePage: React.FC = () => {
                     />
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                        {projects?.data?.projects?.slice(0, 3).map((project: any) => (
+                        {((projects as any)?.data?.projects || (projects as any)?.projects || []).slice(0, 3).map((project: any) => (
                             <FundingProjectCard key={project.id} {...project} />
                         ))}
                     </div>
@@ -201,7 +201,7 @@ export const HomePage: React.FC = () => {
                     />
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {notices?.data?.posts?.slice(0, 2).map((notice: any) => (
+                        {((notices as any)?.data?.posts || (notices as any)?.posts || []).slice(0, 2).map((notice: any) => (
                             <Card key={notice.id} className="cursor-pointer hover:shadow-md transition-all duration-200 border-l-4 border-l-indigo">
                                 <CardContent className="p-5">
                                     <div className="space-y-3">
@@ -260,7 +260,7 @@ export const HomePage: React.FC = () => {
                     />
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {communityPosts?.data?.posts?.slice(0, 4).map((post: any) => (
+                        {((communityPosts as any)?.data?.posts || (communityPosts as any)?.posts || []).slice(0, 4).map((post: any) => (
                             <Card key={post.id} className="cursor-pointer hover:shadow-md transition-shadow">
                                 <CardContent className="p-4">
                                     <div className="space-y-2">

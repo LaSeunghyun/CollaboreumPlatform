@@ -33,7 +33,7 @@ export const EventsPage: React.FC = () => {
             );
         }
 
-        if (!events?.data?.events || events.data.events.length === 0) {
+        if (!((events as any)?.data?.events || (events as any)?.events) || ((events as any)?.data?.events || (events as any)?.events || []).length === 0) {
             return (
                 <EmptyEventsState
                     action={{
