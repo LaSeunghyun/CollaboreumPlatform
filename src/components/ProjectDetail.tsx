@@ -152,15 +152,15 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
 
   const getCategoryColorClass = (category: string) => {
     // API에서 카테고리 데이터를 가져왔다면 해당 색상 사용
-    if (categoriesData?.data?.categories) {
-      const categoryData = categoriesData.data.categories.find((cat: any) =>
+    if ((categoriesData as any)?.data?.categories) {
+      const categoryData = (categoriesData as any).data.categories.find((cat: any) => 
         cat.name === category || cat.label === category
       );
       if (categoryData?.color) {
         return categoryData.color;
       }
     }
-
+    
     // API 데이터가 없거나 해당 카테고리가 없으면 상수 파일의 색상 사용
     return getCategoryColor(category);
   };
