@@ -33,7 +33,7 @@ export function EventDetail({ eventId, onBack }: EventDetailProps) {
           setEvent(response.data);
           // 사용자가 이미 참가하고 있는지 확인
           if (isAuthenticated && user) {
-            const isParticipant = response.data.participants?.some(
+            const isParticipant = (response as any).data?.participants?.some(
               (p: any) => p.id === user.id
             );
             setIsParticipating(isParticipant);

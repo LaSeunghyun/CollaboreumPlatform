@@ -115,9 +115,9 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                 // 좋아요 상태를 즉시 업데이트
                 setPost(prev => prev ? {
                     ...prev,
-                    likes: response.data.likes,
-                    isLiked: response.data.isLiked,
-                    isHot: response.data.likes > 20
+                    likes: (response as any).data.likes,
+                    isLiked: (response as any).data.isLiked,
+                    isHot: (response as any).data.likes > 20
                 } : null);
             }
         } catch (error) {

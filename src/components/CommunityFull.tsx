@@ -34,7 +34,7 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
         // 카테고리 목록 가져오기
         const categoriesResponse = await communityAPI.getCategories() as any;
         if (categoriesResponse.success) {
-          const categoryLabels = ["전체", ...categoriesResponse.data.map((cat: any) => cat.label)];
+          const categoryLabels = ["전체", ...(categoriesResponse as any).data.map((cat: any) => cat.label)];
           setCategories(categoryLabels);
         } else {
           setCategories(KOREAN_CATEGORIES);

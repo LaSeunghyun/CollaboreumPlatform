@@ -50,8 +50,8 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
   const fetchCategories = async () => {
     try {
       const response = await authAPI.get('/categories') as ApiResponse<any[]>;
-      if (response.success && response.data && Array.isArray(response.data)) {
-        const categoryLabels = response.data.map((cat: any) => ({
+      if (response.success && (response as any).data && Array.isArray((response as any).data)) {
+        const categoryLabels = (response as any).data.map((cat: any) => ({
           value: cat.label || cat.name,
           label: cat.label || cat.name
         }));
@@ -82,9 +82,9 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
 
       const response = await authAPI.get(`/community/posts?${params.toString()}`) as ApiResponse<CommunityPostResponse[]>;
 
-      if (response.success && response.data && Array.isArray(response.data)) {
+      if (response.success && (response as any).data && Array.isArray((response as any).data)) {
         // CommunityPostResponse를 Post 타입으로 변환
-        const mappedPosts: Post[] = response.data.map(post => ({
+        const mappedPosts: Post[] = (response as any).data.map((post: CommunityPostResponse) => ({
           id: post.id,
           title: post.title,
           content: post.content,
@@ -92,7 +92,7 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
           author: post.authorName,
           timeAgo: new Date(post.createdAt).toLocaleDateString('ko-KR'),
           replies: 0, // API에서 replies 정보가 없으므로 기본값 설정
-          likes: post.likes.length,
+          likes: post.likes?.length || 0,
           isHot: post.views > 100, // 조회수 기반으로 hot 여부 판단
           images: []
         }));
@@ -102,7 +102,7 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
         } else {
           setPosts(prev => [...prev, ...mappedPosts]);
         }
-        setTotalPosts(response.data.length > 0 && response.data[0].pagination ? response.data[0].pagination.totalPosts : 0);
+        setTotalPosts((response as any).data.length > 0 && (response as any).data[0].pagination ? (response as any).data[0].pagination.totalPosts : 0);
         setCurrentPage(page);
       }
     } catch (error) {
@@ -143,7 +143,20 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
       });
 
       if ((response as any).success && (response as any).data) {
-        setPosts((response as any).data);
+        // CommunityPostResponse를 Post 타입으로 변환
+        const mappedPosts: Post[] = (response as any).data.map((post: CommunityPostResponse) => ({
+          id: post.id,
+          title: post.title,
+          content: post.content,
+          category: post.category,
+          author: post.authorName,
+          timeAgo: new Date(post.createdAt).toLocaleDateString('ko-KR'),
+          replies: 0,
+          likes: post.likes?.length || 0,
+          isHot: post.views > 100,
+          images: []
+        }));
+        setPosts(mappedPosts);
       }
     } catch (error) {
       // 에러 발생 시 클라이언트 사이드 정렬로 폴백

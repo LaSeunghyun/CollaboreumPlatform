@@ -41,12 +41,12 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
             if (contentType && contentType.includes('application/json')) {
               const statsData = await statsResponse.json();
 
-              if (statsData.success && statsData.data) {
+              if (statsData.success && (statsData as any).data) {
                 setPlatformStats({
-                  totalArtists: statsData.data.registeredArtists || 0,
-                  totalProjects: statsData.data.successfulProjects || 0,
-                  totalFunding: statsData.data.totalFunding || 0,
-                  totalUsers: statsData.data.activeSupporters || 0
+                  totalArtists: (statsData as any).data.registeredArtists || 0,
+                  totalProjects: (statsData as any).data.successfulProjects || 0,
+                  totalFunding: (statsData as any).data.totalFunding || 0,
+                  totalUsers: (statsData as any).data.activeSupporters || 0
                 });
               } else {
                 // API 응답이 실패한 경우 기본값 사용

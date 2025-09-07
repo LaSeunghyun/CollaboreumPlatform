@@ -53,7 +53,7 @@ export const NoticesPage: React.FC = () => {
             <Card>
                 <CardContent className="p-0">
                     <div className="divide-y">
-                        {notices.data.posts.map((notice: any) => (
+                        {((notices as any)?.data?.posts || (notices as any)?.posts || []).map((notice: any) => (
                             <NoticePost key={notice.id} {...notice} />
                         ))}
                     </div>

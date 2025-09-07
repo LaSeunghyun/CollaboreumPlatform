@@ -77,8 +77,8 @@ export function CommunitySection({ onViewAllCommunity, onPostClick, onCreatePost
           if (Array.isArray(categoriesResponse)) {
             const categoryLabels = categoriesResponse.map((cat: any) => cat.label || cat.name);
             setCategories(["전체", ...categoryLabels]);
-          } else if (categoriesResponse?.success && Array.isArray(categoriesResponse.data)) {
-            const categoryLabels = categoriesResponse.data.map((cat: any) => cat.label || cat.name);
+          } else if (categoriesResponse?.success && Array.isArray((categoriesResponse as any).data)) {
+            const categoryLabels = (categoriesResponse as any).data.map((cat: any) => cat.label || cat.name);
             setCategories(["전체", ...categoryLabels]);
           } else {
             console.warn('Categories response structure:', categoriesResponse);
