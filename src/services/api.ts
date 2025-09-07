@@ -522,21 +522,18 @@ export const isAPIAvailable = async (): Promise<boolean> => {
 
 
 
-// Enhanced artist data fetcher with smart fallback
-export const getArtistData = async (useAPI: boolean = true) => {
-    if (useAPI) {
-        try {
-            const response = await artistAPI.getPopularArtists(20);
-            if ((response as any).success && (response as any).data?.artists) {
-                return (response as any).data.artists;
-            }
-        } catch (error) {
-            console.warn('API call failed, using mock data:', error);
+// Enhanced artist data fetcher - API만 사용
+export const getArtistData = async () => {
+    try {
+        const response = await artistAPI.getPopularArtists(20);
+        if ((response as any).success && (response as any).data?.artists) {
+            return (response as any).data.artists;
         }
+        return [];
+    } catch (error) {
+        console.error('API call failed:', error);
+        return [];
     }
-
-    // API 실패 시 빈 배열 반환
-    return [];
 };
 
 // Stats APIs

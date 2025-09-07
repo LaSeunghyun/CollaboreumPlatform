@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { SegmentedTabs } from '../../components/ui/SegmentedTabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Badge } from '../../components/ui/badge';
 import { Plus, Clock, Star, TrendingUp } from 'lucide-react';
@@ -81,11 +81,17 @@ export const ProjectsPage: React.FC = () => {
                 )}
             </div>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                <TabsList className="grid w-full grid-cols-2 max-w-md">
-                    <TabsTrigger value="ongoing">진행 중인 펀딩</TabsTrigger>
-                    <TabsTrigger value="all">전체 프로젝트</TabsTrigger>
-                </TabsList>
+            <div className="space-y-6">
+                <SegmentedTabs
+                    value={activeTab}
+                    onValueChange={setActiveTab}
+                    options={[
+                        { value: "ongoing", label: "진행 중인 펀딩" },
+                        { value: "all", label: "전체 프로젝트" }
+                    ]}
+                    size="md"
+                    variant="segmented"
+                />
 
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                     <Select value={projectSort} onValueChange={setProjectSort}>
@@ -115,22 +121,26 @@ export const ProjectsPage: React.FC = () => {
                     </div>
                 </div>
 
-                <TabsContent value="ongoing" className="space-y-6">
-                    {renderProjects(
-                        (ongoingProjects as any)?.data?.projects || (ongoingProjects as any)?.projects || [],
-                        ongoingLoading,
-                        ongoingError
-                    )}
-                </TabsContent>
+                {activeTab === "ongoing" && (
+                    <div className="space-y-6">
+                        {renderProjects(
+                            (ongoingProjects as any)?.data?.projects || (ongoingProjects as any)?.projects || [],
+                            ongoingLoading,
+                            ongoingError
+                        )}
+                    </div>
+                )}
 
-                <TabsContent value="all" className="space-y-6">
-                    {renderProjects(
-                        (allProjects as any)?.data?.projects || (allProjects as any)?.projects || [],
-                        allLoading,
-                        allError
-                    )}
-                </TabsContent>
-            </Tabs>
+                {activeTab === "all" && (
+                    <div className="space-y-6">
+                        {renderProjects(
+                            (allProjects as any)?.data?.projects || (allProjects as any)?.projects || [],
+                            allLoading,
+                            allError
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

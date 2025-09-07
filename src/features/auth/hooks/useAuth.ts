@@ -37,6 +37,9 @@ export function useAuth() {
         onSuccess: (data) => {
             queryClient.setQueryData(authKeys.user(), data.user);
             queryClient.invalidateQueries({ queryKey: authKeys.all });
+
+            // 로그인 성공 시 홈페이지로 이동
+            navigate('/');
         },
         onError: (error) => {
             console.error('로그인 실패:', error);

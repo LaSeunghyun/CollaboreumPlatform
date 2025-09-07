@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { ArrowLeft, Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/api';
 
 interface LoginPageProps {
@@ -22,11 +23,14 @@ export function LoginPage({ onBack, onLogin, onSignupClick }: LoginPageProps) {
     password: ""
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   // 오류 모달 상태 관리
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // useAuth 훅 사용
+  const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +40,8 @@ export function LoginPage({ onBack, onLogin, onSignupClick }: LoginPageProps) {
       const response = await authAPI.login(formData) as any;
 
       if (response.success) {
-        onLogin(response.data);
+        // AuthContext의 login 함수 호출 (자동으로 페이지 이동 처리됨)
+        login(response.data.token, response.data.user);
       } else {
         setErrorMessage(response.message);
         setShowErrorModal(true);
@@ -61,15 +66,6 @@ export function LoginPage({ onBack, onLogin, onSignupClick }: LoginPageProps) {
       </div>
 
       <div className="w-full max-w-md relative">
-        {/* Back Button */}
-        <Button
-          variant="ghost"
-          onClick={onBack}
-          className="mb-6 bg-white/80 hover:bg-white backdrop-blur-sm"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          뒤로가기
-        </Button>
 
         <Card className="backdrop-blur-sm bg-white/90 border-0 shadow-xl">
           <CardHeader className="space-y-4 text-center">

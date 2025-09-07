@@ -40,6 +40,16 @@
   --sky: #0ea5e9;
   --surface: #f8fafc;
 
+  /* Design tokens for tabs */
+  --radius-pill: 9999px;
+  --h-sm: 32px;
+  --h-md: 40px;
+  --fg: #111827;
+  --fg-subtle: #374151;
+  --bg: #fff;
+  --bg-subtle: #f9fafb;
+  --bg-hover: #f3f4f6;
+
   /* Apple system colors for charts - 차분한 색상으로 조정 */
   --chart-1: #4a5568;
   --chart-2: #38a169;

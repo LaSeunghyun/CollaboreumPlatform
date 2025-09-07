@@ -60,7 +60,7 @@ function App() {
                 <Route path="/events/:id" element={<AppLayout><EventDetail eventId="" onBack={() => { }} /></AppLayout>} />
 
                 {/* Auth Routes */}
-                <Route path="/login" element={<LoginPage onBack={() => { }} onLogin={() => { }} onSignupClick={() => { }} />} />
+                <Route path="/login" element={<LoginPage onBack={() => window.history.back()} onLogin={() => { }} onSignupClick={() => { }} />} />
                 <Route path="/signup" element={<SignupPage onBack={() => { }} onSignup={() => { }} onSocialSignup={() => { }} onLoginClick={() => { }} />} />
 
                 {/* Protected Routes */}
