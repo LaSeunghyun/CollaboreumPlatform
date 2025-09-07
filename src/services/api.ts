@@ -4,9 +4,6 @@
 const API_BASE_URL = process.env.REACT_APP_API_URL ||
     (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
 
-// 디버깅을 위한 로그
-console.log('API_BASE_URL:', API_BASE_URL);
-console.log('Current hostname:', window.location.hostname);
 
 // 토큰 가져오기 함수
 const getAuthToken = (): string | null => {
@@ -234,13 +231,14 @@ export const profileAPI = {
 
 // Community APIs
 export const communityAPI = {
-    getForumPosts: (category?: string, options?: { sort?: string; order?: string; page?: number; limit?: number }) => {
+    getForumPosts: (category?: string, options?: { sort?: string; order?: string; page?: number; limit?: number; search?: string }) => {
         const params = new URLSearchParams();
         if (category && category !== "전체") params.append('category', category);
         if (options?.sort) params.append('sort', options.sort);
         if (options?.order) params.append('order', options.order);
         if (options?.page) params.append('page', options.page.toString());
         if (options?.limit) params.append('limit', options.limit.toString());
+        if (options?.search) params.append('search', options.search);
 
         const queryString = params.toString();
         return apiCall(`/community/posts${queryString ? `?${queryString}` : ''}`);
