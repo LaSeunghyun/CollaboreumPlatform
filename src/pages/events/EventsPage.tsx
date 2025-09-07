@@ -46,7 +46,7 @@ export const EventsPage: React.FC = () => {
 
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {events.data.events.map((event: any) => (
+                {((events as any)?.data?.events || (events as any)?.events || []).map((event: any) => (
                     <EventCard key={event.id} {...event} />
                 ))}
             </div>
