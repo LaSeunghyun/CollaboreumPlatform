@@ -2,12 +2,21 @@ import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { TrendingUp, Award, Users, ChevronLeft, ArrowRight, Users2, Target, DollarSign, Heart } from "lucide-react";
 import { StatCard } from "./ui/StatCard";
+import { useQuery } from '@tanstack/react-query';
+import { statsAPI } from '../services/api';
 
 interface AboutProps {
     onBack?: () => void;
 }
 
 export function About({ onBack }: AboutProps) {
+    // 플랫폼 통계 조회
+    const { data: platformStats, isLoading: statsLoading } = useQuery({
+        queryKey: ['platform-stats'],
+        queryFn: statsAPI.getPlatformStats,
+        staleTime: 5 * 60 * 1000, // 5분
+    });
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-background via-secondary/10 to-muted/20">
             {/* Header */}
@@ -150,25 +159,25 @@ export function About({ onBack }: AboutProps) {
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                             <StatCard
                                 label="등록 아티스트"
-                                value="1,247"
+                                value={statsLoading ? "..." : ((platformStats as any)?.data?.totalArtists || 0).toLocaleString()}
                                 icon={Users2}
                                 iconColor="text-indigo"
                             />
                             <StatCard
                                 label="성공 프로젝트"
-                                value="89"
+                                value={statsLoading ? "..." : ((platformStats as any)?.data?.totalProjects || 0).toLocaleString()}
                                 icon={Target}
                                 iconColor="text-sky"
                             />
                             <StatCard
                                 label="총 펀딩 금액"
-                                value="₩2.1억"
+                                value={statsLoading ? "..." : `₩${((platformStats as any)?.data?.totalFunding || 0).toLocaleString()}`}
                                 icon={DollarSign}
                                 iconColor="text-green-500"
                             />
                             <StatCard
                                 label="활성 후원자"
-                                value="15,432"
+                                value={statsLoading ? "..." : ((platformStats as any)?.data?.totalUsers || 0).toLocaleString()}
                                 icon={Heart}
                                 iconColor="text-red-500"
                             />

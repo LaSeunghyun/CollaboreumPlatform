@@ -9,7 +9,8 @@ import {
     Clock,
     Users2,
     Heart,
-    AlertCircle
+    AlertCircle,
+    MessageSquare
 } from 'lucide-react';
 import { ArtistCard } from '../../components/molecules/ArtistCard';
 import { FundingProjectCard } from '../../components/molecules/FundingProjectCard';
@@ -21,6 +22,8 @@ import { useProjects } from '../../lib/api/useProjects';
 import { useNotices } from '../../lib/api/useNotices';
 import { useCommunityPosts } from '../../lib/api/useCommunity';
 import { LoadingState, ErrorState, SkeletonGrid } from '../../components/organisms/States';
+import { useQuery } from '@tanstack/react-query';
+import { statsAPI } from '../../services/api';
 
 export const HomePage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState("");
@@ -40,6 +43,13 @@ export const HomePage: React.FC = () => {
         limit: 4,
         sortBy: 'popularity',
         order: 'desc'
+    });
+
+    // 플랫폼 통계 조회
+    const { data: platformStats, isLoading: statsLoading } = useQuery({
+        queryKey: ['platform-stats'],
+        queryFn: statsAPI.getPlatformStats,
+        staleTime: 5 * 60 * 1000, // 5분
     });
 
     const handleSearch = () => {
@@ -101,19 +111,19 @@ export const HomePage: React.FC = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 pt-8 md:pt-12 max-w-4xl mx-auto">
                         <StatCard
                             label="아티스트"
-                            value="1,200+"
+                            value={statsLoading ? "..." : ((platformStats as any)?.data?.totalArtists || 0).toLocaleString()}
                             icon={Users2}
                             iconColor="text-indigo"
                         />
                         <StatCard
                             label="진행 프로젝트"
-                            value="340+"
+                            value={statsLoading ? "..." : ((platformStats as any)?.data?.totalProjects || 0).toLocaleString()}
                             icon={TrendingUp}
                             iconColor="text-sky"
                         />
                         <StatCard
                             label="총 후원금액"
-                            value="12억원+"
+                            value={statsLoading ? "..." : `₩${((platformStats as any)?.data?.totalFunding || 0).toLocaleString()}`}
                             icon={Heart}
                             iconColor="text-red-500"
                         />
@@ -137,13 +147,38 @@ export const HomePage: React.FC = () => {
                         title="아티스트 정보를 불러올 수 없습니다"
                         description="잠시 후 다시 시도해주세요."
                     />
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                        {((popularArtists as any)?.data?.artists || (popularArtists as any)?.artists || []).slice(0, 3).map((artist: any) => (
-                            <ArtistCard key={artist.id} {...artist} />
-                        ))}
-                    </div>
-                )}
+                ) : (() => {
+                    const artists = (popularArtists as any)?.data?.artists || (popularArtists as any)?.artists || [];
+                    return artists.length === 0 ? (
+                        <Card className="border-dashed">
+                            <CardContent className="p-12 text-center space-y-6">
+                                <div className="w-16 h-16 bg-indigo/10 rounded-full flex items-center justify-center mx-auto">
+                                    <Users2 className="w-8 h-8 text-indigo" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-semibold mb-2">아직 등록된 아티스트가 없습니다</h3>
+                                    <p className="text-muted-foreground mb-6">
+                                        첫 번째 아티스트가 되어보세요!<br />
+                                        창의적인 작품을 세상에 알려보세요.
+                                    </p>
+                                </div>
+                                <Button
+                                    className="bg-indigo hover:bg-indigo/90"
+                                    onClick={() => window.location.href = '/signup'}
+                                >
+                                    <Users2 className="w-4 h-4 mr-2" />
+                                    아티스트 등록하기
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                            {artists.slice(0, 3).map((artist: any) => (
+                                <ArtistCard key={artist.id} {...artist} />
+                            ))}
+                        </div>
+                    );
+                })()}
             </section>
 
             {/* Featured Projects */}
@@ -169,13 +204,38 @@ export const HomePage: React.FC = () => {
                         title="프로젝트 정보를 불러올 수 없습니다"
                         description="잠시 후 다시 시도해주세요."
                     />
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                        {((projects as any)?.data?.projects || (projects as any)?.projects || []).slice(0, 3).map((project: any) => (
-                            <FundingProjectCard key={project.id} {...project} />
-                        ))}
-                    </div>
-                )}
+                ) : (() => {
+                    const projectList = (projects as any)?.data?.projects || (projects as any)?.projects || [];
+                    return projectList.length === 0 ? (
+                        <Card className="border-dashed">
+                            <CardContent className="p-12 text-center space-y-6">
+                                <div className="w-16 h-16 bg-sky/10 rounded-full flex items-center justify-center mx-auto">
+                                    <TrendingUp className="w-8 h-8 text-sky" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-semibold mb-2">아직 진행 중인 프로젝트가 없습니다</h3>
+                                    <p className="text-muted-foreground mb-6">
+                                        첫 번째 프로젝트를 시작해보세요!<br />
+                                        창의적인 아이디어를 현실로 만들어보세요.
+                                    </p>
+                                </div>
+                                <Button
+                                    className="bg-sky hover:bg-sky/90"
+                                    onClick={() => window.location.href = '/funding/create'}
+                                >
+                                    <TrendingUp className="w-4 h-4 mr-2" />
+                                    프로젝트 시작하기
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                            {projectList.slice(0, 3).map((project: any) => (
+                                <FundingProjectCard key={project.id} {...project} />
+                            ))}
+                        </div>
+                    );
+                })()}
             </section>
 
             {/* Notice Preview */}
@@ -197,44 +257,62 @@ export const HomePage: React.FC = () => {
                         title="공지사항을 불러올 수 없습니다"
                         description="잠시 후 다시 시도해주세요."
                     />
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {((notices as any)?.data?.posts || (notices as any)?.posts || []).slice(0, 2).map((notice: any) => (
-                            <Card key={notice.id} className="cursor-pointer hover:shadow-md transition-all duration-200 border-l-4 border-l-indigo">
-                                <CardContent className="p-5">
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2">
-                                            <Badge className="bg-indigo text-white text-xs">
-                                                공지사항
-                                            </Badge>
-                                            {notice.isImportant && (
-                                                <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs">
-                                                    중요
+                ) : (() => {
+                    const noticeList = (notices as any)?.data?.posts || (notices as any)?.posts || [];
+                    return noticeList.length === 0 ? (
+                        <Card className="border-dashed">
+                            <CardContent className="p-12 text-center space-y-6">
+                                <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto">
+                                    <AlertCircle className="w-8 h-8 text-yellow-600" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-semibold mb-2">아직 공지사항이 없습니다</h3>
+                                    <p className="text-muted-foreground mb-6">
+                                        새로운 소식과 업데이트를 기다리고 있습니다.<br />
+                                        곧 유용한 정보를 제공해드릴 예정입니다.
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {noticeList.slice(0, 2).map((notice: any) => (
+                                <Card key={notice.id} className="cursor-pointer hover:shadow-md transition-all duration-200 border-l-4 border-l-indigo">
+                                    <CardContent className="p-5">
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-2">
+                                                <Badge className="bg-indigo text-white text-xs">
+                                                    공지사항
                                                 </Badge>
-                                            )}
-                                            {notice.isPinned && (
-                                                <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 text-xs">
-                                                    📌
-                                                </Badge>
-                                            )}
-                                        </div>
-                                        <h3 className="line-clamp-2 font-medium">{notice.title}</h3>
-                                        <p className="text-sm text-muted-foreground line-clamp-2">
-                                            {notice.content}
-                                        </p>
-                                        <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
-                                            <span className="font-medium">Collaboreum 운영팀</span>
-                                            <div className="flex items-center gap-3">
-                                                <span>조회 {notice.views?.toLocaleString() || 0}</span>
-                                                <span>{new Date(notice.createdAt).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}</span>
+                                                {notice.isImportant && (
+                                                    <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs">
+                                                        중요
+                                                    </Badge>
+                                                )}
+                                                {notice.isPinned && (
+                                                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 text-xs">
+                                                        📌
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                            <h3 className="line-clamp-2 font-medium">{notice.title}</h3>
+                                            <p className="text-sm text-muted-foreground line-clamp-2">
+                                                {notice.content}
+                                            </p>
+                                            <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
+                                                <span className="font-medium">Collaboreum 운영팀</span>
+                                                <div className="flex items-center gap-3">
+                                                    <span>조회 {notice.views?.toLocaleString() || 0}</span>
+                                                    <span>{new Date(notice.createdAt).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                )}
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    );
+                })()}
             </section>
 
             {/* Community Preview */}
@@ -256,56 +334,81 @@ export const HomePage: React.FC = () => {
                         title="커뮤니티 정보를 불러올 수 없습니다"
                         description="잠시 후 다시 시도해주세요."
                     />
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {((communityPosts as any)?.data?.posts || (communityPosts as any)?.posts || []).slice(0, 4).map((post: any) => (
-                            <Card key={post.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                                <CardContent className="p-4">
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                            <Badge
-                                                variant="secondary"
-                                                className={`text-xs ${post.category === "review" ? "bg-green-100 text-green-700" :
-                                                    post.category === "question" ? "bg-blue-100 text-blue-700" :
-                                                        "bg-gray-100 text-gray-700"
-                                                    }`}
-                                            >
-                                                {post.category === "review" && "후기"}
-                                                {post.category === "question" && "질문"}
-                                                {post.category === "free" && "자유"}
-                                            </Badge>
-                                            {post.isHot && (
-                                                <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs">
-                                                    🔥 HOT
-                                                </Badge>
-                                            )}
-                                        </div>
-                                        <h3 className="line-clamp-2 font-medium">{post.title}</h3>
-                                        <p className="text-sm text-muted-foreground line-clamp-2">
-                                            {post.content}
-                                        </p>
-                                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                ) : (() => {
+                    const postList = (communityPosts as any)?.data?.posts || (communityPosts as any)?.posts || [];
+                    return postList.length === 0 ? (
+                        <Card className="border-dashed">
+                            <CardContent className="p-12 text-center space-y-6">
+                                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                                    <MessageSquare className="w-8 h-8 text-green-600" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-semibold mb-2">아직 커뮤니티 글이 없습니다</h3>
+                                    <p className="text-muted-foreground mb-6">
+                                        첫 번째 글을 작성해보세요!<br />
+                                        아티스트들과 소통하고 경험을 공유해보세요.
+                                    </p>
+                                </div>
+                                <Button
+                                    className="bg-green-600 hover:bg-green-700"
+                                    onClick={() => window.location.href = '/community/create'}
+                                >
+                                    <MessageSquare className="w-4 h-4 mr-2" />
+                                    첫 글 작성하기
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {postList.slice(0, 4).map((post: any) => (
+                                <Card key={post.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                                    <CardContent className="p-4">
+                                        <div className="space-y-2">
                                             <div className="flex items-center gap-2">
-                                                <span>{post.author?.name}</span>
-                                                {post.author?.isVerified && (
-                                                    <div className="w-3 h-3 bg-sky rounded-full flex items-center justify-center">
-                                                        <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                                        </svg>
-                                                    </div>
+                                                <Badge
+                                                    variant="secondary"
+                                                    className={`text-xs ${post.category === "review" ? "bg-green-100 text-green-700" :
+                                                        post.category === "question" ? "bg-blue-100 text-blue-700" :
+                                                            "bg-gray-100 text-gray-700"
+                                                        }`}
+                                                >
+                                                    {post.category === "review" && "후기"}
+                                                    {post.category === "question" && "질문"}
+                                                    {post.category === "free" && "자유"}
+                                                </Badge>
+                                                {post.isHot && (
+                                                    <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs">
+                                                        🔥 HOT
+                                                    </Badge>
                                                 )}
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <span>👍 {post.likes || 0}</span>
-                                                <span>💬 {post.comments || 0}</span>
+                                            <h3 className="line-clamp-2 font-medium">{post.title}</h3>
+                                            <p className="text-sm text-muted-foreground line-clamp-2">
+                                                {post.content}
+                                            </p>
+                                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                                <div className="flex items-center gap-2">
+                                                    <span>{post.author?.name}</span>
+                                                    {post.author?.isVerified && (
+                                                        <div className="w-3 h-3 bg-sky rounded-full flex items-center justify-center">
+                                                            <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                            </svg>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span>👍 {post.likes || 0}</span>
+                                                    <span>💬 {post.comments || 0}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                )}
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    );
+                })()}
             </section>
         </div>
     );

@@ -164,7 +164,6 @@ export class ErrorBoundary extends Component<Props, State> {
                                     onClick={this.handleReload}
                                     className="flex items-center gap-2"
                                 >
-                                    <RefreshCw className="w-4 h-4" />
                                     페이지 새로고침
                                 </Button>
 

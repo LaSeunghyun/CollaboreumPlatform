@@ -110,22 +110,44 @@ export const AccountPage: React.FC = () => {
                         </div>
                     ) : profileError ? (
                         <ErrorState title="프로필 정보를 불러올 수 없습니다" />
-                    ) : (
-                        <div className="flex items-center gap-4">
-                            <Avatar className="w-16 h-16">
-                                <AvatarImage src={userProfile.avatar} />
-                                <AvatarFallback>{userProfile.name?.[0] || 'U'}</AvatarFallback>
-                            </Avatar>
-                            <div className="space-y-1">
-                                <h3 className="text-xl font-semibold">{userProfile.name || '사용자'}</h3>
-                                <p className="text-sm text-muted-foreground">{userProfile.email || 'user@example.com'}</p>
-                                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                    <span>팔로워 {userProfile.followers ?? 0}명</span>
-                                    <span>팔로잉 {userProfile.following ?? 0}명</span>
+                    ) : (() => {
+                        const hasProfile = userProfile.name && userProfile.email;
+                        return !hasProfile ? (
+                            <div className="text-center space-y-4">
+                                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto">
+                                    <Settings className="w-8 h-8 text-muted-foreground" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold mb-2">프로필을 완성해주세요</h3>
+                                    <p className="text-sm text-muted-foreground mb-4">
+                                        프로필을 등록하면 더 나은 서비스를 이용할 수 있습니다.
+                                    </p>
+                                </div>
+                                <Button
+                                    className="bg-indigo hover:bg-indigo/90"
+                                    onClick={() => setActiveTab('settings')}
+                                >
+                                    <Settings className="w-4 h-4 mr-2" />
+                                    프로필 등록하기
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-4">
+                                <Avatar className="w-16 h-16">
+                                    <AvatarImage src={userProfile.avatar} />
+                                    <AvatarFallback>{userProfile.name?.[0] || 'U'}</AvatarFallback>
+                                </Avatar>
+                                <div className="space-y-1">
+                                    <h3 className="text-xl font-semibold">{userProfile.name || '사용자'}</h3>
+                                    <p className="text-sm text-muted-foreground">{userProfile.email || 'user@example.com'}</p>
+                                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                        <span>팔로워 {userProfile.followers ?? 0}명</span>
+                                        <span>팔로잉 {userProfile.following ?? 0}명</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        );
+                    })()}
                 </CardContent>
             </Card>
 
@@ -161,7 +183,7 @@ export const AccountPage: React.FC = () => {
                             <MessageSquare className="w-4 h-4 text-sky" />
                             <span className="text-sm text-muted-foreground">커뮤니티 활동</span>
                         </div>
-                        <p className="text-2xl font-bold">23개</p>
+                        <p className="text-2xl font-bold">0개</p>
                     </CardContent>
                 </Card>
 
@@ -171,7 +193,7 @@ export const AccountPage: React.FC = () => {
                             <Award className="w-4 h-4 text-yellow-500" />
                             <span className="text-sm text-muted-foreground">달성한 목표</span>
                         </div>
-                        <p className="text-2xl font-bold">1개</p>
+                        <p className="text-2xl font-bold">0개</p>
                     </CardContent>
                 </Card>
             </div>
@@ -200,33 +222,58 @@ export const AccountPage: React.FC = () => {
                         <SkeletonGrid count={3} cols={3} />
                     ) : projectsError ? (
                         <ErrorState title="프로젝트 정보를 불러올 수 없습니다" />
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {(userProjects.data?.projects || userProjects.projects)?.map((project: any) => (
-                                <FundingProjectCard key={project.id} {...project} />
-                            ))}
-
+                    ) : (() => {
+                        const projects = userProjects.data?.projects || userProjects.projects || [];
+                        return projects.length === 0 ? (
                             <Card className="border-dashed">
-                                <CardContent className="p-6 text-center space-y-4">
-                                    <div className="w-12 h-12 bg-indigo/10 rounded-full flex items-center justify-center mx-auto">
-                                        <Plus className="w-6 h-6 text-indigo" />
+                                <CardContent className="p-12 text-center space-y-6">
+                                    <div className="w-16 h-16 bg-indigo/10 rounded-full flex items-center justify-center mx-auto">
+                                        <Plus className="w-8 h-8 text-indigo" />
                                     </div>
                                     <div>
-                                        <h3 className="mb-2 font-medium">새 프로젝트 시작</h3>
-                                        <p className="text-sm text-muted-foreground">
-                                            창의적인 아이디어를 현실로 만들어보세요
+                                        <h3 className="text-xl font-semibold mb-2">아직 프로젝트가 없습니다</h3>
+                                        <p className="text-muted-foreground mb-6">
+                                            창의적인 아이디어를 현실로 만들어보세요.<br />
+                                            첫 번째 프로젝트를 시작해보세요!
                                         </p>
                                     </div>
                                     <Button
                                         className="bg-indigo hover:bg-indigo/90"
                                         onClick={handleCreateProject}
                                     >
-                                        프로젝트 만들기
+                                        <Plus className="w-4 h-4 mr-2" />
+                                        첫 프로젝트 만들기
                                     </Button>
                                 </CardContent>
                             </Card>
-                        </div>
-                    )}
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {projects.map((project: any) => (
+                                    <FundingProjectCard key={project.id} {...project} />
+                                ))}
+
+                                <Card className="border-dashed">
+                                    <CardContent className="p-6 text-center space-y-4">
+                                        <div className="w-12 h-12 bg-indigo/10 rounded-full flex items-center justify-center mx-auto">
+                                            <Plus className="w-6 h-6 text-indigo" />
+                                        </div>
+                                        <div>
+                                            <h3 className="mb-2 font-medium">새 프로젝트 시작</h3>
+                                            <p className="text-sm text-muted-foreground">
+                                                창의적인 아이디어를 현실로 만들어보세요
+                                            </p>
+                                        </div>
+                                        <Button
+                                            className="bg-indigo hover:bg-indigo/90"
+                                            onClick={handleCreateProject}
+                                        >
+                                            프로젝트 만들기
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        );
+                    })()}
                 </TabsContent>
 
                 <TabsContent value="backed-projects" className="space-y-6">
@@ -234,13 +281,38 @@ export const AccountPage: React.FC = () => {
                         <SkeletonGrid count={3} cols={3} />
                     ) : backingsError ? (
                         <ErrorState title="후원 정보를 불러올 수 없습니다" />
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {userBackings.backings?.map((backing: any) => (
-                                <FundingProjectCard key={backing.project.id} {...backing.project} />
-                            ))}
-                        </div>
-                    )}
+                    ) : (() => {
+                        const backings = userBackings.backings || [];
+                        return backings.length === 0 ? (
+                            <Card className="border-dashed">
+                                <CardContent className="p-12 text-center space-y-6">
+                                    <div className="w-16 h-16 bg-sky/10 rounded-full flex items-center justify-center mx-auto">
+                                        <Heart className="w-8 h-8 text-sky" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-semibold mb-2">아직 후원한 프로젝트가 없습니다</h3>
+                                        <p className="text-muted-foreground mb-6">
+                                            마음에 드는 프로젝트를 찾아서 후원해보세요.<br />
+                                            창의적인 프로젝트들이 여러분을 기다리고 있습니다!
+                                        </p>
+                                    </div>
+                                    <Button
+                                        className="bg-sky hover:bg-sky/90"
+                                        onClick={() => window.location.href = '/funding'}
+                                    >
+                                        <Heart className="w-4 h-4 mr-2" />
+                                        프로젝트 둘러보기
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {backings.map((backing: any) => (
+                                    <FundingProjectCard key={backing.project.id} {...backing.project} />
+                                ))}
+                            </div>
+                        );
+                    })()}
                 </TabsContent>
 
                 <TabsContent value="community-activity" className="space-y-6">

@@ -90,10 +90,10 @@ router.get('/platform', async (req, res) => {
     res.json({
       success: true,
       data: {
-        registeredArtists,
-        successfulProjects,
+        totalArtists: registeredArtists,
+        totalProjects: successfulProjects,
         totalFunding: totalFunding[0]?.total || 0,
-        activeSupporters,
+        totalUsers: activeSupporters,
         newArtistsThisWeek,
         artistsByCategory,
         monthlyFunding

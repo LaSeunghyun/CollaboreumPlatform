@@ -339,7 +339,7 @@ html {
     animation: float 3s ease-in-out infinite;
   }
 
-  /* Collaboreum UI Design utilities */
+  /* Collaboreum utilities */
   .hover-scale {
     transition: transform 0.2s ease-in-out;
   }
