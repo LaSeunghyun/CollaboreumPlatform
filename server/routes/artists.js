@@ -586,7 +586,7 @@ router.get('/stats', auth, async (req, res) => {
 });
 
 // 아티스트 팔로우/언팔로우
-router.post('/:id/follow', authMiddleware, async (req, res) => {
+router.post('/:id/follow', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const { action } = req.body; // 'follow' 또는 'unfollow'
@@ -684,7 +684,7 @@ router.post('/:id/follow', authMiddleware, async (req, res) => {
 });
 
 // 아티스트 프로필 업데이트
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
