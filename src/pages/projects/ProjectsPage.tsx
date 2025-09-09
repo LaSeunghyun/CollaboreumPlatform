@@ -26,7 +26,8 @@ export const ProjectsPage: React.FC = () => {
     });
 
     const handleCreateProject = () => {
-        // 프로젝트 생성 로직
+        // 프로젝트 생성 페이지로 이동
+        window.location.href = '/funding/create';
     };
 
     const renderProjects = (projects: any[], loading: boolean, error: any) => {

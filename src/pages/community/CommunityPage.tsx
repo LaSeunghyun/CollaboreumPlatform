@@ -4,6 +4,8 @@ import { Input } from '../../components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Card, CardContent } from '../../components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/dialog';
+import { Textarea } from '../../components/ui/textarea';
 import { Search, Plus, MessageSquare } from 'lucide-react';
 import { CommunityBoardPost } from '../../components/organisms/CommunityBoardPost';
 import { useCommunityPosts } from '../../lib/api/useCommunity';
@@ -14,6 +16,13 @@ export const CommunityPage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [sortBy, setSortBy] = useState("latest");
     const [isLoggedIn] = useState(true); // 실제로는 인증 상태에서 가져와야 함
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [createFormData, setCreateFormData] = useState({
+        title: '',
+        content: '',
+        category: '',
+        tags: ''
+    });
 
     // API 훅들
     const { data: allPosts, isLoading: allLoading, error: allError } = useCommunityPosts({
@@ -44,7 +53,62 @@ export const CommunityPage: React.FC = () => {
     });
 
     const handleCreatePost = () => {
-        // 게시글 작성 로직
+        setIsCreateModalOpen(true);
+    };
+
+    const handleCreatePostSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        if (!createFormData.title.trim() || !createFormData.content.trim() || !createFormData.category) {
+            alert('제목, 내용, 카테고리를 모두 입력해주세요.');
+            return;
+        }
+
+        try {
+            const API_BASE_URL = process.env.REACT_APP_API_URL ||
+                (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
+
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+
+            const postData = {
+                title: createFormData.title,
+                content: createFormData.content,
+                category: createFormData.category,
+                tags: createFormData.tags ? createFormData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : []
+            };
+
+            const response = await fetch(`${API_BASE_URL}/community/posts`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(postData)
+            });
+
+            if (response.ok) {
+                alert('게시글이 성공적으로 작성되었습니다.');
+                setCreateFormData({
+                    title: '',
+                    content: '',
+                    category: '',
+                    tags: ''
+                });
+                setIsCreateModalOpen(false);
+                // 페이지 새로고침
+                window.location.reload();
+            } else {
+                const errorData = await response.json();
+                alert(`게시글 작성 실패: ${errorData.message || '알 수 없는 오류가 발생했습니다.'}`);
+            }
+        } catch (error) {
+            console.error('게시글 작성 실패:', error);
+            alert('게시글 작성 중 오류가 발생했습니다.');
+        }
     };
 
     const handleSearch = () => {
@@ -97,13 +161,76 @@ export const CommunityPage: React.FC = () => {
                     <p className="text-muted-foreground">아티스트와 팬이 함께 만드는 소통의 공간</p>
                 </div>
                 {isLoggedIn && (
-                    <Button
-                        className="bg-indigo hover:bg-indigo-hover hover-scale transition-button shadow-sm"
-                        onClick={handleCreatePost}
-                    >
-                        <Plus className="w-4 h-4 mr-2" />
-                        글쓰기
-                    </Button>
+                    <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+                        <DialogTrigger asChild>
+                            <Button
+                                className="bg-indigo hover:bg-indigo-hover hover-scale transition-button shadow-sm"
+                                onClick={handleCreatePost}
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                글쓰기
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                            <DialogHeader>
+                                <DialogTitle>새 게시글 작성</DialogTitle>
+                            </DialogHeader>
+                            <form onSubmit={handleCreatePostSubmit} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">제목 *</label>
+                                    <Input
+                                        value={createFormData.title}
+                                        onChange={(e) => setCreateFormData(prev => ({ ...prev, title: e.target.value }))}
+                                        placeholder="게시글 제목을 입력하세요"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">카테고리 *</label>
+                                    <Select value={createFormData.category} onValueChange={(value) => setCreateFormData(prev => ({ ...prev, category: value }))}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="카테고리를 선택하세요" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="question">질문</SelectItem>
+                                            <SelectItem value="review">후기</SelectItem>
+                                            <SelectItem value="free">자유</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">내용 *</label>
+                                    <Textarea
+                                        value={createFormData.content}
+                                        onChange={(e) => setCreateFormData(prev => ({ ...prev, content: e.target.value }))}
+                                        placeholder="게시글 내용을 입력하세요"
+                                        rows={8}
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">태그</label>
+                                    <Input
+                                        value={createFormData.tags}
+                                        onChange={(e) => setCreateFormData(prev => ({ ...prev, tags: e.target.value }))}
+                                        placeholder="태그를 쉼표로 구분하여 입력하세요"
+                                    />
+                                </div>
+
+                                <div className="flex gap-2 pt-4">
+                                    <Button type="submit" className="flex-1">
+                                        게시글 작성
+                                    </Button>
+                                    <Button type="button" variant="outline" className="flex-1" onClick={() => setIsCreateModalOpen(false)}>
+                                        취소
+                                    </Button>
+                                </div>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
                 )}
             </div>
 
