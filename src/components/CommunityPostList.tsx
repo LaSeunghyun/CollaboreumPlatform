@@ -4,9 +4,8 @@ import { Input } from './ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { useAuth } from '../contexts/AuthContext';
-import { authAPI, communityAPI, categoryAPI } from '../services/api';
+import { communityApi } from '../features/community/api/communityApi';
 import { KOREAN_CATEGORIES } from '../constants/categories';
-import { ApiResponse, CommunityPostResponse } from '../types';
 
 interface Post {
   id: string;
@@ -49,9 +48,9 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
   // 카테고리 목록 가져오기
   const fetchCategories = async () => {
     try {
-      const response = await authAPI.get('/categories') as ApiResponse<any[]>;
-      if (response.success && (response as any).data && Array.isArray((response as any).data)) {
-        const categoryLabels = (response as any).data.map((cat: any) => ({
+      const categories = await communityApi.getCategories();
+      if (Array.isArray(categories)) {
+        const categoryLabels = categories.map((cat: any) => ({
           value: cat.label || cat.name,
           label: cat.label || cat.name
         }));
@@ -67,34 +66,26 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
   const fetchPosts = async (page: number = 1, category: string = selectedCategory) => {
     setIsLoading(true);
     try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: '20'
+      const response = await communityApi.getPosts({
+        page,
+        limit: 20,
+        category: category !== '전체' ? category : undefined,
+        search: searchQuery.trim() || undefined
       });
 
-      if (category !== '전체') {
-        params.append('category', category);
-      }
-
-      if (searchQuery.trim()) {
-        params.append('search', searchQuery.trim());
-      }
-
-      const response = await authAPI.get(`/community/posts?${params.toString()}`) as ApiResponse<CommunityPostResponse[]>;
-
-      if (response.success && (response as any).data && Array.isArray((response as any).data)) {
-        // CommunityPostResponse를 Post 타입으로 변환
-        const mappedPosts: Post[] = (response as any).data.map((post: CommunityPostResponse) => ({
+      if (response.posts) {
+        // CommunityPost를 Post 타입으로 변환
+        const mappedPosts: Post[] = response.posts.map((post: any) => ({
           id: post.id,
           title: post.title,
           content: post.content,
           category: post.category,
-          author: post.authorName,
+          author: post.author,
           timeAgo: new Date(post.createdAt).toLocaleDateString('ko-KR'),
-          replies: 0, // API에서 replies 정보가 없으므로 기본값 설정
-          likes: post.likes?.length || 0,
-          isHot: post.views > 100, // 조회수 기반으로 hot 여부 판단
-          images: []
+          replies: post.comments?.length || 0,
+          likes: post.likes || 0,
+          isHot: post.viewCount > 100, // 조회수 기반으로 hot 여부 판단
+          images: post.images || []
         }));
 
         if (page === 1) {
@@ -102,7 +93,7 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
         } else {
           setPosts(prev => [...prev, ...mappedPosts]);
         }
-        setTotalPosts((response as any).data.length > 0 && (response as any).data[0].pagination ? (response as any).data[0].pagination.totalPosts : 0);
+        setTotalPosts(response.pagination?.total || 0);
         setCurrentPage(page);
       }
     } catch (error) {
@@ -137,24 +128,25 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
 
     try {
       // 서버에서 정렬된 데이터를 받아오기
-      const response = await communityAPI.getForumPosts(selectedCategory === "전체" ? undefined : selectedCategory, {
-        sort: sort === 'popular' ? 'likes' : 'createdAt',
+      const response = await communityApi.getPosts({
+        category: selectedCategory === "전체" ? undefined : selectedCategory,
+        sortBy: sort === 'popular' ? 'likes' : 'createdAt',
         order: 'desc'
       });
 
-      if ((response as any).success && (response as any).data) {
-        // CommunityPostResponse를 Post 타입으로 변환
-        const mappedPosts: Post[] = (response as any).data.map((post: CommunityPostResponse) => ({
+      if (response.posts) {
+        // CommunityPost를 Post 타입으로 변환
+        const mappedPosts: Post[] = response.posts.map((post: any) => ({
           id: post.id,
           title: post.title,
           content: post.content,
           category: post.category,
-          author: post.authorName,
+          author: post.author,
           timeAgo: new Date(post.createdAt).toLocaleDateString('ko-KR'),
-          replies: 0,
-          likes: post.likes?.length || 0,
-          isHot: post.views > 100,
-          images: []
+          replies: post.comments?.length || 0,
+          likes: post.likes || 0,
+          isHot: post.viewCount > 100,
+          images: post.images || []
         }));
         setPosts(mappedPosts);
       }

@@ -20,7 +20,7 @@ import { StatCard } from '../../components/ui/StatCard';
 import { usePopularArtists } from '../../lib/api/useArtists';
 import { useProjects } from '../../lib/api/useProjects';
 import { useNotices } from '../../lib/api/useNotices';
-import { useCommunityPosts } from '../../lib/api/useCommunity';
+import { useCommunityPosts } from '../../features/community/hooks/useCommunityPosts';
 import { LoadingState, ErrorState, SkeletonGrid } from '../../components/organisms/States';
 import { useQuery } from '@tanstack/react-query';
 import { statsAPI } from '../../services/api';
@@ -41,7 +41,7 @@ export const HomePage: React.FC = () => {
     });
     const { data: communityPosts, isLoading: communityLoading, error: communityError } = useCommunityPosts({
         limit: 4,
-        sortBy: 'popularity',
+        sortBy: 'likes',
         order: 'desc'
     });
 

@@ -38,3 +38,6 @@ export type { EmptyStateProps } from "./EmptyState"
 
 // 로딩 버튼
 export { LoadingButton } from "./LoadingButton"
+
+// 성공 모달
+export { SuccessModal } from "./SuccessModal"

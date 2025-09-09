@@ -3,7 +3,7 @@ import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { MessageCircle, Heart, Calendar, MapPin, Clock, Users } from "lucide-react";
-import { communityAPI, categoryAPI } from "../services/api";
+import { communityApi } from "../features/community/api/communityApi";
 import { KOREAN_CATEGORIES, getCategoryColor } from "../constants/categories";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -45,40 +45,28 @@ export function CommunitySection({ onViewAllCommunity, onPostClick, onCreatePost
         setError(null);
 
         try {
-          const [postsResponse, eventsResponse, categoriesResponse] = await Promise.all([
-            communityAPI.getForumPosts(selectedCategory === "전체" ? undefined : selectedCategory),
-            communityAPI.getEvents(),
-            communityAPI.getCategories()
-          ]) as any[];
+          const [postsResponse, categoriesResponse] = await Promise.all([
+            communityApi.getPosts({
+              category: selectedCategory === "전체" ? undefined : selectedCategory,
+              limit: 5
+            }),
+            communityApi.getCategories()
+          ]);
 
-
-
-          if (postsResponse.success && postsResponse.data) {
-            // 서버 응답 구조에 맞게 수정
-            let posts = postsResponse.data || [];
-
+          if (postsResponse.posts) {
             // 최신 순으로 정렬 (기본값)
-            posts = posts.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-
+            const posts = postsResponse.posts.sort((a: any, b: any) =>
+              new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+            );
             setForumPosts(posts);
           } else {
             console.warn('Posts response structure:', postsResponse);
             setForumPosts([]);
           }
 
-          if (eventsResponse.success && eventsResponse.data) {
-            setUpcomingEvents(eventsResponse.data || []);
-          } else {
-            console.warn('Events response structure:', eventsResponse);
-            setUpcomingEvents([]);
-          }
-
           // 카테고리 설정 - API에서 동적으로 가져오기
           if (Array.isArray(categoriesResponse)) {
             const categoryLabels = categoriesResponse.map((cat: any) => cat.label || cat.name);
-            setCategories(["전체", ...categoryLabels]);
-          } else if (categoriesResponse?.success && Array.isArray((categoriesResponse as any).data)) {
-            const categoryLabels = (categoriesResponse as any).data.map((cat: any) => cat.label || cat.name);
             setCategories(["전체", ...categoryLabels]);
           } else {
             console.warn('Categories response structure:', categoriesResponse);

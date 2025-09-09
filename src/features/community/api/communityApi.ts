@@ -1,5 +1,5 @@
 // 커뮤니티 API 서비스
-import { apiCall } from '@/services/api'
+import { apiCall } from '../../../services/api'
 import type {
     CommunityPost,
     CommunityPostListQuery,

@@ -6,8 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Label } from './ui/label';
 import { useAuth } from '../contexts/AuthContext';
-import { authAPI } from '../services/api';
-import { ApiResponse, User } from '../types';
+import { communityApi } from '../features/community/api/communityApi';
+import { User } from '../types';
 
 interface CommunityPostFormProps {
   onBack: () => void;
@@ -35,33 +35,11 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const API_BASE_URL = process.env.REACT_APP_API_URL ||
-          (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
-
-        const response = await fetch(`${API_BASE_URL}/categories`);
-        if (response.ok) {
-          const categoriesData = await response.json();
-          setCategories(categoriesData);
-          // 첫 번째 카테고리를 기본값으로 설정
-          if (categoriesData.length > 0) {
-            setFormData(prev => ({ ...prev, category: categoriesData[0].id }));
-          }
-        } else {
-          console.warn('카테고리 API 응답 실패, 기본 카테고리 사용');
-          // API 실패 시 기본 카테고리 사용
-          const defaultCategories = [
-            { id: 'music', label: '음악' },
-            { id: 'art', label: '미술' },
-            { id: 'literature', label: '문학' },
-            { id: 'performance', label: '공연' },
-            { id: 'photo', label: '사진' },
-            { id: 'video', label: '영상' },
-            { id: 'design', label: '디자인' },
-            { id: 'craft', label: '공예' },
-            { id: 'other', label: '기타' }
-          ];
-          setCategories(defaultCategories);
-          setFormData(prev => ({ ...prev, category: 'music' }));
+        const categoriesData = await communityApi.getCategories();
+        setCategories(categoriesData);
+        // 첫 번째 카테고리를 기본값으로 설정
+        if (categoriesData && categoriesData.length > 0) {
+          setFormData(prev => ({ ...prev, category: categoriesData[0]?.id || 'music' }));
         }
       } catch (error) {
         console.error('카테고리 로드 실패:', error);
@@ -172,24 +150,19 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
         title: formData.title.trim(),
         content: formData.content.trim(),
         category: formData.category,
-        images: imageUrls,
-        author: typedUser.id,
-        authorName: typedUser.name || typedUser.username || '사용자'
+        tags: [],
+        status: 'published' as const
       };
 
-      const response = await authAPI.post('/community/posts', postData) as ApiResponse<any>;
+      await communityApi.createPost(postData);
 
-      if (response.success) {
-        setFormData({
-          title: '',
-          content: '',
-          category: '음악',
-          images: []
-        });
-        onBack(); // 포스트 생성 성공 시 뒤로가기
-      } else {
-        setError(response.message || '포스트 생성에 실패했습니다.');
-      }
+      setFormData({
+        title: '',
+        content: '',
+        category: '음악',
+        images: []
+      });
+      onBack(); // 포스트 생성 성공 시 뒤로가기
     } catch (error: any) {
       console.error('포스트 생성 오류:', error);
       setError((error.response as any)?.data?.message || error.message || '포스트 생성 중 오류가 발생했습니다.');

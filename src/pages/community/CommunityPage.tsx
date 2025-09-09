@@ -6,15 +6,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Card, CardContent } from '../../components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '../../components/ui/dialog';
 import { Textarea } from '../../components/ui/textarea';
-import { Search, Plus, MessageSquare } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 import { CommunityBoardPost } from '../../components/organisms/CommunityBoardPost';
-import { useCommunityPosts } from '../../lib/api/useCommunity';
+import { useCommunityPosts, useCreateCommunityPost } from '../../features/community/hooks/useCommunityPosts';
 import { LoadingState, ErrorState, EmptyCommunityState } from '../../components/organisms/States';
 
 export const CommunityPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState("all");
     const [searchQuery, setSearchQuery] = useState("");
-    const [sortBy, setSortBy] = useState("latest");
+    const [sortBy, setSortBy] = useState<"latest" | "popular">("latest");
     const [isLoggedIn] = useState(true); // 실제로는 인증 상태에서 가져와야 함
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [createFormData, setCreateFormData] = useState({
@@ -27,30 +27,32 @@ export const CommunityPage: React.FC = () => {
     // API 훅들
     const { data: allPosts, isLoading: allLoading, error: allError } = useCommunityPosts({
         search: searchQuery || undefined,
-        sortBy: sortBy,
+        sortBy: sortBy === "latest" ? "createdAt" : "likes",
         order: sortBy === 'latest' ? 'desc' : 'desc',
     });
 
     const { data: questionPosts, isLoading: questionLoading, error: questionError } = useCommunityPosts({
         category: 'question',
         search: searchQuery || undefined,
-        sortBy: sortBy,
+        sortBy: sortBy === "latest" ? "createdAt" : "likes",
         order: sortBy === 'latest' ? 'desc' : 'desc',
     });
 
     const { data: reviewPosts, isLoading: reviewLoading, error: reviewError } = useCommunityPosts({
         category: 'review',
         search: searchQuery || undefined,
-        sortBy: sortBy,
+        sortBy: sortBy === "latest" ? "createdAt" : "likes",
         order: sortBy === 'latest' ? 'desc' : 'desc',
     });
 
     const { data: freePosts, isLoading: freeLoading, error: freeError } = useCommunityPosts({
         category: 'free',
         search: searchQuery || undefined,
-        sortBy: sortBy,
+        sortBy: sortBy === "latest" ? "createdAt" : "likes",
         order: sortBy === 'latest' ? 'desc' : 'desc',
     });
+
+    const createPostMutation = useCreateCommunityPost();
 
     const handleCreatePost = () => {
         setIsCreateModalOpen(true);
@@ -65,49 +67,27 @@ export const CommunityPage: React.FC = () => {
         }
 
         try {
-            const API_BASE_URL = process.env.REACT_APP_API_URL ||
-                (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
-
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                alert('로그인이 필요합니다.');
-                return;
-            }
-
             const postData = {
                 title: createFormData.title,
                 content: createFormData.content,
                 category: createFormData.category,
-                tags: createFormData.tags ? createFormData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : []
+                tags: createFormData.tags ? createFormData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
+                status: 'published' as const
             };
 
-            const response = await fetch(`${API_BASE_URL}/community/posts`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(postData)
-            });
+            await createPostMutation.mutateAsync(postData);
 
-            if (response.ok) {
-                alert('게시글이 성공적으로 작성되었습니다.');
-                setCreateFormData({
-                    title: '',
-                    content: '',
-                    category: '',
-                    tags: ''
-                });
-                setIsCreateModalOpen(false);
-                // 페이지 새로고침
-                window.location.reload();
-            } else {
-                const errorData = await response.json();
-                alert(`게시글 작성 실패: ${errorData.message || '알 수 없는 오류가 발생했습니다.'}`);
-            }
-        } catch (error) {
+            alert('게시글이 성공적으로 작성되었습니다.');
+            setCreateFormData({
+                title: '',
+                content: '',
+                category: '',
+                tags: ''
+            });
+            setIsCreateModalOpen(false);
+        } catch (error: any) {
             console.error('게시글 작성 실패:', error);
-            alert('게시글 작성 중 오류가 발생했습니다.');
+            alert(`게시글 작성 실패: ${error?.message || '알 수 없는 오류가 발생했습니다.'}`);
         }
     };
 
@@ -256,7 +236,7 @@ export const CommunityPage: React.FC = () => {
                             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                         />
                     </div>
-                    <Select value={sortBy} onValueChange={setSortBy}>
+                    <Select value={sortBy} onValueChange={(value) => setSortBy(value as "latest" | "popular")}>
                         <SelectTrigger className="w-[120px]">
                             <SelectValue />
                         </SelectTrigger>

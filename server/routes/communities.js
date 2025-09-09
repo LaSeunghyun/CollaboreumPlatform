@@ -65,36 +65,54 @@ router.get('/posts', async (req, res) => {
 
 // 커뮤니티 포스트 작성
 router.post('/posts', auth, async (req, res) => {
+  console.log('=== 커뮤니티 포스트 작성 요청 시작 ===');
+  console.log('요청 시간:', new Date().toISOString());
+  console.log('요청 데이터:', JSON.stringify(req.body, null, 2));
+  console.log('사용자 정보:', JSON.stringify(req.user, null, 2));
+  
   try {
     const { title, content, category, tags } = req.body;
     const userId = req.user.id;
     
+    console.log('파싱된 데이터:', { title, content, category, tags, userId });
+    
     // 필수 필드 검증
     if (!title || !content || !category) {
+      console.log('❌ 필수 필드 누락:', { title: !!title, content: !!content, category: !!category });
       return res.status(400).json({
         success: false,
         message: '제목, 내용, 카테고리를 모두 입력해주세요.'
       });
     }
     
+    console.log('✅ 필수 필드 검증 통과');
+    
     // 새 포스트 생성
-    const newPost = new CommunityPost({
+    const postData = {
       title,
       content,
       category,
       tags: tags || [],
       author: userId,
-      authorName: req.user.name || req.user.username || '익명'
-    });
+      authorName: req.user.name
+    };
+    
+    console.log('생성할 포스트 데이터:', JSON.stringify(postData, null, 2));
+    
+    const newPost = new CommunityPost(postData);
+    console.log('CommunityPost 인스턴스 생성 완료');
     
     await newPost.save();
+    console.log('✅ 포스트 DB 저장 완료, ID:', newPost._id);
     
     // 생성된 포스트 반환
     const savedPost = await CommunityPost.findById(newPost._id)
       .populate('author', 'name')
       .lean();
     
-    res.status(201).json({
+    console.log('저장된 포스트 조회 완료:', JSON.stringify(savedPost, null, 2));
+    
+    const responseData = {
       success: true,
       message: '포스트가 성공적으로 작성되었습니다.',
       data: {
@@ -106,12 +124,21 @@ router.post('/posts', auth, async (req, res) => {
         tags: savedPost.tags,
         createdAt: savedPost.createdAt
       }
-    });
+    };
+    
+    console.log('응답 데이터:', JSON.stringify(responseData, null, 2));
+    console.log('=== 커뮤니티 포스트 작성 요청 완료 ===');
+    
+    res.status(201).json(responseData);
     
   } catch (error) {
-    console.error('포스트 작성 오류:', error);
-    console.error('요청 데이터:', req.body);
-    console.error('사용자 정보:', req.user);
+    console.error('❌ 포스트 작성 오류 발생:');
+    console.error('오류 메시지:', error.message);
+    console.error('오류 스택:', error.stack);
+    console.error('요청 데이터:', JSON.stringify(req.body, null, 2));
+    console.error('사용자 정보:', JSON.stringify(req.user, null, 2));
+    console.error('=== 커뮤니티 포스트 작성 오류 종료 ===');
+    
     res.status(500).json({
       success: false,
       message: '포스트 작성 중 오류가 발생했습니다.',
