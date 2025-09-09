@@ -4,7 +4,7 @@ import { Input } from '../../components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Card, CardContent } from '../../components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '../../components/ui/dialog';
 import { Textarea } from '../../components/ui/textarea';
 import { Search, Plus, MessageSquare } from 'lucide-react';
 import { CommunityBoardPost } from '../../components/organisms/CommunityBoardPost';
@@ -58,7 +58,7 @@ export const CommunityPage: React.FC = () => {
 
     const handleCreatePostSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!createFormData.title.trim() || !createFormData.content.trim() || !createFormData.category) {
             alert('제목, 내용, 카테고리를 모두 입력해주세요.');
             return;
@@ -174,6 +174,9 @@ export const CommunityPage: React.FC = () => {
                         <DialogContent className="max-w-2xl">
                             <DialogHeader>
                                 <DialogTitle>새 게시글 작성</DialogTitle>
+                                <DialogDescription>
+                                    커뮤니티에 새로운 게시글을 작성해보세요. 질문, 후기, 자유 주제로 소통할 수 있습니다.
+                                </DialogDescription>
                             </DialogHeader>
                             <form onSubmit={handleCreatePostSubmit} className="space-y-4">
                                 <div>

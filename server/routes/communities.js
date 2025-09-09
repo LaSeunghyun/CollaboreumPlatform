@@ -84,7 +84,7 @@ router.post('/posts', auth, async (req, res) => {
       category,
       tags: tags || [],
       author: userId,
-      authorName: req.user.name
+      authorName: req.user.name || req.user.username || '익명'
     });
     
     await newPost.save();
@@ -110,9 +110,12 @@ router.post('/posts', auth, async (req, res) => {
     
   } catch (error) {
     console.error('포스트 작성 오류:', error);
+    console.error('요청 데이터:', req.body);
+    console.error('사용자 정보:', req.user);
     res.status(500).json({
       success: false,
-      message: '포스트 작성 중 오류가 발생했습니다.'
+      message: '포스트 작성 중 오류가 발생했습니다.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
