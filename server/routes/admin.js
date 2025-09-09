@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const authMiddleware = require('../middleware/auth');
+const auth = require('../middleware/auth');
 const adminMiddleware = require('../middleware/admin');
 const User = require('../models/User');
 const Project = require('../models/Project');
@@ -8,7 +8,7 @@ const FundingProject = require('../models/FundingProject');
 const CommunityPost = require('../models/CommunityPost');
 
 // Apply admin middleware to all routes
-router.use(authMiddleware, adminMiddleware);
+router.use(auth, adminMiddleware);
 
 // Get all inquiries (사용자 문의사항)
 router.get('/inquiries', async (req, res) => {

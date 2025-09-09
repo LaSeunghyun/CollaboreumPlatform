@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const LiveStream = require('../models/LiveStream');
-const authMiddleware = require('../middleware/auth');
+const auth = require('../middleware/auth');
 
 // 라이브 스트림 목록 조회
 router.get('/', async (req, res) => {

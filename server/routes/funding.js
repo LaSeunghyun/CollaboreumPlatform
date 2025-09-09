@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const FundingProject = require('../models/FundingProject');
-const authMiddleware = require('../middleware/auth');
+const auth = require('../middleware/auth');
 
 // 펀딩 프로젝트 목록 조회
 router.get('/projects', async (req, res) => {
@@ -70,7 +70,7 @@ router.get('/projects', async (req, res) => {
 });
 
 // 아티스트 펀딩 프로젝트 시작
-router.post('/projects', authMiddleware, async (req, res) => {
+router.post('/projects', auth, async (req, res) => {
   try {
     // 아티스트 권한 확인
     if (req.user.role !== 'artist') {
@@ -264,7 +264,7 @@ router.get('/projects/:id', async (req, res) => {
 });
 
 // 후원 참여 (결제 처리)
-router.post('/projects/:id/back', authMiddleware, async (req, res) => {
+router.post('/projects/:id/back', auth, async (req, res) => {
   try {
     const projectId = req.params.id;
     const { amount, rewardId, isAnonymous, message } = req.body;
@@ -358,7 +358,7 @@ router.post('/projects/:id/back', authMiddleware, async (req, res) => {
 });
 
 // 펀딩 실패 시 환불 처리
-router.post('/projects/:id/refund', authMiddleware, async (req, res) => {
+router.post('/projects/:id/refund', auth, async (req, res) => {
   try {
     const projectId = req.params.id;
     
@@ -432,7 +432,7 @@ router.post('/projects/:id/refund', authMiddleware, async (req, res) => {
 });
 
 // 집행 계획 업데이트
-router.put('/projects/:id/execution', authMiddleware, async (req, res) => {
+router.put('/projects/:id/execution', auth, async (req, res) => {
   try {
     const projectId = req.params.id;
     const { stages } = req.body;
@@ -488,7 +488,7 @@ router.put('/projects/:id/execution', authMiddleware, async (req, res) => {
 });
 
 // 비용 사용 내역 추가
-router.post('/projects/:id/expenses', authMiddleware, async (req, res) => {
+router.post('/projects/:id/expenses', auth, async (req, res) => {
   try {
     const projectId = req.params.id;
     const { category, title, description, amount, receipt, date, stageId } = req.body;
@@ -552,7 +552,7 @@ router.post('/projects/:id/expenses', authMiddleware, async (req, res) => {
 });
 
 // 수익 분배 계산 및 실행
-router.post('/projects/:id/distribute-revenue', authMiddleware, async (req, res) => {
+router.post('/projects/:id/distribute-revenue', auth, async (req, res) => {
   try {
     const projectId = req.params.id;
     

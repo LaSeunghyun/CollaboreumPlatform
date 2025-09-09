@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Project = require('../models/Project');
-const authMiddleware = require('../middleware/auth');
+const auth = require('../middleware/auth');
 
 // 모든 프로젝트 조회
 router.get('/', async (req, res) => {

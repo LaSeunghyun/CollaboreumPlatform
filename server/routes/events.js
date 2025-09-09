@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Event = require('../models/Event');
-const authMiddleware = require('../middleware/auth');
+const auth = require('../middleware/auth');
 
 // 모든 이벤트 조회
 router.get('/', async (req, res) => {
@@ -67,7 +67,7 @@ router.get('/', async (req, res) => {
 });
 
 // 관리자 이벤트 생성 (관리자 권한 필요)
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
     // 관리자 권한 확인
     if (req.user.role !== 'admin') {
@@ -233,7 +233,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // 이벤트 수정 (관리자용)
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -290,7 +290,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
 });
 
 // 이벤트 삭제 (관리자용)
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -330,7 +330,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 });
 
 // 이벤트 참가
-router.post('/:id/join', authMiddleware, async (req, res) => {
+router.post('/:id/join', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
@@ -392,7 +392,7 @@ router.post('/:id/join', authMiddleware, async (req, res) => {
 });
 
 // 이벤트 참가 취소
-router.delete('/:id/leave', authMiddleware, async (req, res) => {
+router.delete('/:id/leave', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
@@ -489,7 +489,7 @@ router.get('/:id/participants', async (req, res) => {
 });
 
 // 이벤트 좋아요
-router.post('/:id/like', authMiddleware, async (req, res) => {
+router.post('/:id/like', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
@@ -537,7 +537,7 @@ router.post('/:id/like', authMiddleware, async (req, res) => {
 });
 
 // 이벤트 북마크
-router.post('/:id/bookmark', authMiddleware, async (req, res) => {
+router.post('/:id/bookmark', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;

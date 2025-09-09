@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const authMiddleware = require('../middleware/auth');
+const auth = require('../middleware/auth');
 const Artwork = require('../models/Artwork');
 const User = require('../models/User');
 const Category = require('../models/Category');
@@ -132,7 +132,7 @@ router.get('/categories', async (req, res) => {
 });
 
 // 새 작품 업로드
-router.post('/artworks', authMiddleware, async (req, res) => {
+router.post('/artworks', auth, async (req, res) => {
   try {
     const { title, category, type, description, tags, duration, dimensions, metadata } = req.body;
     
@@ -180,7 +180,7 @@ router.post('/artworks', authMiddleware, async (req, res) => {
 });
 
 // 작품 수정
-router.put('/artworks/:id', authMiddleware, async (req, res) => {
+router.put('/artworks/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -228,7 +228,7 @@ router.put('/artworks/:id', authMiddleware, async (req, res) => {
 });
 
 // 작품 삭제
-router.delete('/artworks/:id', authMiddleware, async (req, res) => {
+router.delete('/artworks/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -266,7 +266,7 @@ router.delete('/artworks/:id', authMiddleware, async (req, res) => {
 });
 
 // 작품 좋아요
-router.post('/artworks/:id/like', authMiddleware, async (req, res) => {
+router.post('/artworks/:id/like', auth, async (req, res) => {
   try {
     const { id } = req.params;
     

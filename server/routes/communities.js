@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const CommunityPost = require('../models/CommunityPost');
-const authMiddleware = require('../middleware/auth');
+const auth = require('../middleware/auth');
 
 // 커뮤니티 포스트 조회
 router.get('/posts', async (req, res) => {
@@ -64,7 +64,7 @@ router.get('/posts', async (req, res) => {
 });
 
 // 커뮤니티 포스트 작성
-router.post('/posts', authMiddleware, async (req, res) => {
+router.post('/posts', auth, async (req, res) => {
   try {
     const { title, content, category, tags } = req.body;
     const userId = req.user.id;
@@ -164,7 +164,7 @@ router.get('/posts/:id', async (req, res) => {
 });
 
 // 포스트 좋아요/취소
-router.post('/posts/:id/like', authMiddleware, async (req, res) => {
+router.post('/posts/:id/like', auth, async (req, res) => {
   try {
     const postId = req.params.id;
     const userId = req.user.id;
@@ -208,7 +208,7 @@ router.post('/posts/:id/like', authMiddleware, async (req, res) => {
 });
 
 // 댓글 작성
-router.post('/posts/:id/comments', authMiddleware, async (req, res) => {
+router.post('/posts/:id/comments', auth, async (req, res) => {
   try {
     const postId = req.params.id;
     const { content } = req.body;

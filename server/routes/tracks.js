@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Track = require('../models/Track');
-const authMiddleware = require('../middleware/auth');
+const auth = require('../middleware/auth');
 
 // 모든 트랙 조회
 router.get('/', async (req, res) => {
