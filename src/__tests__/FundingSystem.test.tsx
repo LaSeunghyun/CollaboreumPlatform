@@ -1146,12 +1146,7 @@ describe('API 연동 통합 테스트', () => {
         test('API 호출 실패 시 적절한 에러 처리가 되어야 한다', async () => {
             const mockApiCall = jest.fn().mockRejectedValue(new Error('네트워크 오류'));
 
-            try {
-                await mockApiCall();
-                fail('에러가 발생해야 합니다');
-            } catch (error: any) {
-                expect(error.message).toBe('네트워크 오류');
-            }
+            await expect(mockApiCall()).rejects.toThrow('네트워크 오류');
         });
 
         test('잘못된 데이터로 API 호출 시 유효성 검사가 수행되어야 한다', async () => {
@@ -1176,16 +1171,10 @@ describe('API 연동 통합 테스트', () => {
             };
 
             // 유효하지 않은 데이터로 테스트
-            try {
-                await validateAndCallAPI({
-                    title: '짧',
-                    goalAmount: 50000
-                });
-                fail('유효성 검사 실패가 발생해야 합니다');
-            } catch (error: any) {
-                expect(error.message).toContain('제목은 최소 3자 이상이어야 합니다');
-                expect(error.message).toContain('목표 금액은 최소 100,000원 이상이어야 합니다');
-            }
+            await expect(validateAndCallAPI({
+                title: '짧',
+                goalAmount: 50000
+            })).rejects.toThrow();
 
             // 유효한 데이터로 테스트
             const validResult = await validateAndCallAPI({

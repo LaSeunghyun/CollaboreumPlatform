@@ -1,0 +1,135 @@
+---
+description: API 호출 및 데이터 관리 표준
+globs: ["src/**/*.tsx", "src/**/*.ts"]
+alwaysApply: true
+---
+
+# API 호출 및 데이터 관리 표준
+
+## 🔌 API 호출 규칙
+
+### React Query 훅 사용
+- **컴포넌트에서 직접 fetch/axios 사용 금지**
+- 모든 API 호출은 `src/lib/api/*` 훅으로 처리
+- `useQuery` (GET), `useMutation` (POST/PUT/DELETE) 사용
+
+```tsx
+// ❌ 금지
+const [data, setData] = useState(null)
+useEffect(() => {
+  fetch('/api/data').then(res => res.json()).then(setData)
+}, [])
+
+// ✅ 권장
+const { data, isLoading, error } = useData()
+```
+
+### QueryKey 표준 패턴
+- 도메인별로 일관된 패턴 사용
+- `['domain', id/params]` 형태
+
+```tsx
+// ✅ 표준 패턴
+queryKey: ['projects', params]
+queryKey: ['user', 'profile', userId]
+queryKey: ['community', 'posts', { category, page }]
+```
+
+### API 서비스 계층
+- `src/services/api.ts`에 API 함수 정의
+- `src/lib/api/*`에 React Query 훅 정의
+- 컴포넌트는 훅만 사용
+
+## 📊 데이터 관리 규칙
+
+### 하드코딩 데이터 금지
+- **더미 데이터 사용 금지**
+- API 실패 시에도 하드코딩된 데이터로 UI 렌더링 금지
+- 모킹은 `src/services/mock/` 계층에서만
+
+```tsx
+// ❌ 금지
+const dummyData = [{ id: 1, name: 'Sample' }]
+setData(dummyData)
+
+// ✅ 권장
+const { data, isLoading, error } = useProjects()
+if (isLoading) return <ProjectListSkeleton />
+if (error) return <ErrorMessage error={error} />
+```
+
+### 타입 안정성
+- API 응답에 대한 DTO 타입 정의
+- `any` 타입 사용 금지
+- Zod를 통한 런타임 검증 (필요시)
+
+```tsx
+// ✅ 타입 안전한 API 호출
+interface ProjectResponse {
+  id: string
+  title: string
+  description: string
+}
+
+const { data } = useQuery<ProjectResponse[]>({
+  queryKey: ['projects'],
+  queryFn: () => projectAPI.getProjects()
+})
+```
+
+## 🔄 상태 관리 규칙
+
+### 로딩 상태
+- `isLoading` 상태에서 스켈레톤만 렌더링
+- 실제 데이터 UI 렌더링 금지
+- `aria-busy="true"` 속성 추가
+
+### 에러 상태
+- `error` 상태에서 명확한 에러 메시지 표시
+- 사용자 액션 가능한 복구 방법 제시
+- `aria-live="polite"` 속성 추가
+
+### 빈 상태
+- `data`가 빈 배열일 때 EmptyState 컴포넌트 사용
+- 사용자에게 다음 액션 안내
+
+## 🚀 성능 최적화
+
+### 캐싱 전략
+- `staleTime`: 5분 (기본값)
+- `gcTime`: 10분 (기본값)
+- 불필요한 refetch 방지
+
+### 옵티미스틱 업데이트
+- **결제/분배/멱등성 불명 구간에서 금지**
+- 안전한 데이터에만 적용
+- 실패 시 롤백 로직 필수
+
+### 무효화 전략
+- 성공 시 선택적 무효화
+- 전체 리패치 금지
+- 관련 쿼리만 무효화
+
+## 🔒 보안 규칙
+
+### 인증 토큰
+- `Authorization` 헤더에 토큰 포함
+- 토큰 만료 시 자동 갱신
+- 민감한 데이터는 암호화
+
+### 입력 검증
+- 클라이언트와 서버 양쪽에서 검증
+- XSS, SQL Injection 방지
+- 파일 업로드 시 타입/크기 제한
+
+## 🧪 테스트 규칙
+
+### API 테스트
+- Mock Service Worker 사용
+- 성공/실패 시나리오 테스트
+- 네트워크 에러 처리 테스트
+
+### 통합 테스트
+- 실제 API와의 연동 테스트
+- 로딩/에러/빈 상태 테스트
+- 사용자 플로우 테스트

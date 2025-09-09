@@ -1,0 +1,26 @@
+{
+  "entry": ["src/index.tsx", "src/App.tsx"],
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignore": [
+    "src/**/*.test.{ts,tsx}",
+    "src/**/*.spec.{ts,tsx}",
+    "src/**/__tests__/**",
+    "src/**/__mocks__/**",
+    "src/setupTests.ts",
+    "src/index.tsx"
+  ],
+  "ignoreDependencies": [
+    "@types/jest",
+    "@types/node",
+    "jest-axe",
+    "ts-prune",
+    "knip",
+    "depcheck",
+    "npm-run-all",
+    "husky"
+  ],
+  "ignoreExports": [
+    "src/index.tsx",
+    "src/App.tsx"
+  ]
+}

@@ -57,23 +57,23 @@ export function LoginPage({ onBack, onLogin, onSignupClick }: LoginPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-secondary-50 to-accent-50 flex items-center justify-center p-4">
       {/* Background Art Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-blue-200/20 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-40 h-40 bg-purple-200/25 rounded-full blur-2xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/4 w-16 h-16 border-2 border-pink-300/30 rotate-45 animate-spin-slow"></div>
+        <div className="absolute top-10 left-10 w-32 h-32 bg-primary-200/20 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-40 h-40 bg-secondary-200/25 rounded-full blur-2xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/4 w-16 h-16 border-2 border-accent-300/30 rotate-45 animate-spin-slow"></div>
       </div>
 
       <div className="w-full max-w-md relative">
 
-        <Card className="backdrop-blur-sm bg-white/90 border-0 shadow-xl">
+        <Card className="backdrop-blur-sm bg-card/90 border-0 shadow-xl">
           <CardHeader className="space-y-4 text-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">Collaboreum</h1>
-              <p className="text-gray-600">창작자와 팬을 연결하는 플랫폼</p>
+              <h1 className="text-2xl font-bold text-foreground mb-2">Collaboreum</h1>
+              <p className="text-muted-foreground">창작자와 팬을 연결하는 플랫폼</p>
             </div>
-            <CardTitle className="text-xl text-gray-900">로그인</CardTitle>
+            <CardTitle className="text-xl text-foreground">로그인</CardTitle>
           </CardHeader>
 
           <CardContent className="space-y-6">

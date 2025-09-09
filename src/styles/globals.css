@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 디자인 토큰 CSS 변수 import */
+@import '../shared/theme/vars.css';
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -167,7 +170,12 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
+  }
+  
+  *:focus {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 
   body {

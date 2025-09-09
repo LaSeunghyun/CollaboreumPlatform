@@ -124,7 +124,7 @@ export const ExpenseRecords: React.FC<ExpenseRecordsProps> = ({
             description: '',
             amount: 0,
             receipt: null,
-            date: new Date().toISOString().split('T')[0],
+            date: new Date().toISOString().split('T')[0] || '',
             stage: null,
             verified: false
         };

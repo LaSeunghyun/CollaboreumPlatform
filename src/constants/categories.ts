@@ -30,32 +30,32 @@ export const CATEGORY_LABELS: Record<string, string> = {
 
 // 카테고리 색상 매핑
 export const CATEGORY_COLORS: Record<string, string> = {
-  [CATEGORIES.MUSIC]: 'bg-blue-100 text-blue-800',
-  [CATEGORIES.ART]: 'bg-purple-100 text-purple-800',
-  [CATEGORIES.LITERATURE]: 'bg-green-100 text-green-800',
-  [CATEGORIES.PERFORMANCE]: 'bg-red-100 text-red-800',
-  [CATEGORIES.PHOTOGRAPHY]: 'bg-pink-100 text-pink-800',
-  [CATEGORIES.TECHNOLOGY]: 'bg-gray-100 text-gray-800',
-  [CATEGORIES.CULTURE]: 'bg-yellow-100 text-yellow-800',
-  [CATEGORIES.ARTIST]: 'bg-indigo-100 text-indigo-800',
-  [CATEGORIES.FAN]: 'bg-orange-100 text-orange-800',
-  [CATEGORIES.GENERAL]: 'bg-gray-100 text-gray-800',
-  [CATEGORIES.OTHER]: 'bg-gray-100 text-gray-800'
+  [CATEGORIES.MUSIC]: 'bg-primary/10 text-primary',
+  [CATEGORIES.ART]: 'bg-accent/10 text-accent-foreground',
+  [CATEGORIES.LITERATURE]: 'bg-success/10 text-success',
+  [CATEGORIES.PERFORMANCE]: 'bg-destructive/10 text-destructive',
+  [CATEGORIES.PHOTOGRAPHY]: 'bg-warning/10 text-warning',
+  [CATEGORIES.TECHNOLOGY]: 'bg-muted text-muted-foreground',
+  [CATEGORIES.CULTURE]: 'bg-secondary text-secondary-foreground',
+  [CATEGORIES.ARTIST]: 'bg-primary/20 text-primary',
+  [CATEGORIES.FAN]: 'bg-warning/20 text-warning',
+  [CATEGORIES.GENERAL]: 'bg-muted text-muted-foreground',
+  [CATEGORIES.OTHER]: 'bg-muted text-muted-foreground'
 };
 
 // 카테고리 배지 색상 (진한 버전)
 export const CATEGORY_BADGE_COLORS: Record<string, string> = {
-  [CATEGORIES.MUSIC]: 'bg-blue-500',
-  [CATEGORIES.ART]: 'bg-purple-500',
-  [CATEGORIES.LITERATURE]: 'bg-green-500',
-  [CATEGORIES.PERFORMANCE]: 'bg-red-500',
-  [CATEGORIES.PHOTOGRAPHY]: 'bg-pink-500',
-  [CATEGORIES.TECHNOLOGY]: 'bg-gray-500',
-  [CATEGORIES.CULTURE]: 'bg-yellow-500',
-  [CATEGORIES.ARTIST]: 'bg-indigo-500',
-  [CATEGORIES.FAN]: 'bg-orange-500',
-  [CATEGORIES.GENERAL]: 'bg-gray-500',
-  [CATEGORIES.OTHER]: 'bg-gray-500'
+  [CATEGORIES.MUSIC]: 'bg-primary',
+  [CATEGORIES.ART]: 'bg-accent',
+  [CATEGORIES.LITERATURE]: 'bg-success',
+  [CATEGORIES.PERFORMANCE]: 'bg-destructive',
+  [CATEGORIES.PHOTOGRAPHY]: 'bg-warning',
+  [CATEGORIES.TECHNOLOGY]: 'bg-muted',
+  [CATEGORIES.CULTURE]: 'bg-secondary',
+  [CATEGORIES.ARTIST]: 'bg-primary/80',
+  [CATEGORIES.FAN]: 'bg-warning/80',
+  [CATEGORIES.GENERAL]: 'bg-muted',
+  [CATEGORIES.OTHER]: 'bg-muted'
 };
 
 // 기본 카테고리 목록
@@ -92,11 +92,11 @@ export const getCategoryLabel = (category: string): string => {
 };
 
 export const getCategoryColor = (category: string): string => {
-  return CATEGORY_COLORS[category] || CATEGORY_COLORS[CATEGORIES.OTHER];
+  return CATEGORY_COLORS[category] || CATEGORY_COLORS[CATEGORIES.OTHER] || '#6b7280';
 };
 
 export const getCategoryBadgeColor = (category: string): string => {
-  return CATEGORY_BADGE_COLORS[category] || CATEGORY_BADGE_COLORS[CATEGORIES.OTHER];
+  return CATEGORY_BADGE_COLORS[category] || CATEGORY_BADGE_COLORS[CATEGORIES.OTHER] || 'bg-gray-100 text-gray-800';
 };
 
 // 카테고리 검증 함수

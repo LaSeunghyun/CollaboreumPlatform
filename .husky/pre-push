@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Pre-push: Preflight 검증 시작"
+echo "⏱️  이 과정은 몇 분 소요될 수 있습니다..."
+
+npm run check:all
+
+if [ $? -eq 0 ]; then
+  echo "✅ Preflight 검증 통과 - 푸시를 진행합니다"
+else
+  echo "❌ Preflight 검증 실패 - 푸시가 차단되었습니다"
+  echo "💡 해결 방법:"
+  echo "  1. npm run fix:lint && npm run fix:format"
+  echo "  2. powershell -ExecutionPolicy Bypass -File scripts/run-preflight.ps1"
+  echo "  3. 오류를 수정한 후 다시 푸시하세요"
+  exit 1
+fi

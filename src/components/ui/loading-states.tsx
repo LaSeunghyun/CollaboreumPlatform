@@ -155,6 +155,7 @@ export function SuccessState({
             const timer = setTimeout(onDismiss, duration);
             return () => clearTimeout(timer);
         }
+        return undefined;
     }, [autoHide, onDismiss, duration]);
 
     return (

@@ -32,12 +32,12 @@ export function FundingProjectCard({
   onClick
 }: FundingProjectCardProps) {
   const progressPercentage = (currentAmount / targetAmount) * 100;
-  
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group relative" onClick={onClick}>
       {/* Share button overlay */}
       <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-        <ShareButton 
+        <ShareButton
           url={`/project/${id}`}
           title={title}
           description={`${artist}의 ${title} 프로젝트를 응원해주세요!`}
@@ -46,7 +46,7 @@ export function FundingProjectCard({
           className="bg-white/90 backdrop-blur-sm shadow-sm"
         />
       </div>
-      
+
       <div className="aspect-video overflow-hidden relative">
         <ImageWithFallback
           src={thumbnail}
@@ -67,7 +67,7 @@ export function FundingProjectCard({
           )}
         </div>
       </div>
-      
+
       <CardContent className="p-5 space-y-4">
         <div className="space-y-3">
           <Badge variant="secondary" className="bg-indigo/10 text-indigo hover:bg-indigo/20">
@@ -78,7 +78,7 @@ export function FundingProjectCard({
             <p className="text-muted-foreground">{artist}</p>
           </div>
         </div>
-        
+
         <div className="space-y-3">
           <Progress value={progressPercentage} className="h-2.5" />
           <div className="flex justify-between text-sm">
@@ -93,7 +93,7 @@ export function FundingProjectCard({
             <span className="tabular-nums">{progressPercentage.toFixed(1)}%</span> 달성
           </div>
         </div>
-        
+
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <Users className="w-4 h-4" />
@@ -101,13 +101,13 @@ export function FundingProjectCard({
           </div>
           <div className="flex items-center gap-1">
             <Clock className="w-4 h-4" />
-            <span className={`tabular-nums ${daysLeft <= 7 ? 'text-red-600 font-medium' : ''}`}>
+            <span className={`tabular-nums ${daysLeft <= 7 ? 'text-danger-600 font-medium' : ''}`}>
               {daysLeft}일 남음
             </span>
           </div>
         </div>
-        
-        <Button 
+
+        <Button
           className="w-full bg-indigo hover:bg-indigo-hover hover-scale transition-button shadow-sm"
           onClick={(e) => {
             e.stopPropagation();

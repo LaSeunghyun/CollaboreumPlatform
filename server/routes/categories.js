@@ -6,9 +6,16 @@ const Category = require('../models/Category');
 router.get('/', async (req, res) => {
   try {
     const categories = await Category.find({ isActive: true }).sort('order');
-    res.json(categories);
+    res.json({
+      success: true,
+      data: categories
+    });
   } catch (error) {
-    res.status(500).json({ message: '카테고리 조회 중 오류가 발생했습니다.', error: error.message });
+    res.status(500).json({ 
+      success: false,
+      message: '카테고리 조회 중 오류가 발생했습니다.', 
+      error: error.message 
+    });
   }
 });
 

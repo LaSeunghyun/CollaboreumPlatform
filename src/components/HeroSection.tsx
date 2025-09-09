@@ -1,135 +1,40 @@
-import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
-import { Badge } from "./ui/badge";
+import { Button } from "../shared/ui/Button";
+import { Card, CardContent } from "../shared/ui/Card";
+import { Badge } from "../shared/ui/Badge";
 import { Users, Star, MessageCircle, ChevronLeft, ChevronRight, Users2, Target, DollarSign, Heart } from "lucide-react";
 import { ImageWithFallback } from "./atoms/ImageWithFallback";
 import { StatCard } from "./ui/StatCard";
 import { useState, useEffect } from "react";
+import { usePlatformStats } from "../lib/api/useStats";
+import { useArtists } from "../lib/api/useArtists";
 
 interface HeroSectionProps {
   onViewArtistCommunity?: (artistId: number) => void;
 }
 
 export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
-  const [weeklyNewcomers, setWeeklyNewcomers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // 플랫폼 통계 상태
-  const [platformStats, setPlatformStats] = useState({
+  // React Query 훅 사용
+  const { data: platformStatsData, isLoading: statsLoading } = usePlatformStats();
+  const { data: artistsData, isLoading: artistsLoading } = useArtists({ limit: 20 });
+
+  const platformStats = (platformStatsData as any)?.data || {
     totalArtists: 0,
     totalProjects: 0,
     totalFunding: 0,
     totalUsers: 0
-  });
+  };
 
-  const [categories, setCategories] = useState<string[]>(["전체"]);
+  const weeklyNewcomers = (artistsData as any)?.data?.artists || (artistsData as any)?.artists || [];
+  const categories = ["전체", "음악", "미술", "문학", "영상", "기타"];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-
-        // 플랫폼 통계 데이터 가져오기
-        try {
-          const API_BASE_URL = process.env.REACT_APP_API_URL ||
-            (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
-
-          const statsResponse = await fetch(`${API_BASE_URL}/stats/platform`);
-          if (statsResponse.ok) {
-            const contentType = statsResponse.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-              const statsData = await statsResponse.json();
-
-              if (statsData.success && (statsData as any).data) {
-                setPlatformStats({
-                  totalArtists: (statsData as any).data.registeredArtists || 0,
-                  totalProjects: (statsData as any).data.successfulProjects || 0,
-                  totalFunding: (statsData as any).data.totalFunding || 0,
-                  totalUsers: (statsData as any).data.activeSupporters || 0
-                });
-              } else {
-                // API 응답이 실패한 경우 기본값 사용
-                setPlatformStats({
-                  totalArtists: 0,
-                  totalProjects: 0,
-                  totalFunding: 0,
-                  totalUsers: 0
-                });
-              }
-            } else {
-              // HTML 응답인 경우 기본값 유지
-              setPlatformStats({
-                totalArtists: 0,
-                totalProjects: 0,
-                totalFunding: 0,
-                totalUsers: 0
-              });
-            }
-          } else {
-            console.warn('통계 API 응답 실패:', statsResponse.status);
-            setPlatformStats({
-              totalArtists: 0,
-              totalProjects: 0,
-              totalFunding: 0,
-              totalUsers: 0
-            });
-          }
-        } catch (error) {
-          console.error('통계 API 호출 실패:', error);
-          // API 실패 시 기본값 유지
-          setPlatformStats({
-            totalArtists: 0,
-            totalProjects: 0,
-            totalFunding: 0,
-            totalUsers: 0
-          });
-        }
-
-        // 주간 신규 아티스트 데이터 가져오기
-        try {
-          const newcomersResponse = await fetch('/api/artists/weekly-newcomers');
-          if (newcomersResponse.ok) {
-            const contentType = newcomersResponse.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-              const newcomersData = await newcomersResponse.json();
-              setWeeklyNewcomers(newcomersData.data || []);
-            } else {
-              // HTML 응답인 경우 빈 배열로 설정
-              setWeeklyNewcomers([]);
-            }
-          } else {
-            setWeeklyNewcomers([]);
-          }
-        } catch (error) {
-          setWeeklyNewcomers([]);
-        }
-
-        // 카테고리 데이터 가져오기
-        try {
-          const { constantsService } = require('../services/constants');
-          const enums = await constantsService.getEnums();
-          const artistCategories = Object.values(enums.ARTIST_CATEGORIES || {});
-          setCategories(["전체", ...(artistCategories as string[])]);
-        } catch (error) {
-          // 기본값 유지
-          setCategories(["전체"]);
-        }
-      } catch (error) {
-        // 에러 발생 시 기본값으로 설정
-        setWeeklyNewcomers([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const isLoading = statsLoading || artistsLoading;
 
   const filteredNewcomers = selectedCategory === "전체"
     ? weeklyNewcomers
-    : weeklyNewcomers.filter(artist => artist.category === selectedCategory);
+    : weeklyNewcomers.filter((artist: any) => artist.category === selectedCategory);
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % filteredNewcomers.length);
@@ -139,7 +44,7 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
     setCurrentIndex((prev) => (prev - 1 + filteredNewcomers.length) % filteredNewcomers.length);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -262,7 +167,7 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
                 className="flex transition-transform duration-300 ease-in-out gap-6"
                 style={{ transform: `translateX(-${currentIndex * (100 / Math.min(filteredNewcomers.length, 3))}%)` }}
               >
-                {filteredNewcomers.map((artist) => (
+                {filteredNewcomers.map((artist: any) => (
                   <div key={artist.id} className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3">
                     <Card className="overflow-hidden hover:shadow-apple-lg transition-all duration-300 group cursor-pointer border-border/50 rounded-3xl">
                       <div className="relative h-48">

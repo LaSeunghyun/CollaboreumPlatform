@@ -63,6 +63,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     initializeAuth();
+
+    return () => {
+      // cleanup function
+    }
   }, []);
 
   // 토큰 유효성 검증 함수
@@ -138,6 +142,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return () => clearInterval(tokenRefreshInterval);
     }
+    return undefined;
   }, [token]);
 
   const value: AuthContextType = {
@@ -151,10 +156,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">인증 상태 확인 중...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">인증 상태 확인 중...</p>
         </div>
       </div>
     );

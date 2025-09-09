@@ -24,8 +24,42 @@ interface FundingProjectsProps {
   onViewProject?: (projectId: number) => void;
 }
 
+interface FundingProject {
+  id: number;
+  title: string;
+  artist: string;
+  category: string;
+  thumbnail: string;
+  currentAmount: number;
+  targetAmount: number;
+  backers: number;
+  daysLeft: number;
+  endDate: string;
+  description: string;
+  tags: string[];
+  budgetBreakdown: Array<{ item: string; amount: number }>;
+  rewards: Array<{ title: string; description: string; amount: number }>;
+  updates: Array<{ title: string; content: string; date: string }>;
+  // API 응답에서 올 수 있는 다른 속성들
+  raisedAmount?: number;
+  goalAmount?: number;
+  fundingGoal?: number;
+  supporters?: number;
+  remainingDays?: number;
+  deadline?: string;
+  fundingEndDate?: string;
+  creator?: string;
+  artistName?: string;
+  genre?: string;
+  keywords?: string[];
+  budget?: Array<{ item: string; amount: number }>;
+  fundingTiers?: Array<{ title: string; description: string; amount: number }>;
+  posts?: Array<{ title: string; content: string; date: string }>;
+  image?: string;
+}
+
 export function FundingProjects({ onViewProject }: FundingProjectsProps) {
-  const [projects, setProjects] = useState<any[]>([]);
+  const [projects, setProjects] = useState<FundingProject[]>([]);
   const [categories, setCategories] = useState<string[]>(["전체"]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("전체");
@@ -35,27 +69,26 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [selectedProjectForPayment, setSelectedProjectForPayment] = useState<any>(null);
+  const [selectedProjectForPayment, setSelectedProjectForPayment] = useState<FundingProject | null>(null);
 
   // API 응답 구조에 맞춰 프로젝트 데이터 정규화
-  const normalizeProjectData = (project: any) => {
+  const normalizeProjectData = (project: Partial<FundingProject>): FundingProject => {
     return {
-      ...project,
+      id: project.id || 0,
+      title: project.title || '제목 없음',
+      artist: project.artist || project.creator || project.artistName || '',
+      category: project.category || project.genre || '',
+      thumbnail: project.thumbnail || project.image || 'https://via.placeholder.com/400/300?text=이미지+없음',
       currentAmount: project.currentAmount || project.raisedAmount || 0,
       targetAmount: project.targetAmount || project.goalAmount || project.fundingGoal || 0,
       backers: project.backers || project.supporters || 0,
       daysLeft: project.daysLeft || project.remainingDays || 0,
       endDate: project.endDate || project.deadline || project.fundingEndDate || '',
-      artist: project.artist || project.creator || project.artistName || '',
-      category: project.category || project.genre || '',
+      description: project.description || '설명 없음',
       tags: project.tags || project.keywords || [],
       budgetBreakdown: project.budgetBreakdown || project.budget || [],
       rewards: project.rewards || project.fundingTiers || [],
       updates: project.updates || project.posts || [],
-      // 기본값 보장
-      title: project.title || '제목 없음',
-      description: project.description || '설명 없음',
-      image: project.image || 'https://via.placeholder.com/400/300?text=이미지+없음'
     };
   };
 
@@ -120,6 +153,8 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
   };
 
   const handlePaymentSuccess = async (paymentData: any) => {
+    if (!selectedProjectForPayment) return;
+
     try {
       const response = await fundingAPI.backProject(selectedProjectForPayment.id.toString(), {
         amount: paymentData.amount,
@@ -150,10 +185,10 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">펀딩 프로젝트를 불러오는 중...</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">펀딩 프로젝트를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -161,9 +196,9 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-500">{error}</p>
+          <p className="text-destructive">{error}</p>
           <Button className="mt-4" onClick={() => window.location.reload()}>
             새로고침
           </Button>
@@ -197,13 +232,13 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
         {project.featured && (
-          <Badge className="absolute top-4 left-4 bg-yellow-500 text-white rounded-xl font-medium">
+          <Badge className="absolute top-4 left-4 bg-warning text-warning-foreground rounded-xl font-medium">
             주목 프로젝트
           </Badge>
         )}
         <Badge className={`absolute top-4 right-4 rounded-xl font-medium ${project.category === "음악" ? "bg-primary text-primary-foreground" :
-          project.category === "미술" ? "bg-chart-5 text-white" :
-            project.category === "문학" ? "bg-chart-2 text-white" : "bg-destructive text-white"
+          project.category === "미술" ? "bg-accent text-accent-foreground" :
+            project.category === "문학" ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"
           }`}>
           {project.category}
         </Badge>
@@ -425,7 +460,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="프로젝트나 아티스트 이름으로 검색..."
-                className="pl-10 h-10 rounded-lg bg-white border border-gray-300"
+                className="pl-10 h-10 rounded-lg bg-background border border-border"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -434,7 +469,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
 
           <div className="flex gap-3">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-24 h-10 rounded-lg bg-white border border-gray-300">
+              <SelectTrigger className="w-24 h-10 rounded-lg bg-background border border-border">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -445,7 +480,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
             </Select>
 
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-24 h-10 rounded-lg bg-white border border-gray-300">
+              <SelectTrigger className="w-24 h-10 rounded-lg bg-background border border-border">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

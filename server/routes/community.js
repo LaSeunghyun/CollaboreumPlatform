@@ -464,7 +464,7 @@ router.get('/posts/:id/comments', async (req, res) => {
 });
 
 // 댓글 작성
-router.post('/posts/:id/comments', authMiddleware, async (req, res) => {
+router.post('/posts/:id/comments', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const { content, parentId } = req.body;
@@ -539,7 +539,7 @@ router.post('/posts/:id/comments', authMiddleware, async (req, res) => {
 });
 
 // 댓글 수정
-router.put('/posts/:id/comments/:commentId', authMiddleware, async (req, res) => {
+router.put('/posts/:id/comments/:commentId', auth, async (req, res) => {
   try {
     const { id, commentId } = req.params;
     const { content } = req.body;
@@ -613,7 +613,7 @@ router.put('/posts/:id/comments/:commentId', authMiddleware, async (req, res) =>
 });
 
 // 댓글 삭제
-router.delete('/posts/:id/comments/:commentId', authMiddleware, async (req, res) => {
+router.delete('/posts/:id/comments/:commentId', auth, async (req, res) => {
   try {
     const { id, commentId } = req.params;
     const userId = req.user._id;
@@ -683,7 +683,7 @@ router.delete('/posts/:id/comments/:commentId', authMiddleware, async (req, res)
 });
 
 // 댓글 반응 (좋아요/싫어요)
-router.post('/posts/:id/comments/:commentId/reactions', authMiddleware, async (req, res) => {
+router.post('/posts/:id/comments/:commentId/reactions', auth, async (req, res) => {
   try {
     const { id, commentId } = req.params;
     const { reaction } = req.body; // 'like' 또는 'dislike'
@@ -762,6 +762,52 @@ router.post('/posts/:id/comments/:commentId/reactions', authMiddleware, async (r
     res.status(500).json({
       success: false,
       message: '반응 처리에 실패했습니다.'
+    });
+  }
+});
+
+// 인기 게시글 조회
+router.get('/posts/popular', async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    
+    const posts = await CommunityPost.find({ isActive: true })
+      .populate('author', 'name role avatar')
+      .sort({ likes: -1, views: -1 })
+      .limit(parseInt(limit));
+
+    res.json({
+      success: true,
+      data: posts
+    });
+  } catch (error) {
+    console.error('인기 게시글 조회 실패:', error);
+    res.status(500).json({
+      success: false,
+      message: '인기 게시글을 불러올 수 없습니다.'
+    });
+  }
+});
+
+// 최신 게시글 조회
+router.get('/posts/recent', async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    
+    const posts = await CommunityPost.find({ isActive: true })
+      .populate('author', 'name role avatar')
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit));
+
+    res.json({
+      success: true,
+      data: posts
+    });
+  } catch (error) {
+    console.error('최신 게시글 조회 실패:', error);
+    res.status(500).json({
+      success: false,
+      message: '최신 게시글을 불러올 수 없습니다.'
     });
   }
 });

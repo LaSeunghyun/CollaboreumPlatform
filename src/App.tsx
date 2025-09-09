@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { queryClient } from './lib/queryClient';
 import { AuthProvider } from './contexts/AuthContext';
@@ -20,7 +20,6 @@ import { AccountPage } from './pages/account/AccountPage';
 import { LoginPage } from './components/LoginPage';
 import { SignupPage } from './components/SignupPage';
 import { ArtistDashboard } from './components/ArtistDashboard';
-import { ArtistMyPage } from './components/ArtistMyPage';
 import { AdminDashboard } from './components/AdminDashboard';
 import { ArtistGallery } from './components/ArtistGallery';
 import { ArtistProfile } from './components/ArtistProfile';

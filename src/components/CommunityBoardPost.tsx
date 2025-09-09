@@ -84,7 +84,7 @@ export function CommunityBoardPost({
                                 </Badge>
                             )}
                             {isHot && (
-                                <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs">
+                                <Badge variant="secondary" className="bg-danger-100 text-danger-700 text-xs">
                                     🔥 HOT
                                 </Badge>
                             )}

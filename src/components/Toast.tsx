@@ -6,10 +6,10 @@ export function Toast() {
       position="top-center"
       toastOptions={{
         style: {
-          background: "white",
-          border: "1px solid #E2E8F0",
-          color: "#0F172A",
-          borderRadius: "12px",
+          background: "var(--background)",
+          border: "1px solid var(--border)",
+          color: "var(--foreground)",
+          borderRadius: "var(--radius-lg)",
           fontSize: "14px",
           fontFamily: "Inter, system-ui, sans-serif",
         },

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../shared/ui/Card";
+import { Badge } from "../shared/ui/Badge";
+import { Button } from "../shared/ui/Button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
@@ -151,7 +151,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
         dimensions: newArtwork.dimensions,
         price: newArtwork.price,
         status: 'pending',
-        uploadDate: new Date().toISOString().split('T')[0],
+        uploadDate: new Date().toISOString().split('T')[0] || '',
         description: newArtwork.description,
         imageUrl: newArtwork.imageUrl,
         tags: newArtwork.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
@@ -198,7 +198,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
             <CheckCircle2 className="w-4 h-4 mr-1" />
             승인
           </Button>
-          <Button size="sm" variant="destructive" onClick={() => handleArtworkStatusChange(artwork.id, 'rejected')}>
+          <Button size="sm" variant="outline" tone="danger" onClick={() => handleArtworkStatusChange(artwork.id, 'rejected')}>
             <XCircle className="w-4 h-4 mr-1" />
             거부
           </Button>
@@ -636,7 +636,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                               <Edit className="w-4 h-4" />
                             </Button>
                             {getStatusActions(artwork)}
-                            <Button size="sm" variant="destructive" onClick={() => handleDeleteArtwork(artwork.id)} title="삭제">
+                            <Button size="sm" variant="outline" tone="danger" onClick={() => handleDeleteArtwork(artwork.id)} title="삭제">
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>

@@ -1,7 +1,7 @@
 
 
 // API Base URL
-const API_BASE_URL = process.env.REACT_APP_API_URL ||
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL ||
     (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
 
 
@@ -464,7 +464,8 @@ export const authAPI = {
 
 // Live Stream APIs
 export const liveStreamAPI = {
-    getLiveStreams: () => apiCall('/live-streams'),
+    getLiveStreams: () => apiCall('/live-streams') as Promise<any>,
+    getLiveStream: (streamId: string) => apiCall(`/live-streams/${streamId}`) as Promise<any>,
     getScheduledStreams: () => apiCall('/live-streams/scheduled'),
     startStream: (data: any) =>
         apiCall('/live-streams', {

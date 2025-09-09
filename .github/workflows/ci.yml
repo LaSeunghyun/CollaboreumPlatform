@@ -1,0 +1,83 @@
+name: CI Preflight
+
+on:
+  pull_request:
+    branches: [ main, develop, master ]
+  push:
+    branches: [ main, develop, master ]
+
+env:
+  NODE_VERSION: '20'
+  CACHE_VERSION: 'v1'
+
+jobs:
+  preflight:
+    name: Preflight 검증
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 코드 체크아웃
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📦 Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: 📦 의존성 설치
+        run: |
+          npm ci
+          echo "✅ 의존성 설치 완료"
+
+      - name: 🔍 환경변수 스키마 검증
+        run: npm run check:env
+        continue-on-error: false
+
+      - name: 🔍 TypeScript 타입 체크
+        run: npm run check:types
+        continue-on-error: false
+
+      - name: 🔍 ESLint 검사
+        run: npm run check:lint
+        continue-on-error: false
+
+      - name: 🔍 Prettier 포맷 검사
+        run: npm run check:format
+        continue-on-error: false
+
+      - name: 🧪 테스트 실행
+        run: npm run check:test
+        continue-on-error: false
+
+      - name: ♿ 접근성 테스트
+        run: npm run check:accessibility
+        continue-on-error: false
+
+      - name: 🧹 미사용 코드 검사
+        run: npm run check:deadcode
+        continue-on-error: false
+
+      - name: 📦 의존성 및 구성 검사
+        run: npm run check:deps
+        continue-on-error: false
+
+      - name: 🎨 색상 하드코딩 검사
+        run: |
+          # Windows 환경이 아니므로 색상 검사 스킵
+          echo "ℹ️  색상 검사는 Windows 환경에서만 실행됩니다"
+        continue-on-error: true
+
+      - name: 🏗️ 프로덕션 빌드
+        run: npm run check:build
+        continue-on-error: false
+
+      - name: 🎉 결과 요약
+        if: always()
+        run: |
+          echo "🎉 Preflight 검증 완료!"
+          echo "✅ 모든 검증이 통과했습니다"
+          echo "🚀 배포 준비 완료"

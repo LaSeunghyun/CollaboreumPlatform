@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../contexts/AuthContext';
 
@@ -611,12 +611,9 @@ describe('이벤트 시스템 TDD 테스트', () => {
             expect(adminPermission.allowed).toBe(true);
 
             // 로그인하지 않은 사용자 테스트
-            try {
+            expect(() => {
                 checkEventCreationPermission(null);
-                fail('로그인 에러가 발생해야 합니다');
-            } catch (error: any) {
-                expect(error.message).toBe('로그인이 필요합니다');
-            }
+            }).toThrow('로그인이 필요합니다');
         });
 
         test('이벤트 수정 권한이 올바르게 관리되어야 한다', () => {
@@ -707,12 +704,9 @@ describe('이벤트 시스템 TDD 테스트', () => {
             expect(validateEventInput('123', 'number')).toHaveLength(0);
 
             // 위험한 입력 테스트
-            try {
+            expect(() => {
                 validateEventInput('<script>alert("XSS")</script>', 'text');
-                fail('XSS 에러가 발생해야 합니다');
-            } catch (error: any) {
-                expect(error.message).toBe('잠재적으로 위험한 입력이 감지되었습니다');
-            }
+            }).toThrow('잠재적으로 위험한 입력이 감지되었습니다');
         });
 
         test('이벤트 파일 업로드 보안이 올바르게 검증되어야 한다', () => {

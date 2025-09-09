@@ -1,52 +1,22 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../shared/ui/Card";
+import { Badge } from "../shared/ui/Badge";
+import { Button } from "../shared/ui/Button";
 import { Play, Radio, Eye } from "lucide-react";
 import { ImageWithFallback } from "./atoms/ImageWithFallback";
-import { liveStreamAPI } from "../services/api";
+import { useLiveStreams } from "../lib/api/useLiveStreams";
 import { getCategoryColor } from "../constants/categories";
 
 export function LiveAndPointsSection() {
-  const [liveStreams, setLiveStreams] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: liveStreamsData, isLoading, error } = useLiveStreams();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  const liveStreams = (liveStreamsData as any)?.data?.streams || (liveStreamsData as any)?.streams || [];
 
-        try {
-          const response = await liveStreamAPI.getLiveStreams() as any;
-          if (response.success && (response.data?.streams || response.streams)) {
-            setLiveStreams(response.data?.streams || response.streams);
-          }
-        } catch (apiError) {
-          console.error('API 호출 실패:', apiError);
-          setError('서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.');
-          setLiveStreams([]);
-          return;
-        }
-      } catch (error) {
-        console.error('Failed to fetch live stream data:', error);
-        setError('라이브 스트림 데이터를 불러오는데 실패했습니다.');
-        setLiveStreams([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">라이브 스트림 데이터를 불러오는 중...</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">라이브 스트림 데이터를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -54,9 +24,9 @@ export function LiveAndPointsSection() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-500">{error}</p>
+          <p className="text-destructive">라이브 스트림 데이터를 불러오는데 실패했습니다.</p>
           <Button onClick={() => window.location.reload()} className="mt-4">
             다시 시도
           </Button>
@@ -66,11 +36,11 @@ export function LiveAndPointsSection() {
   }
 
   return (
-    <section id="live" className="py-20 bg-gray-50">
+    <section id="live" className="py-20 bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">라이브 스트리밍</h2>
-          <p className="text-xl text-gray-600">실시간 창작 과정을 지켜보고 함께 소통하세요</p>
+          <h2 className="text-3xl font-bold text-foreground mb-4">라이브 스트리밍</h2>
+          <p className="text-xl text-muted-foreground">실시간 창작 과정을 지켜보고 함께 소통하세요</p>
         </div>
 
         <div className="max-w-4xl mx-auto">
@@ -124,18 +94,18 @@ export function LiveAndPointsSection() {
                               {stream.category}
                             </Badge>
                             {stream.status === 'scheduled' && (
-                              <span className="text-sm text-gray-500">{stream.scheduledTime} 시작 예정</span>
+                              <span className="text-sm text-muted-foreground">{stream.scheduledTime} 시작 예정</span>
                             )}
                           </div>
 
-                          <h4 className="font-medium text-gray-900 mb-1 line-clamp-1">
+                          <h4 className="font-medium text-foreground mb-1 line-clamp-1">
                             {stream.title}
                           </h4>
 
-                          <p className="text-sm text-gray-600 mb-2">by {stream.artist}</p>
+                          <p className="text-sm text-muted-foreground mb-2">by {stream.artist}</p>
 
                           {stream.status === 'live' && (
-                            <div className="flex items-center gap-1 text-sm text-gray-600">
+                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
                               <Eye className="w-4 h-4" />
                               <span>{stream.viewers}명 시청 중</span>
                             </div>
@@ -148,11 +118,11 @@ export function LiveAndPointsSection() {
               )}
             </div>
 
-            <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
+            <div className="mt-6 p-4 bg-gradient-to-r from-primary-50 to-secondary-50 border border-primary-200 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-1">라이브 스케줄 알림</h4>
-                  <p className="text-sm text-gray-600">관심 아티스트의 라이브를 놓치지 마세요!</p>
+                  <h4 className="font-medium text-foreground mb-1">라이브 스케줄 알림</h4>
+                  <p className="text-sm text-muted-foreground">관심 아티스트의 라이브를 놓치지 마세요!</p>
                 </div>
                 <Button variant="outline" size="sm">
                   알림 설정
