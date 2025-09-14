@@ -27,14 +27,26 @@ import { CommunityFull } from './components/CommunityFull';
 import { CommunityMain } from './components/CommunityMain';
 import { ProjectDetail } from './components/ProjectDetail';
 import { EventDetail } from './components/EventDetail';
-import { SearchResults } from './components/SearchResults';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { CommunityPostDetail } from './components/CommunityPostDetail';
+import { useParams, useNavigate } from 'react-router-dom';
 import { CommunityPostForm } from './components/CommunityPostForm';
 import { About } from './components/About';
 
 // Layout component
 import { AppLayout } from './components/layout/AppLayout';
+
+// CommunityPostDetail Wrapper for URL params
+const CommunityPostDetailWrapper: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    navigate('/community');
+  };
+
+  return <CommunityPostDetail postId={id || ''} onBack={handleBack} />;
+};
 
 function App() {
   return (
@@ -52,7 +64,7 @@ function App() {
                 <Route path="/projects" element={<AppLayout><ProjectsPage /></AppLayout>} />
                 <Route path="/projects/:slug" element={<AppLayout><ProjectDetail projectId={0} onBack={() => { }} /></AppLayout>} />
                 <Route path="/community" element={<AppLayout><CommunityPage /></AppLayout>} />
-                <Route path="/community/:category/:id" element={<AppLayout><CommunityPostDetail postId="" /></AppLayout>} />
+                <Route path="/community/post/:id" element={<AppLayout><CommunityPostDetailWrapper /></AppLayout>} />
                 <Route path="/notices" element={<AppLayout><NoticesPage /></AppLayout>} />
                 <Route path="/notices/:id" element={<AppLayout><CommunityPostDetail postId="" /></AppLayout>} />
                 <Route path="/events" element={<AppLayout><EventsPage /></AppLayout>} />
@@ -96,7 +108,6 @@ function App() {
                     <AppLayout><CommunityMain onBack={() => { }} /></AppLayout>
                   </ProtectedRoute>
                 } />
-                <Route path="/search" element={<AppLayout><SearchResults query="" onBack={() => { }} /></AppLayout>} />
                 <Route path="/post-detail/:id" element={<AppLayout><CommunityPostDetail postId="" /></AppLayout>} />
                 <Route path="/create-post" element={<AppLayout><CommunityPostForm onBack={() => { }} /></AppLayout>} />
                 <Route path="/about" element={<AppLayout><About onBack={() => { }} /></AppLayout>} />

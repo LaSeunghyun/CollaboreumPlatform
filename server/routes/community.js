@@ -143,6 +143,41 @@ router.post('/posts/:id/views', async (req, res) => {
   }
 });
 
+// 포스트 사용자별 반응 상태 확인
+router.get('/posts/:id/reactions', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+    
+    const post = await CommunityPost.findById(id);
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: '포스트를 찾을 수 없습니다.'
+      });
+    }
+    
+    const isLiked = post.likes.includes(userId);
+    const isDisliked = post.dislikes.includes(userId);
+    
+    res.json({
+      success: true,
+      data: {
+        isLiked,
+        isDisliked,
+        likes: post.likes.length,
+        dislikes: post.dislikes.length
+      }
+    });
+  } catch (error) {
+    console.error('반응 상태 확인 실패:', error);
+    res.status(500).json({
+      success: false,
+      message: '반응 상태 확인에 실패했습니다.'
+    });
+  }
+});
+
 // 포스트 생성 (인증 필요)
 router.post('/posts', auth, async (req, res) => {
   try {

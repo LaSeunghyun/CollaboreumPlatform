@@ -13,8 +13,10 @@ export interface CommunityPost {
     category: string
     tags: string[]
     likes: number
+    dislikes: number
     replies: number
     views: number
+    viewCount: number
     isHot: boolean
     isPinned: boolean
     status: 'published' | 'draft' | 'archived'

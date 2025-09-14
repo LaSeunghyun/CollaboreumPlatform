@@ -36,13 +36,25 @@ router.get('/posts', async (req, res) => {
       id: post._id,
       title: post.title,
       content: post.content,
-      author: post.author?.name || post.authorName,
+      author: {
+        id: post.author?._id || post.author,
+        name: post.author?.name || post.authorName,
+        avatar: post.author?.avatar,
+        role: post.author?.role || 'user'
+      },
       category: post.category,
+      tags: post.tags || [],
       likes: post.likes?.length || 0,
-      comments: post.comments?.length || 0,
+      dislikes: post.dislikes?.length || 0,
+      replies: post.comments?.length || 0,
+      views: post.viewCount || 0,
+      viewCount: post.viewCount || 0,
+      isHot: false,
+      isPinned: false,
+      status: post.isActive ? 'published' : 'archived',
       createdAt: post.createdAt,
-      tags: post.tags,
-      viewCount: post.viewCount
+      updatedAt: post.updatedAt,
+      publishedAt: post.createdAt
     }));
 
     res.json({
@@ -174,13 +186,26 @@ router.get('/posts/:id', async (req, res) => {
         id: post._id,
         title: post.title,
         content: post.content,
-        author: post.author?.name || post.authorName,
+        author: {
+          id: post.author?._id || post.author,
+          name: post.author?.name || post.authorName,
+          avatar: post.author?.avatar,
+          role: post.author?.role || 'user'
+        },
         category: post.category,
+        tags: post.tags || [],
         likes: post.likes?.length || 0,
-        comments: post.comments || [],
+        dislikes: post.dislikes?.length || 0,
+        replies: post.comments?.length || 0,
+        views: post.viewCount || 0,
+        viewCount: post.viewCount || 0,
+        isHot: false,
+        isPinned: false,
+        status: post.isActive ? 'published' : 'archived',
         createdAt: post.createdAt,
-        tags: post.tags,
-        viewCount: post.viewCount
+        updatedAt: post.updatedAt,
+        publishedAt: post.createdAt,
+        comments: post.comments || []
       }
     });
     
@@ -233,6 +258,144 @@ router.post('/posts/:id/like', auth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: '좋아요 처리 중 오류가 발생했습니다.'
+    });
+  }
+});
+
+// 포스트 반응 (좋아요/싫어요) - 프론트엔드 API와 호환
+router.post('/posts/:id/reaction', auth, async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.user.id;
+    const { type } = req.body; // 'like' 또는 'dislike'
+    
+    const post = await CommunityPost.findById(postId);
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: '포스트를 찾을 수 없습니다.'
+      });
+    }
+    
+    if (type === 'like') {
+      const isLiked = post.likes.includes(userId);
+      
+      if (isLiked) {
+        // 좋아요 취소
+        post.likes = post.likes.filter(id => id.toString() !== userId);
+      } else {
+        // 좋아요 추가
+        post.likes.push(userId);
+        // 싫어요에서 제거
+        post.dislikes = post.dislikes.filter(id => id.toString() !== userId);
+      }
+    } else if (type === 'dislike') {
+      const isDisliked = post.dislikes.includes(userId);
+      
+      if (isDisliked) {
+        // 싫어요 취소
+        post.dislikes = post.dislikes.filter(id => id.toString() !== userId);
+      } else {
+        // 싫어요 추가
+        post.dislikes.push(userId);
+        // 좋아요에서 제거
+        post.likes = post.likes.filter(id => id.toString() !== userId);
+      }
+    }
+    
+    await post.save();
+    
+    res.json({
+      success: true,
+      message: '반응이 처리되었습니다.',
+      data: {
+        likes: post.likes.length,
+        dislikes: post.dislikes.length
+      }
+    });
+    
+  } catch (error) {
+    console.error('반응 처리 오류:', error);
+    res.status(500).json({
+      success: false,
+      message: '반응 처리 중 오류가 발생했습니다.'
+    });
+  }
+});
+
+// 포스트 조회수 증가
+router.post('/posts/:id/views', async (req, res) => {
+  try {
+    const postId = req.params.id;
+    
+    const post = await CommunityPost.findByIdAndUpdate(
+      postId, 
+      { $inc: { viewCount: 1 } },
+      { new: true }
+    );
+    
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: '포스트를 찾을 수 없습니다.'
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: '조회수가 증가되었습니다.',
+      data: {
+        views: post.viewCount
+      }
+    });
+    
+  } catch (error) {
+    console.error('조회수 증가 오류:', error);
+    res.status(500).json({
+      success: false,
+      message: '조회수 증가 중 오류가 발생했습니다.'
+    });
+  }
+});
+
+// 포스트 삭제
+router.delete('/posts/:id', auth, async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+    
+    const post = await CommunityPost.findById(postId);
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: '포스트를 찾을 수 없습니다.'
+      });
+    }
+    
+    // 작성자 본인 또는 관리자만 삭제 가능
+    if (post.author.toString() !== userId && userRole !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: '삭제 권한이 없습니다.'
+      });
+    }
+    
+    // 소프트 삭제 (isActive를 false로 설정)
+    post.isActive = false;
+    post.deletedAt = new Date();
+    await post.save();
+    
+    res.json({
+      success: true,
+      message: '포스트가 삭제되었습니다.'
+    });
+    
+  } catch (error) {
+    console.error('포스트 삭제 오류:', error);
+    res.status(500).json({
+      success: false,
+      message: '포스트 삭제 중 오류가 발생했습니다.'
     });
   }
 });

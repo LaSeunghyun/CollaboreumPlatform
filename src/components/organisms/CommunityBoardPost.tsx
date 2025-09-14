@@ -20,6 +20,7 @@ interface CommunityBoardPostProps {
     comments: number;
     isPinned?: boolean;
     isHot?: boolean;
+    rank?: number;
     onClick?: () => void;
 }
 
@@ -35,6 +36,7 @@ export const CommunityBoardPost: React.FC<CommunityBoardPostProps> = ({
     comments,
     isPinned,
     isHot,
+    rank,
     onClick
 }) => {
     const getCategoryLabel = () => {
@@ -71,50 +73,60 @@ export const CommunityBoardPost: React.FC<CommunityBoardPostProps> = ({
 
     return (
         <>
-            {/* Desktop/Tablet Layout */}
+            {/* Desktop/Tablet Layout - IssueLink 스타일 */}
             <div
-                className="hidden md:block border-b border-border last:border-b-0 hover:bg-surface/50 transition-colors cursor-pointer group"
+                className="hidden md:block border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors cursor-pointer group"
                 onClick={onClick}
             >
-                <div className="p-6 space-y-4">
-                    <div className="flex items-start gap-3">
+                <div className="p-4">
+                    <div className="flex items-start gap-4">
+                        {/* 순위 표시 */}
+                        {rank && (
+                            <div className="flex-shrink-0 w-8 text-center">
+                                <span className="text-sm font-medium text-gray-500">#{rank}</span>
+                            </div>
+                        )}
+
+                        {/* 카테고리 및 핫 배지 */}
                         <div className="flex items-center gap-2 min-w-0 flex-1">
                             {isPinned && (
-                                <Badge variant="secondary" className="bg-indigo/10 text-indigo text-xs">
-                                    📌
+                                <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs px-2 py-1">
+                                    📌 고정
                                 </Badge>
                             )}
                             {isHot && (
-                                <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs">
+                                <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs px-2 py-1">
                                     🔥 HOT
                                 </Badge>
                             )}
-                            <Badge className={`${getCategoryColor()} text-xs`}>
+                            <Badge className={`${getCategoryColor()} text-xs px-2 py-1`}>
                                 {getCategoryLabel()}
                             </Badge>
                         </div>
                     </div>
 
-                    <div className="space-y-3">
-                        <h3 className="text-lg line-clamp-2 hover:text-indigo transition-colors">
+                    {/* 제목과 내용 */}
+                    <div className="mt-3">
+                        <h3 className="text-lg font-medium line-clamp-2 hover:text-blue-600 transition-colors mb-2">
                             {title}
                         </h3>
-                        <p className="text-muted-foreground line-clamp-2 leading-relaxed">
+                        <p className="text-gray-600 line-clamp-2 leading-relaxed text-sm">
                             {content}
                         </p>
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    {/* 하단 정보 */}
+                    <div className="flex items-center justify-between mt-4">
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2">
-                                <Avatar className="w-7 h-7">
+                                <Avatar className="w-6 h-6">
                                     <AvatarImage src={author.avatar} />
                                     <AvatarFallback className="text-xs">{author.name[0]}</AvatarFallback>
                                 </Avatar>
                                 <div className="flex items-center gap-1">
-                                    <span className="text-sm text-muted-foreground">{author.name}</span>
+                                    <span className="text-sm text-gray-600">{author.name}</span>
                                     {author.isVerified && (
-                                        <div className="w-3 h-3 bg-sky rounded-full flex items-center justify-center">
+                                        <div className="w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center">
                                             <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                             </svg>
@@ -122,104 +134,96 @@ export const CommunityBoardPost: React.FC<CommunityBoardPostProps> = ({
                                     )}
                                 </div>
                             </div>
-                            <span className="text-sm text-muted-foreground">
+                            <span className="text-sm text-gray-500">
                                 {timeAgo(createdAt)}
                             </span>
                         </div>
 
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-4 text-sm text-gray-500">
                             <div className="flex items-center gap-1">
                                 <Eye className="w-4 h-4" />
-                                <span className="tabular-nums">{views}</span>
+                                <span className="tabular-nums">{views.toLocaleString()}</span>
                             </div>
                             <div className="flex items-center gap-1">
                                 <ThumbsUp className="w-4 h-4" />
-                                <span className="tabular-nums">{likes}</span>
+                                <span className="tabular-nums">{likes.toLocaleString()}</span>
                             </div>
                             <div className="flex items-center gap-1">
                                 <MessageCircle className="w-4 h-4" />
-                                <span className="tabular-nums">{comments}</span>
+                                <span className="tabular-nums">{comments.toLocaleString()}</span>
                             </div>
-                            <ShareButton
-                                url={`/community/post/${id}`}
-                                title={title}
-                                description={content}
-                                variant="ghost"
-                                size="icon"
-                                className="opacity-0 group-hover:opacity-100 transition-opacity"
-                            />
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Mobile Layout */}
+            {/* Mobile Layout - IssueLink 스타일 */}
             <div
-                className="md:hidden border-b border-border last:border-b-0 hover:bg-surface/50 transition-colors cursor-pointer group"
+                className="md:hidden border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors cursor-pointer group"
                 onClick={onClick}
             >
-                <div className="p-4 space-y-3">
-                    <div className="flex items-start gap-2">
-                        <div className="flex items-center gap-1 flex-wrap">
-                            {isPinned && (
-                                <Badge variant="secondary" className="bg-indigo/10 text-indigo text-xs px-1.5 py-0.5">
-                                    📌
-                                </Badge>
-                            )}
-                            {isHot && (
-                                <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs px-1.5 py-0.5">
-                                    🔥
-                                </Badge>
-                            )}
-                            <Badge className={`${getCategoryColor()} text-xs px-1.5 py-0.5`}>
-                                {getCategoryLabel()}
-                            </Badge>
-                        </div>
-                        <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                            <ShareButton
-                                url={`/community/post/${id}`}
-                                title={title}
-                                description={content}
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                            />
-                        </div>
-                    </div>
+                <div className="p-4">
+                    <div className="flex items-start gap-3">
+                        {/* 순위 표시 */}
+                        {rank && (
+                            <div className="flex-shrink-0 w-6 text-center">
+                                <span className="text-xs font-medium text-gray-500">#{rank}</span>
+                            </div>
+                        )}
 
-                    {/* Title only - compact for mobile */}
-                    <h3 className="line-clamp-2 hover:text-indigo transition-colors leading-snug font-medium">
-                        {title}
-                    </h3>
+                        <div className="flex-1 min-w-0">
+                            {/* 카테고리 및 핫 배지 */}
+                            <div className="flex items-center gap-1 flex-wrap mb-2">
+                                {isPinned && (
+                                    <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs px-1.5 py-0.5">
+                                        📌
+                                    </Badge>
+                                )}
+                                {isHot && (
+                                    <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs px-1.5 py-0.5">
+                                        🔥
+                                    </Badge>
+                                )}
+                                <Badge className={`${getCategoryColor()} text-xs px-1.5 py-0.5`}>
+                                    {getCategoryLabel()}
+                                </Badge>
+                            </div>
 
-                    {/* Compact author info */}
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                            <span>{author.name}</span>
-                            {author.isVerified && (
-                                <div className="w-3 h-3 bg-sky rounded-full flex items-center justify-center">
-                                    <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                    </svg>
+                            {/* 제목 */}
+                            <h3 className="line-clamp-2 hover:text-blue-600 transition-colors leading-snug font-medium text-sm mb-2">
+                                {title}
+                            </h3>
+
+                            {/* 하단 정보 */}
+                            <div className="flex items-center justify-between text-xs text-gray-500">
+                                <div className="flex items-center gap-2">
+                                    <span>{author.name}</span>
+                                    {author.isVerified && (
+                                        <div className="w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center">
+                                            <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                            </svg>
+                                        </div>
+                                    )}
+                                    <span>·</span>
+                                    <span>{timeAgo(createdAt)}</span>
                                 </div>
-                            )}
-                            <span>·</span>
-                            <span>{timeAgo(createdAt)}</span>
-                        </div>
 
-                        <div className="flex items-center gap-3">
-                            <span className="flex items-center gap-1">
-                                <Eye className="w-3 h-3" />
-                                <span className="tabular-nums">{views > 999 ? `${Math.floor(views / 1000)}k` : views}</span>
-                            </span>
-                            <span className="flex items-center gap-1">
-                                <MessageCircle className="w-3 h-3" />
-                                <span className="tabular-nums">{comments}</span>
-                            </span>
-                            <span className="flex items-center gap-1">
-                                <ThumbsUp className="w-3 h-3" />
-                                <span className="tabular-nums">{likes}</span>
-                            </span>
+                                <div className="flex items-center gap-3">
+                                    <span className="flex items-center gap-1">
+                                        <Eye className="w-3 h-3" />
+                                        <span className="tabular-nums">{views > 999 ? `${Math.floor(views / 1000)}k` : views}</span>
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <MessageCircle className="w-3 h-3" />
+                                        <span className="tabular-nums">{comments}</span>
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <ThumbsUp className="w-3 h-3" />
+                                        <span className="tabular-nums">{likes}</span>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

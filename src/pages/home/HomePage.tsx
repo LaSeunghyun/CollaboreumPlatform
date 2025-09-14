@@ -24,9 +24,14 @@ import { useCommunityPosts } from '../../features/community/hooks/useCommunityPo
 import { LoadingState, ErrorState, SkeletonGrid } from '../../components/organisms/States';
 import { useQuery } from '@tanstack/react-query';
 import { statsAPI } from '../../services/api';
+import { ExecutionStatus } from '../../components/ExecutionStatus';
+import { ExpenseRecords } from '../../components/ExpenseRecords';
+import { RevenueDistribution } from '../../components/RevenueDistribution';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 
 export const HomePage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState("");
+    const [selectedProjectId, setSelectedProjectId] = useState<string>("demo-project-1");
 
     // API 훅들
     const { data: popularArtists, isLoading: artistsLoading, error: artistsError } = usePopularArtists(3);
@@ -54,6 +59,85 @@ export const HomePage: React.FC = () => {
 
     const handleSearch = () => {
         // 검색 로직 구현
+    };
+
+    // 데모 데이터
+    const demoExecutionPlan = {
+        stages: [
+            {
+                id: "stage-1",
+                name: "앨범 제작",
+                description: "음악 녹음 및 믹싱",
+                budget: 5000000,
+                startDate: "2024-01-01",
+                endDate: "2024-03-31",
+                status: "진행중" as const,
+                progress: 65
+            },
+            {
+                id: "stage-2",
+                name: "뮤직비디오 제작",
+                description: "메인 타이틀곡 뮤직비디오 촬영",
+                budget: 3000000,
+                startDate: "2024-04-01",
+                endDate: "2024-05-31",
+                status: "계획" as const,
+                progress: 0
+            }
+        ],
+        totalBudget: 8000000
+    };
+
+    const demoExpenseRecords = [
+        {
+            id: "expense-1",
+            category: "인건비" as const,
+            title: "음악 프로듀서 비용",
+            description: "앨범 제작 프로듀서 비용",
+            amount: 2000000,
+            receipt: "receipt-1.pdf",
+            date: "2024-01-15",
+            stage: "앨범 제작",
+            verified: true
+        },
+        {
+            id: "expense-2",
+            category: "재료비" as const,
+            title: "녹음실 대여비",
+            description: "프리미엄 녹음실 대여",
+            amount: 1500000,
+            receipt: "receipt-2.pdf",
+            date: "2024-02-01",
+            stage: "앨범 제작",
+            verified: true
+        }
+    ];
+
+    const demoRevenueDistribution = {
+        totalRevenue: 12000000,
+        platformFee: 1200000,
+        artistShare: 10800000,
+        backerShare: 0,
+        distributions: [
+            {
+                backer: "backer-1",
+                userName: "김후원",
+                originalAmount: 100000,
+                profitShare: 20000,
+                totalReturn: 120000,
+                distributedAt: "2024-03-15",
+                status: "분배완료" as const
+            },
+            {
+                backer: "backer-2",
+                userName: "이지원",
+                originalAmount: 500000,
+                profitShare: 100000,
+                totalReturn: 600000,
+                distributedAt: "2024-03-15",
+                status: "분배완료" as const
+            }
+        ]
     };
 
     return (
@@ -266,7 +350,7 @@ export const HomePage: React.FC = () => {
                                     <AlertCircle className="w-8 h-8 text-yellow-600" />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-semibold mb-2">아직 공지사항이 없습니다</h3>
+                                    <h3 className="text-xl font-semibold mb-2">아직 공지지사항이 없습니다</h3>
                                     <p className="text-muted-foreground mb-6">
                                         새로운 소식과 업데이트를 기다리고 있습니다.<br />
                                         곧 유용한 정보를 제공해드릴 예정입니다.
@@ -409,6 +493,67 @@ export const HomePage: React.FC = () => {
                         </div>
                     );
                 })()}
+            </section>
+
+            {/* Funding System Features */}
+            <section className="space-y-6">
+                <div className="text-center space-y-4">
+                    <h2 className="text-3xl font-bold">투명한 펀딩 시스템</h2>
+                    <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                        모든 비용 사용 내역을 공개하고, 투명한 수익 분배를 통해 신뢰할 수 있는 크리에이터 경제를 구축합니다.
+                    </p>
+                </div>
+
+                <Tabs defaultValue="execution" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger value="execution">집행 관리</TabsTrigger>
+                        <TabsTrigger value="expenses">비용 공개</TabsTrigger>
+                        <TabsTrigger value="revenue">수익 분배</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="execution" className="space-y-4">
+                        <Card>
+                            <CardContent className="p-6">
+                                <ExecutionStatus
+                                    executionPlan={demoExecutionPlan}
+                                    projectStatus="진행중"
+                                    isArtist={false}
+                                    projectId={selectedProjectId}
+                                    onUpdate={() => { }}
+                                />
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+
+                    <TabsContent value="expenses" className="space-y-4">
+                        <Card>
+                            <CardContent className="p-6">
+                                <ExpenseRecords
+                                    expenseRecords={demoExpenseRecords}
+                                    executionPlan={demoExecutionPlan}
+                                    projectStatus="진행중"
+                                    isArtist={false}
+                                    projectId={selectedProjectId}
+                                    onUpdate={() => { }}
+                                />
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+
+                    <TabsContent value="revenue" className="space-y-4">
+                        <Card>
+                            <CardContent className="p-6">
+                                <RevenueDistribution
+                                    revenueDistribution={demoRevenueDistribution}
+                                    projectStatus="진행중"
+                                    isArtist={false}
+                                    projectId={selectedProjectId}
+                                    onUpdate={() => { }}
+                                />
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+                </Tabs>
             </section>
         </div>
     );

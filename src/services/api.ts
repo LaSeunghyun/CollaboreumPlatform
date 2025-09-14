@@ -670,7 +670,11 @@ export const communityPostAPI = {
     incrementPostViews: (postId: string) =>
         apiCall(`/community/posts/${postId}/views`, {
             method: 'POST'
-        })
+        }),
+
+    // 게시글 사용자별 반응 상태 확인
+    getPostReactions: (postId: string) =>
+        apiCall(`/community/posts/${postId}/reactions`)
 };
 
 // Community Comment APIs

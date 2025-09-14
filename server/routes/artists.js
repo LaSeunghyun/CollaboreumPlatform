@@ -5,6 +5,105 @@ const auth = require('../middleware/auth');
 const User = require('../models/User');
 const Artist = require('../models/Artist');
 const Project = require('../models/Project');
+const FundingProject = require('../models/FundingProject');
+
+// 월별 수익 계산 함수
+async function calculateMonthlyEarnings(artistId) {
+  try {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    
+    // 이번 달에 완료된 프로젝트들의 수익 계산
+    const completedProjects = await FundingProject.find({
+      artist: artistId,
+      status: { $in: ['성공', '완료'] },
+      updatedAt: {
+        $gte: startOfMonth,
+        $lte: endOfMonth
+      }
+    });
+    
+    let monthlyEarnings = 0;
+    
+    for (const project of completedProjects) {
+      // 아티스트 수익 계산 (플랫폼 수수료 제외)
+      const artistShare = project.revenueDistribution?.artistShare || 0.70;
+      const totalRevenue = project.revenueDistribution?.totalRevenue || project.currentAmount;
+      const artistEarnings = totalRevenue * artistShare;
+      
+      monthlyEarnings += artistEarnings;
+    }
+    
+    return Math.round(monthlyEarnings);
+  } catch (error) {
+    console.error('월별 수익 계산 오류:', error);
+    return 0;
+  }
+}
+
+// 팔로잉 수 계산 함수
+async function calculateFollowingCount(artistId) {
+  try {
+    // 아티스트가 팔로우하는 다른 아티스트 수 계산
+    // 현재는 간단히 0으로 반환 (실제 팔로잉 시스템이 구현되면 수정)
+    // TODO: 실제 팔로잉 관계 테이블이 구현되면 이 함수를 수정
+    return 0;
+  } catch (error) {
+    console.error('팔로잉 수 계산 오류:', error);
+    return 0;
+  }
+}
+
+// 최근 활동 데이터 조회 함수
+async function getRecentActivity(artistId) {
+  try {
+    const activities = [];
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+    
+    // 최근 30일 내 프로젝트 활동
+    const recentProjects = await FundingProject.find({
+      artist: artistId,
+      updatedAt: { $gte: thirtyDaysAgo }
+    }).sort({ updatedAt: -1 }).limit(5);
+    
+    for (const project of recentProjects) {
+      activities.push({
+        type: 'project',
+        title: `프로젝트 "${project.title}" 업데이트`,
+        description: `상태: ${project.status}, 진행률: ${project.progress}%`,
+        date: project.updatedAt,
+        link: `/projects/${project._id}`
+      });
+    }
+    
+    // 최근 30일 내 완료된 프로젝트
+    const completedProjects = await FundingProject.find({
+      artist: artistId,
+      status: { $in: ['성공', '완료'] },
+      updatedAt: { $gte: thirtyDaysAgo }
+    }).sort({ updatedAt: -1 }).limit(3);
+    
+    for (const project of completedProjects) {
+      activities.push({
+        type: 'completion',
+        title: `프로젝트 "${project.title}" 완료`,
+        description: `목표 달성률: ${project.progress}%`,
+        date: project.updatedAt,
+        link: `/projects/${project._id}`
+      });
+    }
+    
+    // 날짜순으로 정렬하고 최대 10개까지만 반환
+    return activities
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 10);
+  } catch (error) {
+    console.error('최근 활동 조회 오류:', error);
+    return [];
+  }
+}
 
 // MongoDB ObjectId 검증 함수
 const isValidObjectId = (id) => {
@@ -329,12 +428,12 @@ router.get('/:id/dashboard', async (req, res) => {
         completedProjects: completedProjects,
         activeProjects: activeProjects,
         totalEarnings: artistProfile?.totalEarned || 0,
-        monthlyEarnings: 0, // TODO: 월별 수익 계산 로직 추가
+        monthlyEarnings: await calculateMonthlyEarnings(artistId),
         followers: artistProfile?.followers || 0,
-        following: 0, // TODO: 팔로잉 수 계산 로직 추가
+        following: await calculateFollowingCount(artistId),
         rating: artistProfile?.rating || 0
       },
-      recentActivity: [] // TODO: 실제 최근 활동 데이터 조회 로직 추가
+      recentActivity: await getRecentActivity(artistId)
     };
 
     console.log(`✅ 아티스트 대시보드 조회 성공: ${artist.name} (${artist.email})`);

@@ -5,9 +5,29 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useAuth } from '../contexts/AuthContext';
-import { authAPI, communityAPI } from '../services/api';
+import { authAPI, communityAPI, communityPostAPI } from '../services/api';
 import { ApiResponse } from '../types';
-import { ArrowLeft, Heart, MessageCircle, Eye, Trash2 } from 'lucide-react';
+import { useDeleteCommunityPost } from '../features/community/hooks/useCommunityPosts';
+import { ArrowLeft, Heart, MessageCircle, Eye, Trash2, MoreVertical, Copy, Share2, ExternalLink } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { ko } from 'date-fns/locale';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from './ui/dropdown-menu';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger
+} from './ui/alert-dialog';
 
 interface Comment {
     id: string;
@@ -31,9 +51,12 @@ interface PostDetail {
     timeAgo: string;
     replies: number;
     likes: number;
+    dislikes: number;
     isLiked: boolean;
+    isDisliked: boolean;
     isHot: boolean;
     viewCount: number;
+    views: number;
     createdAt: Date;
     updatedAt: Date;
     comments: Comment[];
@@ -49,17 +72,53 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
     onBack
 }) => {
     const { user } = useAuth();
+    const deletePostMutation = useDeleteCommunityPost();
     const [post, setPost] = useState<PostDetail | null>(null);
     const [comment, setComment] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmittingComment, setIsSubmittingComment] = useState(false);
     const [isLiking, setIsLiking] = useState(false);
+    const [isDisliking, setIsDisliking] = useState(false);
     const [error, setError] = useState('');
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     // 대댓글 관련 상태
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
     const [replyContent, setReplyContent] = useState('');
     const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+    const [copiedLink, setCopiedLink] = useState(false);
+
+    // 링크 복사 기능
+    const handleCopyLink = async () => {
+        const link = `${window.location.origin}/community/post/${postId}`;
+        try {
+            await navigator.clipboard.writeText(link);
+            setCopiedLink(true);
+            setTimeout(() => setCopiedLink(false), 2000);
+        } catch (error) {
+            console.error('링크 복사 실패:', error);
+        }
+    };
+
+    // 소셜 공유 기능
+    const handleSocialShare = (platform: 'twitter' | 'facebook' | 'kakao') => {
+        const link = `${window.location.origin}/community/post/${postId}`;
+        const title = post?.title || '게시글';
+        const text = post?.content?.substring(0, 100) || '';
+
+        switch (platform) {
+            case 'twitter':
+                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(link)}`, '_blank');
+                break;
+            case 'facebook':
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`, '_blank');
+                break;
+            case 'kakao':
+                // 카카오톡 공유는 Kakao SDK가 필요하므로 기본 링크 복사로 대체
+                handleCopyLink();
+                break;
+        }
+    };
 
     useEffect(() => {
         // 현재 페이지 정보를 세션 스토리지에 저장
@@ -73,6 +132,8 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         sessionStorage.setItem('currentPage', currentPage);
 
         fetchPostDetail();
+        // 조회수 증가
+        incrementViewCount();
 
         // 브라우저 뒤로가기 버튼 처리
         const handlePopState = () => {
@@ -92,7 +153,49 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
             const response = await authAPI.get(`/community/posts/${postId}`) as ApiResponse<PostDetail>;
 
             if (response.success && response.data) {
-                setPost(response.data);
+                const postData = response.data;
+                // API 응답을 컴포넌트에서 사용하는 형식으로 변환
+                const formattedPost: PostDetail = {
+                    id: postData.id,
+                    title: postData.title,
+                    category: postData.category,
+                    author: typeof postData.author === 'string' ? postData.author : (postData.author as any)?.name || 'Unknown',
+                    authorId: typeof postData.author === 'string' ? postData.author : (postData.author as any)?.id || postData.author,
+                    content: postData.content,
+                    images: postData.images || [],
+                    timeAgo: formatDistanceToNow(new Date(postData.createdAt), { addSuffix: true, locale: ko }),
+                    replies: postData.replies || 0,
+                    likes: Array.isArray(postData.likes) ? postData.likes.length : (postData.likes || 0),
+                    dislikes: Array.isArray(postData.dislikes) ? postData.dislikes.length : (postData.dislikes || 0),
+                    isLiked: false,
+                    isDisliked: false,
+                    isHot: (Array.isArray(postData.likes) ? postData.likes.length : (postData.likes || 0)) > 20,
+                    viewCount: postData.views || postData.viewCount || 0,
+                    views: postData.views || postData.viewCount || 0,
+                    createdAt: new Date(postData.createdAt),
+                    updatedAt: new Date(postData.updatedAt),
+                    comments: postData.comments || []
+                };
+                setPost(formattedPost);
+
+                // 사용자별 반응 상태 확인
+                if (user) {
+                    try {
+                        const reactionsResponse = await communityPostAPI.getPostReactions(postData.id) as any;
+                        if (reactionsResponse?.success && reactionsResponse?.data) {
+                            const data = reactionsResponse.data;
+                            setPost(prev => prev ? {
+                                ...prev,
+                                isLiked: data?.isLiked || false,
+                                isDisliked: data?.isDisliked || false,
+                                likes: data?.likes || 0,
+                                dislikes: data?.dislikes || 0
+                            } : null);
+                        }
+                    } catch (err) {
+                        console.error('반응 상태 확인 실패:', err);
+                    }
+                }
             } else {
                 setError('포스트를 불러올 수 없습니다.');
             }
@@ -104,20 +207,32 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         }
     };
 
+    // 조회수 증가 함수
+    const incrementViewCount = async () => {
+        try {
+            await authAPI.post(`/community/posts/${postId}/views`);
+        } catch (error) {
+            console.error('조회수 증가 실패:', error);
+            // 조회수 증가 실패는 사용자에게 보여주지 않음
+        }
+    };
+
     const handleLike = async () => {
         if (!user || !post) return;
 
         try {
             setIsLiking(true);
-            const response = await authAPI.post(`/community/posts/${postId}/like`) as ApiResponse<any>;
+            const response = await authAPI.post(`/community/posts/${postId}/reaction`, {
+                type: 'like'
+            }) as ApiResponse<any>;
 
             if (response.success && response.data) {
                 // 좋아요 상태를 즉시 업데이트
                 setPost(prev => prev ? {
                     ...prev,
-                    likes: (response as any).data.likes,
-                    isLiked: (response as any).data.isLiked,
-                    isHot: (response as any).data.likes > 20
+                    likes: response.data.likes,
+                    isLiked: response.data.isLiked,
+                    isHot: response.data.likes > 20
                 } : null);
             }
         } catch (error) {
@@ -127,13 +242,37 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         }
     };
 
+    const handleDislike = async () => {
+        if (!user || !post) return;
+
+        try {
+            setIsDisliking(true);
+            const response = await authAPI.post(`/community/posts/${postId}/reaction`, {
+                type: 'dislike'
+            }) as ApiResponse<any>;
+
+            if (response.success && response.data) {
+                // 싫어요 상태를 즉시 업데이트
+                setPost(prev => prev ? {
+                    ...prev,
+                    dislikes: response.data.dislikes,
+                    isDisliked: response.data.isDisliked
+                } : null);
+            }
+        } catch (error) {
+            console.error('싫어요 처리 오류:', error);
+        } finally {
+            setIsDisliking(false);
+        }
+    };
+
     const handleCommentSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!comment.trim() || !user || !post) return;
 
         try {
             setIsSubmittingComment(true);
-            const response = await authAPI.post(`/community/posts/${postId}/comments`, {
+            const response = await authAPI.post(`/communities/posts/${postId}/comments`, {
                 content: comment.trim()
             }) as ApiResponse<any>;
 
@@ -153,7 +292,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         if (!user || !post) return;
 
         try {
-            const response = await authAPI.delete(`/community/posts/${postId}/comments/${commentId}`) as ApiResponse<any>;
+            const response = await authAPI.delete(`/communities/posts/${postId}/comments/${commentId}`) as ApiResponse<any>;
 
             if (response.success) {
                 // 댓글 목록 새로고침
@@ -232,6 +371,25 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         return user && (user.id === commentAuthorId || user.id === post?.authorId);
     };
 
+    const canDeletePost = () => {
+        return user && post && (user.id === post.authorId || user.role === 'admin');
+    };
+
+    const handleDeletePost = async () => {
+        if (!user || !post) return;
+
+        try {
+            await deletePostMutation.mutateAsync(postId);
+            // 삭제 성공 시 목록으로 돌아가기
+            handleBack();
+        } catch (error) {
+            console.error('게시글 삭제 오류:', error);
+            setError('게시글 삭제 중 오류가 발생했습니다.');
+        } finally {
+            setShowDeleteDialog(false);
+        }
+    };
+
     // 이전 페이지로 돌아가기
     const handleBack = () => {
         if (onBack) {
@@ -291,6 +449,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
     }
 
     const isLiked = post.isLiked;
+    const isDisliked = post.isDisliked;
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">
@@ -321,6 +480,79 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                                             {post.viewCount}
                                         </span>
                                     </div>
+                                </div>
+
+                                {/* 액션 버튼들 */}
+                                <div className="flex items-center gap-2">
+                                    {/* 링크 복사 버튼 */}
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleCopyLink}
+                                        className="h-8 px-3"
+                                    >
+                                        {copiedLink ? (
+                                            <div className="flex items-center gap-1 text-green-600">
+                                                <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                                                복사됨
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-1">
+                                                <Copy className="w-4 h-4" />
+                                                링크 복사
+                                            </div>
+                                        )}
+                                    </Button>
+
+                                    {/* 소셜 공유 메뉴 */}
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="sm" className="h-8 px-3">
+                                                <Share2 className="w-4 h-4 mr-1" />
+                                                공유
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onClick={() => handleSocialShare('twitter')}>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                                                    트위터
+                                                </div>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleSocialShare('facebook')}>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-4 h-4 bg-blue-600 rounded"></div>
+                                                    페이스북
+                                                </div>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleSocialShare('kakao')}>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-4 h-4 bg-yellow-400 rounded"></div>
+                                                    카카오톡
+                                                </div>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+
+                                    {/* 게시글 액션 메뉴 */}
+                                    {canDeletePost() && (
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                                    <MoreVertical className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem
+                                                    onClick={() => setShowDeleteDialog(true)}
+                                                    className="text-red-600 focus:text-red-600"
+                                                >
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    삭제
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    )}
                                 </div>
                             </div>
                         </CardHeader>
@@ -355,6 +587,17 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                                 >
                                     <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
                                     좋아요 {post.likes}
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    onClick={handleDislike}
+                                    disabled={isDisliking}
+                                    className={`flex items-center gap-2 ${isDisliked ? 'text-blue-500' : ''}`}
+                                >
+                                    <svg className={`w-5 h-5 ${isDisliked ? 'fill-current' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 13l3 3 7-7" />
+                                    </svg>
+                                    싫어요 {post.dislikes}
                                 </Button>
                                 <div className="flex items-center gap-2 text-gray-500">
                                     <MessageCircle className="w-5 h-5" />
@@ -491,6 +734,30 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                     </CardContent>
                 </Card>
             </div>
+
+            {/* 삭제 확인 모달 */}
+            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>게시글 삭제</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            이 게시글을 정말 삭제하시겠습니까? 삭제된 게시글은 복구할 수 없습니다.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={deletePostMutation.isPending}>
+                            취소
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDeletePost}
+                            disabled={deletePostMutation.isPending}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            {deletePostMutation.isPending ? '삭제 중...' : '삭제'}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };

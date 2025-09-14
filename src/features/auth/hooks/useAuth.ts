@@ -179,9 +179,32 @@ export function usePermissions() {
         // 관리자는 모든 권한을 가짐
         if (user.role === 'admin') return true;
 
-        // TODO: 실제 권한 체크 로직 구현
-        // 현재는 역할 기반으로만 체크
-        return true;
+        // 역할별 권한 매핑
+        const rolePermissions: Record<string, string[]> = {
+            artist: [
+                'create_project',
+                'edit_own_project',
+                'delete_own_project',
+                'view_own_analytics',
+                'manage_own_profile',
+                'upload_content',
+                'create_event',
+                'manage_own_events'
+            ],
+            fan: [
+                'view_projects',
+                'back_project',
+                'comment_on_posts',
+                'like_content',
+                'follow_artists',
+                'view_events',
+                'join_events'
+            ]
+        };
+
+        // 사용자 역할에 따른 권한 확인
+        const userPermissions = rolePermissions[user.role] || [];
+        return userPermissions.includes(permission);
     };
 
     const hasRole = (role: string): boolean => {

@@ -16,8 +16,11 @@ interface Post {
   timeAgo: string;
   replies: number;
   likes: number;
+  dislikes: number;
+  views: number;
   isHot: boolean;
   images?: string[];
+  createdAt: string;
 }
 
 interface CommunityPostListProps {
@@ -80,12 +83,15 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
           title: post.title,
           content: post.content,
           category: post.category,
-          author: post.author,
+          author: typeof post.author === 'string' ? post.author : (post.author?.name || 'Unknown'),
           timeAgo: new Date(post.createdAt).toLocaleDateString('ko-KR'),
           replies: post.comments?.length || 0,
-          likes: post.likes || 0,
-          isHot: post.viewCount > 100, // 조회수 기반으로 hot 여부 판단
-          images: post.images || []
+          likes: post.likes?.length || 0,
+          dislikes: post.dislikes?.length || 0,
+          views: post.views || 0,
+          isHot: (post.likes?.length || 0) > 20 || (post.views || 0) > 100,
+          images: post.images || [],
+          createdAt: post.createdAt
         }));
 
         if (page === 1) {
@@ -141,12 +147,15 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
           title: post.title,
           content: post.content,
           category: post.category,
-          author: post.author,
+          author: typeof post.author === 'string' ? post.author : (post.author?.name || 'Unknown'),
           timeAgo: new Date(post.createdAt).toLocaleDateString('ko-KR'),
           replies: post.comments?.length || 0,
-          likes: post.likes || 0,
-          isHot: post.viewCount > 100,
-          images: post.images || []
+          likes: post.likes?.length || 0,
+          dislikes: post.dislikes?.length || 0,
+          views: post.views || 0,
+          isHot: (post.likes?.length || 0) > 20 || (post.views || 0) > 100,
+          images: post.images || [],
+          createdAt: post.createdAt
         }));
         setPosts(mappedPosts);
       }
@@ -236,7 +245,18 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
       </div>
 
       {/* 포스트 목록 */}
-      <div className="space-y-4">
+      <div className="bg-white rounded-lg shadow-sm">
+        {/* 테이블 헤더 */}
+        <div className="hidden md:grid md:grid-cols-12 gap-4 p-4 bg-gray-50 border-b text-sm font-medium text-gray-600">
+          <div className="col-span-1 text-center">번호</div>
+          <div className="col-span-5">제목</div>
+          <div className="col-span-2 text-center">작성자</div>
+          <div className="col-span-1 text-center">조회</div>
+          <div className="col-span-1 text-center">좋아요</div>
+          <div className="col-span-1 text-center">싫어요</div>
+          <div className="col-span-1 text-center">작성일</div>
+        </div>
+
         {posts.length === 0 && !isLoading ? (
           <div className="text-center py-12 text-gray-500">
             <p className="text-lg">아직 작성된 글이 없습니다.</p>
@@ -250,16 +270,89 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
             )}
           </div>
         ) : (
-          posts.map((post) => (
-            <Card
+          posts.map((post, index) => (
+            <div
               key={post.id}
-              className="hover:shadow-md transition-shadow cursor-pointer"
+              className="hidden md:grid md:grid-cols-12 gap-4 p-4 border-b hover:bg-gray-50 transition-colors cursor-pointer"
               onClick={() => onPostClick(post.id)}
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+              {/* 번호 */}
+              <div className="col-span-1 text-center text-sm text-gray-500">
+                {totalPosts - (currentPage - 1) * 20 - index}
+              </div>
+
+              {/* 제목 */}
+              <div className="col-span-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <Badge variant="secondary" className="text-xs">
+                    {post.category}
+                  </Badge>
+                  {post.isHot && (
+                    <Badge variant="destructive" className="text-xs">
+                      HOT
+                    </Badge>
+                  )}
+                </div>
+                <h3 className="text-sm font-medium line-clamp-1 hover:text-blue-600">
+                  {post.title}
+                  {post.replies > 0 && (
+                    <span className="text-blue-600 ml-1">[{post.replies}]</span>
+                  )}
+                </h3>
+              </div>
+
+              {/* 작성자 */}
+              <div className="col-span-2 text-center text-sm text-gray-600">
+                {post.author}
+              </div>
+
+              {/* 조회수 */}
+              <div className="col-span-1 text-center text-sm text-gray-500">
+                {post.views.toLocaleString()}
+              </div>
+
+              {/* 좋아요 */}
+              <div className="col-span-1 text-center text-sm text-gray-500">
+                <div className="flex items-center justify-center gap-1">
+                  <span className="text-red-500">❤️</span>
+                  <span>{post.likes}</span>
+                </div>
+              </div>
+
+              {/* 싫어요 */}
+              <div className="col-span-1 text-center text-sm text-gray-500">
+                <div className="flex items-center justify-center gap-1">
+                  <span className="text-blue-500">👎</span>
+                  <span>{post.dislikes}</span>
+                </div>
+              </div>
+
+              {/* 작성일 */}
+              <div className="col-span-1 text-center text-sm text-gray-500">
+                {post.timeAgo}
+              </div>
+            </div>
+          ))
+        )}
+
+        {/* 모바일 레이아웃 */}
+        {posts.length > 0 && (
+          <div className="md:hidden">
+            {posts.map((post, index) => (
+              <div
+                key={post.id}
+                className="p-4 border-b hover:bg-gray-50 transition-colors cursor-pointer"
+                onClick={() => onPostClick(post.id)}
+              >
+                <div className="flex items-start gap-3">
+                  {/* 번호 */}
+                  <div className="flex-shrink-0 w-8 text-center text-sm text-gray-500">
+                    {totalPosts - (currentPage - 1) * 20 - index}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    {/* 카테고리 및 핫 배지 */}
+                    <div className="flex items-center gap-1 mb-2">
                       <Badge variant="secondary" className="text-xs">
                         {post.category}
                       </Badge>
@@ -269,47 +362,42 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
                         </Badge>
                       )}
                     </div>
-                    <CardTitle className="text-lg line-clamp-2">{post.title}</CardTitle>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-gray-600 mb-3 line-clamp-3">
-                  {formatContent(post.content)}
-                </p>
 
-                {/* 이미지 미리보기 */}
-                {post.images && post.images.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2 mb-3">
-                    {post.images.slice(0, 3).map((image, index) => (
-                      <img
-                        key={index}
-                        src={image}
-                        alt={`이미지 ${index + 1}`}
-                        className="w-full h-20 object-cover rounded"
-                      />
-                    ))}
-                    {post.images.length > 3 && (
-                      <div className="w-full h-20 bg-gray-200 rounded flex items-center justify-center text-sm text-gray-500">
-                        +{post.images.length - 3}
+                    {/* 제목 */}
+                    <h3 className="text-sm font-medium line-clamp-2 hover:text-blue-600 mb-2">
+                      {post.title}
+                      {post.replies > 0 && (
+                        <span className="text-blue-600 ml-1">[{post.replies}]</span>
+                      )}
+                    </h3>
+
+                    {/* 하단 정보 */}
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <div className="flex items-center gap-2">
+                        <span>{post.author}</span>
+                        <span>·</span>
+                        <span>{post.timeAgo}</span>
                       </div>
-                    )}
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <div className="flex items-center gap-4">
-                    <span>{post.author}</span>
-                    <span>{post.timeAgo}</span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span>💬 {post.replies}</span>
-                    <span>❤️ {post.likes}</span>
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1">
+                          <span>👁️</span>
+                          <span>{post.views > 999 ? `${Math.floor(post.views / 1000)}k` : post.views}</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span className="text-red-500">❤️</span>
+                          <span>{post.likes}</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span className="text-blue-500">👎</span>
+                          <span>{post.dislikes}</span>
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
