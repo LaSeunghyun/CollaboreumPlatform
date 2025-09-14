@@ -23,8 +23,8 @@ export function FundingManagementSection() {
 
     const updateProjectApproval = useUpdateProjectApproval();
 
-    const projects = projectsData?.projects || [];
-    const pagination = projectsData?.pagination;
+    const projects = (projectsData as any)?.projects || [];
+    const pagination = (projectsData as any)?.pagination;
 
     const getStatusBadge = (status: string) => {
         switch (status) {
@@ -66,7 +66,7 @@ export function FundingManagementSection() {
         try {
             await updateProjectApproval.mutateAsync({
                 projectId,
-                approvalStatus,
+                approvalStatus: approvalStatus === 'approved',
                 feedback: approvalStatus === 'approved' ? '승인되었습니다.' : '반려되었습니다.'
             });
         } catch (error) {

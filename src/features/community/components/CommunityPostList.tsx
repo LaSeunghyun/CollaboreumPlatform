@@ -60,9 +60,7 @@ export function CommunityPostList({
         return (
             <ErrorMessage
                 error={error}
-                title="게시글을 불러올 수 없습니다"
                 onRetry={() => refetch()}
-                retryLabel="다시 시도"
             />
         )
     }

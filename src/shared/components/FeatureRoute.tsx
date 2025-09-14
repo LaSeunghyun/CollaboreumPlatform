@@ -30,7 +30,6 @@ export function FeatureRoute({
                     title="곧 출시될 기능입니다"
                     description="이 기능은 현재 개발 중입니다. 곧 만나보실 수 있습니다."
                     icon={<Construction className="h-16 w-16 text-neutral-400" />}
-                    size="lg"
                 />
             </div>
         )

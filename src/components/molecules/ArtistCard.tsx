@@ -120,7 +120,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
                 {/* Actions */}
                 <div className="flex gap-3">
                     <Button
-                        variant={isFollowing ? "secondary" : "solid"}
+                        variant={isFollowing ? "secondary" : "default"}
                         size="sm"
                         className={`flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl ${!isFollowing ? "hover:scale-105 transition-transform" : ""}`}
                         onClick={(e) => {

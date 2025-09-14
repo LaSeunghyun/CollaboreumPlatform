@@ -261,7 +261,7 @@ export function CommunityPostForm({
                             )}
                             <LoadingButton
                                 type="submit"
-                                isLoading={isSubmitting}
+                                loading={isSubmitting}
                                 loadingText="저장 중..."
                             >
                                 {isEditing ? '수정하기' : '작성하기'}
@@ -280,8 +280,7 @@ export function CommunityPostForm({
                 open={showSuccessModal}
                 onOpenChange={setShowSuccessModal}
                 title={successMessage}
-                description={successMessage.includes('실패') ? '다시 시도해주세요.' : '게시글이 성공적으로 처리되었습니다.'}
-                confirmText="확인"
+                message={successMessage.includes('실패') ? '다시 시도해주세요.' : '게시글이 성공적으로 처리되었습니다.'}
             />
         </>
     )

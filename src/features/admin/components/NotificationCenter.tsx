@@ -136,21 +136,21 @@ export function NotificationCenter({ className = "" }: NotificationCenterProps) 
                 {/* Filter buttons */}
                 <div className="flex gap-2 flex-wrap mt-3">
                     <Button
-                        variant={filter === "all" ? "default" : "outline"}
+                        variant={filter === "all" ? "solid" : "outline"}
                         size="sm"
                         onClick={() => setFilter("all")}
                     >
                         전체
                     </Button>
                     <Button
-                        variant={filter === "unread" ? "default" : "outline"}
+                        variant={filter === "unread" ? "solid" : "outline"}
                         size="sm"
                         onClick={() => setFilter("unread")}
                     >
                         읽지 않음 {unreadCount > 0 && `(${unreadCount})`}
                     </Button>
                     <Button
-                        variant={filter === "action_required" ? "default" : "outline"}
+                        variant={filter === "action_required" ? "solid" : "outline"}
                         size="sm"
                         onClick={() => setFilter("action_required")}
                     >
