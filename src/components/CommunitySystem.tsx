@@ -73,6 +73,27 @@ interface Comment {
   parentId?: string;
 }
 
+// 댓글 데이터 변환 함수
+const transformComments = (comments: any[]): Comment[] => {
+  if (!Array.isArray(comments)) return [];
+
+  return comments.map((comment: any) => ({
+    id: comment.id || comment._id || '',
+    content: comment.content || '',
+    author: {
+      id: comment.author?.id || comment.authorId || comment.author || '',
+      username: comment.author?.username || comment.authorName || comment.author || 'Unknown',
+      role: comment.author?.role || '사용자',
+      avatar: comment.author?.avatar
+    },
+    createdAt: new Date(comment.createdAt),
+    likes: typeof comment.likes === 'number' ? comment.likes : (Array.isArray(comment.likes) ? comment.likes.length : 0),
+    dislikes: typeof comment.dislikes === 'number' ? comment.dislikes : (Array.isArray(comment.dislikes) ? comment.dislikes.length : 0),
+    replies: comment.replies ? transformComments(comment.replies) : [],
+    parentId: comment.parentId
+  }));
+};
+
 // Post Creation Form Component
 export const PostCreationForm: React.FC = () => {
   const queryClient = useQueryClient();
@@ -489,7 +510,8 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
 
         // 댓글 목록 조회
         const commentsResponse = await communityCommentAPI.getComments(postId);
-        const commentsData = safeArrayResponse<Comment>(commentsResponse, []);
+        const rawComments = safeArrayResponse<any>(commentsResponse, []);
+        const commentsData = transformComments(rawComments);
         setComments(commentsData);
 
         // 조회수 증가
@@ -516,9 +538,10 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
       };
 
       const response = await communityCommentAPI.createComment(postId, commentData);
-      const newCommentData = safeObjectResponse<Comment>(response, null);
-      if (newCommentData) {
-        setComments((prev: any) => [...(Array.isArray(prev) ? prev : []), newCommentData]);
+      const rawComment = safeObjectResponse<any>(response, null);
+      if (rawComment) {
+        const transformedComment = transformComments([rawComment])[0];
+        setComments((prev: any) => [...(Array.isArray(prev) ? prev : []), transformedComment]);
       }
       setNewComment('');
       setReplyTo(null);
@@ -543,9 +566,10 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
       };
 
       const response = await communityCommentAPI.createComment(postId, commentData);
-      const newCommentData = safeObjectResponse<Comment>(response, null);
-      if (newCommentData) {
-        setComments((prev: any) => [...(Array.isArray(prev) ? prev : []), newCommentData]);
+      const rawComment = safeObjectResponse<any>(response, null);
+      if (rawComment) {
+        const transformedComment = transformComments([rawComment])[0];
+        setComments((prev: any) => [...(Array.isArray(prev) ? prev : []), transformedComment]);
       }
       setReplyContent('');
       setReplyTo(null);
@@ -578,7 +602,8 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
       await communityCommentAPI.toggleCommentReaction(postId, commentId, reaction);
       // 댓글 목록 새로고침
       const updatedCommentsResponse = await communityCommentAPI.getComments(postId);
-      const updatedComments = (updatedCommentsResponse as any)?.data || updatedCommentsResponse;
+      const rawComments = safeArrayResponse<any>(updatedCommentsResponse, []);
+      const updatedComments = transformComments(rawComments);
       setComments(updatedComments);
     } catch (err) {
       console.error('댓글 반응 처리 실패:', err);
@@ -849,4 +874,3 @@ export const CommunitySystem: React.FC = () => {
 };
 
 export default CommunitySystem;
-자

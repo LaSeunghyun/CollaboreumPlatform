@@ -13,6 +13,7 @@ import { fundingAPI, communityAPI } from '../services/api';
 import { PaymentModal } from './PaymentModal';
 import { dynamicConstantsService } from '../services/constantsService';
 import { useRetry } from '../hooks/useRetry';
+import { ApiResponse } from '../types';
 import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
 import {
   CATEGORIES,
@@ -161,13 +162,13 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
         amount: paymentData.amount,
         message: paymentData.message || '',
         rewardId: paymentData.rewardId
-      }) as any;
+      }) as ApiResponse<any>;
 
       if (response.success) {
         // 프로젝트 목록 새로고침
-        const updatedResponse = await fundingAPI.getProjects() as any;
-        if (updatedResponse.success && (updatedResponse.data?.projects || updatedResponse.projects)) {
-          setProjects(updatedResponse.data?.projects || updatedResponse.projects);
+        const updatedResponse = await fundingAPI.getProjects() as ApiResponse<any>;
+        if (updatedResponse.success && updatedResponse.data?.projects) {
+          setProjects(updatedResponse.data.projects);
         }
         setShowPaymentModal(false);
         setSelectedProjectForPayment(null);
@@ -394,12 +395,12 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
             className="cursor-pointer hover:bg-secondary/50 rounded-xl px-4"
             onClick={async () => {
               try {
-                const response = await fundingAPI.likeProject(project.id.toString()) as any;
+                const response = await fundingAPI.likeProject(project.id.toString()) as ApiResponse<any>;
                 if (response.success) {
                   // 프로젝트 목록 새로고침
-                  const updatedResponse = await fundingAPI.getProjects() as any;
-                  if (updatedResponse.success && (updatedResponse.data?.projects || updatedResponse.projects)) {
-                    setProjects(updatedResponse.data?.projects || updatedResponse.projects);
+                  const updatedResponse = await fundingAPI.getProjects() as ApiResponse<any>;
+                  if (updatedResponse.success && updatedResponse.data?.projects) {
+                    setProjects(updatedResponse.data.projects);
                   }
                 }
               } catch (error) {

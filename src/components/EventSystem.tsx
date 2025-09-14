@@ -82,14 +82,8 @@ export const EventCreationForm: React.FC = () => {
         setCategories(eventCategories);
       } catch (error) {
         console.error('카테고리를 가져오는 중 오류 발생:', error);
-        setCategories([
-          { id: 'festival', label: '축제' },
-          { id: 'performance', label: '공연' },
-          { id: 'competition', label: '경연' },
-          { id: 'workshop', label: '워크샵' },
-          { id: 'seminar', label: '세미나' },
-          { id: 'other', label: '기타' }
-        ]);
+        // API 실패 시 빈 배열로 설정 (하드코딩된 데이터 사용 금지)
+        setCategories([]);
       } finally {
         setLoadingCategories(false);
       }

@@ -12,6 +12,7 @@ import { fundingAPI, interactionAPI } from '../services/api';
 import { useCategories } from '../lib/api/useCategories';
 import { getCategoryColor } from '../constants/categories';
 import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
+import { ApiResponse } from '../types';
 
 interface ProjectDetailProps {
   projectId: number;
@@ -33,7 +34,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
     const fetchProject = async () => {
       try {
         setLoading(true);
-        const response = await fundingAPI.getProject(projectId.toString()) as any;
+        const response = await fundingAPI.getProject(projectId.toString()) as ApiResponse<any>;
 
         if (response.success && response.data) {
           setProject(response.data);
@@ -61,11 +62,11 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
         amount: paymentData.amount,
         message: paymentData.message || '',
         rewardId: paymentData.rewardId
-      }) as any;
+      }) as ApiResponse<any>;
 
       if (response.success) {
         // 프로젝트 정보 새로고침
-        const updatedResponse = await fundingAPI.getProject(projectId.toString()) as any;
+        const updatedResponse = await fundingAPI.getProject(projectId.toString()) as ApiResponse<any>;
         if (updatedResponse.success && updatedResponse.data) {
           setProject(updatedResponse.data);
         }
@@ -78,12 +79,12 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
 
   const handleLike = async () => {
     try {
-      const response = await fundingAPI.likeProject(projectId.toString()) as any;
+      const response = await fundingAPI.likeProject(projectId.toString()) as ApiResponse<any>;
       if (response.success) {
         // 좋아요 상태를 즉시 업데이트
         setIsLiked(!isLiked);
         // 프로젝트 정보 새로고침
-        const updatedResponse = await fundingAPI.getProject(projectId.toString()) as any;
+        const updatedResponse = await fundingAPI.getProject(projectId.toString()) as ApiResponse<any>;
         if (updatedResponse.success && updatedResponse.data) {
           setProject((prev: any) => ({
             ...prev,
@@ -100,11 +101,11 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
 
   const handleBookmark = async () => {
     try {
-      const response = await fundingAPI.bookmarkProject(projectId.toString()) as any;
+      const response = await fundingAPI.bookmarkProject(projectId.toString()) as ApiResponse<any>;
       if (response.success) {
         setIsBookmarked(!isBookmarked);
         // 프로젝트 정보 새로고침
-        const updatedResponse = await fundingAPI.getProject(projectId.toString()) as any;
+        const updatedResponse = await fundingAPI.getProject(projectId.toString()) as ApiResponse<any>;
         if (updatedResponse.success && updatedResponse.data) {
           setProject(updatedResponse.data);
         }
@@ -283,7 +284,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
                 className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600 hover:border-blue-700"
                 onClick={async () => {
                   try {
-                    const response = await interactionAPI.followArtist(project.artistId || project.artist.id) as any;
+                    const response = await interactionAPI.followArtist(project.artistId || project.artist.id) as ApiResponse<any>;
                     if (response.success) {
                       alert('아티스트를 팔로우했습니다!');
                     }

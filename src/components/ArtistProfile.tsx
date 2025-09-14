@@ -8,6 +8,7 @@ import { ImageWithFallback } from "./atoms/ImageWithFallback";
 import { useEffect, useState } from "react";
 import { artistAPI } from '../services/api';
 import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
+import { ApiResponse } from '../types';
 
 interface ArtistProfileProps {
   artistId: number;
@@ -27,7 +28,7 @@ export function ArtistProfile({ artistId, onBack }: ArtistProfileProps) {
         setLoading(true);
         setError(null);
 
-        const artistResponse = await artistAPI.getArtistById(artistId.toString()) as any;
+        const artistResponse = await artistAPI.getArtistById(artistId.toString()) as ApiResponse<any>;
 
         if (artistResponse.success && artistResponse.data) {
           setArtistData(artistResponse.data);

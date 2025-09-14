@@ -9,6 +9,7 @@ import { ImageWithFallback } from './atoms/ImageWithFallback';
 import { eventManagementAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
+import { ApiResponse } from '../types';
 
 interface EventDetailProps {
   eventId: string;
@@ -28,7 +29,7 @@ export function EventDetail({ eventId, onBack }: EventDetailProps) {
     const fetchEvent = async () => {
       try {
         setLoading(true);
-        const response = await eventManagementAPI.getEvent(eventId) as any;
+        const response = await eventManagementAPI.getEvent(eventId) as ApiResponse<any>;
 
         if (response.success && response.data) {
           setEvent(response.data);
@@ -60,12 +61,12 @@ export function EventDetail({ eventId, onBack }: EventDetailProps) {
     }
 
     try {
-      const response = await eventManagementAPI.joinEvent(eventId) as any;
+      const response = await eventManagementAPI.joinEvent(eventId) as ApiResponse<any>;
 
       if (response.success) {
         setIsParticipating(true);
         // 이벤트 정보 새로고침
-        const updatedResponse = await eventManagementAPI.getEvent(eventId) as any;
+        const updatedResponse = await eventManagementAPI.getEvent(eventId) as ApiResponse<any>;
         if (updatedResponse.success && updatedResponse.data) {
           setEvent(updatedResponse.data);
         }
@@ -79,12 +80,12 @@ export function EventDetail({ eventId, onBack }: EventDetailProps) {
 
   const handleCancelParticipation = async () => {
     try {
-      const response = await eventManagementAPI.leaveEvent(eventId) as any;
+      const response = await eventManagementAPI.leaveEvent(eventId) as ApiResponse<any>;
 
       if (response.success) {
         setIsParticipating(false);
         // 이벤트 정보 새로고침
-        const updatedResponse = await eventManagementAPI.getEvent(eventId) as any;
+        const updatedResponse = await eventManagementAPI.getEvent(eventId) as ApiResponse<any>;
         if (updatedResponse.success && updatedResponse.data) {
           setEvent(updatedResponse.data);
         }
@@ -98,12 +99,12 @@ export function EventDetail({ eventId, onBack }: EventDetailProps) {
 
   const handleLike = async () => {
     try {
-      const response = await eventManagementAPI.likeEvent(eventId) as any;
+      const response = await eventManagementAPI.likeEvent(eventId) as ApiResponse<any>;
       if (response.success) {
         // 좋아요 상태를 즉시 업데이트
         setIsLiked(!isLiked);
         // 이벤트 정보 새로고침
-        const updatedResponse = await eventManagementAPI.getEvent(eventId) as any;
+        const updatedResponse = await eventManagementAPI.getEvent(eventId) as ApiResponse<any>;
         if (updatedResponse.success && updatedResponse.data) {
           setEvent((prev: any) => ({
             ...prev,
@@ -120,11 +121,11 @@ export function EventDetail({ eventId, onBack }: EventDetailProps) {
 
   const handleBookmark = async () => {
     try {
-      const response = await eventManagementAPI.bookmarkEvent(eventId) as any;
+      const response = await eventManagementAPI.bookmarkEvent(eventId) as ApiResponse<any>;
       if (response.success) {
         setIsBookmarked(!isBookmarked);
         // 이벤트 정보 새로고침
-        const updatedResponse = await eventManagementAPI.getEvent(eventId) as any;
+        const updatedResponse = await eventManagementAPI.getEvent(eventId) as ApiResponse<any>;
         if (updatedResponse.data) {
           setEvent(updatedResponse.data);
         }

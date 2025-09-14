@@ -167,6 +167,22 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
             if (response.success && response.data) {
                 const postData = response.data;
                 // API 응답을 컴포넌트에서 사용하는 형식으로 변환
+                // 댓글 데이터 변환 함수
+                const transformComments = (comments: any[]): Comment[] => {
+                    if (!Array.isArray(comments)) return [];
+
+                    return comments.map((comment: any) => ({
+                        id: comment.id || comment._id || '',
+                        author: comment.author || comment.authorName || 'Unknown',
+                        authorId: comment.authorId || comment.author || comment.authorName || '',
+                        content: comment.content || '',
+                        timeAgo: comment.timeAgo || formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: ko }),
+                        createdAt: new Date(comment.createdAt),
+                        replies: comment.replies ? transformComments(comment.replies) : [],
+                        parentId: comment.parentId
+                    }));
+                };
+
                 const formattedPost: PostDetail = {
                     id: postData.id || (postData as any)._id || postId, // _id를 id로 매핑
                     title: postData.title,
@@ -186,14 +202,14 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                     views: postData.views || postData.viewCount || 0,
                     createdAt: new Date(postData.createdAt),
                     updatedAt: new Date(postData.updatedAt),
-                    comments: postData.comments || []
+                    comments: transformComments(postData.comments || [])
                 };
                 setPost(formattedPost);
 
                 // 사용자별 반응 상태 확인
                 if (user && formattedPost.id) {
                     try {
-                        const reactionsResponse = await communityPostAPI.getPostReactions(formattedPost.id) as any;
+                        const reactionsResponse = await communityPostAPI.getPostReactions(formattedPost.id) as ApiResponse<any>;
                         if (reactionsResponse?.success && reactionsResponse?.data) {
                             const data = reactionsResponse.data;
                             setPost((prev: any) => prev ? {

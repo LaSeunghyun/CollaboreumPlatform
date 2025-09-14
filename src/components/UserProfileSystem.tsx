@@ -9,6 +9,10 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Separator } from './ui/separator';
+import { useAuth } from '../contexts/AuthContext';
+import { artistAPI } from '../services/api';
+import { LoadingState, ErrorState } from './organisms/States';
+import { ApiResponse } from '../types';
 import {
   User,
   Settings,
@@ -28,7 +32,6 @@ import {
 import { format } from 'date-fns';
 import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
 import { ko } from 'date-fns/locale';
-import { useAuth } from '../contexts/AuthContext';
 import { userProfileAPI } from '../services/api';
 import { dynamicConstantsService } from '../services/constantsService';
 
@@ -277,44 +280,51 @@ export const PasswordChangeForm: React.FC = () => {
 
 // Artist MyPage Component
 export const ArtistMyPage: React.FC = () => {
-  const [profile, setProfile] = useState<UserProfile>({
-    id: 'artist1',
-    username: '테스트아티스트',
-    email: 'artist@example.com',
-    role: 'artist',
-    bio: '음악을 사랑하는 아티스트입니다.',
-    createdAt: new Date('2023-01-01'),
-    lastLoginAt: new Date('2024-01-15'),
-    status: 'active'
-  });
-
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [revenues, setRevenues] = useState<Revenue[]>([]);
   const [activeTab, setActiveTab] = useState('profile');
   const [statusConfig, setStatusConfig] = useState<Record<string, { label: string; variant: any }>>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchArtistData = async () => {
+      if (!user) return;
+
       try {
+        setLoading(true);
+        setError(null);
+
+        // 사용자 프로필 정보 설정
+        setProfile({
+          id: user.id,
+          username: user.name,
+          email: user.email,
+          role: user.role,
+          bio: user.bio || '',
+          createdAt: new Date(user.createdAt || new Date()),
+          lastLoginAt: new Date(),
+          status: 'active'
+        });
+
         // API에서 프로젝트 정보 가져오기
-        const projectsResponse = await fetch('/api/projects/artist');
-        if (projectsResponse.ok) {
-          const projectsData = await projectsResponse.json();
-          setProjects(projectsData.data || []);
+        const projectsResponse = await artistAPI.getProjects(parseInt(user.id));
+        if (projectsResponse && Array.isArray(projectsResponse)) {
+          setProjects(projectsResponse);
         }
 
-        // API에서 수익 정보 가져오기
-        const revenuesResponse = await fetch('/api/revenues/artist');
-        if (revenuesResponse.ok) {
-          const revenuesData = await revenuesResponse.json();
-          setRevenues(revenuesData.data || []);
-        }
+        // API에서 수익 정보 가져오기 (수익 API가 있다면)
+        // const revenuesResponse = await artistAPI.getRevenues(user.id);
+        // setRevenues(revenuesResponse || []);
 
         // API에서 상태 설정 가져오기
         const statusConfigData = await dynamicConstantsService.getProjectStatusConfig();
         setStatusConfig(statusConfigData);
       } catch (error) {
         console.error('아티스트 데이터 로드 실패:', error);
+        setError('데이터를 불러오는데 실패했습니다.');
         setProjects([]);
         setRevenues([]);
         // 기본 상태 설정 사용
@@ -324,25 +334,25 @@ export const ArtistMyPage: React.FC = () => {
           completed: { label: '완료', variant: 'outline' },
           failed: { label: '실패', variant: 'destructive' }
         });
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchArtistData();
-  }, []);
+  }, [user]);
 
   const handleProfileSave = async (data: Partial<UserProfile>) => {
-    try {
-      const response = await fetch('/api/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        },
-        body: JSON.stringify(data)
-      });
+    if (!profile) {
+      alert('프로필 정보를 찾을 수 없습니다.');
+      return;
+    }
 
-      if (response.ok) {
-        setProfile(prev => ({ ...prev, ...data }));
+    try {
+      const response = await artistAPI.updateArtistProfile(profile.id, data) as ApiResponse<any>;
+
+      if (response && response.success) {
+        setProfile(prev => prev ? { ...prev, ...data } : null);
         alert('프로필이 성공적으로 업데이트되었습니다.');
       } else {
         alert('프로필 업데이트에 실패했습니다.');
@@ -357,6 +367,43 @@ export const ArtistMyPage: React.FC = () => {
     const config = statusConfig[status] || { label: status, variant: 'secondary' };
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
+
+  // 로딩 상태 처리
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <LoadingState title="데이터를 불러오는 중..." />
+      </div>
+    );
+  }
+
+  // 에러 상태 처리
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <ErrorState
+          title="데이터 로드 실패"
+          description={error}
+          action={{
+            label: "다시 시도",
+            onClick: () => window.location.reload()
+          }}
+        />
+      </div>
+    );
+  }
+
+  // 프로필이 없는 경우
+  if (!profile) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <ErrorState
+          title="프로필을 찾을 수 없습니다"
+          description="사용자 정보를 불러올 수 없습니다."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -8,6 +8,7 @@ import { Search, Filter, MessageCircle, Heart, ArrowLeft } from "lucide-react";
 import { communityAPI, userAPI, categoryAPI } from "../services/api";
 import { KOREAN_CATEGORIES, getCategoryColor } from "../constants/categories";
 import { getFirstChar, getUsername, getAvatarUrl } from "../utils/typeGuards";
+import { ApiResponse } from "../types";
 
 interface CommunityFullProps {
   onBack: () => void;
@@ -33,7 +34,7 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
         setError(null);
 
         // 카테고리 목록 가져오기
-        const categoriesResponse = await communityAPI.getCategories() as any;
+        const categoriesResponse = await communityAPI.getCategories() as ApiResponse<any>;
         if (categoriesResponse.success) {
           const categoryLabels = ["전체", ...(categoriesResponse as any).data.map((cat: any) => cat.label)];
           setCategories(categoryLabels);
@@ -42,13 +43,13 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
         }
 
         // 아티스트 목록 가져오기
-        const artistsResponse = await userAPI.getFollowingArtists('current-user') as any;
+        const artistsResponse = await userAPI.getFollowingArtists('current-user') as ApiResponse<any>;
         if (artistsResponse.success) {
           setArtists(artistsResponse.data || []);
         }
 
         // 포럼 게시물 가져오기
-        const postsResponse = await communityAPI.getForumPosts() as any;
+        const postsResponse = await communityAPI.getForumPosts() as ApiResponse<any>;
         if (postsResponse.success) {
           setForumPosts(postsResponse.data || []);
         }
