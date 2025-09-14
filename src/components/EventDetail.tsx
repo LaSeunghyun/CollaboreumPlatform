@@ -406,7 +406,7 @@ export function EventDetail({ eventId, onBack }: EventDetailProps) {
               <CardContent className="p-6">
                 <h3 className="text-xl font-semibold mb-4">댓글</h3>
                 <div className="space-y-4">
-                  {event.comments?.map((comment: any, index: number) => (
+                  {(Array.isArray(event.comments) ? event.comments : []).map((comment: any, index: number) => (
                     <div key={index} className="flex gap-3">
                       <Avatar className="w-8 h-8">
                         <AvatarImage src={comment.author.avatar} alt={comment.author.username} />

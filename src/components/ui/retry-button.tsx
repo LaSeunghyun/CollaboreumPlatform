@@ -48,8 +48,8 @@ export function RetryButton({
         if (children) return children;
         if (isLoading) return "재시도 중...";
         if (isMaxRetriesReached) return "재시도 실패";
-        if (retryCount > 0) return `다시 시도 (${retryCount}/${maxRetries})`;
-        return "다시 시도";
+        if (retryCount > 0) return `페이지 새로고침 (${retryCount}/${maxRetries})`;
+        return "페이지 새로고침";
     };
 
     return (

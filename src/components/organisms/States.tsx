@@ -44,7 +44,7 @@ export const LoadingState: React.FC<StateProps> = ({
 // 에러 상태 컴포넌트
 export const ErrorState: React.FC<StateProps> = ({
     title = "오류가 발생했습니다",
-    description = "데이터를 불러오는 중 문제가 발생했습니다. 다시 시도해주세요.",
+    description = "데이터를 불러오는 중 문제가 발생했습니다. 페이지를 새로고침해주세요.",
     action,
     className = ""
 }) => {

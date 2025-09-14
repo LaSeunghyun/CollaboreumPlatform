@@ -676,12 +676,12 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
 
                         {/* 댓글 목록 */}
                         <div className="space-y-4">
-                            {post.comments.length === 0 ? (
+                            {(Array.isArray(post.comments) ? post.comments : []).length === 0 ? (
                                 <p className="text-center text-gray-500 py-8">
                                     아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!
                                 </p>
                             ) : (
-                                post.comments.map((comment) => (
+                                (Array.isArray(post.comments) ? post.comments : []).map((comment) => (
                                     <div key={comment.id} className="flex gap-3 p-4 bg-gray-50 rounded-lg">
                                         <Avatar className="w-10 h-10">
                                             <AvatarFallback>{getFirstChar(comment.author)}</AvatarFallback>

@@ -145,25 +145,13 @@ export class ErrorBoundary extends Component<Props, State> {
 
                             {/* 액션 버튼들 */}
                             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                                {!isMaxRetriesReached && (
-                                    <RetryButton
-                                        onRetry={this.handleRetry}
-                                        retryCount={retryCount}
-                                        maxRetries={this.maxRetries}
-                                        variant="default"
-                                        size="lg"
-                                    >
-                                        <RefreshCw className="w-4 h-4" />
-                                        다시 시도
-                                    </RetryButton>
-                                )}
-
                                 <Button
-                                    variant="outline"
+                                    variant="default"
                                     size="lg"
                                     onClick={this.handleReload}
                                     className="flex items-center gap-2"
                                 >
+                                    <RefreshCw className="w-4 h-4" />
                                     페이지 새로고침
                                 </Button>
 

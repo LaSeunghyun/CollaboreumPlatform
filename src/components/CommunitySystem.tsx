@@ -723,11 +723,11 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
       {/* 댓글 목록 */}
       <Card>
         <CardHeader>
-          <CardTitle>댓글 ({comments.length})</CardTitle>
+          <CardTitle>댓글 ({(Array.isArray(comments) ? comments : []).length})</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {comments.map(comment => (
+            {(Array.isArray(comments) ? comments : []).map(comment => (
               <div key={comment.id} className="space-y-3">
                 <div className="flex gap-3">
                   <Avatar className="w-8 h-8">
@@ -849,3 +849,4 @@ export const CommunitySystem: React.FC = () => {
 };
 
 export default CommunitySystem;
+자
