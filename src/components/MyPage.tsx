@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 import { User, Edit, Heart, TrendingUp, Gift, Bell, Shield, CreditCard, Settings, Camera } from "lucide-react";
+import { getFirstChar, getUsername, getAvatarUrl } from "../utils/typeGuards";
 
 const userData = {
   name: "김지현",
@@ -86,16 +87,16 @@ export function MyPage() {
               <div className="relative">
                 <Avatar className="w-32 h-32">
                   <AvatarImage src={userData.avatar} alt={userData.name} />
-                  <AvatarFallback className="text-2xl">{userData.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="text-2xl">{getFirstChar(userData.name)}</AvatarFallback>
                 </Avatar>
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   className="absolute bottom-0 right-0 rounded-full w-8 h-8 p-0"
                 >
                   <Camera className="w-4 h-4" />
                 </Button>
               </div>
-              
+
               <div className="flex-1 text-center md:text-left">
                 <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
                   <h1 className="text-3xl font-bold">{userData.name}</h1>
@@ -103,13 +104,13 @@ export function MyPage() {
                 </div>
                 <p className="text-gray-600 mb-2">{userData.username}</p>
                 <p className="text-gray-700 mb-4">{userData.bio}</p>
-                
+
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-600 mb-4">
                   <span>📍 {userData.location}</span>
                   <span>📅 가입일: {userData.joinDate}</span>
                   <span>🌐 <a href={userData.website} className="text-blue-600 hover:underline">블로그</a></span>
                 </div>
-                
+
                 <div className="flex justify-center md:justify-start gap-3">
                   <Button>
                     <Edit className="w-4 h-4 mr-2" />
@@ -211,17 +212,17 @@ export function MyPage() {
                           <h4 className="font-medium">{investment.project}</h4>
                           <p className="text-sm text-gray-600">by {investment.artist}</p>
                         </div>
-                        <Badge 
+                        <Badge
                           className={
-                            investment.status === 'completed' 
-                              ? 'bg-green-100 text-green-800' 
+                            investment.status === 'completed'
+                              ? 'bg-green-100 text-green-800'
                               : 'bg-blue-100 text-blue-800'
                           }
                         >
                           {investment.status === 'completed' ? '완료' : '진행중'}
                         </Badge>
                       </div>
-                      
+
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
                           <span className="text-gray-600">투자금:</span>
@@ -229,9 +230,8 @@ export function MyPage() {
                         </div>
                         <div>
                           <span className="text-gray-600">수익:</span>
-                          <p className={`font-medium ${
-                            investment.status === 'completed' ? 'text-green-600' : 'text-blue-600'
-                          }`}>
+                          <p className={`font-medium ${investment.status === 'completed' ? 'text-green-600' : 'text-blue-600'
+                            }`}>
                             {investment.status === 'completed' ? '+' : '예상 '}
                             ₩{investment.returned.toLocaleString()}
                           </p>
@@ -261,7 +261,7 @@ export function MyPage() {
                       <div className="flex items-center gap-3">
                         <Avatar className="w-12 h-12">
                           <AvatarImage src={artist.avatar} alt={artist.name} />
-                          <AvatarFallback>{artist.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback>{getFirstChar(artist.name)}</AvatarFallback>
                         </Avatar>
                         <div>
                           <h4 className="font-medium">{artist.name}</h4>
@@ -290,7 +290,7 @@ export function MyPage() {
                     <p className="text-sm text-gray-600 mb-1">사용 가능 포인트</p>
                     <p className="text-3xl font-bold text-blue-600">{pointsData.availablePoints.toLocaleString()}P</p>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div className="text-center p-3 bg-gray-50 rounded">
                       <p className="text-gray-600">총 적립</p>
@@ -340,7 +340,7 @@ export function MyPage() {
                   </div>
                   <Switch id="funding-notifications" defaultChecked />
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="artist-notifications">팔로잉 아티스트 알림</Label>
@@ -348,7 +348,7 @@ export function MyPage() {
                   </div>
                   <Switch id="artist-notifications" defaultChecked />
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="point-notifications">포인트 적립 알림</Label>
@@ -374,17 +374,17 @@ export function MyPage() {
                     <Input id="username" defaultValue={userData.username} />
                   </div>
                 </div>
-                
+
                 <div>
                   <Label htmlFor="email">이메일</Label>
                   <Input id="email" type="email" defaultValue={userData.email} />
                 </div>
-                
+
                 <div>
                   <Label htmlFor="bio">소개</Label>
                   <Textarea id="bio" defaultValue={userData.bio} rows={3} />
                 </div>
-                
+
                 <Button>변경 사항 저장</Button>
               </CardContent>
             </Card>

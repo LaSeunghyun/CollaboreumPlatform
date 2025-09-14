@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Input } from '../../../../shared/ui/Input';
 import { Search, Eye, CheckCircle2, XCircle, Clock, Image, Edit, Trash2 } from 'lucide-react';
 import { useArtworks, useUpdateArtworkStatus } from '../../hooks/useAdminData';
+import { getFirstChar, getUsername, getAvatarUrl } from '../../../../utils/typeGuards';
 import { Artwork } from '../../types';
 
 export function ArtworkManagementSection() {
@@ -135,7 +136,7 @@ export function ArtworkManagementSection() {
                                         <div className="flex items-center gap-2">
                                             <Avatar className="w-8 h-8">
                                                 <AvatarImage src={artwork.artistAvatar} alt={artwork.artist} />
-                                                <AvatarFallback>{artwork.artist.charAt(0)}</AvatarFallback>
+                                                <AvatarFallback>{getFirstChar(artwork.artist)}</AvatarFallback>
                                             </Avatar>
                                             <span>{artwork.artist}</span>
                                         </div>

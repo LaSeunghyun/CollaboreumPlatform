@@ -11,6 +11,7 @@ import { PaymentModal } from './PaymentModal';
 import { fundingAPI, interactionAPI } from '../services/api';
 import { useCategories } from '../lib/api/useCategories';
 import { getCategoryColor } from '../constants/categories';
+import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
 
 interface ProjectDetailProps {
   projectId: number;
@@ -79,11 +80,16 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
     try {
       const response = await fundingAPI.likeProject(projectId.toString()) as any;
       if (response.success) {
+        // 좋아요 상태를 즉시 업데이트
         setIsLiked(!isLiked);
         // 프로젝트 정보 새로고침
         const updatedResponse = await fundingAPI.getProject(projectId.toString()) as any;
         if (updatedResponse.success && updatedResponse.data) {
-          setProject(updatedResponse.data);
+          setProject((prev: any) => ({
+            ...prev,
+            ...updatedResponse.data,
+            isLiked: !isLiked
+          }));
         }
       }
     } catch (error) {
@@ -198,7 +204,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
                 <div className="flex items-center gap-4 mb-4">
                   <Avatar className="w-12 h-12">
                     <AvatarImage src={project.artistAvatar} alt={project.artist} />
-                    <AvatarFallback>{project.artist.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>{getFirstChar(project.artist)}</AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-medium text-gray-900">by {project.artist}</p>
@@ -372,7 +378,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
                     <div key={index} className="flex gap-3">
                       <Avatar className="w-8 h-8">
                         <AvatarImage src={comment.author.avatar} alt={comment.author.username} />
-                        <AvatarFallback>{comment.author.username.charAt(0)}</AvatarFallback>
+                        <AvatarFallback>{getFirstChar(comment.author)}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">

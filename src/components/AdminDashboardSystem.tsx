@@ -30,6 +30,7 @@ import {
     X
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
 import { ko } from 'date-fns/locale';
 
 // Types
@@ -265,7 +266,7 @@ export const UserManagement: React.FC = () => {
                                         <div className="flex items-center gap-3">
                                             <Avatar className="w-8 h-8">
                                                 <AvatarImage src={user.avatar} />
-                                                <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
+                                                <AvatarFallback>{getFirstChar(user.username)}</AvatarFallback>
                                             </Avatar>
                                             <div>
                                                 <p className="font-medium">{user.username}</p>
@@ -338,7 +339,7 @@ export const UserManagement: React.FC = () => {
                             <div className="flex items-center gap-4">
                                 <Avatar className="w-16 h-16">
                                     <AvatarImage src={selectedUser.avatar} />
-                                    <AvatarFallback>{selectedUser.username.charAt(0)}</AvatarFallback>
+                                    <AvatarFallback>{getFirstChar(selectedUser.username)}</AvatarFallback>
                                 </Avatar>
                                 <div>
                                     <h3 className="text-lg font-semibold">{selectedUser.username}</h3>
@@ -524,7 +525,7 @@ export const ProjectApproval: React.FC = () => {
                                         <div className="flex items-center gap-3 mb-3">
                                             <Avatar className="w-10 h-10">
                                                 <AvatarImage src={project.artist.avatar} />
-                                                <AvatarFallback>{project.artist.username.charAt(0)}</AvatarFallback>
+                                                <AvatarFallback>{getFirstChar(project.artist)}</AvatarFallback>
                                             </Avatar>
                                             <div>
                                                 <h3 className="font-semibold">{project.title}</h3>

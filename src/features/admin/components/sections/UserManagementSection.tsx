@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Input } from '../../../../shared/ui/Input';
 import { Search, Eye, Ban, CheckCircle, UserCheck, UserX } from 'lucide-react';
 import { useUsers, useUpdateUserStatus, useSuspendUser, useRestoreUser } from '../../hooks/useAdminData';
+import { getFirstChar, getUsername, getAvatarUrl } from '../../../../utils/typeGuards';
 import { User } from '../../types';
 
 export function UserManagementSection() {
@@ -134,7 +135,7 @@ export function UserManagementSection() {
                                         <div className="flex items-center gap-3">
                                             <Avatar className="w-8 h-8">
                                                 <AvatarImage src={user.avatar} alt={user.name} />
-                                                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                                                <AvatarFallback>{getFirstChar(user.name)}</AvatarFallback>
                                             </Avatar>
                                             <div>
                                                 <div className="font-medium">{user.name}</div>

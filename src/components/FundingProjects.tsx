@@ -13,6 +13,7 @@ import { fundingAPI, communityAPI } from '../services/api';
 import { PaymentModal } from './PaymentModal';
 import { dynamicConstantsService } from '../services/constantsService';
 import { useRetry } from '../hooks/useRetry';
+import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
 import {
   CATEGORIES,
   CATEGORY_LABELS,
@@ -260,7 +261,7 @@ export function FundingProjects({ onViewProject }: FundingProjectsProps) {
         <div className="flex items-center gap-4 mb-4">
           <Avatar className="w-12 h-12">
             <AvatarImage src={project.artistAvatar} alt={project.artist} />
-            <AvatarFallback>{project.artist.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{getFirstChar(project.artist)}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <h3 className="font-semibold text-foreground text-lg line-clamp-1">{project.title}</h3>

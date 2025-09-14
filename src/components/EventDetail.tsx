@@ -8,6 +8,7 @@ import { Calendar, MapPin, Clock, Users, Star, Heart, Share2, Bookmark } from 'l
 import { ImageWithFallback } from './atoms/ImageWithFallback';
 import { eventManagementAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
 
 interface EventDetailProps {
   eventId: string;
@@ -99,11 +100,16 @@ export function EventDetail({ eventId, onBack }: EventDetailProps) {
     try {
       const response = await eventManagementAPI.likeEvent(eventId) as any;
       if (response.success) {
+        // 좋아요 상태를 즉시 업데이트
         setIsLiked(!isLiked);
         // 이벤트 정보 새로고침
         const updatedResponse = await eventManagementAPI.getEvent(eventId) as any;
         if (updatedResponse.success && updatedResponse.data) {
-          setEvent(updatedResponse.data);
+          setEvent((prev: any) => ({
+            ...prev,
+            ...updatedResponse.data,
+            isLiked: !isLiked
+          }));
         }
       }
     } catch (error) {
@@ -216,7 +222,7 @@ export function EventDetail({ eventId, onBack }: EventDetailProps) {
                 <div className="flex items-center gap-4 mb-4">
                   <Avatar className="w-12 h-12">
                     <AvatarImage src={event.organizer.avatar} alt={event.organizer.username} />
-                    <AvatarFallback>{event.organizer.username.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>{getFirstChar(event.organizer)}</AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-medium text-gray-900">주최자: {event.organizer.username}</p>
@@ -356,7 +362,7 @@ export function EventDetail({ eventId, onBack }: EventDetailProps) {
                       <div className="flex items-center gap-3">
                         <Avatar className="w-8 h-8">
                           <AvatarImage src={participant.avatar} alt={participant.username} />
-                          <AvatarFallback>{participant.username.charAt(0)}</AvatarFallback>
+                          <AvatarFallback>{getFirstChar(participant)}</AvatarFallback>
                         </Avatar>
                         <div>
                           <p className="font-medium text-sm">{participant.username}</p>
@@ -404,7 +410,7 @@ export function EventDetail({ eventId, onBack }: EventDetailProps) {
                     <div key={index} className="flex gap-3">
                       <Avatar className="w-8 h-8">
                         <AvatarImage src={comment.author.avatar} alt={comment.author.username} />
-                        <AvatarFallback>{comment.author.username.charAt(0)}</AvatarFallback>
+                        <AvatarFallback>{getFirstChar(comment.author)}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">

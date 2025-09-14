@@ -310,13 +310,13 @@ router.delete('/posts/:id', auth, async (req, res) => {
 });
 
 // 포스트 좋아요/싫어요 (인증 필요)
-router.post('/posts/:id/reaction', auth, async (req, res) => {
+router.post('/posts/:id/reactions', auth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { type } = req.body; // 'like' 또는 'dislike'
+    const { reaction } = req.body; // 'like' 또는 'dislike'
     const userId = req.user._id;
 
-    if (!['like', 'dislike'].includes(type)) {
+    if (!['like', 'dislike'].includes(reaction)) {
       return res.status(400).json({
         success: false,
         message: '유효하지 않은 반응 타입입니다.'
@@ -332,7 +332,7 @@ router.post('/posts/:id/reaction', auth, async (req, res) => {
     }
 
     // 기존 반응 제거
-    if (type === 'like') {
+    if (reaction === 'like') {
       if (post.likes.includes(userId)) {
         post.likes = post.likes.filter(id => id.toString() !== userId);
       } else {

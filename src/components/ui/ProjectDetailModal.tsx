@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getFirstChar, getUsername, getAvatarUrl } from '../../utils/typeGuards';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './dialog';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { Badge } from './badge';
@@ -348,7 +349,7 @@ export function ProjectDetailModal({ projectId, isOpen, onClose }: ProjectDetail
                                                     <div className="flex items-center gap-3">
                                                         <Avatar className="w-10 h-10">
                                                             <AvatarImage src={backer.avatar} alt={backer.name} />
-                                                            <AvatarFallback>{backer.name.charAt(0)}</AvatarFallback>
+                                                            <AvatarFallback>{getFirstChar(backer.name)}</AvatarFallback>
                                                         </Avatar>
                                                         <div>
                                                             <p className="font-medium text-gray-900">{backer.name}</p>

@@ -16,9 +16,9 @@ router.get('/platform', async (req, res) => {
       isActive: true 
     });
 
-    // 성공 프로젝트 수 (status: "completed" 또는 "successful")
+    // 성공 프로젝트 수 (status: "성공" 또는 "완료")
     const successfulProjects = await Project.countDocuments({
-      status: { $in: ['completed', 'successful'] }
+      status: { $in: ['성공', '완료'] }
     });
 
     // 총 펀딩 금액 (모든 프로젝트의 currentAmount 합계)
@@ -142,7 +142,7 @@ router.get('/artist/:id', async (req, res) => {
       {
         $match: { 
           artistId: mongoose.Types.ObjectId(id),
-          status: { $in: ['completed', 'successful'] }
+          status: { $in: ['성공', '완료'] }
         }
       },
       {
@@ -237,7 +237,7 @@ router.get('/projects', async (req, res) => {
 router.get('/community', async (req, res) => {
   try {
     // 총 게시글 수
-    const totalPosts = await CommunityPost.countDocuments({ status: 'published' });
+    const totalPosts = await CommunityPost.countDocuments({ isActive: true });
 
     // 활성 사용자 수 (최근 30일 내에 게시글을 작성한 사용자)
     const thirtyDaysAgo = new Date();
@@ -252,7 +252,7 @@ router.get('/community', async (req, res) => {
       {
         $group: {
           _id: null,
-          total: { $sum: { $ifNull: ['$comments', 0] } }
+          total: { $sum: { $size: { $ifNull: ['$comments', []] } } }
         }
       }
     ]);
@@ -262,7 +262,7 @@ router.get('/community', async (req, res) => {
       {
         $group: {
           _id: null,
-          avg: { $avg: { $ifNull: ['$likes', 0] } }
+          avg: { $avg: { $size: { $ifNull: ['$likes', []] } } }
         }
       }
     ]);
@@ -276,13 +276,13 @@ router.get('/community', async (req, res) => {
 
     // 지난 주 게시글 수
     const lastWeekPosts = await CommunityPost.countDocuments({
-      status: 'published',
+      isActive: true,
       createdAt: { $gte: oneWeekAgo }
     });
 
     // 그 전 주 게시글 수
     const previousWeekPosts = await CommunityPost.countDocuments({
-      status: 'published',
+      isActive: true,
       createdAt: { $gte: twoWeeksAgo, $lt: oneWeekAgo }
     });
 

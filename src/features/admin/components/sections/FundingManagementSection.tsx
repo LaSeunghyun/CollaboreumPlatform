@@ -9,6 +9,7 @@ import { Input } from '../../../../shared/ui/Input';
 import { Progress } from '../../../../shared/ui/Progress';
 import { Search, Eye, CheckCircle, XCircle, DollarSign, Clock } from 'lucide-react';
 import { useFundingProjects, useUpdateProjectApproval } from '../../hooks/useAdminData';
+import { getFirstChar, getUsername, getAvatarUrl } from '../../../../utils/typeGuards';
 
 export function FundingManagementSection() {
     const [filter, setFilter] = useState("all");
@@ -145,7 +146,7 @@ export function FundingManagementSection() {
                                         <div className="flex items-center gap-3">
                                             <Avatar className="w-8 h-8">
                                                 <AvatarImage src={project.artist.avatar} alt={project.artist.name} />
-                                                <AvatarFallback>{project.artist.name.charAt(0)}</AvatarFallback>
+                                                <AvatarFallback>{getFirstChar(project.artist.name)}</AvatarFallback>
                                             </Avatar>
                                             <div>
                                                 <div className="font-medium max-w-xs truncate">{project.title}</div>

@@ -3,6 +3,7 @@ import { Badge } from './badge';
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import { ArtistFundingHistory } from '../../types/funding';
 import { FundingProjectCard } from './FundingProjectCard';
+import { getFirstChar, getUsername, getAvatarUrl } from '../../utils/typeGuards';
 
 interface ArtistFundingSectionProps {
     artist: ArtistFundingHistory;
@@ -16,7 +17,7 @@ export function ArtistFundingSection({ artist, onViewProjectDetails }: ArtistFun
                 <div className="flex items-center gap-4">
                     <Avatar className="w-16 h-16">
                         <AvatarImage src={artist.artistAvatar} alt={artist.artistName} />
-                        <AvatarFallback className="text-xl">{artist.artistName?.charAt(0) || 'A'}</AvatarFallback>
+                        <AvatarFallback className="text-xl">{getFirstChar(artist.artistName)}</AvatarFallback>
                     </Avatar>
                     <div>
                         <CardTitle className="text-xl text-gray-900">{artist.artistName}</CardTitle>

@@ -30,6 +30,8 @@ import {
   User
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
+import { safeArrayResponse, safeObjectResponse, getErrorMessage } from '../utils/apiUtils';
 
 // Types
 interface CommunityPost {
@@ -132,9 +134,9 @@ export const PostCreationForm: React.FC = () => {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev: any) => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -213,6 +215,7 @@ export const PostCreationForm: React.FC = () => {
 
 // Post List Component
 export const PostList: React.FC = () => {
+  const { user } = useAuth();
   // 커뮤니티 포스트 데이터 상태
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<CommunityPost[]>([]);
@@ -229,12 +232,13 @@ export const PostList: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const data = await communityPostAPI.getPosts();
-        setPosts(data as CommunityPost[]);
-        setFilteredPosts(data as CommunityPost[]);
+        const response = await communityPostAPI.getPosts();
+        const data = safeArrayResponse<CommunityPost>(response, []);
+        setPosts(data);
+        setFilteredPosts(data);
       } catch (error) {
         console.error('커뮤니티 포스트 로드 실패:', error);
-        setError(error instanceof Error ? error.message : '커뮤니티 포스트를 불러올 수 없습니다.');
+        setError(getErrorMessage(error, '커뮤니티 포스트를 불러올 수 없습니다.'));
         setPosts([]);
         setFilteredPosts([]);
       } finally {
@@ -279,48 +283,74 @@ export const PostList: React.FC = () => {
     setFilteredPosts(filtered);
   }, [posts, searchTerm, selectedCategory, sortBy]);
 
+  const handlePostReaction = async (postId: string, reaction: 'like' | 'dislike') => {
+    if (!user?.id) return;
 
+    try {
+      await communityPostAPI.togglePostReaction(postId, reaction);
+      // 게시글 목록 새로고침
+      const response = await communityPostAPI.getPosts();
+      const data = safeArrayResponse<CommunityPost>(response, []);
+      setPosts(data);
+    } catch (err) {
+      console.error('반응 처리 실패:', err);
+    }
+  };
 
   return (
     <div className="space-y-6">
       {/* 검색 및 필터 */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder="게시글 검색..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="게시글 검색..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="latest">최신순</SelectItem>
+                <SelectItem value="popular">인기순</SelectItem>
+                <SelectItem value="views">조회순</SelectItem>
+                <SelectItem value="comments">댓글순</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="카테고리" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">전체</SelectItem>
-              {DEFAULT_CATEGORIES.map(category => (
-                <SelectItem key={category} value={category}>
-                  {CATEGORY_LABELS[category]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="latest">최신순</SelectItem>
-              <SelectItem value="popular">인기순</SelectItem>
-              <SelectItem value="views">조회순</SelectItem>
-              <SelectItem value="comments">댓글순</SelectItem>
-            </SelectContent>
-          </Select>
+
+        {/* 카테고리 필터 */}
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setSelectedCategory('')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedCategory === ''
+              ? "bg-primary text-primary-foreground"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+          >
+            전체
+          </button>
+          {DEFAULT_CATEGORIES.map(category => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedCategory === category
+                ? "bg-primary text-primary-foreground"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+            >
+              {CATEGORY_LABELS[category]}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -340,8 +370,8 @@ export const PostList: React.FC = () => {
               <CardContent className="p-6">
                 <div className="flex gap-4">
                   <Avatar className="w-12 h-12">
-                    <AvatarImage src={post.author.avatar} />
-                    <AvatarFallback>{post.author.username?.charAt(0) || 'A'}</AvatarFallback>
+                    <AvatarImage src={getAvatarUrl(post.author)} />
+                    <AvatarFallback>{getFirstChar(post.author)}</AvatarFallback>
                   </Avatar>
 
                   <div className="flex-1 space-y-3">
@@ -379,7 +409,7 @@ export const PostList: React.FC = () => {
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <div className="flex items-center gap-1">
                           <User className="w-4 h-4" />
-                          {post.author.username}
+                          {getUsername(post.author)}
                         </div>
                         <div className="flex items-center gap-1">
                           <MessageCircle className="w-4 h-4" />
@@ -392,13 +422,23 @@ export const PostList: React.FC = () => {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="flex items-center gap-1"
+                          onClick={() => handlePostReaction(post.id, 'like')}
+                        >
                           <ThumbsUp className="w-4 h-4" />
-                          {post.likes}
+                          {typeof post.likes === 'number' ? post.likes : 0}
                         </Button>
-                        <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="flex items-center gap-1"
+                          onClick={() => handlePostReaction(post.id, 'dislike')}
+                        >
                           <ThumbsDown className="w-4 h-4" />
-                          {post.dislikes}
+                          {typeof post.dislikes === 'number' ? post.dislikes : 0}
                         </Button>
                         <Button variant="ghost" size="sm">
                           <Bookmark className="w-4 h-4" />
@@ -423,6 +463,7 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [replyContent, setReplyContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -434,12 +475,12 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
 
         // 게시글 상세 정보 조회
         const postResponse = await communityPostAPI.getPostById(postId);
-        const postData = (postResponse as any)?.data || postResponse;
+        const postData = safeObjectResponse<CommunityPost>(postResponse, null);
         setPost(postData);
 
         // 댓글 목록 조회
         const commentsResponse = await communityCommentAPI.getComments(postId);
-        const commentsData = (commentsResponse as any)?.data || commentsResponse;
+        const commentsData = safeArrayResponse<Comment>(commentsResponse, []);
         setComments(commentsData);
 
         // 조회수 증가
@@ -447,7 +488,7 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
 
       } catch (err) {
         console.error('데이터 로딩 실패:', err);
-        setError('데이터를 불러오는데 실패했습니다.');
+        setError(getErrorMessage(err, '데이터를 불러오는데 실패했습니다.'));
       } finally {
         setLoading(false);
       }
@@ -466,8 +507,10 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
       };
 
       const response = await communityCommentAPI.createComment(postId, commentData);
-      const newCommentData = (response as any)?.data || response;
-      setComments(prev => [...prev, newCommentData]);
+      const newCommentData = safeObjectResponse<Comment>(response, null);
+      if (newCommentData) {
+        setComments((prev: any) => [...prev, newCommentData]);
+      }
       setNewComment('');
       setReplyTo(null);
     } catch (err) {
@@ -478,6 +521,29 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
 
   const handleReply = (commentId: string) => {
     setReplyTo(replyTo === commentId ? null : commentId);
+    setReplyContent('');
+  };
+
+  const handleAddReply = async (parentCommentId: string) => {
+    if (!replyContent.trim() || !user?.id) return;
+
+    try {
+      const commentData = {
+        content: replyContent,
+        parentId: parentCommentId
+      };
+
+      const response = await communityCommentAPI.createComment(postId, commentData);
+      const newCommentData = safeObjectResponse<Comment>(response, null);
+      if (newCommentData) {
+        setComments((prev: any) => [...prev, newCommentData]);
+      }
+      setReplyContent('');
+      setReplyTo(null);
+    } catch (err) {
+      console.error('답글 작성 실패:', err);
+      setError('답글 작성에 실패했습니다.');
+    }
   };
 
   const handlePostReaction = async (reaction: 'like' | 'dislike') => {
@@ -487,8 +553,10 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
       await communityPostAPI.togglePostReaction(postId, reaction);
       // 게시글 정보 새로고침
       const updatedPostResponse = await communityPostAPI.getPostById(postId);
-      const updatedPost = (updatedPostResponse as any)?.data || updatedPostResponse;
-      setPost(updatedPost);
+      const updatedPost = safeObjectResponse<CommunityPost>(updatedPostResponse, null);
+      if (updatedPost) {
+        setPost(updatedPost);
+      }
     } catch (err) {
       console.error('반응 처리 실패:', err);
     }
@@ -583,12 +651,12 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
 
             <div className="flex items-center gap-4">
               <Avatar className="w-12 h-12">
-                <AvatarImage src={post.author.avatar} />
-                <AvatarFallback>{post.author.username?.charAt(0) || 'A'}</AvatarFallback>
+                <AvatarImage src={getAvatarUrl(post.author)} />
+                <AvatarFallback>{getFirstChar(post.author)}</AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-medium">{post.author.username}</p>
-                <p className="text-sm text-gray-600">{post.author.role}</p>
+                <p className="font-medium">{getUsername(post.author)}</p>
+                <p className="text-sm text-gray-600">{post.author.role || '사용자'}</p>
               </div>
             </div>
 
@@ -598,13 +666,21 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
 
             <div className="flex items-center justify-between pt-4">
               <div className="flex items-center gap-4">
-                <Button variant="ghost" className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-2"
+                  onClick={() => handlePostReaction('like')}
+                >
                   <ThumbsUp className="w-4 h-4" />
-                  {post.likes}
+                  {typeof post.likes === 'number' ? post.likes : 0}
                 </Button>
-                <Button variant="ghost" className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-2"
+                  onClick={() => handlePostReaction('dislike')}
+                >
                   <ThumbsDown className="w-4 h-4" />
-                  {post.dislikes}
+                  {typeof post.dislikes === 'number' ? post.dislikes : 0}
                 </Button>
               </div>
               <div className="text-sm text-gray-500">
@@ -646,14 +722,14 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
               <div key={comment.id} className="space-y-3">
                 <div className="flex gap-3">
                   <Avatar className="w-8 h-8">
-                    <AvatarImage src={comment.author.avatar} />
-                    <AvatarFallback>{comment.author.username?.charAt(0) || 'A'}</AvatarFallback>
+                    <AvatarImage src={getAvatarUrl(comment.author)} />
+                    <AvatarFallback>{getFirstChar(comment.author)}</AvatarFallback>
                   </Avatar>
 
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium">{comment.author.username}</span>
-                      <Badge variant="outline" className="text-xs">{comment.author.role}</Badge>
+                      <span className="font-medium">{getUsername(comment.author)}</span>
+                      <Badge variant="outline" className="text-xs">{comment.author.role || '사용자'}</Badge>
                       <span className="text-sm text-gray-500">
                         {format(comment.createdAt, 'MM/dd HH:mm')}
                       </span>
@@ -662,13 +738,23 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
                     <p className="text-gray-700 mb-2">{comment.content}</p>
 
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="flex items-center gap-1"
+                        onClick={() => handleCommentReaction(comment.id, 'like')}
+                      >
                         <ThumbsUp className="w-3 h-3" />
-                        {comment.likes}
+                        {typeof comment.likes === 'number' ? comment.likes : 0}
                       </Button>
-                      <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="flex items-center gap-1"
+                        onClick={() => handleCommentReaction(comment.id, 'dislike')}
+                      >
                         <ThumbsDown className="w-3 h-3" />
-                        {comment.dislikes}
+                        {typeof comment.dislikes === 'number' ? comment.dislikes : 0}
                       </Button>
                       <Button
                         variant="ghost"
@@ -684,11 +770,18 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
                       <div className="mt-3 ml-4">
                         <Textarea
                           placeholder="답글을 입력하세요..."
+                          value={replyContent}
+                          onChange={(e) => setReplyContent(e.target.value)}
                           rows={2}
                           className="mb-2"
                         />
                         <div className="flex gap-2">
-                          <Button size="sm">답글 작성</Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleAddReply(comment.id)}
+                          >
+                            답글 작성
+                          </Button>
                           <Button
                             variant="outline"
                             size="sm"

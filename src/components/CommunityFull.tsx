@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Search, Filter, MessageCircle, Heart, ArrowLeft } from "lucide-react";
 import { communityAPI, userAPI, categoryAPI } from "../services/api";
 import { KOREAN_CATEGORIES, getCategoryColor } from "../constants/categories";
+import { getFirstChar, getUsername, getAvatarUrl } from "../utils/typeGuards";
 
 interface CommunityFullProps {
   onBack: () => void;
@@ -186,7 +187,7 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
                       >
                         <Avatar className="w-8 h-8">
                           <AvatarImage src={artist.avatar} alt={artist.name} />
-                          <AvatarFallback className="text-xs">{artist.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback className="text-xs">{getFirstChar(artist.name)}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <p className="truncate">{artist.name}</p>
@@ -234,7 +235,7 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
                         alt={artists.find(a => a.id === selectedArtist)?.name}
                       />
                       <AvatarFallback>
-                        {artists.find(a => a.id === selectedArtist)?.name.charAt(0)}
+                        {getFirstChar(artists.find(a => a.id === selectedArtist)?.name)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
@@ -290,7 +291,7 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
                             src={artists.find(a => a.id === post.artistId)?.avatar}
                             alt={post.author}
                           />
-                          <AvatarFallback className="text-xs">{post.author.charAt(0)}</AvatarFallback>
+                          <AvatarFallback className="text-xs">{getFirstChar(post.author)}</AvatarFallback>
                         </Avatar>
                         <span className="text-sm text-gray-600">by {post.author}</span>
                       </div>

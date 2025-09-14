@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { ArrowLeft, MessageSquare, Users, DollarSign, Clock, Search, Filter, Eye, Edit, Trash2, Plus, Image, Palette, CheckCircle2, XCircle } from "lucide-react";
 import { adminAPI } from '../services/api';
 import { dynamicConstantsService } from '../services/constantsService';
+import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
 
 // 타입 정의
 interface Inquiry {
@@ -369,7 +370,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                       <div key={inquiry.id} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg">
                         <Avatar className="w-10 h-10">
                           <AvatarImage src={inquiry.artistAvatar} alt={inquiry.artist} />
-                          <AvatarFallback>{inquiry.artist?.charAt(0) || 'A'}</AvatarFallback>
+                          <AvatarFallback>{getFirstChar(inquiry.artist)}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm">{inquiry.subject}</p>
@@ -457,7 +458,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                           <div className="flex items-center gap-3">
                             <Avatar className="w-8 h-8">
                               <AvatarImage src={inquiry.artistAvatar} alt={inquiry.artist} />
-                              <AvatarFallback>{inquiry.artist?.charAt(0) || 'A'}</AvatarFallback>
+                              <AvatarFallback>{getFirstChar(inquiry.artist)}</AvatarFallback>
                             </Avatar>
                             <span className="font-medium">{inquiry.artist}</span>
                           </div>
@@ -645,7 +646,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                           <div className="flex items-center gap-2">
                             <Avatar className="w-8 h-8">
                               <AvatarImage src={artwork.artistAvatar} alt={artwork.artist} />
-                              <AvatarFallback>{artwork.artist?.charAt(0) || 'A'}</AvatarFallback>
+                              <AvatarFallback>{getFirstChar(artwork.artist)}</AvatarFallback>
                             </Avatar>
                             <span>{artwork.artist}</span>
                           </div>

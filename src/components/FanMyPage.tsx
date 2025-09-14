@@ -8,6 +8,7 @@ import { Progress } from "./ui/progress";
 import { Separator } from "./ui/separator";
 import { Heart, TrendingUp, Wallet, Star, Calendar, DollarSign, BarChart3, Users, MessageCircle, ExternalLink, Eye } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { getFirstChar, getUsername, getAvatarUrl } from "../utils/typeGuards";
 
 const fanData = {
   name: "김팬심",
@@ -157,7 +158,7 @@ export function FanMyPage() {
           <div className="flex items-center gap-6 mb-6">
             <Avatar className="w-24 h-24">
               <AvatarImage src={fanData.avatar} alt={fanData.name} />
-              <AvatarFallback className="text-xl">{fanData.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="text-xl">{getFirstChar(fanData.name)}</AvatarFallback>
             </Avatar>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{fanData.name}</h1>
@@ -223,11 +224,10 @@ export function FanMyPage() {
               <div className="lg:col-span-2 space-y-4">
                 <h2 className="text-xl font-semibold text-gray-900">내 투자 목록</h2>
                 {investments.map((investment) => (
-                  <Card 
-                    key={investment.id} 
-                    className={`cursor-pointer transition-all ${
-                      selectedInvestment === investment.id ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'
-                    }`}
+                  <Card
+                    key={investment.id}
+                    className={`cursor-pointer transition-all ${selectedInvestment === investment.id ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'
+                      }`}
                     onClick={() => setSelectedInvestment(investment.id)}
                   >
                     <CardContent className="p-6">
@@ -235,7 +235,7 @@ export function FanMyPage() {
                         <div className="flex items-center gap-3">
                           <Avatar className="w-12 h-12">
                             <AvatarImage src={investment.artistAvatar} alt={investment.artistName} />
-                            <AvatarFallback>{investment.artistName.charAt(0)}</AvatarFallback>
+                            <AvatarFallback>{getFirstChar(investment.artistName)}</AvatarFallback>
                           </Avatar>
                           <div>
                             <h3 className="font-medium text-gray-900 mb-1">{investment.projectTitle}</h3>
@@ -307,7 +307,7 @@ export function FanMyPage() {
                             </div>
                           </div>
                           <p className="text-sm text-gray-700">{update.content}</p>
-                          
+
                           <div className="bg-gray-50 p-3 rounded-lg">
                             <div className="flex justify-between text-sm mb-2">
                               <span>예산 사용 현황</span>
@@ -315,7 +315,7 @@ export function FanMyPage() {
                             </div>
                             <Progress value={(update.usedAmount / update.totalBudget) * 100} className="h-2" />
                           </div>
-                          
+
                           {index < investments.find(inv => inv.id === selectedInvestment)!.updates.length - 1 && <Separator />}
                         </div>
                       ))}
@@ -344,7 +344,7 @@ export function FanMyPage() {
                       <div className="relative">
                         <Avatar className="w-12 h-12">
                           <AvatarImage src={artist.avatar} alt={artist.name} />
-                          <AvatarFallback>{artist.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback>{getFirstChar(artist.name)}</AvatarFallback>
                         </Avatar>
                         {artist.isActive && (
                           <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
@@ -393,7 +393,7 @@ export function FanMyPage() {
                     </p>
                     <p className="text-gray-600">사용 가능한 포인트</p>
                   </div>
-                  
+
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <span>이번 달 적립</span>
@@ -434,9 +434,8 @@ export function FanMyPage() {
                           <p className="text-sm text-gray-600">{transaction.date}</p>
                         </div>
                         <div className="text-right">
-                          <p className={`font-semibold ${
-                            transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
-                          }`}>
+                          <p className={`font-semibold ${transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
                             {transaction.amount > 0 ? '+' : ''}{transaction.amount.toLocaleString()}P
                           </p>
                           <Badge variant="outline" className="text-xs">

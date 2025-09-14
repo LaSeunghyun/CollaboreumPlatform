@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Input } from '../../../../shared/ui/Input';
 import { Search, Eye, CheckCircle, XCircle, MessageSquare, Users, TrendingUp } from 'lucide-react';
 import { useReports, useResolveReport } from '../../hooks/useAdminData';
+import { getFirstChar, getUsername, getAvatarUrl } from '../../../../utils/typeGuards';
 import { Report } from '../../types';
 
 export function CommunityManagementSection() {
@@ -218,7 +219,7 @@ export function CommunityManagementSection() {
                                         <div className="flex items-center gap-3">
                                             <Avatar className="w-8 h-8">
                                                 <AvatarImage src={report.reporter.avatar} alt={report.reporter.name} />
-                                                <AvatarFallback>{report.reporter.name.charAt(0)}</AvatarFallback>
+                                                <AvatarFallback>{getFirstChar(report.reporter.name)}</AvatarFallback>
                                             </Avatar>
                                             <div>
                                                 <div className="font-medium">{report.reporter.name}</div>
@@ -230,7 +231,7 @@ export function CommunityManagementSection() {
                                         <div className="flex items-center gap-3">
                                             <Avatar className="w-8 h-8">
                                                 <AvatarImage src={report.reportedUser.avatar} alt={report.reportedUser.name} />
-                                                <AvatarFallback>{report.reportedUser.name.charAt(0)}</AvatarFallback>
+                                                <AvatarFallback>{getFirstChar(report.reportedUser.name)}</AvatarFallback>
                                             </Avatar>
                                             <div>
                                                 <div className="font-medium">{report.reportedUser.name}</div>

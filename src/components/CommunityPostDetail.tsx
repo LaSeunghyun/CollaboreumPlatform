@@ -11,6 +11,7 @@ import { useDeleteCommunityPost } from '../features/community/hooks/useCommunity
 import { ArrowLeft, Heart, MessageCircle, Eye, Trash2, MoreVertical, Copy, Share2, ExternalLink } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -197,7 +198,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                         const reactionsResponse = await communityPostAPI.getPostReactions(postData.id) as any;
                         if (reactionsResponse?.success && reactionsResponse?.data) {
                             const data = reactionsResponse.data;
-                            setPost(prev => prev ? {
+                            setPost((prev: any) => prev ? {
                                 ...prev,
                                 isLiked: data?.isLiked || false,
                                 isDisliked: data?.isDisliked || false,
@@ -249,10 +250,12 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
 
             if (response.success && response.data) {
                 // 좋아요 상태를 즉시 업데이트
-                setPost(prev => prev ? {
+                setPost((prev: any) => prev ? {
                     ...prev,
                     likes: response.data.likes,
-                    isLiked: response.data.isLiked,
+                    dislikes: response.data.dislikes,
+                    isLiked: !prev.isLiked, // 토글
+                    isDisliked: false, // 좋아요를 누르면 싫어요는 자동으로 취소
                     isHot: response.data.likes > 20
                 } : null);
             }
@@ -278,10 +281,12 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
 
             if (response.success && response.data) {
                 // 싫어요 상태를 즉시 업데이트
-                setPost(prev => prev ? {
+                setPost((prev: any) => prev ? {
                     ...prev,
+                    likes: response.data.likes,
                     dislikes: response.data.dislikes,
-                    isDisliked: response.data.isDisliked
+                    isLiked: false, // 싫어요를 누르면 좋아요는 자동으로 취소
+                    isDisliked: !prev.isDisliked // 토글
                 } : null);
             }
         } catch (error) {
@@ -365,12 +370,12 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                 {replies.map((reply) => (
                     <div key={reply.id} className="flex gap-3 p-3 bg-gray-100 rounded-lg">
                         <Avatar className="w-8 h-8">
-                            <AvatarFallback>{reply.author.charAt(0)}</AvatarFallback>
+                            <AvatarFallback>{getFirstChar(reply.author)}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                             <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
-                                    <span className="font-medium text-sm">{reply.author}</span>
+                                    <span className="font-medium text-sm">{getUsername(reply.author)}</span>
                                     <span className="text-xs text-gray-500">{reply.timeAgo}</span>
                                 </div>
                                 {canDeleteComment(reply.authorId) && (
@@ -646,7 +651,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                                 <div className="flex gap-3">
                                     <Avatar className="w-10 h-10">
                                         <AvatarImage src={user.avatar} />
-                                        <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
+                                        <AvatarFallback>{getFirstChar(user.name)}</AvatarFallback>
                                     </Avatar>
                                     <div className="flex-1">
                                         <Input
@@ -681,12 +686,12 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                                 post.comments.map((comment) => (
                                     <div key={comment.id} className="flex gap-3 p-4 bg-gray-50 rounded-lg">
                                         <Avatar className="w-10 h-10">
-                                            <AvatarFallback>{comment.author.charAt(0)}</AvatarFallback>
+                                            <AvatarFallback>{getFirstChar(comment.author)}</AvatarFallback>
                                         </Avatar>
                                         <div className="flex-1">
                                             <div className="flex items-center justify-between mb-2">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-medium text-sm">{comment.author}</span>
+                                                    <span className="font-medium text-sm">{getUsername(comment.author)}</span>
                                                     <span className="text-xs text-gray-500">{comment.timeAgo}</span>
                                                 </div>
                                                 {canDeleteComment(comment.authorId) && (

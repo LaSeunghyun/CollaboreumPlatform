@@ -31,6 +31,7 @@ const CommunityPage = lazy(() => import('./pages/community/CommunityPage').then(
 const NoticesPage = lazy(() => import('./pages/notices/NoticesPage').then(module => ({ default: module.NoticesPage })));
 const EventsPage = lazy(() => import('./pages/events/EventsPage').then(module => ({ default: module.EventsPage })));
 const AccountPage = lazy(() => import('./pages/account/AccountPage').then(module => ({ default: module.AccountPage })));
+const SearchPage = lazy(() => import('./pages/search/SearchPage').then(module => ({ default: module.SearchPage })));
 
 // Loading component
 const PageLoading = () => (
@@ -81,6 +82,11 @@ function App() {
                   </Suspense>
                 } />
                 <Route path="/projects/:slug" element={<AppLayout><ProjectDetail projectId={0} onBack={() => { }} /></AppLayout>} />
+                <Route path="/funding/create" element={
+                  <Suspense fallback={<PageLoading />}>
+                    <AppLayout><ProjectsPage /></AppLayout>
+                  </Suspense>
+                } />
                 <Route path="/community" element={
                   <Suspense fallback={<PageLoading />}>
                     <AppLayout><CommunityPage /></AppLayout>
@@ -99,6 +105,11 @@ function App() {
                   </Suspense>
                 } />
                 <Route path="/events/:id" element={<AppLayout><EventDetail eventId="" onBack={() => { }} /></AppLayout>} />
+                <Route path="/search" element={
+                  <Suspense fallback={<PageLoading />}>
+                    <AppLayout><SearchPage /></AppLayout>
+                  </Suspense>
+                } />
 
                 {/* Auth Routes */}
                 <Route path="/login" element={<LoginPage onBack={() => window.history.back()} onLogin={() => { }} onSignupClick={() => { }} />} />

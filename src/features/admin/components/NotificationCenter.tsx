@@ -17,6 +17,7 @@ import {
     X
 } from 'lucide-react';
 import { useNotifications, useMarkNotificationAsRead } from '../hooks/useAdminData';
+import { getFirstChar, getUsername, getAvatarUrl } from '../../../utils/typeGuards';
 import { AdminNotification } from '../types';
 
 interface NotificationCenterProps {
@@ -205,7 +206,7 @@ export function NotificationCenter({ className = "" }: NotificationCenterProps) 
                                                                     alt={notification.relatedUser.name}
                                                                 />
                                                                 <AvatarFallback className="text-xs">
-                                                                    {notification.relatedUser.name.charAt(0)}
+                                                                    {getFirstChar(notification.relatedUser.name)}
                                                                 </AvatarFallback>
                                                             </Avatar>
                                                             <span className="text-xs text-gray-600">

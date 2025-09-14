@@ -3,7 +3,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { Search, Palette, BarChart3, Users, Heart, Star } from 'lucide-react';
+import { Search, Palette, BarChart3, Users, Heart, Star, Plus } from 'lucide-react';
 import { ArtistCard } from '../../components/molecules/ArtistCard';
 import { useArtists, usePopularArtists, useNewArtists } from '../../lib/api/useArtists';
 import { usePlatformStats } from '../../lib/api/useStats';
@@ -33,6 +33,11 @@ export const ArtistsPage: React.FC = () => {
 
     const handleSearch = () => {
         // 검색 로직은 useArtists 훅이 자동으로 처리
+    };
+
+    const handleCreateProject = () => {
+        // 프로젝트 생성 페이지로 이동
+        window.location.href = '/funding/create';
     };
 
     const handleCategoryChange = (category: string) => {
@@ -67,7 +72,11 @@ export const ArtistsPage: React.FC = () => {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {artists.map((artist: any) => (
-                    <ArtistCard key={artist.id} {...artist} />
+                    <ArtistCard
+                        key={artist.id}
+                        {...artist}
+                        onClick={() => window.location.href = `/artists/${artist.id}`}
+                    />
                 ))}
             </div>
         );
@@ -76,9 +85,18 @@ export const ArtistsPage: React.FC = () => {
     return (
         <div className="space-y-8">
             <div className="space-y-6">
-                <div>
-                    <h1 className="text-3xl font-bold">아티스트</h1>
-                    <p className="text-muted-foreground">재능 있는 아티스트들을 발견하고 팔로우하세요</p>
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold">아티스트</h1>
+                        <p className="text-muted-foreground">재능 있는 아티스트들을 발견하고 팔로우하세요</p>
+                    </div>
+                    <Button
+                        className="bg-indigo hover:bg-indigo-hover hover-scale transition-button shadow-sm"
+                        onClick={handleCreateProject}
+                    >
+                        <Plus className="w-4 h-4 mr-2" />
+                        프로젝트 시작하기
+                    </Button>
                 </div>
 
                 {/* Search and Filter */}
@@ -120,7 +138,7 @@ export const ArtistsPage: React.FC = () => {
 
                 <TabsContent value="hot" className="space-y-6">
                     {renderArtists(
-                        (popularArtists as any)?.data?.artists || (popularArtists as any)?.artists || [],
+                        (popularArtists as any)?.data || [],
                         popularLoading,
                         popularError
                     )}
@@ -128,7 +146,7 @@ export const ArtistsPage: React.FC = () => {
 
                 <TabsContent value="new" className="space-y-6">
                     {renderArtists(
-                        (newArtists as any)?.data?.artists || (newArtists as any)?.artists || [],
+                        (newArtists as any)?.data?.artists || (newArtists as any)?.data || [],
                         newLoading,
                         newError
                     )}
@@ -136,7 +154,7 @@ export const ArtistsPage: React.FC = () => {
 
                 <TabsContent value="all" className="space-y-6">
                     {renderArtists(
-                        (allArtists as any)?.data?.artists || (allArtists as any)?.artists || [],
+                        (allArtists as any)?.data || [],
                         allArtistsLoading,
                         allArtistsError
                     )}
@@ -206,7 +224,7 @@ export const ArtistsPage: React.FC = () => {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {((platformStats as any)?.data?.registeredArtists || 0).toLocaleString()}
+                                    {((platformStats as any)?.data?.totalArtists || 0).toLocaleString()}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
                                     {((platformStats as any)?.data?.newArtistsThisWeek || 0) > 0 ? '+' : ''}

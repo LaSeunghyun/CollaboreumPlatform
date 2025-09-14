@@ -14,6 +14,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCommunityStats } from '../../lib/api/useStats';
 import { useCategories } from '../../lib/api/useCategories';
 import { Badge } from '../../components/ui/badge';
+import { DEFAULT_CATEGORIES, CATEGORY_LABELS } from '../../constants/categories';
 
 // 카테고리별 게시글 컴포넌트
 const CategoryPosts: React.FC<{
@@ -469,7 +470,7 @@ export const CommunityPage: React.FC = () => {
                                             <label className="block text-sm font-medium mb-2">제목 *</label>
                                             <Input
                                                 value={createFormData.title}
-                                                onChange={(e) => setCreateFormData(prev => ({ ...prev, title: e.target.value }))}
+                                                onChange={(e) => setCreateFormData((prev: any) => ({ ...prev, title: e.target.value }))}
                                                 placeholder="게시글 제목을 입력하세요"
                                                 required
                                             />
@@ -477,7 +478,7 @@ export const CommunityPage: React.FC = () => {
 
                                         <div>
                                             <label className="block text-sm font-medium mb-2">카테고리 *</label>
-                                            <Select value={createFormData.category} onValueChange={(value) => setCreateFormData(prev => ({ ...prev, category: value }))}>
+                                            <Select value={createFormData.category} onValueChange={(value) => setCreateFormData((prev: any) => ({ ...prev, category: value }))}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="카테고리를 선택하세요" />
                                                 </SelectTrigger>
@@ -499,7 +500,7 @@ export const CommunityPage: React.FC = () => {
                                             <label className="block text-sm font-medium mb-2">내용 *</label>
                                             <Textarea
                                                 value={createFormData.content}
-                                                onChange={(e) => setCreateFormData(prev => ({ ...prev, content: e.target.value }))}
+                                                onChange={(e) => setCreateFormData((prev: any) => ({ ...prev, content: e.target.value }))}
                                                 placeholder="게시글 내용을 입력하세요"
                                                 rows={8}
                                                 required
@@ -510,7 +511,7 @@ export const CommunityPage: React.FC = () => {
                                             <label className="block text-sm font-medium mb-2">태그</label>
                                             <Input
                                                 value={createFormData.tags}
-                                                onChange={(e) => setCreateFormData(prev => ({ ...prev, tags: e.target.value }))}
+                                                onChange={(e) => setCreateFormData((prev: any) => ({ ...prev, tags: e.target.value }))}
                                                 placeholder="태그를 쉼표로 구분하여 입력하세요"
                                             />
                                         </div>
@@ -534,23 +535,31 @@ export const CommunityPage: React.FC = () => {
                         <div className="max-w-7xl mx-auto px-4 py-4">
                             <div className="flex items-center justify-between flex-wrap gap-4">
                                 {/* 카테고리 탭 */}
-                                <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-                                    <TabsList className={`grid w-full max-w-lg ${categories ? `grid-cols-${(categories.length + 1)}` : 'grid-cols-4'}`}>
-                                        <TabsTrigger value="all">전체</TabsTrigger>
-                                        {categoriesLoading ? (
-                                            <>
-                                                <TabsTrigger value="loading1" disabled>로딩중...</TabsTrigger>
-                                                <TabsTrigger value="loading2" disabled>로딩중...</TabsTrigger>
-                                            </>
-                                        ) : (
-                                            categories?.map((category) => (
-                                                <TabsTrigger key={category.id} value={category.id}>
-                                                    {category.label}
-                                                </TabsTrigger>
-                                            ))
-                                        )}
-                                    </TabsList>
-                                </Tabs>
+                                <div className="flex-1">
+                                    <div className="flex flex-wrap gap-2">
+                                        <button
+                                            onClick={() => setActiveTab("all")}
+                                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === "all"
+                                                ? "bg-primary text-primary-foreground"
+                                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                                }`}
+                                        >
+                                            전체
+                                        </button>
+                                        {DEFAULT_CATEGORIES.map((category) => (
+                                            <button
+                                                key={category}
+                                                onClick={() => setActiveTab(category)}
+                                                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === category
+                                                    ? "bg-primary text-primary-foreground"
+                                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                                    }`}
+                                            >
+                                                {CATEGORY_LABELS[category]}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
 
                                 {/* 검색 및 필터 */}
                                 <div className="flex items-center gap-4">

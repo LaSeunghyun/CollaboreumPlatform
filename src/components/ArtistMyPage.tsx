@@ -8,6 +8,7 @@ import { Progress } from "./ui/progress";
 import { Separator } from "./ui/separator";
 import { DollarSign, TrendingUp, Users, Calendar, BarChart3, Eye, Edit, Plus, MessageCircle, Heart, Star, Target } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { getFirstChar, getUsername, getAvatarUrl } from "../utils/typeGuards";
 
 const artistData = {
   name: "김민수",
@@ -124,7 +125,7 @@ export function ArtistMyPage() {
           <div className="flex items-center gap-6 mb-6">
             <Avatar className="w-24 h-24">
               <AvatarImage src={artistData.avatar} alt={artistData.name} />
-              <AvatarFallback className="text-xl">{artistData.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="text-xl">{getFirstChar(artistData.name)}</AvatarFallback>
             </Avatar>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{artistData.name}</h1>
@@ -205,11 +206,10 @@ export function ArtistMyPage() {
               {/* Project List */}
               <div className="lg:col-span-2 space-y-4">
                 {projects.map((project) => (
-                  <Card 
+                  <Card
                     key={project.id}
-                    className={`cursor-pointer transition-all ${
-                      selectedProject === project.id ? 'ring-2 ring-purple-500 shadow-lg' : 'hover:shadow-md'
-                    }`}
+                    className={`cursor-pointer transition-all ${selectedProject === project.id ? 'ring-2 ring-purple-500 shadow-lg' : 'hover:shadow-md'
+                      }`}
                     onClick={() => setSelectedProject(project.id)}
                   >
                     <CardContent className="p-6">
@@ -221,7 +221,7 @@ export function ArtistMyPage() {
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        
+
                         <div className="flex-1">
                           <div className="flex justify-between items-start mb-2">
                             <div>
@@ -350,10 +350,9 @@ export function ArtistMyPage() {
                               <div className="space-y-3">
                                 {recentActivities.map((activity) => (
                                   <div key={activity.id} className="flex items-start gap-3">
-                                    <div className={`w-2 h-2 rounded-full mt-2 ${
-                                      activity.type === 'funding' ? 'bg-green-500' :
-                                      activity.type === 'comment' ? 'bg-blue-500' : 'bg-purple-500'
-                                    }`} />
+                                    <div className={`w-2 h-2 rounded-full mt-2 ${activity.type === 'funding' ? 'bg-green-500' :
+                                        activity.type === 'comment' ? 'bg-blue-500' : 'bg-purple-500'
+                                      }`} />
                                     <div className="flex-1">
                                       <p className="text-sm text-gray-900">{activity.message}</p>
                                       <p className="text-xs text-gray-600">{activity.time}</p>

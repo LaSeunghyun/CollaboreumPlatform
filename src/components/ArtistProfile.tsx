@@ -7,6 +7,7 @@ import { ArrowLeft, Users, Play, ExternalLink, MessageCircle, Heart, TrendingUp 
 import { ImageWithFallback } from "./atoms/ImageWithFallback";
 import { useEffect, useState } from "react";
 import { artistAPI } from '../services/api';
+import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
 
 interface ArtistProfileProps {
   artistId: number;
@@ -121,7 +122,7 @@ export function ArtistProfile({ artistId, onBack }: ArtistProfileProps) {
               <div className="absolute -top-16 left-8">
                 <Avatar className="w-32 h-32 border-4 border-white shadow-lg">
                   <AvatarImage src={artistData.profileImage} alt={artistData.name} />
-                  <AvatarFallback className="text-2xl">{artistData.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="text-2xl">{getFirstChar(artistData.name)}</AvatarFallback>
                 </Avatar>
               </div>
 
@@ -228,7 +229,7 @@ export function ArtistProfile({ artistId, onBack }: ArtistProfileProps) {
                     <div className="flex items-center gap-3 mb-4">
                       <Avatar className="w-10 h-10">
                         <AvatarImage src={artistData.profileImage} alt={artistData.name} />
-                        <AvatarFallback>{artistData.name.charAt(0)}</AvatarFallback>
+                        <AvatarFallback>{getFirstChar(artistData.name)}</AvatarFallback>
                       </Avatar>
                       <div>
                         <p className="font-medium">{artistData.name}</p>

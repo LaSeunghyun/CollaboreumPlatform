@@ -26,6 +26,7 @@ import {
   LogOut
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
 import { ko } from 'date-fns/locale';
 import { useAuth } from '../contexts/AuthContext';
 import { userProfileAPI } from '../services/api';
@@ -113,7 +114,7 @@ export const ProfileEditForm: React.FC<{ profile: UserProfile; onSave: (data: Pa
         <div className="flex items-center gap-4">
           <Avatar className="w-20 h-20">
             <AvatarImage src={formData.avatar} />
-            <AvatarFallback>{profile.username.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{getFirstChar(profile.username)}</AvatarFallback>
           </Avatar>
           <div>
             <Input
