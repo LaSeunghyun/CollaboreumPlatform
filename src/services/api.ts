@@ -553,6 +553,8 @@ export const statsAPI = {
         const queryString = queryParams.toString();
         return apiCall(`/stats/projects${queryString ? `?${queryString}` : ''}`);
     },
+    // 커뮤니티 통계 조회
+    getCommunityStats: () => apiCall('/stats/community'),
 };
 
 // User Profile Management APIs

@@ -7,6 +7,7 @@ import { StatCard } from "./ui/StatCard";
 import { useState, useEffect } from "react";
 import { usePlatformStats } from "../lib/api/useStats";
 import { useArtists } from "../lib/api/useArtists";
+import { useCategories } from "../lib/api/useCategories";
 
 interface HeroSectionProps {
   onViewArtistCommunity?: (artistId: number) => void;
@@ -19,6 +20,7 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
   // React Query 훅 사용
   const { data: platformStatsData, isLoading: statsLoading } = usePlatformStats();
   const { data: artistsData, isLoading: artistsLoading } = useArtists({ limit: 20 });
+  const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
 
   const platformStats = (platformStatsData as any)?.data || {
     totalArtists: 0,
@@ -28,9 +30,12 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
   };
 
   const weeklyNewcomers = (artistsData as any)?.data?.artists || (artistsData as any)?.artists || [];
-  const categories = ["전체", "음악", "미술", "문학", "영상", "기타"];
 
-  const isLoading = statsLoading || artistsLoading;
+  // API에서 카테고리 데이터 가져오기
+  const categories = (categoriesData as any)?.data || [];
+  const categoryLabels = categories.map((cat: any) => cat.label || cat.name);
+
+  const isLoading = statsLoading || artistsLoading || categoriesLoading;
 
   const filteredNewcomers = selectedCategory === "전체"
     ? weeklyNewcomers
@@ -50,6 +55,18 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">히어로 섹션을 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 카테고리가 로드되지 않은 경우 기본값 사용
+  if (categoryLabels.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">카테고리 정보를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -142,7 +159,7 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
           {/* Category Filter */}
           <div className="flex justify-center mb-12">
             <div className="flex gap-1 p-2 glass-morphism rounded-2xl border-border/30">
-              {categories.map((category) => (
+              {categoryLabels.map((category: string) => (
                 <button
                   key={category}
                   onClick={() => {

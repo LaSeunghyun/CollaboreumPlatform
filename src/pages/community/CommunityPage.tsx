@@ -7,15 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '../../components/ui/dialog';
 import { Textarea } from '../../components/ui/textarea';
-import { Search, Plus, Copy, ExternalLink, TrendingUp, Clock, MessageCircle, Eye, Users, MessageSquare, Heart } from 'lucide-react';
-import { CommunityBoardPost } from '../../components/organisms/CommunityBoardPost';
+import { Search, Plus, MessageCircle, Users, MessageSquare, Heart } from 'lucide-react';
 import { useCommunityPosts, useCreateCommunityPost } from '../../features/community/hooks/useCommunityPosts';
 import { LoadingState, ErrorState, EmptyCommunityState } from '../../components/organisms/States';
 import { useAuth } from '../../contexts/AuthContext';
-import { CommunityFull } from '../../components/CommunityFull';
-import { CommunityMain } from '../../components/CommunityMain';
-import { CommunityPostForm } from '../../components/CommunityPostForm';
-import { CommunityPostDetail } from '../../components/CommunityPostDetail';
+import { useCommunityStats } from '../../lib/api/useStats';
 import { Badge } from '../../components/ui/badge';
 
 export const CommunityPage: React.FC = () => {
@@ -24,7 +20,6 @@ export const CommunityPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState("all");
     const [searchQuery, setSearchQuery] = useState("");
     const [sortBy, setSortBy] = useState<"latest" | "popular" | "comments" | "views">("latest");
-    const [timeFilter, setTimeFilter] = useState<"all" | "3h" | "6h" | "12h" | "1d" | "2d" | "3d" | "7d">("all");
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [createFormData, setCreateFormData] = useState({
         title: '',
@@ -32,7 +27,6 @@ export const CommunityPage: React.FC = () => {
         category: '',
         tags: ''
     });
-    const [copiedLink, setCopiedLink] = useState<string | null>(null);
 
     // API 훅들
     const { data: allPosts, isLoading: allLoading, error: allError } = useCommunityPosts({
@@ -64,40 +58,22 @@ export const CommunityPage: React.FC = () => {
 
     const createPostMutation = useCreateCommunityPost();
 
+    // 커뮤니티 통계 조회
+    const { data: communityStats, isLoading: statsLoading } = useCommunityStats();
+
     const handleCreatePost = () => {
         setIsCreateModalOpen(true);
     };
 
     const handlePostClick = (postId: string) => {
+        console.log('Post clicked with ID:', postId);
+        if (!postId || postId === 'undefined' || postId === 'null') {
+            console.error('Invalid postId:', postId);
+            return;
+        }
         navigate(`/community/post/${postId}`);
     };
 
-    // 링크 복사 기능
-    const handleCopyLink = async (postId: string) => {
-        const link = `${window.location.origin}/community/post/${postId}`;
-        try {
-            await navigator.clipboard.writeText(link);
-            setCopiedLink(postId);
-            setTimeout(() => setCopiedLink(null), 2000);
-        } catch (error) {
-            console.error('링크 복사 실패:', error);
-        }
-    };
-
-    // 시간 필터 적용
-    const getTimeFilterValue = () => {
-        const now = new Date();
-        switch (timeFilter) {
-            case '3h': return new Date(now.getTime() - 3 * 60 * 60 * 1000);
-            case '6h': return new Date(now.getTime() - 6 * 60 * 60 * 1000);
-            case '12h': return new Date(now.getTime() - 12 * 60 * 60 * 1000);
-            case '1d': return new Date(now.getTime() - 24 * 60 * 60 * 1000);
-            case '2d': return new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
-            case '3d': return new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
-            case '7d': return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-            default: return undefined;
-        }
-    };
 
     const handleCreatePostSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -162,51 +138,156 @@ export const CommunityPage: React.FC = () => {
         }
 
         return (
-            <Card className="shadow-sm">
-                <CardContent className="p-0">
-                    <div className="divide-y">
-                        {posts.map((post: any, index: number) => (
-                            <div key={post.id} className="relative group">
-                                <CommunityBoardPost
-                                    {...post}
-                                    onClick={() => handlePostClick(post.id)}
-                                    rank={index + 1}
-                                />
-                                {/* 링크 복사 버튼 */}
-                                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleCopyLink(post.id);
-                                        }}
-                                        className="h-8 w-8 p-0"
-                                    >
-                                        {copiedLink === post.id ? (
-                                            <div className="text-green-600 text-xs">✓</div>
-                                        ) : (
-                                            <Copy className="w-4 h-4" />
-                                        )}
-                                    </Button>
+            <div className="bg-white rounded-lg shadow-sm">
+                {/* 테이블 헤더 */}
+                <div className="hidden md:grid md:grid-cols-12 gap-4 p-4 bg-gray-50 border-b text-sm font-medium text-gray-600">
+                    <div className="col-span-1 text-center">번호</div>
+                    <div className="col-span-5">제목</div>
+                    <div className="col-span-2 text-center">작성자</div>
+                    <div className="col-span-1 text-center">조회</div>
+                    <div className="col-span-1 text-center">좋아요</div>
+                    <div className="col-span-1 text-center">싫어요</div>
+                    <div className="col-span-1 text-center">작성일</div>
+                </div>
+
+                {/* 게시글 목록 */}
+                {posts.map((post: any, index: number) => {
+                    // postId 검증 및 로깅
+                    const postId = post.id || post._id;
+                    console.log('Rendering post:', { postId, title: post.title, fullPost: post });
+
+                    if (!postId) {
+                        console.error('Post missing ID:', post);
+                        return null;
+                    }
+
+                    return (
+                        <div
+                            key={postId}
+                            className="hidden md:grid md:grid-cols-12 gap-4 p-4 border-b hover:bg-gray-50 transition-colors cursor-pointer"
+                            onClick={() => handlePostClick(postId)}
+                        >
+                            {/* 번호 */}
+                            <div className="col-span-1 text-center text-sm text-gray-500">
+                                {posts.length - index}
+                            </div>
+
+                            {/* 제목 */}
+                            <div className="col-span-5">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Badge variant="secondary" className="text-xs">
+                                        {post.category === 'question' ? '질문' :
+                                            post.category === 'review' ? '후기' :
+                                                post.category === 'free' ? '자유' : post.category}
+                                    </Badge>
+                                    {post.isHot && (
+                                        <Badge variant="destructive" className="text-xs">
+                                            HOT
+                                        </Badge>
+                                    )}
+                                </div>
+                                <h3 className="text-sm font-medium line-clamp-1 hover:text-blue-600">
+                                    {post.title}
+                                    {(post.comments || post.replies) > 0 && (
+                                        <span className="text-blue-600 ml-1">[{post.comments || post.replies}]</span>
+                                    )}
+                                </h3>
+                            </div>
+
+                            {/* 작성자 */}
+                            <div className="col-span-2 text-center text-sm text-gray-600">
+                                {typeof post.author === 'string' ? post.author : post.author?.name || 'Unknown'}
+                            </div>
+
+                            {/* 조회수 */}
+                            <div className="col-span-1 text-center text-sm text-gray-500">
+                                {(post.views || post.viewCount || 0).toLocaleString()}
+                            </div>
+
+                            {/* 좋아요 */}
+                            <div className="col-span-1 text-center text-sm text-gray-500">
+                                <div className="flex items-center justify-center gap-1">
+                                    <span className="text-red-500">❤️</span>
+                                    <span>{post.likes || 0}</span>
                                 </div>
                             </div>
-                        ))}
+
+                            {/* 싫어요 */}
+                            <div className="col-span-1 text-center text-sm text-gray-500">
+                                <div className="flex items-center justify-center gap-1">
+                                    <span className="text-blue-500">👎</span>
+                                    <span>{post.dislikes || 0}</span>
+                                </div>
+                            </div>
+
+                            {/* 작성일 */}
+                            <div className="col-span-1 text-center text-sm text-gray-500">
+                                {new Date(post.createdAt).toLocaleDateString('ko-KR', {
+                                    month: 'long',
+                                    day: 'numeric'
+                                })}
+                            </div>
+                        </div>
+                    );
+                })}
+
+                {/* 모바일 레이아웃 */}
+                {posts.length > 0 && (
+                    <div className="md:hidden space-y-2 p-4">
+                        {posts.map((post: any, index: number) => {
+                            const postId = post.id || post._id;
+                            if (!postId) {
+                                console.error('Post missing ID in mobile layout:', post);
+                                return null;
+                            }
+
+                            return (
+                                <div
+                                    key={postId}
+                                    className="p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                                    onClick={() => handlePostClick(postId)}
+                                >
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Badge variant="secondary" className="text-xs">
+                                            {post.category === 'question' ? '질문' :
+                                                post.category === 'review' ? '후기' :
+                                                    post.category === 'free' ? '자유' : post.category}
+                                        </Badge>
+                                        {post.isHot && (
+                                            <Badge variant="destructive" className="text-xs">
+                                                HOT
+                                            </Badge>
+                                        )}
+                                    </div>
+                                    <h3 className="font-medium text-sm mb-2 line-clamp-2">
+                                        {post.title}
+                                    </h3>
+                                    <div className="flex items-center justify-between text-xs text-gray-500">
+                                        <span>{typeof post.author === 'string' ? post.author : post.author?.name || 'Unknown'}</span>
+                                        <div className="flex items-center gap-3">
+                                            <span>조회 {post.views || post.viewCount || 0}</span>
+                                            <span>❤️ {post.likes || 0}</span>
+                                            <span>👎 {post.dislikes || 0}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
-                </CardContent>
-            </Card>
+                )}
+            </div>
         );
     };
 
 
     return (
-        <div className="space-y-8">
-            {/* IssueLink 스타일 헤더 */}
+        <div className="space-y-6">
+            {/* 간단한 헤더 */}
             <div className="bg-white border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 py-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900">커뮤니티 베스트</h1>
+                            <h1 className="text-3xl font-bold text-gray-900">커뮤니티</h1>
                             <p className="text-gray-600 mt-1">다양한 주제에 대해 이야기하고 소통해보세요</p>
                         </div>
                         {user && (
@@ -217,7 +298,7 @@ export const CommunityPage: React.FC = () => {
                                         onClick={handleCreatePost}
                                     >
                                         <Plus className="w-4 h-4 mr-2" />
-                                        글쓰기
+                                        새 글 작성
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent className="max-w-2xl">
@@ -286,19 +367,17 @@ export const CommunityPage: React.FC = () => {
                         )}
                     </div>
 
-                    {/* IssueLink 스타일 필터 바 */}
+                    {/* 필터 바 */}
                     <div className="bg-white border-b border-gray-200">
                         <div className="max-w-7xl mx-auto px-4 py-4">
                             <div className="flex items-center justify-between flex-wrap gap-4">
                                 {/* 카테고리 탭 */}
                                 <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-                                    <TabsList className="grid w-full grid-cols-6 max-w-2xl">
+                                    <TabsList className="grid w-full grid-cols-4 max-w-lg">
                                         <TabsTrigger value="all">전체</TabsTrigger>
                                         <TabsTrigger value="question">질문</TabsTrigger>
                                         <TabsTrigger value="review">후기</TabsTrigger>
                                         <TabsTrigger value="free">자유</TabsTrigger>
-                                        <TabsTrigger value="full">전체보기</TabsTrigger>
-                                        <TabsTrigger value="main">메인</TabsTrigger>
                                     </TabsList>
                                 </Tabs>
 
@@ -314,23 +393,6 @@ export const CommunityPage: React.FC = () => {
                                             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                                         />
                                     </div>
-
-                                    {/* 시간 필터 */}
-                                    <Select value={timeFilter} onValueChange={(value) => setTimeFilter(value as any)}>
-                                        <SelectTrigger className="w-[100px]">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">전체</SelectItem>
-                                            <SelectItem value="3h">3시간</SelectItem>
-                                            <SelectItem value="6h">6시간</SelectItem>
-                                            <SelectItem value="12h">12시간</SelectItem>
-                                            <SelectItem value="1d">1일</SelectItem>
-                                            <SelectItem value="2d">2일</SelectItem>
-                                            <SelectItem value="3d">3일</SelectItem>
-                                            <SelectItem value="7d">7일</SelectItem>
-                                        </SelectContent>
-                                    </Select>
 
                                     {/* 정렬 필터 */}
                                     <Select value={sortBy} onValueChange={(value) => setSortBy(value as any)}>
@@ -355,7 +417,7 @@ export const CommunityPage: React.FC = () => {
 
                             <TabsContent value="question" className="space-y-6">
                                 {renderPosts(
-                                    (questionPosts as any)?.data?.posts || (questionPosts as any)?.posts || [],
+                                    (questionPosts as any)?.posts || [],
                                     questionLoading,
                                     questionError,
                                     'question'
@@ -364,7 +426,7 @@ export const CommunityPage: React.FC = () => {
 
                             <TabsContent value="review" className="space-y-6">
                                 {renderPosts(
-                                    (reviewPosts as any)?.data?.posts || (reviewPosts as any)?.posts || [],
+                                    (reviewPosts as any)?.posts || [],
                                     reviewLoading,
                                     reviewError,
                                     'review'
@@ -373,7 +435,7 @@ export const CommunityPage: React.FC = () => {
 
                             <TabsContent value="free" className="space-y-6">
                                 {renderPosts(
-                                    (freePosts as any)?.data?.posts || (freePosts as any)?.posts || [],
+                                    (freePosts as any)?.posts || [],
                                     freeLoading,
                                     freeError,
                                     'free'
@@ -382,41 +444,13 @@ export const CommunityPage: React.FC = () => {
 
                             <TabsContent value="all" className="space-y-6">
                                 {renderPosts(
-                                    (allPosts as any)?.data?.posts || (allPosts as any)?.posts || [],
+                                    (allPosts as any)?.posts || [],
                                     allLoading,
                                     allError,
                                     'all'
                                 )}
                             </TabsContent>
 
-                            <TabsContent value="full" className="space-y-6">
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-2">
-                                        <Users className="w-5 h-5 text-indigo" />
-                                        <h3 className="text-xl font-semibold">커뮤니티 전체보기</h3>
-                                    </div>
-                                    <p className="text-muted-foreground">
-                                        모든 아티스트와 팬들이 함께 소통하는 공간입니다.
-                                    </p>
-                                    <CommunityFull
-                                        onBack={() => setActiveTab("all")}
-                                        onSelectArtist={(artistId) => console.log('Selected artist:', artistId)}
-                                    />
-                                </div>
-                            </TabsContent>
-
-                            <TabsContent value="main" className="space-y-6">
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-2">
-                                        <MessageSquare className="w-5 h-5 text-sky" />
-                                        <h3 className="text-xl font-semibold">커뮤니티 메인</h3>
-                                    </div>
-                                    <p className="text-muted-foreground">
-                                        인기 게시물과 실시간 소통을 확인하세요.
-                                    </p>
-                                    <CommunityMain onBack={() => setActiveTab("all")} />
-                                </div>
-                            </TabsContent>
                         </Tabs>
                     </div>
                 </div>
@@ -431,59 +465,86 @@ export const CommunityPage: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">총 게시글</CardTitle>
-                            <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">2,456</div>
-                            <p className="text-xs text-muted-foreground">
-                                +15% 지난 주 대비
-                            </p>
-                        </CardContent>
-                    </Card>
+                {statsLoading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        {[...Array(4)].map((_, i) => (
+                            <Card key={i}>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">로딩 중...</CardTitle>
+                                    <div className="h-4 w-4 bg-gray-200 rounded animate-pulse" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="h-8 bg-gray-200 rounded animate-pulse mb-2" />
+                                    <div className="h-4 bg-gray-200 rounded animate-pulse w-20" />
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">총 게시글</CardTitle>
+                                <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    {((communityStats as any)?.data?.totalPosts || 0).toLocaleString()}
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    {((communityStats as any)?.data?.postsGrowthRate || 0) > 0 ? '+' : ''}
+                                    {((communityStats as any)?.data?.postsGrowthRate || 0)}% 지난 주 대비
+                                </p>
+                            </CardContent>
+                        </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">활성 사용자</CardTitle>
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">1,234</div>
-                            <p className="text-xs text-muted-foreground">
-                                +8% 지난 주 대비
-                            </p>
-                        </CardContent>
-                    </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">활성 사용자</CardTitle>
+                                <Users className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    {((communityStats as any)?.data?.activeUsers || 0).toLocaleString()}
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    {((communityStats as any)?.data?.usersGrowthRate || 0) > 0 ? '+' : ''}
+                                    {((communityStats as any)?.data?.usersGrowthRate || 0)}% 지난 주 대비
+                                </p>
+                            </CardContent>
+                        </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">총 댓글</CardTitle>
-                            <MessageCircle className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">8,912</div>
-                            <p className="text-xs text-muted-foreground">
-                                +22% 지난 주 대비
-                            </p>
-                        </CardContent>
-                    </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">총 댓글</CardTitle>
+                                <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    {((communityStats as any)?.data?.totalComments || 0).toLocaleString()}
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    커뮤니티 참여도
+                                </p>
+                            </CardContent>
+                        </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">평균 좋아요</CardTitle>
-                            <Heart className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">156</div>
-                            <p className="text-xs text-muted-foreground">
-                                +12% 지난 주 대비
-                            </p>
-                        </CardContent>
-                    </Card>
-                </div>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">평균 좋아요</CardTitle>
+                                <Heart className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    {((communityStats as any)?.data?.avgLikes || 0).toLocaleString()}
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    게시글당 평균
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                )}
             </section>
         </div>
     );

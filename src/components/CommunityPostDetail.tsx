@@ -121,6 +121,13 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
     };
 
     useEffect(() => {
+        // postId가 유효하지 않은 경우 처리
+        if (!postId || postId === 'undefined') {
+            setError('유효하지 않은 게시글 ID입니다.');
+            setIsLoading(false);
+            return;
+        }
+
         // 현재 페이지 정보를 세션 스토리지에 저장
         const currentPage = window.location.href;
         const previousPage = sessionStorage.getItem('currentPage');
@@ -148,6 +155,12 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
     }, [postId]);
 
     const fetchPostDetail = async () => {
+        if (!postId || postId === 'undefined') {
+            setError('유효하지 않은 게시글 ID입니다.');
+            setIsLoading(false);
+            return;
+        }
+
         try {
             setIsLoading(true);
             const response = await authAPI.get(`/community/posts/${postId}`) as ApiResponse<PostDetail>;
@@ -209,6 +222,10 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
 
     // 조회수 증가 함수
     const incrementViewCount = async () => {
+        if (!postId || postId === 'undefined') {
+            return;
+        }
+
         try {
             await authAPI.post(`/community/posts/${postId}/views`);
         } catch (error) {

@@ -2,6 +2,7 @@ const express = require('express');
 const User = require('../models/User');
 const Project = require('../models/Project');
 const Artist = require('../models/Artist');
+const CommunityPost = require('../models/CommunityPost');
 const mongoose = require('mongoose');
 
 const router = express.Router();
@@ -227,6 +228,100 @@ router.get('/projects', async (req, res) => {
     res.status(500).json({
       success: false,
       message: '프로젝트 통계 조회 중 오류가 발생했습니다',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// 커뮤니티 통계 조회
+router.get('/community', async (req, res) => {
+  try {
+    // 총 게시글 수
+    const totalPosts = await CommunityPost.countDocuments({ status: 'published' });
+
+    // 활성 사용자 수 (최근 30일 내에 게시글을 작성한 사용자)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const activeUsers = await CommunityPost.distinct('authorId', {
+      createdAt: { $gte: thirtyDaysAgo }
+    });
+
+    // 총 댓글 수
+    const totalComments = await CommunityPost.aggregate([
+      {
+        $group: {
+          _id: null,
+          total: { $sum: { $ifNull: ['$comments', 0] } }
+        }
+      }
+    ]);
+
+    // 평균 좋아요 수
+    const avgLikes = await CommunityPost.aggregate([
+      {
+        $group: {
+          _id: null,
+          avg: { $avg: { $ifNull: ['$likes', 0] } }
+        }
+      }
+    ]);
+
+    // 지난 주 대비 증가율 계산
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+    // 지난 주 게시글 수
+    const lastWeekPosts = await CommunityPost.countDocuments({
+      status: 'published',
+      createdAt: { $gte: oneWeekAgo }
+    });
+
+    // 그 전 주 게시글 수
+    const previousWeekPosts = await CommunityPost.countDocuments({
+      status: 'published',
+      createdAt: { $gte: twoWeeksAgo, $lt: oneWeekAgo }
+    });
+
+    // 지난 주 활성 사용자 수
+    const lastWeekActiveUsers = await CommunityPost.distinct('authorId', {
+      createdAt: { $gte: oneWeekAgo }
+    });
+
+    // 그 전 주 활성 사용자 수
+    const previousWeekActiveUsers = await CommunityPost.distinct('authorId', {
+      createdAt: { $gte: twoWeeksAgo, $lt: oneWeekAgo }
+    });
+
+    // 증가율 계산
+    const postsGrowthRate = previousWeekPosts > 0 
+      ? Math.round(((lastWeekPosts - previousWeekPosts) / previousWeekPosts) * 100)
+      : 0;
+
+    const usersGrowthRate = previousWeekActiveUsers.length > 0 
+      ? Math.round(((lastWeekActiveUsers.length - previousWeekActiveUsers.length) / previousWeekActiveUsers.length) * 100)
+      : 0;
+
+    res.json({
+      success: true,
+      data: {
+        totalPosts,
+        activeUsers: activeUsers.length,
+        totalComments: totalComments[0]?.total || 0,
+        avgLikes: Math.round(avgLikes[0]?.avg || 0),
+        postsGrowthRate,
+        usersGrowthRate
+      }
+    });
+
+  } catch (error) {
+    console.error('Community stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: '커뮤니티 통계 조회 중 오류가 발생했습니다',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }

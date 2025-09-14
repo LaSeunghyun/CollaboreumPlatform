@@ -47,7 +47,7 @@ export const Header: React.FC = () => {
     { path: '/', label: '홈' },
     { path: '/artists', label: '아티스트' },
     { path: '/projects', label: '프로젝트' },
-    { path: '/notices', label: '공지사항항' },
+    { path: '/notices', label: '공지사항' },
     { path: '/community', label: '커뮤니티' },
     { path: '/events', label: '이벤트' },
   ];
