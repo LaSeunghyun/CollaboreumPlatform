@@ -170,7 +170,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                 const postData = response.data;
                 // API 응답을 컴포넌트에서 사용하는 형식으로 변환
                 const formattedPost: PostDetail = {
-                    id: postData.id,
+                    id: postData.id || postData._id || postId, // _id를 id로 매핑
                     title: postData.title,
                     category: postData.category,
                     author: typeof postData.author === 'string' ? postData.author : (postData.author as any)?.name || 'Unknown',
@@ -193,9 +193,9 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                 setPost(formattedPost);
 
                 // 사용자별 반응 상태 확인
-                if (user) {
+                if (user && formattedPost.id) {
                     try {
-                        const reactionsResponse = await communityPostAPI.getPostReactions(postData.id) as any;
+                        const reactionsResponse = await communityPostAPI.getPostReactions(formattedPost.id) as any;
                         if (reactionsResponse?.success && reactionsResponse?.data) {
                             const data = reactionsResponse.data;
                             setPost((prev: any) => prev ? {

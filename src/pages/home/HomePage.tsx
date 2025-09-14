@@ -246,7 +246,7 @@ export const HomePage: React.FC = () => {
                         </Card>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                            {projectList.slice(0, 3).map((project: any) => (
+                            {(Array.isArray(projectList) ? projectList : []).slice(0, 3).map((project: any) => (
                                 <FundingProjectCard key={project.id} {...project} />
                             ))}
                         </div>
@@ -292,7 +292,7 @@ export const HomePage: React.FC = () => {
                         </Card>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {noticeList.slice(0, 2).map((notice: any) => (
+                            {(Array.isArray(noticeList) ? noticeList : []).slice(0, 2).map((notice: any) => (
                                 <Card key={notice.id} className="cursor-pointer hover:shadow-md transition-all duration-200 border-l-4 border-l-indigo">
                                     <CardContent className="p-5">
                                         <div className="space-y-3">

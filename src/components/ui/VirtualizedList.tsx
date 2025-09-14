@@ -21,21 +21,24 @@ export const VirtualizedList: React.FC<VirtualizedListProps> = ({
     const [scrollTop, setScrollTop] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
 
+    // items가 undefined이거나 배열이 아닌 경우 빈 배열로 처리
+    const safeItems = Array.isArray(items) ? items : [];
+
     const visibleRange = useMemo(() => {
         const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
         const endIndex = Math.min(
-            items.length - 1,
+            safeItems.length - 1,
             Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
         );
 
         return { startIndex, endIndex };
-    }, [scrollTop, itemHeight, containerHeight, items.length, overscan]);
+    }, [scrollTop, itemHeight, containerHeight, safeItems.length, overscan]);
 
     const visibleItems = useMemo(() => {
-        return items.slice(visibleRange.startIndex, visibleRange.endIndex + 1);
-    }, [items, visibleRange]);
+        return safeItems.slice(visibleRange.startIndex, visibleRange.endIndex + 1);
+    }, [safeItems, visibleRange]);
 
-    const totalHeight = items.length * itemHeight;
+    const totalHeight = safeItems.length * itemHeight;
     const offsetY = visibleRange.startIndex * itemHeight;
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {

@@ -46,9 +46,9 @@ export const HistoryProvider: React.FC<HistoryProviderProps> = ({ children }) =>
     };
 
     // 현재 인덱스 이후의 히스토리를 제거하고 새 엔트리 추가
-    const newHistory = history.slice(0, currentIndex + 1);
+    const newHistory = (Array.isArray(history) ? history : []).slice(0, currentIndex + 1);
     newHistory.push(newEntry);
-    
+
     setHistory(newHistory);
     setCurrentIndex(newHistory.length - 1);
   };

@@ -75,7 +75,7 @@ export function RealTimeAlerts() {
 
             // 20% 확률로 새 알림 생성 (데모용)
             if (Math.random() < 0.2) {
-                setAlerts(prev => [randomAlert, ...prev.slice(0, 9)]); // 최대 10개 유지
+                setAlerts(prev => [randomAlert, ...(Array.isArray(prev) ? prev : []).slice(0, 9)]); // 최대 10개 유지
             }
         }, 10000);
 

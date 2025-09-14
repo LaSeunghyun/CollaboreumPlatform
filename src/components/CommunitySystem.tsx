@@ -8,6 +8,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/Avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/Tabs';
 import { ErrorRetry, LoadingRetry } from './ui/retry-button';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { communityPostAPI, communityCommentAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -74,6 +75,7 @@ interface Comment {
 
 // Post Creation Form Component
 export const PostCreationForm: React.FC = () => {
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -124,8 +126,9 @@ export const PostCreationForm: React.FC = () => {
         // 성공 메시지 표시 (토스트 등으로 개선 가능)
         alert('게시글이 성공적으로 작성되었습니다.');
 
-        // 페이지 새로고침 대신 React Query 캐시 무효화로 개선 가능
-        window.location.reload();
+        // React Query 캐시 무효화로 데이터 새로고침
+        queryClient.invalidateQueries({ queryKey: ['community-posts'] });
+        queryClient.invalidateQueries({ queryKey: ['platform-stats'] });
       } catch (error) {
         console.error('게시글 작성 실패:', error);
         alert('게시글 작성 중 오류가 발생했습니다.');
@@ -216,6 +219,7 @@ export const PostCreationForm: React.FC = () => {
 // Post List Component
 export const PostList: React.FC = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   // 커뮤니티 포스트 데이터 상태
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<CommunityPost[]>([]);
@@ -250,7 +254,9 @@ export const PostList: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    let filtered = posts;
+    // posts가 undefined이거나 배열이 아닌 경우 빈 배열로 처리
+    const safePosts = Array.isArray(posts) ? posts : [];
+    let filtered = safePosts;
 
     if (searchTerm) {
       filtered = filtered.filter(post =>
@@ -288,6 +294,9 @@ export const PostList: React.FC = () => {
 
     try {
       await communityPostAPI.togglePostReaction(postId, reaction);
+      // React Query 캐시 무효화로 데이터 새로고침
+      queryClient.invalidateQueries({ queryKey: ['community-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['platform-stats'] });
       // 게시글 목록 새로고침
       const response = await communityPostAPI.getPosts();
       const data = safeArrayResponse<CommunityPost>(response, []);
@@ -509,7 +518,7 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
       const response = await communityCommentAPI.createComment(postId, commentData);
       const newCommentData = safeObjectResponse<Comment>(response, null);
       if (newCommentData) {
-        setComments((prev: any) => [...prev, newCommentData]);
+        setComments((prev: any) => [...(Array.isArray(prev) ? prev : []), newCommentData]);
       }
       setNewComment('');
       setReplyTo(null);
@@ -536,7 +545,7 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
       const response = await communityCommentAPI.createComment(postId, commentData);
       const newCommentData = safeObjectResponse<Comment>(response, null);
       if (newCommentData) {
-        setComments((prev: any) => [...prev, newCommentData]);
+        setComments((prev: any) => [...(Array.isArray(prev) ? prev : []), newCommentData]);
       }
       setReplyContent('');
       setReplyTo(null);

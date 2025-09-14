@@ -66,13 +66,13 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
     fetchData();
   }, []);
 
-  const filteredArtists = artists.filter(artist => {
+  const filteredArtists = (Array.isArray(artists) ? artists : []).filter(artist => {
     const categoryMatch = selectedCategory === "전체" || artist.category === selectedCategory;
     const searchMatch = artist.name?.toLowerCase().includes(searchQuery.toLowerCase());
     return categoryMatch && searchMatch;
   });
 
-  const filteredPosts = forumPosts.filter(post => {
+  const filteredPosts = (Array.isArray(forumPosts) ? forumPosts : []).filter(post => {
     const categoryMatch = selectedCategory === "전체" || post.category === selectedCategory;
     const artistMatch = selectedArtist === null || post.artistId === selectedArtist;
     return categoryMatch && artistMatch;

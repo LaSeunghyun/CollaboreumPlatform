@@ -397,7 +397,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {artworks.slice(0, 3).map(artwork => (
+                    {(Array.isArray(artworks) ? artworks : []).slice(0, 3).map(artwork => (
                       <div key={artwork.id} className="p-3 border border-gray-200 rounded-lg">
                         <div className="flex justify-between items-start mb-2">
                           <h4 className="font-medium text-sm">{artwork.title}</h4>

@@ -97,12 +97,12 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-5">
-                    {tags.slice(0, 3).map((tag, index) => (
+                    {(Array.isArray(tags) ? tags : []).slice(0, 3).map((tag, index) => (
                         <Badge key={index} variant="secondary" className="text-xs bg-secondary/60 text-foreground rounded-lg px-2 py-1">
                             {tag}
                         </Badge>
                     ))}
-                    {tags.length > 3 && (
+                    {Array.isArray(tags) && tags.length > 3 && (
                         <Badge variant="secondary" className="text-xs bg-secondary/60 text-foreground rounded-lg px-2 py-1">
                             +{tags.length - 3}
                         </Badge>

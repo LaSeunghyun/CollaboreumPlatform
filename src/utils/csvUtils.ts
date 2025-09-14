@@ -203,7 +203,7 @@ export const previewCsv = (
     maxRows: number = 5
 ): string => {
     const lines = csvContent.split('\n');
-    const previewLines = lines.slice(0, maxRows + 1); // 헤더 + 데이터
+    const previewLines = (Array.isArray(lines) ? lines : []).slice(0, maxRows + 1); // 헤더 + 데이터
 
     return previewLines.join('\n');
 };
