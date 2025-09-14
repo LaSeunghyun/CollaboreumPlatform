@@ -148,12 +148,12 @@ export const Header: React.FC = () => {
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="flex items-center gap-2 p-0 h-auto">
+                      <button className="flex items-center gap-2 p-0 h-auto hover:bg-gray-100 rounded-full transition-colors">
                         <Avatar className="w-8 h-8 cursor-pointer hover:scale-105 transition-transform">
                           <AvatarImage src={user?.avatar} />
                           <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
                         </Avatar>
-                      </Button>
+                      </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
                       <DropdownMenuItem onClick={() => navigate('/account')}>

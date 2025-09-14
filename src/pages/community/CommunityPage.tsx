@@ -216,8 +216,10 @@ export const CommunityPage: React.FC = () => {
 
     const createPostMutation = useCreateCommunityPost();
 
-    // 커뮤니티 통계 조회
-    const { data: communityStats, isLoading: statsLoading } = useCommunityStats();
+    // 커뮤니티 통계 조회 (임시 비활성화 - API 404 오류 해결 전까지)
+    // const { data: communityStats, isLoading: statsLoading } = useCommunityStats();
+    const communityStats = null;
+    const statsLoading = false;
 
     // 카테고리 목록 조회
     const { data: categories, isLoading: categoriesLoading } = useCategories();
