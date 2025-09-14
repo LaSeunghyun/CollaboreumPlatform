@@ -14,7 +14,7 @@ import {
     Badge,
     Button,
     SkeletonCard,
-    ProjectListSkeleton,
+    // ProjectListSkeleton,
     EmptyState,
     ErrorMessage
 } from '../../../shared/ui'
@@ -52,7 +52,7 @@ export function CommunityPostList({
 
     // 로딩 상태
     if (isLoading) {
-        return <ProjectListSkeleton count={6} />
+        return <SkeletonCard count={6} />
     }
 
     // 에러 상태
