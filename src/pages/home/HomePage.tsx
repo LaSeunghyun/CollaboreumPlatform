@@ -143,7 +143,7 @@ export const HomePage: React.FC = () => {
     return (
         <div className="space-y-8 md:space-y-12">
             {/* Hero Section */}
-            <section className="text-center space-y-8 md:space-y-12 py-12 md:py-20 lg:py-24 relative overflow-hidden">
+            <section className="text-center space-y-8 md:space-y-12 py-8 md:py-12 relative overflow-hidden">
                 {/* Background Gradient */}
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo/5 via-sky/5 to-transparent pointer-events-none" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(79,70,229,0.1),transparent_50%)] pointer-events-none" />
@@ -162,7 +162,7 @@ export const HomePage: React.FC = () => {
 
                             <div className="max-w-4xl mx-auto space-y-3 md:space-y-4 pt-4">
                                 <p className="text-xl md:text-2xl lg:text-3xl text-foreground/90 leading-relaxed font-medium">
-                                    독립 아티스트의 꿈을 현실로 만들고, 팬들과 함께 성장하는 새로운 플랫폼.
+                                    독립 아티스트의 꿈을 현실로 만들고<br />팬들과 함께 성장하는 새로운 플랫폼
                                 </p>
                                 <p className="text-lg md:text-xl text-muted-foreground/80 leading-relaxed">
                                     신뢰와 투명성을 바탕으로 건강한 예술 생태계를 구축합니다.
