@@ -8,10 +8,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { authAPI, communityAPI, communityPostAPI } from '../services/api';
 import { ApiResponse } from '../types';
 import { useDeleteCommunityPost } from '../features/community/hooks/useCommunityPosts';
-import { ArrowLeft, Heart, MessageCircle, Eye, Trash2, MoreVertical, Copy, Share2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, Eye, Trash2, MoreVertical, Copy, Share2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
+import { getFirstChar, getUsername } from '../utils/typeGuards';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -27,7 +27,6 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger
 } from './ui/alert-dialog';
 
 interface Comment {
@@ -105,7 +104,6 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
     const handleSocialShare = (platform: 'twitter' | 'facebook' | 'kakao') => {
         const link = `${window.location.origin}/community/post/${postId}`;
         const title = post?.title || '게시글';
-        const text = post?.content?.substring(0, 100) || '';
 
         switch (platform) {
             case 'twitter':
@@ -170,7 +168,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                 const postData = response.data;
                 // API 응답을 컴포넌트에서 사용하는 형식으로 변환
                 const formattedPost: PostDetail = {
-                    id: postData.id || postData._id || postId, // _id를 id로 매핑
+                    id: postData.id || (postData as any)._id || postId, // _id를 id로 매핑
                     title: postData.title,
                     category: postData.category,
                     author: typeof postData.author === 'string' ? postData.author : (postData.author as any)?.name || 'Unknown',

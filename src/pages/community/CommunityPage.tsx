@@ -65,7 +65,7 @@ const CategoryPosts: React.FC<{
 
             {/* 게시글 목록 */}
             {categoryPosts.posts.map((post: any, index: number) => {
-                const postId = post.id || post._id;
+                const postId = post.id || (post as any)._id;
                 if (!postId) return null;
 
                 return (
@@ -147,7 +147,7 @@ const CategoryPosts: React.FC<{
             {categoryPosts.posts.length > 0 && (
                 <div className="md:hidden space-y-2 p-4">
                     {categoryPosts.posts.map((post: any, index: number) => {
-                        const postId = post.id || post._id;
+                        const postId = post.id || (post as any)._id;
                         if (!postId) return null;
 
                         return (
@@ -314,7 +314,7 @@ export const CommunityPage: React.FC = () => {
                 {/* 게시글 목록 */}
                 {posts.map((post: any, index: number) => {
                     // postId 검증 및 로깅
-                    const postId = post.id || post._id;
+                    const postId = post.id || (post as any)._id;
                     console.log('Rendering post:', { postId, title: post.title, fullPost: post });
 
                     if (!postId) {
@@ -394,7 +394,7 @@ export const CommunityPage: React.FC = () => {
                 {posts.length > 0 && (
                     <div className="md:hidden space-y-2 p-4">
                         {posts.map((post: any, index: number) => {
-                            const postId = post.id || post._id;
+                            const postId = post.id || (post as any)._id;
                             if (!postId) {
                                 console.error('Post missing ID in mobile layout:', post);
                                 return null;
