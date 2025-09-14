@@ -3,20 +3,20 @@ import { cn } from "../lib/cn"
 import { forwardRef } from "react"
 
 const buttonStyles = cva(
-    "inline-flex items-center justify-center font-medium rounded-md focus:outline-none focus:ring-2 ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed",
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-ring/30 focus-visible:ring-4 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive cursor-pointer",
     {
         variants: {
             variant: {
-                solid: "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-300",
-                outline: "border border-neutral-300 bg-transparent text-neutral-700 hover:bg-neutral-50 focus:ring-primary-300",
-                ghost: "bg-transparent text-neutral-700 hover:bg-neutral-100 focus:ring-primary-300",
-                link: "bg-transparent text-primary-600 underline-offset-4 hover:underline focus:ring-primary-300",
+                solid: "bg-primary-600 text-white hover:bg-primary-700 shadow-apple hover:shadow-apple-lg active:scale-95 focus:ring-primary-300",
+                outline: "border border-border bg-background/80 backdrop-blur-sm text-foreground hover:bg-secondary/50 hover:border-border/80 focus:ring-primary-300",
+                ghost: "hover:bg-secondary/60 hover:text-foreground focus:ring-primary-300",
+                link: "text-primary-600 underline-offset-4 hover:underline focus:ring-primary-300",
             },
             size: {
-                sm: "h-8 px-3 text-sm",
-                md: "h-10 px-4 text-sm",
-                lg: "h-12 px-6 text-base",
-                icon: "h-10 w-10",
+                sm: "h-8 rounded-xl gap-1.5 px-4 text-sm [&_svg]:px-3",
+                md: "h-10 px-6 py-2 text-sm [&_svg]:px-4",
+                lg: "h-12 rounded-2xl px-8 text-base [&_svg]:px-6",
+                icon: "size-10 rounded-2xl",
             },
             tone: {
                 default: "",
@@ -102,6 +102,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 disabled={loading || props.disabled}
                 aria-busy={loading}
                 aria-disabled={loading || props.disabled}
+                aria-label={props['aria-label'] || (loading ? '로딩 중' : undefined)}
+                aria-describedby={props['aria-describedby']}
+                role={asChild ? "button" : undefined}
+                tabIndex={asChild ? 0 : undefined}
+                onKeyDown={asChild ? (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        (e.target as HTMLElement).click();
+                    }
+                } : undefined}
                 {...props}
             />
         )

@@ -3,10 +3,23 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import {
   Menu,
   X,
   Bell,
-  Search
+  Search,
+  Shield,
+  User,
+  BarChart3,
+  Palette,
+  Settings,
+  LogOut
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../lib/api/useUser';
@@ -52,6 +65,11 @@ export const Header: React.FC = () => {
     { path: '/events', label: '이벤트' },
   ];
 
+  // 관리자 전용 메뉴
+  const adminNavigationItems = [
+    { path: '/admin', label: '관리자', icon: 'Shield' },
+  ];
+
   return (
     <header className="border-b bg-white/95 backdrop-blur sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 md:py-4">
@@ -78,6 +96,26 @@ export const Header: React.FC = () => {
                   {item.label}
                 </Link>
               ))}
+
+              {/* 관리자 메뉴 */}
+              {isAuthenticated && user?.role === 'admin' && (
+                <>
+                  <div className="h-4 w-px bg-border" />
+                  {adminNavigationItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`flex items-center gap-2 text-sm transition-colors hover:scale-105 ${isActive(item.path)
+                        ? "text-indigo font-medium"
+                        : "text-muted-foreground hover:text-foreground"
+                        }`}
+                    >
+                      <Shield className="w-4 h-4" />
+                      {item.label}
+                    </Link>
+                  ))}
+                </>
+              )}
             </nav>
           </div>
 
@@ -108,15 +146,62 @@ export const Header: React.FC = () => {
                       </span>
                     )}
                   </Button>
-                  <div className="relative">
-                    <Avatar
-                      className="w-8 h-8 cursor-pointer hover:scale-105 transition-transform"
-                      onClick={() => navigate('/account')}
-                    >
-                      <AvatarImage src={user?.avatar} />
-                      <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
-                    </Avatar>
-                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="flex items-center gap-2 p-0 h-auto">
+                        <Avatar className="w-8 h-8 cursor-pointer hover:scale-105 transition-transform">
+                          <AvatarImage src={user?.avatar} />
+                          <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuItem onClick={() => navigate('/account')}>
+                        <User className="mr-2 h-4 w-4" />
+                        마이페이지
+                      </DropdownMenuItem>
+
+                      {(user?.role === 'artist' || user?.role === 'admin') && (
+                        <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                          <BarChart3 className="mr-2 h-4 w-4" />
+                          {user?.role === 'artist' ? '아티스트 대시보드' : '대시보드'}
+                        </DropdownMenuItem>
+                      )}
+
+                      <DropdownMenuItem onClick={() => navigate('/gallery')}>
+                        <Palette className="mr-2 h-4 w-4" />
+                        작품 갤러리
+                      </DropdownMenuItem>
+
+                      <DropdownMenuSeparator />
+
+                      {user?.role === 'admin' && (
+                        <>
+                          <DropdownMenuItem onClick={() => navigate('/admin')}>
+                            <Shield className="mr-2 h-4 w-4" />
+                            어드민 관리
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                        </>
+                      )}
+
+                      <DropdownMenuItem>
+                        <Settings className="mr-2 h-4 w-4" />
+                        설정
+                      </DropdownMenuItem>
+
+                      <DropdownMenuSeparator />
+
+                      <DropdownMenuItem onClick={() => {
+                        if (window.confirm('로그아웃하시겠습니까?')) {
+                          handleLogout();
+                        }
+                      }}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        로그아웃
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </>
               ) : (
                 <>
@@ -182,6 +267,27 @@ export const Header: React.FC = () => {
                   {item.label}
                 </Link>
               ))}
+
+              {/* 모바일 관리자 메뉴 */}
+              {isAuthenticated && user?.role === 'admin' && (
+                <>
+                  <div className="h-px bg-border my-2" />
+                  {adminNavigationItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`flex items-center gap-2 text-left py-2 px-3 rounded-lg transition-colors ${isActive(item.path)
+                        ? "bg-indigo/10 text-indigo font-medium"
+                        : "text-muted-foreground hover:bg-surface"
+                        }`}
+                    >
+                      <Shield className="w-4 h-4" />
+                      {item.label}
+                    </Link>
+                  ))}
+                </>
+              )}
             </nav>
 
             {/* Mobile Auth Actions */}

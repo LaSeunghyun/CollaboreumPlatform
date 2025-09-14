@@ -20,7 +20,7 @@ import { AccountPage } from './pages/account/AccountPage';
 import { LoginPage } from './components/LoginPage';
 import { SignupPage } from './components/SignupPage';
 import { ArtistDashboard } from './components/ArtistDashboard';
-import { AdminDashboard } from './components/AdminDashboard';
+import { AdminDashboard as LegacyAdminDashboard } from './components/AdminDashboard';
 import { ArtistGallery } from './components/ArtistGallery';
 import { ArtistProfile } from './components/ArtistProfile';
 import { CommunityFull } from './components/CommunityFull';
@@ -32,6 +32,9 @@ import { CommunityPostDetail } from './components/CommunityPostDetail';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CommunityPostForm } from './components/CommunityPostForm';
 import { About } from './components/About';
+
+// New Admin Dashboard
+import { AdminDashboard } from './features/admin/components/AdminDashboard';
 
 // Layout component
 import { AppLayout } from './components/layout/AppLayout';
@@ -94,7 +97,7 @@ function App() {
                 } />
                 <Route path="/admin" element={
                   <ProtectedRoute requiredRole="admin">
-                    <AppLayout><AdminDashboard onBack={() => { }} /></AppLayout>
+                    <AdminDashboard onBack={() => { }} />
                   </ProtectedRoute>
                 } />
                 <Route path="/gallery" element={

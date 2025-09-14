@@ -3,14 +3,14 @@ import { cn } from "../lib/cn"
 import { forwardRef } from "react"
 
 const cardStyles = cva(
-    "rounded-lg border border-neutral-200 bg-white text-neutral-950 shadow-sm",
+    "bg-card text-card-foreground flex flex-col gap-6 rounded-3xl border border-border/50 shadow-apple",
     {
         variants: {
             variant: {
-                default: "border-neutral-200 bg-white",
-                outlined: "border-neutral-300 bg-transparent",
-                filled: "border-transparent bg-neutral-50",
-                elevated: "border-neutral-200 bg-white shadow-md",
+                default: "border-border/50 bg-card",
+                outlined: "border-border bg-transparent",
+                filled: "border-transparent bg-secondary/50",
+                elevated: "border-border/50 bg-card shadow-apple-lg",
             },
             size: {
                 sm: "p-3",
@@ -26,13 +26,13 @@ const cardStyles = cva(
 )
 
 const cardHeaderStyles = cva(
-    "flex flex-col space-y-1.5",
+    "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 pt-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
     {
         variants: {
             size: {
-                sm: "p-3 pb-2",
-                md: "p-4 pb-3",
-                lg: "p-6 pb-4",
+                sm: "px-3 pt-3 pb-2",
+                md: "px-6 pt-6 pb-3",
+                lg: "px-6 pt-6 pb-4",
             },
         },
         defaultVariants: {
@@ -74,13 +74,13 @@ const cardDescriptionStyles = cva(
 )
 
 const cardContentStyles = cva(
-    "text-sm text-neutral-950",
+    "px-6 [&:last-child]:pb-6",
     {
         variants: {
             size: {
-                sm: "p-3 pt-0 text-xs",
-                md: "p-4 pt-0 text-sm",
-                lg: "p-6 pt-0 text-base",
+                sm: "px-3 pt-0 text-xs",
+                md: "px-6 pt-0 text-sm",
+                lg: "px-6 pt-0 text-base",
             },
         },
         defaultVariants: {
@@ -90,13 +90,13 @@ const cardContentStyles = cva(
 )
 
 const cardFooterStyles = cva(
-    "flex items-center",
+    "flex items-center px-6 pb-6 [.border-t]:pt-6",
     {
         variants: {
             size: {
-                sm: "p-3 pt-0",
-                md: "p-4 pt-0",
-                lg: "p-6 pt-0",
+                sm: "px-3 pt-0",
+                md: "px-6 pt-0",
+                lg: "px-6 pt-0",
             },
         },
         defaultVariants: {
@@ -128,6 +128,9 @@ export interface CardContentProps
 export interface CardFooterProps
     extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof cardFooterStyles> { }
+
+export interface CardActionProps
+    extends React.HTMLAttributes<HTMLDivElement> { }
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
     ({ className, variant, size, ...props }, ref) => (
@@ -195,11 +198,27 @@ const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
 )
 CardFooter.displayName = "CardFooter"
 
+const CardAction = forwardRef<HTMLDivElement, CardActionProps>(
+    ({ className, ...props }, ref) => (
+        <div
+            ref={ref}
+            data-slot="card-action"
+            className={cn(
+                "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
+                className
+            )}
+            {...props}
+        />
+    )
+)
+CardAction.displayName = "CardAction"
+
 export {
     Card,
     CardHeader,
     CardTitle,
     CardDescription,
+    CardAction,
     CardContent,
     CardFooter,
     cardStyles,

@@ -15,6 +15,183 @@ import { useCommunityStats } from '../../lib/api/useStats';
 import { useCategories } from '../../lib/api/useCategories';
 import { Badge } from '../../components/ui/badge';
 
+// 카테고리별 게시글 컴포넌트
+const CategoryPosts: React.FC<{
+    categoryId: string;
+    searchQuery: string;
+    sortBy: "latest" | "popular" | "comments" | "views";
+}> = ({ categoryId, searchQuery, sortBy }) => {
+    const { data: categoryPosts, isLoading, error } = useCommunityPosts({
+        category: categoryId,
+        search: searchQuery || undefined,
+        sortBy: sortBy === "latest" ? "createdAt" : "likes",
+        order: sortBy === 'latest' ? 'desc' : 'desc',
+    });
+
+    if (isLoading) {
+        return <LoadingState title="게시글을 불러오는 중..." />;
+    }
+
+    if (error) {
+        return (
+            <ErrorState
+                title="게시글을 불러올 수 없습니다"
+                description="잠시 후 다시 시도해주세요."
+            />
+        );
+    }
+
+    if (!categoryPosts?.posts || categoryPosts.posts.length === 0) {
+        return (
+            <EmptyCommunityState
+                action={undefined}
+            />
+        );
+    }
+
+    return (
+        <div className="bg-white rounded-lg shadow-sm">
+            {/* 테이블 헤더 */}
+            <div className="hidden md:grid md:grid-cols-12 gap-4 p-4 bg-gray-50 border-b text-sm font-medium text-gray-600">
+                <div className="col-span-1 text-center">번호</div>
+                <div className="col-span-5">제목</div>
+                <div className="col-span-2 text-center">작성자</div>
+                <div className="col-span-1 text-center">조회</div>
+                <div className="col-span-1 text-center">좋아요</div>
+                <div className="col-span-1 text-center">싫어요</div>
+                <div className="col-span-1 text-center">작성일</div>
+            </div>
+
+            {/* 게시글 목록 */}
+            {categoryPosts.posts.map((post: any, index: number) => {
+                const postId = post.id || post._id;
+                if (!postId) return null;
+
+                return (
+                    <div
+                        key={postId}
+                        className="hidden md:grid md:grid-cols-12 gap-4 p-4 border-b hover:bg-gray-50 transition-colors cursor-pointer"
+                        onClick={() => {
+                            console.log('Post clicked with ID:', postId);
+                            if (!postId || postId === 'undefined' || postId === 'null') {
+                                console.error('Invalid postId:', postId);
+                                return;
+                            }
+                            window.location.href = `/community/post/${postId}`;
+                        }}
+                    >
+                        {/* 번호 */}
+                        <div className="col-span-1 text-center text-sm text-gray-500">
+                            {categoryPosts.posts.length - index}
+                        </div>
+
+                        {/* 제목 */}
+                        <div className="col-span-5">
+                            <div className="flex items-center gap-2 mb-1">
+                                <Badge variant="secondary" className="text-xs">
+                                    {post.category}
+                                </Badge>
+                                {post.isHot && (
+                                    <Badge variant="destructive" className="text-xs">
+                                        HOT
+                                    </Badge>
+                                )}
+                            </div>
+                            <h3 className="text-sm font-medium line-clamp-1 hover:text-blue-600">
+                                {post.title}
+                                {(post.comments || post.replies) > 0 && (
+                                    <span className="text-blue-600 ml-1">[{post.comments || post.replies}]</span>
+                                )}
+                            </h3>
+                        </div>
+
+                        {/* 작성자 */}
+                        <div className="col-span-2 text-center text-sm text-gray-600">
+                            {typeof post.author === 'string' ? post.author : post.author?.name || 'Unknown'}
+                        </div>
+
+                        {/* 조회수 */}
+                        <div className="col-span-1 text-center text-sm text-gray-500">
+                            {(post.views || post.viewCount || 0).toLocaleString()}
+                        </div>
+
+                        {/* 좋아요 */}
+                        <div className="col-span-1 text-center text-sm text-gray-500">
+                            <div className="flex items-center justify-center gap-1">
+                                <span className="text-red-500">❤️</span>
+                                <span>{post.likes || 0}</span>
+                            </div>
+                        </div>
+
+                        {/* 싫어요 */}
+                        <div className="col-span-1 text-center text-sm text-gray-500">
+                            <div className="flex items-center justify-center gap-1">
+                                <span className="text-blue-500">👎</span>
+                                <span>{post.dislikes || 0}</span>
+                            </div>
+                        </div>
+
+                        {/* 작성일 */}
+                        <div className="col-span-1 text-center text-sm text-gray-500">
+                            {new Date(post.createdAt).toLocaleDateString('ko-KR', {
+                                month: 'long',
+                                day: 'numeric'
+                            })}
+                        </div>
+                    </div>
+                );
+            })}
+
+            {/* 모바일 레이아웃 */}
+            {categoryPosts.posts.length > 0 && (
+                <div className="md:hidden space-y-2 p-4">
+                    {categoryPosts.posts.map((post: any, index: number) => {
+                        const postId = post.id || post._id;
+                        if (!postId) return null;
+
+                        return (
+                            <div
+                                key={postId}
+                                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                                onClick={() => {
+                                    console.log('Post clicked with ID:', postId);
+                                    if (!postId || postId === 'undefined' || postId === 'null') {
+                                        console.error('Invalid postId:', postId);
+                                        return;
+                                    }
+                                    window.location.href = `/community/post/${postId}`;
+                                }}
+                            >
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Badge variant="secondary" className="text-xs">
+                                        {post.category}
+                                    </Badge>
+                                    {post.isHot && (
+                                        <Badge variant="destructive" className="text-xs">
+                                            HOT
+                                        </Badge>
+                                    )}
+                                </div>
+                                <h3 className="font-medium text-sm mb-2 line-clamp-2">
+                                    {post.title}
+                                </h3>
+                                <div className="flex items-center justify-between text-xs text-gray-500">
+                                    <span>{typeof post.author === 'string' ? post.author : post.author?.name || 'Unknown'}</span>
+                                    <div className="flex items-center gap-3">
+                                        <span>조회 {post.views || post.viewCount || 0}</span>
+                                        <span>❤️ {post.likes || 0}</span>
+                                        <span>👎 {post.dislikes || 0}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
+};
+
 export const CommunityPage: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -92,9 +269,6 @@ export const CommunityPage: React.FC = () => {
         }
     };
 
-    const handleSearch = () => {
-        // 검색 로직은 useCommunityPosts 훅이 자동으로 처리
-    };
 
     const renderPosts = (posts: any[], loading: boolean, error: any, category: string) => {
         if (loading) {
@@ -385,7 +559,6 @@ export const CommunityPage: React.FC = () => {
                                             className="pl-10 w-64"
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
-                                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                                         />
                                     </div>
 
@@ -419,26 +592,15 @@ export const CommunityPage: React.FC = () => {
                                 )}
                             </TabsContent>
 
-                            {categories?.map((category) => {
-                                // 각 카테고리별로 게시글 데이터를 가져오는 로직
-                                const categoryPosts = useCommunityPosts({
-                                    category: category.id,
-                                    search: searchQuery || undefined,
-                                    sortBy: sortBy === "latest" ? "createdAt" : "likes",
-                                    order: sortBy === 'latest' ? 'desc' : 'desc',
-                                });
-
-                                return (
-                                    <TabsContent key={category.id} value={category.id} className="space-y-6">
-                                        {renderPosts(
-                                            (categoryPosts.data as any)?.posts || [],
-                                            categoryPosts.isLoading,
-                                            categoryPosts.error,
-                                            category.id
-                                        )}
-                                    </TabsContent>
-                                );
-                            })}
+                            {categories?.map((category) => (
+                                <TabsContent key={category.id} value={category.id} className="space-y-6">
+                                    <CategoryPosts
+                                        categoryId={category.id}
+                                        searchQuery={searchQuery}
+                                        sortBy={sortBy}
+                                    />
+                                </TabsContent>
+                            ))}
 
                         </Tabs>
                     </div>

@@ -60,13 +60,27 @@ export const HomePage: React.FC = () => {
     return (
         <div className="space-y-8 md:space-y-12">
             {/* Hero Section */}
-            <section className="text-center space-y-8 md:space-y-12 py-8 md:py-12 relative overflow-hidden">
-                {/* Background Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo/5 via-sky/5 to-transparent pointer-events-none" />
+            <section className="text-center space-y-8 md:space-y-12 py-8 md:py-12 relative overflow-hidden min-h-screen flex items-center justify-center">
+                {/* Enhanced Background with refer 폴더 스타일 */}
+                <div className="absolute inset-0 bg-gradient-to-br from-background via-secondary/20 to-muted/30 pointer-events-none" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(79,70,229,0.1),transparent_50%)] pointer-events-none" />
+
+                {/* Animated Background Elements */}
+                <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-float pointer-events-none" />
+                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float pointer-events-none" style={{ animationDelay: '1s' }} />
+                <div className="absolute top-3/4 left-1/2 w-48 h-48 bg-primary/8 rounded-full blur-2xl animate-float pointer-events-none" style={{ animationDelay: '2s' }} />
+
+                {/* Yellow gradient highlight behind hero text */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-radial from-yellow-400/30 via-yellow-300/15 to-transparent rounded-full blur-3xl opacity-60 pointer-events-none" />
 
                 <div className="relative z-10 space-y-8 md:space-y-12 px-4">
                     <div className="space-y-6 md:space-y-8">
+                        {/* Status Badge */}
+                        <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-8">
+                            <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                            새로운 창작 생태계가 시작됩니다
+                        </div>
+
                         <div className="space-y-4 md:space-y-6">
                             <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[0.95] tracking-tight">
                                 <span className="block bg-gradient-to-r from-indigo via-sky to-indigo bg-clip-text text-transparent">
@@ -108,8 +122,8 @@ export const HomePage: React.FC = () => {
                         </Button>
                     </div>
 
-                    {/* Stats */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 pt-8 md:pt-12 max-w-4xl mx-auto">
+                    {/* Enhanced Stats Grid */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 max-w-5xl mx-auto pt-8 md:pt-12">
                         <StatCard
                             label="아티스트"
                             value={statsLoading ? "..." : ((platformStats as any)?.data?.totalArtists || 0).toLocaleString()}
@@ -128,6 +142,13 @@ export const HomePage: React.FC = () => {
                             icon={Heart}
                             iconColor="text-red-500"
                         />
+                    </div>
+                </div>
+
+                {/* Scroll Indicator */}
+                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+                    <div className="w-6 h-10 border-2 border-muted-foreground rounded-full flex justify-center">
+                        <div className="w-1 h-3 bg-muted-foreground rounded-full mt-2 animate-pulse"></div>
                     </div>
                 </div>
             </section>

@@ -24,7 +24,7 @@ const communityPostSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ['질문', '자유', '음악', '미술', '문학', '공연', '사진', '기타'],
+    enum: ['자유', '질문', '음악', '미술', '문학', '공연', '사진', '기술', '기타'],
     default: '자유'
   },
   likes: [{

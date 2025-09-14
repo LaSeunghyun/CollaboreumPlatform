@@ -39,45 +39,52 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
     onClick
 }) => {
     return (
-        <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group" onClick={onClick}>
+        <Card className="overflow-hidden hover:shadow-apple-lg transition-all duration-300 cursor-pointer group border-border/50 rounded-3xl" onClick={onClick}>
             {/* Cover Image */}
             {coverImage && (
-                <div className="aspect-[16/9] overflow-hidden">
+                <div className="relative h-36">
                     <ImageWithFallback
                         src={coverImage}
                         alt={`${name} cover`}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 </div>
             )}
 
-            <CardContent className="p-4 space-y-4">
+            <CardContent className="p-6 space-y-4">
                 {/* Artist Profile */}
-                <div className="flex items-start gap-3">
-                    <Avatar className="w-12 h-12 ring-2 ring-white shadow-md">
-                        <AvatarImage src={avatar} />
-                        <AvatarFallback>{name[0]}</AvatarFallback>
-                    </Avatar>
-
-                    <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                            <h3 className="truncate font-medium">{name}</h3>
-                            {isVerified && (
-                                <div className="w-4 h-4 bg-sky rounded-full flex items-center justify-center">
-                                    <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                            )}
+                <div className="relative px-6 pb-6">
+                    {/* Profile Image */}
+                    <div className="absolute -top-12 left-6">
+                        <div className="w-24 h-24 rounded-full border-4 border-background overflow-hidden shadow-apple">
+                            <Avatar className="w-full h-full">
+                                <AvatarImage src={avatar} />
+                                <AvatarFallback>{name[0]}</AvatarFallback>
+                            </Avatar>
                         </div>
+                    </div>
 
-                        <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="secondary" className="bg-indigo/10 text-indigo text-xs">
-                                {category}
-                            </Badge>
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <Users className="w-3 h-3" />
-                                <span>{followers.toLocaleString()}</span>
+                    {/* Artist Info */}
+                    <div className="pt-16">
+                        <div className="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 className="text-xl font-bold text-foreground">{name}</h3>
+                                <p className="text-muted-foreground font-medium">{category}</p>
+                                {isVerified && (
+                                    <div className="flex items-center gap-1 mt-1">
+                                        <div className="w-4 h-4 bg-sky rounded-full flex items-center justify-center">
+                                            <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <span className="text-xs text-muted-foreground">인증됨</span>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex items-center bg-primary/10 px-3 py-1 rounded-full">
+                                <Users className="w-4 h-4 text-primary mr-1" />
+                                <span className="text-sm font-medium text-primary">{followers.toLocaleString()}</span>
                             </div>
                         </div>
                     </div>
@@ -85,18 +92,18 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
 
                 {/* Bio */}
                 {bio && (
-                    <p className="text-sm text-muted-foreground line-clamp-2">{bio}</p>
+                    <p className="text-foreground/80 text-sm mb-4 line-clamp-2 leading-relaxed">{bio}</p>
                 )}
 
                 {/* Tags */}
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-2 mb-5">
                     {tags.slice(0, 3).map((tag, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
+                        <Badge key={index} variant="secondary" className="text-xs bg-secondary/60 text-foreground rounded-lg px-2 py-1">
                             {tag}
                         </Badge>
                     ))}
                     {tags.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="secondary" className="text-xs bg-secondary/60 text-foreground rounded-lg px-2 py-1">
                             +{tags.length - 3}
                         </Badge>
                     )}
@@ -104,26 +111,27 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
 
                 {/* Featured Work */}
                 {featuredWork && (
-                    <div className="space-y-2">
+                    <div className="space-y-2 mb-4">
                         <p className="text-xs text-muted-foreground">대표작</p>
-                        <p className="text-sm">{featuredWork}</p>
+                        <p className="text-sm text-foreground">{featuredWork}</p>
                     </div>
                 )}
 
                 {/* Actions */}
-                <div className="flex gap-2 pt-2">
+                <div className="flex gap-3">
                     <Button
-                        variant={isFollowing ? "secondary" : "default"}
+                        variant={isFollowing ? "secondary" : "solid"}
                         size="sm"
-                        className={`flex-1 ${!isFollowing ? "bg-indigo hover:bg-indigo-hover hover-scale transition-button" : ""}`}
+                        className={`flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl ${!isFollowing ? "hover:scale-105 transition-transform" : ""}`}
                         onClick={(e) => {
                             e.stopPropagation();
                             onFollow?.();
                         }}
                     >
+                        <Users className="w-4 h-4 mr-2" />
                         {isFollowing ? "팔로잉" : "팔로우"}
                     </Button>
-                    <Button variant="outline" size="sm" className="px-3">
+                    <Button variant="outline" size="sm" className="border-border hover:bg-secondary/50 rounded-xl px-3">
                         <Heart className="w-4 h-4" />
                     </Button>
                     <ShareButton
@@ -132,7 +140,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
                         description={bio || `${name} 아티스트의 프로필을 확인해보세요`}
                         variant="outline"
                         size="sm"
-                        className="px-3"
+                        className="border-border hover:bg-secondary/50 rounded-xl px-3"
                     />
                 </div>
             </CardContent>

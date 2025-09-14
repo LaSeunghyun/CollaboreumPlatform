@@ -35,7 +35,7 @@ export const FundingProjectCard: React.FC<FundingProjectCardProps> = ({
     const progressPercentage = (currentAmount / targetAmount) * 100;
 
     return (
-        <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group relative" onClick={onClick}>
+        <Card className="overflow-hidden hover:shadow-apple-lg transition-all duration-300 cursor-pointer group relative border-border/50 rounded-3xl" onClick={onClick}>
             {/* Share button overlay */}
             <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                 <ShareButton
@@ -44,7 +44,7 @@ export const FundingProjectCard: React.FC<FundingProjectCardProps> = ({
                     description={`${artist}의 ${title} 프로젝트를 응원해주세요!`}
                     variant="secondary"
                     size="icon"
-                    className="bg-white/90 backdrop-blur-sm shadow-sm"
+                    className="bg-white/90 backdrop-blur-sm shadow-apple rounded-xl"
                 />
             </div>
 
