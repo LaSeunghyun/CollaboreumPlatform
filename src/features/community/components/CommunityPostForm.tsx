@@ -23,8 +23,8 @@ import {
     CardTitle,
     LoadingButton,
     SuccessModal
-} from '@/shared/ui'
-import { useAuth } from '@/contexts/AuthContext'
+} from '../../../shared/ui'
+import { useAuth } from '../../../contexts/AuthContext'
 
 // 폼 검증 스키마
 const postFormSchema = z.object({

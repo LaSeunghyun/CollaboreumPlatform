@@ -1,8 +1,8 @@
 import { useSystemMetrics } from '../hooks/useAdminData';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/Card';
-import { Badge } from '@/shared/ui/Badge';
-import { Progress } from '@/shared/ui/Progress';
-import { Separator } from '@/shared/ui/Separator';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../shared/ui/Card';
+import { Badge } from '../../../shared/ui/Badge';
+import { Progress } from '../../../shared/ui/Progress';
+import { Separator } from '../../../shared/ui/Separator';
 import {
     Activity,
     Server,

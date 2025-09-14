@@ -41,3 +41,12 @@ export { LoadingButton } from "./LoadingButton"
 
 // 성공 모달
 export { SuccessModal } from "./SuccessModal"
+
+// 추가 UI 컴포넌트들
+export { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs"
+export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption } from "./Table"
+export { Avatar, AvatarImage, AvatarFallback } from "./Avatar"
+export { Progress } from "./Progress"
+export { ScrollArea, ScrollBar } from "./ScrollArea"
+export { Separator } from "./Separator"
+export { Dialog, DialogPortal, DialogOverlay, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "./Dialog"

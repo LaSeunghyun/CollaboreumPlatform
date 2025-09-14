@@ -1,39 +1,25 @@
-import { forwardRef } from 'react'
-import { Button, ButtonProps } from './Button'
-import { Loader2 } from 'lucide-react'
+import * as React from "react"
+import { Button } from "./Button"
+import { Loader2 } from "lucide-react"
 
-interface LoadingButtonProps extends ButtonProps {
-    isLoading?: boolean
-    loadingText?: string
+interface LoadingButtonProps extends React.ComponentProps<typeof Button> {
+  loading?: boolean
 }
 
-const LoadingButton = forwardRef<HTMLButtonElement, LoadingButtonProps>(
-    ({
-        isLoading = false,
-        loadingText,
-        children,
-        disabled,
-        ...props
-    }, ref) => {
-        return (
-            <Button
-                ref={ref}
-                disabled={disabled || isLoading}
-                aria-busy={isLoading}
-                {...props}
-            >
-                {isLoading ? (
-                    <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        {loadingText || '처리 중...'}
-                    </>
-                ) : (
-                    children
-                )}
-            </Button>
-        )
-    }
+const LoadingButton = React.forwardRef<HTMLButtonElement, LoadingButtonProps>(
+  ({ loading, children, disabled, ...props }, ref) => {
+    return (
+      <Button
+        ref={ref}
+        disabled={disabled || loading}
+        {...props}
+      >
+        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {children}
+      </Button>
+    )
+  }
 )
-LoadingButton.displayName = 'LoadingButton'
+LoadingButton.displayName = "LoadingButton"
 
 export { LoadingButton }

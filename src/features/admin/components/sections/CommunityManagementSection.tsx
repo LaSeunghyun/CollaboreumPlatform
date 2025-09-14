@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/shared/ui/Input';
 import { Search, Eye, CheckCircle, XCircle, MessageSquare, Users, TrendingUp } from 'lucide-react';
 import { useReports, useResolveReport } from '../../hooks/useAdminData';
+import { Report } from '../../types';
 
 export function CommunityManagementSection() {
     const [filter, setFilter] = useState("all");
@@ -142,7 +143,7 @@ export function CommunityManagementSection() {
                             <div>
                                 <p className="text-sm text-gray-600">미처리 신고</p>
                                 <p className="text-2xl font-bold text-red-600">
-                                    {reports.filter(r => r.status === 'pending').length}
+                                    {reports.filter((r: Report) => r.status === 'pending').length}
                                 </p>
                             </div>
                             <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
@@ -211,7 +212,7 @@ export function CommunityManagementSection() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {reports.map((report: any) => (
+                            {reports.map((report: Report) => (
                                 <TableRow key={report.id}>
                                     <TableCell>
                                         <div className="flex items-center gap-3">
@@ -255,7 +256,7 @@ export function CommunityManagementSection() {
                                                         size="sm"
                                                         variant="outline"
                                                         className="text-green-600 hover:text-green-700"
-                                                        onClick={() => handleResolveReport(report.id, 'resolved')}
+                                                        onClick={() => handleResolveReport(report.id.toString(), 'resolved')}
                                                         disabled={resolveReport.isPending}
                                                     >
                                                         <CheckCircle className="w-4 h-4" />
@@ -264,7 +265,7 @@ export function CommunityManagementSection() {
                                                         size="sm"
                                                         variant="outline"
                                                         className="text-red-600 hover:text-red-700"
-                                                        onClick={() => handleResolveReport(report.id, 'dismissed')}
+                                                        onClick={() => handleResolveReport(report.id.toString(), 'dismissed')}
                                                         disabled={resolveReport.isPending}
                                                     >
                                                         <XCircle className="w-4 h-4" />

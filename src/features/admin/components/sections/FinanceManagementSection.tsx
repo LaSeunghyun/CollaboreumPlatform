@@ -1,6 +1,6 @@
 import { useFinancialData } from '../../hooks/useAdminData';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/Card';
-import { Badge } from '@/shared/ui/Badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../../shared/ui/Card';
+import { Badge } from '../../../../shared/ui/Badge';
 import { DollarSign, TrendingUp, CreditCard, AlertCircle } from 'lucide-react';
 
 export function FinanceManagementSection() {

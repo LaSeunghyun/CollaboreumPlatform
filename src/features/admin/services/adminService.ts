@@ -1,4 +1,4 @@
-import { apiCall } from '@/services/api';
+import { apiCall } from '../../../services/api';
 import {
     AdminDashboardMetrics,
     User,
@@ -7,7 +7,10 @@ import {
     Report,
     FinancialData,
     AdminNotification,
-    SystemMetrics
+    SystemMetrics,
+    UsersResponse,
+    ArtworksResponse,
+    ReportsResponse
 } from '../types';
 
 export const adminService = {
@@ -24,7 +27,7 @@ export const adminService = {
         limit?: number;
         sortBy?: string;
         order?: 'asc' | 'desc';
-    }) => {
+    }): Promise<UsersResponse> => {
         const queryParams = new URLSearchParams();
         if (params?.role) queryParams.append('role', params.role);
         if (params?.status) queryParams.append('status', params.status);
@@ -35,7 +38,7 @@ export const adminService = {
         if (params?.order) queryParams.append('order', params.order);
 
         const queryString = queryParams.toString();
-        return apiCall(`/admin/users${queryString ? `?${queryString}` : ''}`);
+        return apiCall(`/admin/users${queryString ? `?${queryString}` : ''}`) as Promise<UsersResponse>;
     },
 
     updateUserStatus: (userId: string, status: string, reason?: string) =>
@@ -50,7 +53,7 @@ export const adminService = {
             body: JSON.stringify({ role })
         }),
 
-    suspendUser: (userId: string, reason?: string) =>
+    suspendUser: (userId: string, reason: string) =>
         apiCall(`/admin/users/${userId}/suspend`, {
             method: 'POST',
             body: JSON.stringify({ reason })
@@ -65,20 +68,26 @@ export const adminService = {
     getFundingProjects: (params?: {
         status?: string;
         approvalStatus?: string;
+        search?: string;
         page?: number;
         limit?: number;
+        sortBy?: string;
+        order?: 'asc' | 'desc';
     }) => {
         const queryParams = new URLSearchParams();
         if (params?.status) queryParams.append('status', params.status);
         if (params?.approvalStatus) queryParams.append('approval_status', params.approvalStatus);
+        if (params?.search) queryParams.append('search', params.search);
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.limit) queryParams.append('limit', params.limit.toString());
+        if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+        if (params?.order) queryParams.append('order', params.order);
 
         const queryString = queryParams.toString();
         return apiCall(`/admin/funding/projects${queryString ? `?${queryString}` : ''}`);
     },
 
-    updateProjectApproval: (projectId: string, approvalStatus: string, feedback?: string) =>
+    updateProjectApproval: (projectId: string, approvalStatus: boolean, feedback?: string) =>
         apiCall(`/admin/funding/projects/${projectId}/approval`, {
             method: 'PATCH',
             body: JSON.stringify({ approvalStatus, feedback })
@@ -91,39 +100,49 @@ export const adminService = {
         search?: string;
         page?: number;
         limit?: number;
-    }) => {
+        sortBy?: string;
+        order?: 'asc' | 'desc';
+    }): Promise<ArtworksResponse> => {
         const queryParams = new URLSearchParams();
         if (params?.status) queryParams.append('status', params.status);
         if (params?.category) queryParams.append('category', params.category);
         if (params?.search) queryParams.append('search', params.search);
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.limit) queryParams.append('limit', params.limit.toString());
+        if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+        if (params?.order) queryParams.append('order', params.order);
 
         const queryString = queryParams.toString();
-        return apiCall(`/admin/artworks${queryString ? `?${queryString}` : ''}`);
+        return apiCall(`/admin/artworks${queryString ? `?${queryString}` : ''}`) as Promise<ArtworksResponse>;
     },
 
-    updateArtworkStatus: (artworkId: string, status: string) =>
+    updateArtworkStatus: (artworkId: string, status: string, reason?: string) =>
         apiCall(`/admin/artworks/${artworkId}/status`, {
             method: 'PATCH',
-            body: JSON.stringify({ status })
+            body: JSON.stringify({ status, reason })
         }),
 
     // 신고 관리
     getReports: (params?: {
         status?: string;
         type?: string;
+        search?: string;
         page?: number;
         limit?: number;
-    }) => {
+        sortBy?: string;
+        order?: 'asc' | 'desc';
+    }): Promise<ReportsResponse> => {
         const queryParams = new URLSearchParams();
         if (params?.status) queryParams.append('status', params.status);
         if (params?.type) queryParams.append('type', params.type);
+        if (params?.search) queryParams.append('search', params.search);
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.limit) queryParams.append('limit', params.limit.toString());
+        if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+        if (params?.order) queryParams.append('order', params.order);
 
         const queryString = queryParams.toString();
-        return apiCall(`/admin/reports${queryString ? `?${queryString}` : ''}`);
+        return apiCall(`/admin/reports${queryString ? `?${queryString}` : ''}`) as Promise<ReportsResponse>;
     },
 
     resolveReport: (reportId: string, resolution: string, actionTaken?: string, notes?: string) =>
@@ -155,4 +174,5 @@ export const adminService = {
 
     getFundingPerformanceData: (period: string = 'monthly', months: number = 8) =>
         apiCall(`/admin/analytics/funding-performance?period=${period}&months=${months}`),
+
 };

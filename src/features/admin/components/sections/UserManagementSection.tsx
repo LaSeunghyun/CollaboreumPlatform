@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/shared/ui/Input';
 import { Search, Eye, Ban, CheckCircle, UserCheck, UserX } from 'lucide-react';
 import { useUsers, useUpdateUserStatus, useSuspendUser, useRestoreUser } from '../../hooks/useAdminData';
+import { User } from '../../types';
 
 export function UserManagementSection() {
     const [filter, setFilter] = useState("all");
@@ -127,7 +128,7 @@ export function UserManagementSection() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {users.map((user: any) => (
+                            {users.map((user: User) => (
                                 <TableRow key={user.id}>
                                     <TableCell>
                                         <div className="flex items-center gap-3">
@@ -166,7 +167,7 @@ export function UserManagementSection() {
                                                     size="sm"
                                                     variant="outline"
                                                     className="text-red-600 hover:text-red-700"
-                                                    onClick={() => handleStatusChange(user.id, 'suspended')}
+                                                    onClick={() => handleStatusChange(user.id.toString(), 'suspended')}
                                                     disabled={suspendUser.isPending}
                                                 >
                                                     <Ban className="w-4 h-4" />
@@ -176,7 +177,7 @@ export function UserManagementSection() {
                                                     size="sm"
                                                     variant="outline"
                                                     className="text-green-600 hover:text-green-700"
-                                                    onClick={() => handleStatusChange(user.id, 'active')}
+                                                    onClick={() => handleStatusChange(user.id.toString(), 'active')}
                                                     disabled={restoreUser.isPending}
                                                 >
                                                     <CheckCircle className="w-4 h-4" />

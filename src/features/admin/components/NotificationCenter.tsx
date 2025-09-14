@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/Card';
-import { Button } from '@/shared/ui/Button';
-import { Badge } from '@/shared/ui/Badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/Avatar';
-import { ScrollArea } from '@/shared/ui/ScrollArea';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../shared/ui/Card';
+import { Button } from '../../../shared/ui/Button';
+import { Badge } from '../../../shared/ui/Badge';
+import { Avatar, AvatarFallback, AvatarImage } from '../../../shared/ui/Avatar';
+import { ScrollArea } from '../../../shared/ui/ScrollArea';
 import {
     Bell,
     AlertTriangle,

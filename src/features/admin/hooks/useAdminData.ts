@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminService } from '../services/adminService';
-import { AdminDashboardMetrics, User, FundingProject, Artwork, Report, FinancialData, AdminNotification, SystemMetrics } from '../types';
+import { AdminDashboardMetrics, User, FundingProject, Artwork, Report, FinancialData, AdminNotification, SystemMetrics, UsersResponse, ArtworksResponse, ReportsResponse } from '../types';
 
 // 대시보드 메트릭
 export const useAdminMetrics = () => {
@@ -22,7 +22,7 @@ export const useUsers = (params?: {
     sortBy?: string;
     order?: 'asc' | 'desc';
 }) => {
-    return useQuery({
+    return useQuery<UsersResponse>({
         queryKey: ['admin', 'users', params],
         queryFn: () => adminService.getUsers(params),
         staleTime: 5 * 60 * 1000, // 5분
@@ -58,7 +58,7 @@ export const useSuspendUser = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ userId, reason }: { userId: string; reason?: string }) =>
+        mutationFn: ({ userId, reason }: { userId: string; reason: string }) =>
             adminService.suspendUser(userId, reason),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
@@ -99,7 +99,7 @@ export const useUpdateProjectApproval = () => {
     return useMutation({
         mutationFn: ({ projectId, approvalStatus, feedback }: {
             projectId: string;
-            approvalStatus: string;
+            approvalStatus: boolean;
             feedback?: string
         }) => adminService.updateProjectApproval(projectId, approvalStatus, feedback),
         onSuccess: () => {
@@ -116,8 +116,10 @@ export const useArtworks = (params?: {
     search?: string;
     page?: number;
     limit?: number;
+    sortBy?: string;
+    order?: 'asc' | 'desc';
 }) => {
-    return useQuery({
+    return useQuery<ArtworksResponse>({
         queryKey: ['admin', 'artworks', params],
         queryFn: () => adminService.getArtworks(params),
         staleTime: 5 * 60 * 1000, // 5분
@@ -128,8 +130,8 @@ export const useUpdateArtworkStatus = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ artworkId, status }: { artworkId: string; status: string }) =>
-            adminService.updateArtworkStatus(artworkId, status),
+        mutationFn: ({ artworkId, status, reason }: { artworkId: string; status: string; reason?: string }) =>
+            adminService.updateArtworkStatus(artworkId, status, reason),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'artworks'] });
             queryClient.invalidateQueries({ queryKey: ['admin', 'metrics'] });
@@ -141,10 +143,13 @@ export const useUpdateArtworkStatus = () => {
 export const useReports = (params?: {
     status?: string;
     type?: string;
+    search?: string;
     page?: number;
     limit?: number;
+    sortBy?: string;
+    order?: 'asc' | 'desc';
 }) => {
-    return useQuery({
+    return useQuery<ReportsResponse>({
         queryKey: ['admin', 'reports', params],
         queryFn: () => adminService.getReports(params),
         staleTime: 2 * 60 * 1000, // 2분

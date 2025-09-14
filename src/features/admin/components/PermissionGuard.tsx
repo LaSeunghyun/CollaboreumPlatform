@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { useAdminPermissions } from '../hooks/useAdminPermissions';
 import { AdminPermissions } from '../types';
-import { Card, CardContent } from '@/shared/ui/Card';
+import { Card, CardContent } from '../../../shared/ui/Card';
 import { AlertTriangle, Lock } from 'lucide-react';
 
 interface PermissionGuardProps {

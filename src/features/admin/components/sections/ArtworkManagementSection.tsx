@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/shared/ui/Input';
 import { Search, Eye, CheckCircle2, XCircle, Clock, Image, Edit, Trash2 } from 'lucide-react';
 import { useArtworks, useUpdateArtworkStatus } from '../../hooks/useAdminData';
+import { Artwork } from '../../types';
 
 export function ArtworkManagementSection() {
     const [filter, setFilter] = useState("all");
@@ -109,7 +110,7 @@ export function ArtworkManagementSection() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {artworks.map((artwork: any) => (
+                            {artworks.map((artwork: Artwork) => (
                                 <TableRow key={artwork.id}>
                                     <TableCell>
                                         <div className="flex items-center gap-3">
@@ -169,7 +170,7 @@ export function ArtworkManagementSection() {
                                                         size="sm"
                                                         variant="outline"
                                                         className="text-green-600 hover:text-green-700"
-                                                        onClick={() => handleStatusChange(artwork.id, 'approved')}
+                                                        onClick={() => handleStatusChange(artwork.id.toString(), 'approved')}
                                                         disabled={updateArtworkStatus.isPending}
                                                     >
                                                         <CheckCircle2 className="w-4 h-4" />
@@ -178,7 +179,7 @@ export function ArtworkManagementSection() {
                                                         size="sm"
                                                         variant="outline"
                                                         className="text-red-600 hover:text-red-700"
-                                                        onClick={() => handleStatusChange(artwork.id, 'rejected')}
+                                                        onClick={() => handleStatusChange(artwork.id.toString(), 'rejected')}
                                                         disabled={updateArtworkStatus.isPending}
                                                     >
                                                         <XCircle className="w-4 h-4" />
@@ -190,7 +191,7 @@ export function ArtworkManagementSection() {
                                                     size="sm"
                                                     variant="outline"
                                                     className="text-blue-600 hover:text-blue-700"
-                                                    onClick={() => handleStatusChange(artwork.id, 'pending')}
+                                                    onClick={() => handleStatusChange(artwork.id.toString(), 'pending')}
                                                     disabled={updateArtworkStatus.isPending}
                                                 >
                                                     <Clock className="w-4 h-4" />

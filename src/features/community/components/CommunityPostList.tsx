@@ -17,7 +17,7 @@ import {
     ProjectListSkeleton,
     EmptyState,
     ErrorMessage
-} from '@/shared/ui'
+} from '../../../shared/ui'
 import {
     Heart,
     MessageCircle,

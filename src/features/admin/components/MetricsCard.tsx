@@ -1,5 +1,5 @@
-import { Card, CardContent } from '@/shared/ui/Card';
-import { Badge } from '@/shared/ui/Badge';
+import { Card, CardContent } from '../../../shared/ui/Card';
+import { Badge } from '../../../shared/ui/Badge';
 import { LucideIcon } from 'lucide-react';
 
 interface MetricsCardProps {

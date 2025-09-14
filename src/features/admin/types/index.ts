@@ -159,3 +159,44 @@ export interface FinancialData {
     investorReturns: number;
     pendingPayments: number;
 }
+
+// API 응답 타입들
+export interface PaginatedResponse<T> {
+    data: T[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
+}
+
+export interface UsersResponse {
+    users: User[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
+}
+
+export interface ArtworksResponse {
+    artworks: Artwork[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
+}
+
+export interface ReportsResponse {
+    reports: Report[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
+}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@/shared/ui/Button';
-import { Badge } from '@/shared/ui/Badge';
-import { Card, CardContent } from '@/shared/ui/Card';
+import { Button } from '../../../shared/ui/Button';
+import { Badge } from '../../../shared/ui/Badge';
+import { Card, CardContent } from '../../../shared/ui/Card';
 import {
     AlertTriangle,
     Clock,
@@ -211,7 +211,7 @@ export function RealTimeAlerts() {
                                     >
                                         <motion.div
                                             className={`h-full ${alert.type === 'critical' ? 'bg-red-500' :
-                                                    alert.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+                                                alert.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
                                                 }`}
                                             initial={{ width: "100%" }}
                                             animate={{ width: "0%" }}

@@ -1,8 +1,8 @@
 import { useAdminMetrics } from '../../hooks/useAdminData';
 import { MetricsCard } from '../MetricsCard';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/Card';
-import { Badge } from '@/shared/ui/Badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/Avatar';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../../shared/ui/Card';
+import { Badge } from '../../../../shared/ui/Badge';
+import { Avatar, AvatarFallback, AvatarImage } from '../../../../shared/ui/Avatar';
 import {
     Users,
     UserCheck,

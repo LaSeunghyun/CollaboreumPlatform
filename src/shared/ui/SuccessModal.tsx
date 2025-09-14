@@ -1,65 +1,33 @@
-import React from 'react'
-import { CheckCircle } from 'lucide-react'
-import { Modal, ModalContent, ModalHeader, ModalTitle, ModalDescription, ModalFooter } from './Modal'
-import { Button } from './Button'
+import * as React from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./Dialog"
+import { CheckCircle } from "lucide-react"
 
 interface SuccessModalProps {
-    open: boolean
-    onOpenChange: (open: boolean) => void
-    title: string
-    description?: string
-    onConfirm?: () => void
-    confirmText?: string
-    showConfirmButton?: boolean
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  title?: string
+  message?: string
 }
 
-export function SuccessModal({
-    open,
-    onOpenChange,
-    title,
-    description,
-    onConfirm,
-    confirmText = '확인',
-    showConfirmButton = true
+export function SuccessModal({ 
+  open, 
+  onOpenChange, 
+  title = "성공", 
+  message = "작업이 완료되었습니다." 
 }: SuccessModalProps) {
-    const handleConfirm = () => {
-        onConfirm?.()
-        onOpenChange(false)
-    }
-
-    return (
-        <Modal
-            open={open}
-            onOpenChange={onOpenChange}
-            size="sm"
-            titleId="success-modal-title"
-            descriptionId="success-modal-description"
-        >
-            <ModalHeader>
-                <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-success-100 rounded-full">
-                    <CheckCircle className="w-6 h-6 text-success-600" />
-                </div>
-                <ModalTitle id="success-modal-title" className="text-center">
-                    {title}
-                </ModalTitle>
-                {description && (
-                    <ModalDescription id="success-modal-description" className="text-center">
-                        {description}
-                    </ModalDescription>
-                )}
-            </ModalHeader>
-
-            <ModalFooter>
-                {showConfirmButton && (
-                    <Button
-                        onClick={handleConfirm}
-                        className="w-full"
-                        tone="success"
-                    >
-                        {confirmText}
-                    </Button>
-                )}
-            </ModalFooter>
-        </Modal>
-    )
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-green-500" />
+            {title}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          <p className="text-sm text-muted-foreground">{message}</p>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
 }

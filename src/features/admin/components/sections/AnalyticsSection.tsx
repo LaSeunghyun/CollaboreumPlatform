@@ -1,6 +1,6 @@
 import { useUserGrowthData, useFundingPerformanceData } from '../../hooks/useAdminData';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/Card';
-import { Badge } from '@/shared/ui/Badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../../shared/ui/Card';
+import { Badge } from '../../../../shared/ui/Badge';
 import { Users, TrendingUp, DollarSign, Activity, BarChart3, PieChart } from 'lucide-react';
 
 export function AnalyticsSection() {

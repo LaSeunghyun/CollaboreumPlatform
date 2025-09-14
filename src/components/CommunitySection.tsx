@@ -1,6 +1,6 @@
-import { Card, CardContent } from "@/shared/ui/Card";
-import { Badge } from "@/shared/ui/Badge";
-import { Button } from "@/shared/ui/Button";
+import { Card, CardContent } from "../shared/ui/Card";
+import { Badge } from "../shared/ui/Badge";
+import { Button } from "../shared/ui/Button";
 import { MessageCircle, Heart, Calendar, MapPin, Clock, Users } from "lucide-react";
 import { useCommunityPosts } from "../lib/api/useCommunityPosts";
 import { useUpcomingEvents } from "../lib/api/useEvents";

@@ -1,5 +1,5 @@
 import { useState, lazy, Suspense } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/Tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../shared/ui/Tabs';
 import { AdminLayout } from './AdminLayout';
 import { PermissionGuard } from './PermissionGuard';
 import { NotificationCenter } from './NotificationCenter';
