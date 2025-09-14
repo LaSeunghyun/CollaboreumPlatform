@@ -12,6 +12,7 @@ import { useCommunityPosts, useCreateCommunityPost } from '../../features/commun
 import { LoadingState, ErrorState, EmptyCommunityState } from '../../components/organisms/States';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCommunityStats } from '../../lib/api/useStats';
+import { useCategories } from '../../lib/api/useCategories';
 import { Badge } from '../../components/ui/badge';
 
 export const CommunityPage: React.FC = () => {
@@ -35,31 +36,14 @@ export const CommunityPage: React.FC = () => {
         order: sortBy === 'latest' ? 'desc' : 'desc',
     });
 
-    const { data: questionPosts, isLoading: questionLoading, error: questionError } = useCommunityPosts({
-        category: 'question',
-        search: searchQuery || undefined,
-        sortBy: sortBy === "latest" ? "createdAt" : "likes",
-        order: sortBy === 'latest' ? 'desc' : 'desc',
-    });
-
-    const { data: reviewPosts, isLoading: reviewLoading, error: reviewError } = useCommunityPosts({
-        category: 'review',
-        search: searchQuery || undefined,
-        sortBy: sortBy === "latest" ? "createdAt" : "likes",
-        order: sortBy === 'latest' ? 'desc' : 'desc',
-    });
-
-    const { data: freePosts, isLoading: freeLoading, error: freeError } = useCommunityPosts({
-        category: 'free',
-        search: searchQuery || undefined,
-        sortBy: sortBy === "latest" ? "createdAt" : "likes",
-        order: sortBy === 'latest' ? 'desc' : 'desc',
-    });
 
     const createPostMutation = useCreateCommunityPost();
 
     // 커뮤니티 통계 조회
     const { data: communityStats, isLoading: statsLoading } = useCommunityStats();
+
+    // 카테고리 목록 조회
+    const { data: categories, isLoading: categoriesLoading } = useCategories();
 
     const handleCreatePost = () => {
         setIsCreateModalOpen(true);
@@ -176,9 +160,7 @@ export const CommunityPage: React.FC = () => {
                             <div className="col-span-5">
                                 <div className="flex items-center gap-2 mb-1">
                                     <Badge variant="secondary" className="text-xs">
-                                        {post.category === 'question' ? '질문' :
-                                            post.category === 'review' ? '후기' :
-                                                post.category === 'free' ? '자유' : post.category}
+                                        {categories?.find(cat => cat.id === post.category)?.label || post.category}
                                     </Badge>
                                     {post.isHot && (
                                         <Badge variant="destructive" className="text-xs">
@@ -249,9 +231,7 @@ export const CommunityPage: React.FC = () => {
                                 >
                                     <div className="flex items-center gap-2 mb-2">
                                         <Badge variant="secondary" className="text-xs">
-                                            {post.category === 'question' ? '질문' :
-                                                post.category === 'review' ? '후기' :
-                                                    post.category === 'free' ? '자유' : post.category}
+                                            {categories?.find(cat => cat.id === post.category)?.label || post.category}
                                         </Badge>
                                         {post.isHot && (
                                             <Badge variant="destructive" className="text-xs">
@@ -326,9 +306,15 @@ export const CommunityPage: React.FC = () => {
                                                     <SelectValue placeholder="카테고리를 선택하세요" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="question">질문</SelectItem>
-                                                    <SelectItem value="review">후기</SelectItem>
-                                                    <SelectItem value="free">자유</SelectItem>
+                                                    {categoriesLoading ? (
+                                                        <SelectItem value="loading" disabled>카테고리 로딩 중...</SelectItem>
+                                                    ) : (
+                                                        categories?.map((category) => (
+                                                            <SelectItem key={category.id} value={category.id}>
+                                                                {category.label}
+                                                            </SelectItem>
+                                                        ))
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -373,11 +359,20 @@ export const CommunityPage: React.FC = () => {
                             <div className="flex items-center justify-between flex-wrap gap-4">
                                 {/* 카테고리 탭 */}
                                 <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-                                    <TabsList className="grid w-full grid-cols-4 max-w-lg">
+                                    <TabsList className={`grid w-full max-w-lg ${categories ? `grid-cols-${(categories.length + 1)}` : 'grid-cols-4'}`}>
                                         <TabsTrigger value="all">전체</TabsTrigger>
-                                        <TabsTrigger value="question">질문</TabsTrigger>
-                                        <TabsTrigger value="review">후기</TabsTrigger>
-                                        <TabsTrigger value="free">자유</TabsTrigger>
+                                        {categoriesLoading ? (
+                                            <>
+                                                <TabsTrigger value="loading1" disabled>로딩중...</TabsTrigger>
+                                                <TabsTrigger value="loading2" disabled>로딩중...</TabsTrigger>
+                                            </>
+                                        ) : (
+                                            categories?.map((category) => (
+                                                <TabsTrigger key={category.id} value={category.id}>
+                                                    {category.label}
+                                                </TabsTrigger>
+                                            ))
+                                        )}
                                     </TabsList>
                                 </Tabs>
 
@@ -415,33 +410,6 @@ export const CommunityPage: React.FC = () => {
                     <div className="max-w-7xl mx-auto px-4">
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
 
-                            <TabsContent value="question" className="space-y-6">
-                                {renderPosts(
-                                    (questionPosts as any)?.posts || [],
-                                    questionLoading,
-                                    questionError,
-                                    'question'
-                                )}
-                            </TabsContent>
-
-                            <TabsContent value="review" className="space-y-6">
-                                {renderPosts(
-                                    (reviewPosts as any)?.posts || [],
-                                    reviewLoading,
-                                    reviewError,
-                                    'review'
-                                )}
-                            </TabsContent>
-
-                            <TabsContent value="free" className="space-y-6">
-                                {renderPosts(
-                                    (freePosts as any)?.posts || [],
-                                    freeLoading,
-                                    freeError,
-                                    'free'
-                                )}
-                            </TabsContent>
-
                             <TabsContent value="all" className="space-y-6">
                                 {renderPosts(
                                     (allPosts as any)?.posts || [],
@@ -450,6 +418,27 @@ export const CommunityPage: React.FC = () => {
                                     'all'
                                 )}
                             </TabsContent>
+
+                            {categories?.map((category) => {
+                                // 각 카테고리별로 게시글 데이터를 가져오는 로직
+                                const categoryPosts = useCommunityPosts({
+                                    category: category.id,
+                                    search: searchQuery || undefined,
+                                    sortBy: sortBy === "latest" ? "createdAt" : "likes",
+                                    order: sortBy === 'latest' ? 'desc' : 'desc',
+                                });
+
+                                return (
+                                    <TabsContent key={category.id} value={category.id} className="space-y-6">
+                                        {renderPosts(
+                                            (categoryPosts.data as any)?.posts || [],
+                                            categoryPosts.isLoading,
+                                            categoryPosts.error,
+                                            category.id
+                                        )}
+                                    </TabsContent>
+                                );
+                            })}
 
                         </Tabs>
                     </div>

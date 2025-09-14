@@ -1,22 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
-import { categoryAPI } from '../../services/api';
+import { useQuery } from '@tanstack/react-query'
+import { communityApi } from '../../features/community/api/communityApi'
+import type { CommunityCategory } from '../../features/community/types'
 
-// 모든 카테고리 조회
 export const useCategories = () => {
-    return useQuery({
+    return useQuery<CommunityCategory[]>({
         queryKey: ['categories'],
-        queryFn: () => categoryAPI.getAllCategories(),
-        staleTime: 30 * 60 * 1000, // 30분
-        gcTime: 60 * 60 * 1000, // 1시간
-    });
-};
-
-// 특정 카테고리 조회
-export const useCategory = (categoryId: string) => {
-    return useQuery({
-        queryKey: ['category', categoryId],
-        queryFn: () => categoryAPI.getCategoryById(categoryId),
-        enabled: !!categoryId,
-        staleTime: 30 * 60 * 1000,
-    });
-};
+        queryFn: () => communityApi.getCategories(),
+        staleTime: 5 * 60 * 1000, // 5분
+        gcTime: 10 * 60 * 1000, // 10분
+    })
+}
