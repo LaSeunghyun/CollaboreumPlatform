@@ -4,12 +4,12 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { ScrollArea } from "../ui/scroll-area";
-import { 
-  Bell, 
-  AlertTriangle, 
-  Clock, 
-  DollarSign, 
-  Users, 
+import {
+  Bell,
+  AlertTriangle,
+  Clock,
+  DollarSign,
+  Users,
   MessageSquare,
   TrendingUp,
   Shield,
@@ -126,7 +126,7 @@ export function NotificationCenter({ className = "" }: NotificationCenterProps) 
 
   const getNotificationIcon = (category: string, type: string) => {
     const iconClass = "w-4 h-4";
-    
+
     switch (category) {
       case "funding":
         return <DollarSign className={iconClass} />;
@@ -179,9 +179,9 @@ export function NotificationCenter({ className = "" }: NotificationCenterProps) 
   });
 
   const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(notification => 
-        notification.id === id 
+    setNotifications(prev =>
+      prev.map(notification =>
+        notification.id === id
           ? { ...notification, read: true }
           : notification
       )
@@ -189,7 +189,7 @@ export function NotificationCenter({ className = "" }: NotificationCenterProps) 
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => 
+    setNotifications(prev =>
       prev.map(notification => ({ ...notification, read: true }))
     );
   };
@@ -202,7 +202,7 @@ export function NotificationCenter({ className = "" }: NotificationCenterProps) 
     const now = new Date();
     const notificationTime = new Date(timestamp);
     const diffInHours = Math.floor((now.getTime() - notificationTime.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor((now.getTime() - notificationTime.getTime()) / (1000 * 60));
       return `${diffInMinutes}분 전`;
@@ -229,10 +229,10 @@ export function NotificationCenter({ className = "" }: NotificationCenterProps) 
           read: false
         }
       ];
-      
+
       // 10% 확률로 새 알림 추가 (데모용)
-      if (Math.random() < 0.1) {
-        setNotifications(prev => [randomNotifications[0], ...prev]);
+      if (Math.random() < 0.1 && randomNotifications[0]) {
+        setNotifications(prev => [randomNotifications[0] as AdminNotification, ...prev]);
       }
     }, 30000); // 30초마다 체크
 
@@ -324,9 +324,9 @@ export function NotificationCenter({ className = "" }: NotificationCenterProps) 
                           {notification.relatedUser && (
                             <div className="flex items-center gap-1">
                               <Avatar className="w-4 h-4">
-                                <AvatarImage 
-                                  src={notification.relatedUser.avatar} 
-                                  alt={notification.relatedUser.name} 
+                                <AvatarImage
+                                  src={notification.relatedUser.avatar}
+                                  alt={notification.relatedUser.name}
                                 />
                                 <AvatarFallback className="text-xs">
                                   {notification.relatedUser.name.charAt(0)}

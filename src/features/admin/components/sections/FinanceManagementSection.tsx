@@ -1,7 +1,7 @@
 import { useFinancialData } from '../../hooks/useAdminData';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../shared/ui/Card';
 import { Badge } from '../../../../shared/ui/Badge';
-import { DollarSign, TrendingUp, CreditCard, AlertCircle } from 'lucide-react';
+import { DollarSign, TrendingUp, CreditCard, AlertCircle, Calendar } from 'lucide-react';
 
 export function FinanceManagementSection() {
     const { data: financialData, isLoading, error } = useFinancialData();
@@ -148,7 +148,7 @@ export function FinanceManagementSection() {
             </div>
 
             {/* 알림 영역 */}
-            {financialData[0]?.pendingPayments > 1000000 && (
+            {financialData && financialData.length > 0 && financialData[0] && financialData[0].pendingPayments > 1000000 && (
                 <Card className="border-yellow-200 bg-yellow-50">
                     <CardContent className="p-4">
                         <div className="flex items-center gap-2">

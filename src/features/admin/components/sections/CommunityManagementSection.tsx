@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/Card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/Table';
-import { Badge } from '@/shared/ui/Badge';
-import { Button } from '@/shared/ui/Button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/Avatar';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/Select';
-import { Input } from '@/shared/ui/Input';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../../shared/ui/Card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../../shared/ui/Table';
+import { Badge } from '../../../../shared/ui/Badge';
+import { Button } from '../../../../shared/ui/Button';
+import { Avatar, AvatarFallback, AvatarImage } from '../../../../shared/ui/Avatar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../shared/ui/Select';
+import { Input } from '../../../../shared/ui/Input';
 import { Search, Eye, CheckCircle, XCircle, MessageSquare, Users, TrendingUp } from 'lucide-react';
 import { useReports, useResolveReport } from '../../hooks/useAdminData';
 import { Report } from '../../types';
