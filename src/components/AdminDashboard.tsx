@@ -128,9 +128,9 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
 
   const filteredArtworks = artworks.filter((artwork) => {
     const matchesFilter = artworkFilter === "전체" || artwork.status === artworkFilter;
-    const matchesSearch = artwork.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      artwork.artist.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      artwork.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = artwork.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      artwork.artist?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      artwork.category?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -364,7 +364,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                           {getStatusBadge(artwork.status)}
                         </div>
                         <p className="text-xs text-gray-600 mb-2">{artwork.artist} • {artwork.category}</p>
-                        <p className="text-sm">{artwork.description.substring(0, 60)}...</p>
+                        <p className="text-sm">{artwork.description?.substring(0, 60) || '설명 없음'}...</p>
                       </div>
                     ))}
                   </div>
@@ -606,7 +606,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                           <div className="flex items-center gap-2">
                             <Avatar className="w-8 h-8">
                               <AvatarImage src={artwork.artistAvatar} alt={artwork.artist} />
-                              <AvatarFallback>{artwork.artist.charAt(0)}</AvatarFallback>
+                              <AvatarFallback>{artwork.artist?.charAt(0) || 'A'}</AvatarFallback>
                             </Avatar>
                             <span>{artwork.artist}</span>
                           </div>
@@ -615,7 +615,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                           <Badge variant="outline">{artwork.category}</Badge>
                         </TableCell>
                         <TableCell>
-                          <span className="font-medium">₩{artwork.price.toLocaleString()}</span>
+                          <span className="font-medium">₩{artwork.price?.toLocaleString() || '0'}</span>
                         </TableCell>
                         <TableCell>
                           {getStatusBadge(artwork.status)}
@@ -864,7 +864,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-gray-700">가격</Label>
-                  <p className="text-gray-900">₩{selectedArtwork.price.toLocaleString()}</p>
+                  <p className="text-gray-900">₩{selectedArtwork.price?.toLocaleString() || '0'}</p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-gray-700">상태</Label>
@@ -878,7 +878,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
               <div>
                 <Label className="text-sm font-medium text-gray-700">태그</Label>
                 <div className="flex flex-wrap gap-2 mt-1">
-                  {selectedArtwork.tags.map((tag, index) => (
+                  {selectedArtwork.tags?.map((tag, index) => (
                     <Badge key={index} variant="outline">{tag}</Badge>
                   ))}
                 </div>
