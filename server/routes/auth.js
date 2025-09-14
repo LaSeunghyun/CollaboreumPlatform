@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();
-const authMiddleware = require('../middleware/auth');
+const auth = require('../middleware/auth');
 const { logger } = require('../src/logger');
 const { userEvents } = require('../src/logger/event');
 
@@ -267,9 +267,9 @@ router.post('/logout', async (req, res) => {
 });
 
 // 토큰 검증
-router.get('/verify', authMiddleware, async (req, res) => {
+router.get('/verify', auth, async (req, res) => {
   try {
-    // authMiddleware에서 이미 토큰 검증이 완료됨
+    // auth에서 이미 토큰 검증이 완료됨
     // req.user에는 검증된 사용자 정보가 포함되어 있음
     
     console.log(`🔍 토큰 검증 요청: ${req.user.email} (${req.user.role})`);
