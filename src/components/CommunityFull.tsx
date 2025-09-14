@@ -124,7 +124,7 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
                 <CardTitle className="text-lg">카테고리</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
+                <div className="flex flex-wrap gap-2">
                   {isLoadingCategories ? (
                     <div className="text-sm text-gray-500">카테고리 로딩 중...</div>
                   ) : (
@@ -135,9 +135,9 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
                           setSelectedCategory(category);
                           setSelectedArtist(null);
                         }}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedCategory === category
-                          ? "bg-blue-100 text-blue-800 font-medium"
-                          : "text-gray-600 hover:bg-gray-100"
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedCategory === category
+                          ? "bg-blue-100 text-blue-700 border-2 border-blue-300"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                           }`}
                       >
                         {category}

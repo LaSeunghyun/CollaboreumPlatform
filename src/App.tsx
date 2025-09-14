@@ -1,22 +1,11 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { queryClient } from './lib/queryClient';
 import { AuthProvider } from './contexts/AuthContext';
 import { Toast } from './components/organisms/Toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
-
-// Pages
-import { HomePage } from './pages/home/HomePage';
-import { ArtistsPage } from './pages/artists/ArtistsPage';
-import { ProjectsPage } from './pages/projects/ProjectsPage';
-import { CommunityPage } from './pages/community/CommunityPage';
-import { NoticesPage } from './pages/notices/NoticesPage';
-import { EventsPage } from './pages/events/EventsPage';
-import { AccountPage } from './pages/account/AccountPage';
-
-// Legacy components (기존 컴포넌트들)
 import { LoginPage } from './components/LoginPage';
 import { SignupPage } from './components/SignupPage';
 import { ArtistDashboard } from './components/ArtistDashboard';
@@ -29,15 +18,29 @@ import { ProjectDetail } from './components/ProjectDetail';
 import { EventDetail } from './components/EventDetail';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { CommunityPostDetail } from './components/CommunityPostDetail';
-import { useParams, useNavigate } from 'react-router-dom';
 import { CommunityPostForm } from './components/CommunityPostForm';
 import { About } from './components/About';
-
-// New Admin Dashboard
 import { AdminDashboard } from './features/admin/components/AdminDashboard';
-
-// Layout component
 import { AppLayout } from './components/layout/AppLayout';
+
+// Lazy load pages for better performance
+const HomePage = lazy(() => import('./pages/home/HomePage').then(module => ({ default: module.HomePage })));
+const ArtistsPage = lazy(() => import('./pages/artists/ArtistsPage').then(module => ({ default: module.ArtistsPage })));
+const ProjectsPage = lazy(() => import('./pages/projects/ProjectsPage').then(module => ({ default: module.ProjectsPage })));
+const CommunityPage = lazy(() => import('./pages/community/CommunityPage').then(module => ({ default: module.CommunityPage })));
+const NoticesPage = lazy(() => import('./pages/notices/NoticesPage').then(module => ({ default: module.NoticesPage })));
+const EventsPage = lazy(() => import('./pages/events/EventsPage').then(module => ({ default: module.EventsPage })));
+const AccountPage = lazy(() => import('./pages/account/AccountPage').then(module => ({ default: module.AccountPage })));
+
+// Loading component
+const PageLoading = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+      <p className="mt-4 text-gray-600">페이지를 불러오는 중...</p>
+    </div>
+  </div>
+);
 
 // CommunityPostDetail Wrapper for URL params
 const CommunityPostDetailWrapper: React.FC = () => {
@@ -61,16 +64,40 @@ function App() {
               <Toast />
               <Routes>
                 {/* Public Routes */}
-                <Route path="/" element={<AppLayout><HomePage /></AppLayout>} />
-                <Route path="/artists" element={<AppLayout><ArtistsPage /></AppLayout>} />
+                <Route path="/" element={
+                  <Suspense fallback={<PageLoading />}>
+                    <AppLayout><HomePage /></AppLayout>
+                  </Suspense>
+                } />
+                <Route path="/artists" element={
+                  <Suspense fallback={<PageLoading />}>
+                    <AppLayout><ArtistsPage /></AppLayout>
+                  </Suspense>
+                } />
                 <Route path="/artists/:handle" element={<AppLayout><ArtistProfile artistId={0} onBack={() => { }} /></AppLayout>} />
-                <Route path="/projects" element={<AppLayout><ProjectsPage /></AppLayout>} />
+                <Route path="/projects" element={
+                  <Suspense fallback={<PageLoading />}>
+                    <AppLayout><ProjectsPage /></AppLayout>
+                  </Suspense>
+                } />
                 <Route path="/projects/:slug" element={<AppLayout><ProjectDetail projectId={0} onBack={() => { }} /></AppLayout>} />
-                <Route path="/community" element={<AppLayout><CommunityPage /></AppLayout>} />
+                <Route path="/community" element={
+                  <Suspense fallback={<PageLoading />}>
+                    <AppLayout><CommunityPage /></AppLayout>
+                  </Suspense>
+                } />
                 <Route path="/community/post/:id" element={<AppLayout><CommunityPostDetailWrapper /></AppLayout>} />
-                <Route path="/notices" element={<AppLayout><NoticesPage /></AppLayout>} />
+                <Route path="/notices" element={
+                  <Suspense fallback={<PageLoading />}>
+                    <AppLayout><NoticesPage /></AppLayout>
+                  </Suspense>
+                } />
                 <Route path="/notices/:id" element={<AppLayout><CommunityPostDetail postId="" /></AppLayout>} />
-                <Route path="/events" element={<AppLayout><EventsPage /></AppLayout>} />
+                <Route path="/events" element={
+                  <Suspense fallback={<PageLoading />}>
+                    <AppLayout><EventsPage /></AppLayout>
+                  </Suspense>
+                } />
                 <Route path="/events/:id" element={<AppLayout><EventDetail eventId="" onBack={() => { }} /></AppLayout>} />
 
                 {/* Auth Routes */}
@@ -80,7 +107,9 @@ function App() {
                 {/* Protected Routes */}
                 <Route path="/account" element={
                   <ProtectedRoute>
-                    <AppLayout><AccountPage /></AppLayout>
+                    <Suspense fallback={<PageLoading />}>
+                      <AppLayout><AccountPage /></AppLayout>
+                    </Suspense>
                   </ProtectedRoute>
                 } />
 

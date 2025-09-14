@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Badge } from './ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/Card';
+import { Button } from '@/shared/ui/Button';
+import { Input } from '@/shared/ui/Input';
+import { Textarea } from '@/shared/ui/Textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/Select';
+import { Badge } from '@/shared/ui/Badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/Avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/Tabs';
 import { ErrorRetry, LoadingRetry } from './ui/retry-button';
 
 import { communityPostAPI, communityCommentAPI } from '../services/api';
@@ -102,15 +102,6 @@ export const PostCreationForm: React.FC = () => {
     e.preventDefault();
     if (validateForm()) {
       try {
-        const API_BASE_URL = process.env.REACT_APP_API_URL ||
-          (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
-
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-          alert('로그인이 필요합니다.');
-          return;
-        }
-
         const postData = {
           title: formData.title,
           content: formData.content,
@@ -118,30 +109,21 @@ export const PostCreationForm: React.FC = () => {
           tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : []
         };
 
-        const response = await fetch(`${API_BASE_URL}/community/posts`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(postData)
+        await communityPostAPI.createPost(postData);
+
+        // 폼 초기화
+        setFormData({
+          title: '',
+          content: '',
+          category: '',
+          tags: ''
         });
 
-        if (response.ok) {
-          alert('게시글이 성공적으로 작성되었습니다.');
-          // 폼 초기화
-          setFormData({
-            title: '',
-            content: '',
-            category: '',
-            tags: ''
-          });
-          // 페이지 새로고침 또는 게시글 목록으로 이동
-          window.location.reload();
-        } else {
-          const errorData = await response.json();
-          alert(`게시글 작성 실패: ${errorData.message || '알 수 없는 오류가 발생했습니다.'}`);
-        }
+        // 성공 메시지 표시 (토스트 등으로 개선 가능)
+        alert('게시글이 성공적으로 작성되었습니다.');
+
+        // 페이지 새로고침 대신 React Query 캐시 무효화로 개선 가능
+        window.location.reload();
       } catch (error) {
         console.error('게시글 작성 실패:', error);
         alert('게시글 작성 중 오류가 발생했습니다.');
@@ -149,7 +131,7 @@ export const PostCreationForm: React.FC = () => {
     }
   };
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -247,19 +229,9 @@ export const PostList: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        // 실제 API 호출로 변경
-        const response = await fetch('/api/community/posts');
-        if (!response.ok) {
-          throw new Error('커뮤니티 포스트를 불러올 수 없습니다.');
-        }
-
-        const data = await response.json();
-        if (data.success) {
-          setPosts(data.data);
-          setFilteredPosts(data.data);
-        } else {
-          throw new Error(data.message || '커뮤니티 포스트를 불러올 수 없습니다.');
-        }
+        const data = await communityPostAPI.getPosts();
+        setPosts(data as CommunityPost[]);
+        setFilteredPosts(data as CommunityPost[]);
       } catch (error) {
         console.error('커뮤니티 포스트 로드 실패:', error);
         setError(error instanceof Error ? error.message : '커뮤니티 포스트를 불러올 수 없습니다.');

@@ -14,6 +14,48 @@ import { ArrowLeft, MessageSquare, Users, DollarSign, Clock, Search, Filter, Eye
 import { adminAPI } from '../services/api';
 import { dynamicConstantsService } from '../services/constantsService';
 
+// 타입 정의
+interface Inquiry {
+  id: string;
+  subject: string;
+  artist: string;
+  artistAvatar?: string;
+  category: string;
+  priority: '높음' | '중간' | '낮음';
+  status: '대기' | '진행중' | '완료';
+  assignedTo?: string;
+  date: string;
+}
+
+interface MatchingRequest {
+  id: string;
+  requestType: string;
+  requester: string;
+  requesterCategory: string;
+  description: string;
+  preferredCategory: string;
+  budget: string;
+  timeline: string;
+  status: '대기' | '진행중' | '완료';
+  applications: number;
+  date: string;
+}
+
+interface FinancialData {
+  month: string;
+  totalRevenue: number;
+  platformFee: number;
+  artistPayouts: number;
+  investorReturns: number;
+  pendingPayments: number;
+}
+
+interface ArtworkCategory {
+  id: string;
+  label: string;
+  icon: string;
+}
+
 interface AdminDashboardProps {
   onBack?: () => void;
 }
@@ -39,9 +81,9 @@ interface Artwork {
 export function AdminDashboard({ onBack }: AdminDashboardProps) {
   const [selectedTab, setSelectedTab] = useState("overview");
   const [inquiryFilter, setInquiryFilter] = useState("전체");
-  const [inquiries, setInquiries] = useState<any[]>([]);
-  const [matchingRequests, setMatchingRequests] = useState<any[]>([]);
-  const [financialData, setFinancialData] = useState<any[]>([]);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [matchingRequests, setMatchingRequests] = useState<MatchingRequest[]>([]);
+  const [financialData, setFinancialData] = useState<FinancialData[]>([]);
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState(true);
   const [artworkFilter, setArtworkFilter] = useState("전체");
@@ -60,7 +102,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
     tags: "",
     imageUrl: ""
   });
-  const [artworkCategories, setArtworkCategories] = useState<Array<{ id: string, label: string, icon: string }>>([]);
+  const [artworkCategories, setArtworkCategories] = useState<ArtworkCategory[]>([]);
 
   // 이전 페이지로 돌아가기
   const handleBack = () => {
@@ -95,25 +137,19 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
           dynamicConstantsService.getArtworkCategories()
         ]);
 
-        setInquiries(inquiriesData as any[]);
-        setMatchingRequests(matchingData as any[]);
-        setFinancialData(financialData as any[]);
+        setInquiries(inquiriesData as Inquiry[]);
+        setMatchingRequests(matchingData as MatchingRequest[]);
+        setFinancialData(financialData as FinancialData[]);
         setArtworks([]);
         setArtworkCategories(categoriesData);
       } catch (error) {
         console.error('Failed to fetch admin data:', error);
-        // API 실패 시 빈 데이터로 설정
+        // API 실패 시 빈 데이터로 설정 (더미 데이터 사용 금지)
         setInquiries([]);
         setMatchingRequests([]);
         setFinancialData([]);
         setArtworks([]);
-        setArtworkCategories([
-          { id: 'painting', label: '회화', icon: '🎨' },
-          { id: 'sculpture', label: '조각', icon: '🗿' },
-          { id: 'photography', label: '사진', icon: '📸' },
-          { id: 'digital', label: '디지털아트', icon: '💻' },
-          { id: 'craft', label: '공예', icon: '🛠️' }
-        ]);
+        setArtworkCategories([]);
       } finally {
         setLoading(false);
       }
@@ -122,7 +158,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
     fetchData();
   }, []);
 
-  const filteredInquiries = inquiries.filter((inquiry: any) =>
+  const filteredInquiries = inquiries.filter((inquiry: Inquiry) =>
     inquiryFilter === "전체" || inquiry.status === inquiryFilter
   );
 
@@ -180,13 +216,13 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800">대기중</Badge>;
+        return <Badge className="bg-warning-100 text-warning-800">대기중</Badge>;
       case 'approved':
-        return <Badge className="bg-green-100 text-green-800">승인됨</Badge>;
+        return <Badge className="bg-success-100 text-success-800">승인됨</Badge>;
       case 'rejected':
-        return <Badge className="bg-red-100 text-red-800">거부됨</Badge>;
+        return <Badge className="bg-danger-100 text-danger-800">거부됨</Badge>;
       default:
-        return <Badge className="bg-gray-100 text-gray-800">{status}</Badge>;
+        return <Badge className="bg-neutral-100 text-neutral-800">{status}</Badge>;
     }
   };
 
@@ -215,17 +251,17 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">데이터를 불러오는 중...</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600 mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">데이터를 불러오는 중...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -233,8 +269,8 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">관리자 대시보드</h1>
-            <p className="text-gray-600">플랫폼 운영 현황을 관리하고 모니터링하세요</p>
+            <h1 className="text-3xl font-bold text-foreground">관리자 대시보드</h1>
+            <p className="text-muted-foreground">플랫폼 운영 현황을 관리하고 모니터링하세요</p>
           </div>
         </div>
 
@@ -257,13 +293,13 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600">미처리 문의</p>
-                      <p className="text-2xl font-bold text-red-600">
+                      <p className="text-sm text-muted-foreground">미처리 문의</p>
+                      <p className="text-2xl font-bold text-danger-600">
                         {inquiries.filter(i => i.status === "대기").length}
                       </p>
                     </div>
-                    <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                      <MessageSquare className="w-6 h-6 text-red-600" />
+                    <div className="w-12 h-12 bg-danger-100 rounded-lg flex items-center justify-center">
+                      <MessageSquare className="w-6 h-6 text-danger-600" />
                     </div>
                   </div>
                 </CardContent>
@@ -273,13 +309,13 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600">매칭 대기</p>
-                      <p className="text-2xl font-bold text-yellow-600">
+                      <p className="text-sm text-muted-foreground">매칭 대기</p>
+                      <p className="text-2xl font-bold text-warning-600">
                         {matchingRequests.filter(r => r.status === "대기").length}
                       </p>
                     </div>
-                    <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                      <Users className="w-6 h-6 text-yellow-600" />
+                    <div className="w-12 h-12 bg-warning-100 rounded-lg flex items-center justify-center">
+                      <Users className="w-6 h-6 text-warning-600" />
                     </div>
                   </div>
                 </CardContent>
@@ -289,13 +325,13 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600">대기중 작품</p>
-                      <p className="text-2xl font-bold text-blue-600">
+                      <p className="text-sm text-muted-foreground">대기중 작품</p>
+                      <p className="text-2xl font-bold text-primary-600">
                         {artworks.filter(a => a.status === 'pending').length}
                       </p>
                     </div>
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Palette className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                      <Palette className="w-6 h-6 text-primary-600" />
                     </div>
                   </div>
                 </CardContent>
@@ -305,13 +341,16 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600">이번 달 매출</p>
-                      <p className="text-2xl font-bold text-green-600">
-                        ₩{(financialData.length > 0 ? financialData[0]?.totalRevenue / 1000000 : 0).toFixed(1)}M
+                      <p className="text-sm text-muted-foreground">이번 달 매출</p>
+                      <p className="text-2xl font-bold text-success-600">
+                        ₩{(() => {
+                          const firstData = financialData[0];
+                          return firstData ? (firstData.totalRevenue / 1000000).toFixed(1) : '0.0';
+                        })()}M
                       </p>
                     </div>
-                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                      <DollarSign className="w-6 h-6 text-green-600" />
+                    <div className="w-12 h-12 bg-success-100 rounded-lg flex items-center justify-center">
+                      <DollarSign className="w-6 h-6 text-success-600" />
                     </div>
                   </div>
                 </CardContent>

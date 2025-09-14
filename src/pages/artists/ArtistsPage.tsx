@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Search, Palette, BarChart3, Users, Heart, Star } from 'lucide-react';
 import { ArtistCard } from '../../components/molecules/ArtistCard';
 import { useArtists, usePopularArtists, useNewArtists } from '../../lib/api/useArtists';
+import { usePlatformStats } from '../../lib/api/useStats';
 import { LoadingState, ErrorState, EmptyArtistsState, SkeletonGrid } from '../../components/organisms/States';
 import { ArtistGallery } from '../../components/ArtistGallery';
 import { ArtistProfile } from '../../components/ArtistProfile';
@@ -26,6 +27,9 @@ export const ArtistsPage: React.FC = () => {
 
     const { data: popularArtists, isLoading: popularLoading, error: popularError } = usePopularArtists();
     const { data: newArtists, isLoading: newLoading, error: newError } = useNewArtists();
+
+    // 플랫폼 통계 조회
+    const { data: platformStats, isLoading: statsLoading, error: statsError } = usePlatformStats();
 
     const handleSearch = () => {
         // 검색 로직은 useArtists 훅이 자동으로 처리
@@ -174,46 +178,74 @@ export const ArtistsPage: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">총 아티스트</CardTitle>
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">1,234</div>
-                            <p className="text-xs text-muted-foreground">
-                                +12% 지난 달 대비
-                            </p>
-                        </CardContent>
-                    </Card>
+                {statsLoading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {[...Array(3)].map((_, i) => (
+                            <Card key={i}>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">로딩 중...</CardTitle>
+                                    <div className="h-4 w-4 bg-gray-200 rounded animate-pulse" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="h-8 bg-gray-200 rounded animate-pulse mb-2" />
+                                    <div className="h-4 bg-gray-200 rounded animate-pulse w-20" />
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                ) : statsError ? (
+                    <div className="text-center py-8">
+                        <p className="text-red-500">통계를 불러올 수 없습니다.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">총 아티스트</CardTitle>
+                                <Users className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    {((platformStats as any)?.data?.registeredArtists || 0).toLocaleString()}
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    {((platformStats as any)?.data?.newArtistsThisWeek || 0) > 0 ? '+' : ''}
+                                    {((platformStats as any)?.data?.newArtistsThisWeek || 0)}명 이번 주 신규
+                                </p>
+                            </CardContent>
+                        </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">평균 좋아요</CardTitle>
-                            <Heart className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">456</div>
-                            <p className="text-xs text-muted-foreground">
-                                +8% 지난 주 대비
-                            </p>
-                        </CardContent>
-                    </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">성공 프로젝트</CardTitle>
+                                <Heart className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    {((platformStats as any)?.data?.successfulProjects || 0).toLocaleString()}
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    총 펀딩 ₩{((platformStats as any)?.data?.totalFunding || 0).toLocaleString()}
+                                </p>
+                            </CardContent>
+                        </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">평균 평점</CardTitle>
-                            <Star className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">4.8</div>
-                            <p className="text-xs text-muted-foreground">
-                                +0.2 지난 달 대비
-                            </p>
-                        </CardContent>
-                    </Card>
-                </div>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">활성 후원자</CardTitle>
+                                <Star className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    {((platformStats as any)?.data?.activeSupporters || 0).toLocaleString()}
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    최근 30일 활동
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                )}
             </section>
         </div>
     );

@@ -239,8 +239,12 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
 
         try {
             setIsLiking(true);
+
+            // 이미 좋아요가 되어 있다면 취소, 아니면 좋아요
+            const action = post.isLiked ? 'unlike' : 'like';
+
             const response = await authAPI.post(`/community/posts/${postId}/reaction`, {
-                type: 'like'
+                type: action
             }) as ApiResponse<any>;
 
             if (response.success && response.data) {
@@ -264,8 +268,12 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
 
         try {
             setIsDisliking(true);
+
+            // 이미 싫어요가 되어 있다면 취소, 아니면 싫어요
+            const action = post.isDisliked ? 'undislike' : 'dislike';
+
             const response = await authAPI.post(`/community/posts/${postId}/reaction`, {
-                type: 'dislike'
+                type: action
             }) as ApiResponse<any>;
 
             if (response.success && response.data) {
