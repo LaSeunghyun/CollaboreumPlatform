@@ -132,9 +132,9 @@ export const Disabled: Story = {
 export const AllSizes: Story = {
     render: () => (
         <div className="space-y-4 w-80">
-            <Input size="sm" placeholder="Small input" />
-            <Input size="md" placeholder="Medium input" />
-            <Input size="lg" placeholder="Large input" />
+            <Input placeholder="Small input" />
+            <Input placeholder="Medium input" />
+            <Input placeholder="Large input" />
         </div>
     ),
     parameters: {
@@ -151,9 +151,9 @@ export const AllTones: Story = {
     render: () => (
         <div className="space-y-4 w-80">
             <Input placeholder="Default input" />
-            <Input tone="success" placeholder="Success input" defaultValue="Valid input" />
-            <Input tone="warning" placeholder="Warning input" defaultValue="Warning input" />
-            <Input tone="danger" placeholder="Danger input" defaultValue="Invalid input" />
+            <Input placeholder="Success input" defaultValue="Valid input" />
+            <Input placeholder="Warning input" defaultValue="Warning input" />
+            <Input placeholder="Danger input" defaultValue="Invalid input" />
         </div>
     ),
     parameters: {

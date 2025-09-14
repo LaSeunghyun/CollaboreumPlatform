@@ -27,6 +27,7 @@ export { Skeleton, skeletonStyles } from "./Skeleton"
 export type { SkeletonProps } from "./Skeleton"
 
 export { SkeletonCard } from "./SkeletonCard"
+export { ProjectListSkeleton } from "./ProjectListSkeleton"
 
 // 에러/빈 상태 컴포넌트들
 export { ErrorMessage } from "./ErrorMessage"

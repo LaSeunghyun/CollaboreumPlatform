@@ -126,8 +126,8 @@ export const UserManagement: React.FC = () => {
 
         if (searchTerm) {
             filtered = filtered.filter(user =>
-                user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                user.email.toLowerCase().includes(searchTerm.toLowerCase())
+                user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.email?.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
 
@@ -411,8 +411,8 @@ export const ProjectApproval: React.FC = () => {
 
         if (searchTerm) {
             filtered = filtered.filter(project =>
-                project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                project.artist.username.toLowerCase().includes(searchTerm.toLowerCase())
+                project.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                project.artist?.username?.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
 

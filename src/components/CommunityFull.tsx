@@ -67,7 +67,7 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
 
   const filteredArtists = artists.filter(artist => {
     const categoryMatch = selectedCategory === "전체" || artist.category === selectedCategory;
-    const searchMatch = artist.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const searchMatch = artist.name?.toLowerCase().includes(searchQuery.toLowerCase());
     return categoryMatch && searchMatch;
   });
 

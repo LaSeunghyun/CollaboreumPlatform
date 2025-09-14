@@ -278,9 +278,9 @@ export const PostList: React.FC = () => {
 
     if (searchTerm) {
       filtered = filtered.filter(post =>
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+        post.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.tags?.some(tag => tag?.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 
@@ -369,7 +369,7 @@ export const PostList: React.FC = () => {
                 <div className="flex gap-4">
                   <Avatar className="w-12 h-12">
                     <AvatarImage src={post.author.avatar} />
-                    <AvatarFallback>{post.author.username.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>{post.author.username?.charAt(0) || 'A'}</AvatarFallback>
                   </Avatar>
 
                   <div className="flex-1 space-y-3">
@@ -612,7 +612,7 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
             <div className="flex items-center gap-4">
               <Avatar className="w-12 h-12">
                 <AvatarImage src={post.author.avatar} />
-                <AvatarFallback>{post.author.username.charAt(0)}</AvatarFallback>
+                <AvatarFallback>{post.author.username?.charAt(0) || 'A'}</AvatarFallback>
               </Avatar>
               <div>
                 <p className="font-medium">{post.author.username}</p>
@@ -675,7 +675,7 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
                 <div className="flex gap-3">
                   <Avatar className="w-8 h-8">
                     <AvatarImage src={comment.author.avatar} />
-                    <AvatarFallback>{comment.author.username.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>{comment.author.username?.charAt(0) || 'A'}</AvatarFallback>
                   </Avatar>
 
                   <div className="flex-1">
