@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import * as React from "react"
-import { SelectItemProps } from "../Select"
+// import { SelectItemProps } from "../Select"
 
 export interface UseSelectProps {
     value?: string
@@ -37,7 +37,7 @@ export const useSelect = ({
         if (value) {
             const item = React.Children.toArray(children).find(
                 (child) => React.isValidElement(child) && child.props.value === value
-            ) as React.ReactElement<SelectItemProps>
+            ) as React.ReactElement<any>
             if (item) {
                 setSelectedItem({
                     value: item.props.value,
@@ -52,7 +52,7 @@ export const useSelect = ({
     const handleValueChange = useCallback((newValue: string) => {
         const item = React.Children.toArray(children).find(
             (child) => React.isValidElement(child) && child.props.value === newValue
-        ) as React.ReactElement<SelectItemProps>
+        ) as React.ReactElement<any>
 
         if (item) {
             setSelectedItem({
@@ -151,7 +151,7 @@ export const useSelect = ({
     // Memoize rendered children to prevent unnecessary re-renders
     const renderedChildren = useMemo(() => {
         return React.Children.map(children, (child) => {
-            if (React.isValidElement<SelectItemProps>(child)) {
+            if (React.isValidElement(child)) {
                 return React.cloneElement(child, {
                     ...child.props,
                     onSelect: () => handleValueChange(child.props.value),

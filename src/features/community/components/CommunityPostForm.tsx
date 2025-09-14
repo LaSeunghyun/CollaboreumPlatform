@@ -262,9 +262,8 @@ export function CommunityPostForm({
                             <LoadingButton
                                 type="submit"
                                 loading={isSubmitting}
-                                loadingText="저장 중..."
                             >
-                                {isEditing ? '수정하기' : '작성하기'}
+                                {isSubmitting ? '저장 중...' : (isEditing ? '수정하기' : '작성하기')}
                             </LoadingButton>
                         </div>
                     </form>
