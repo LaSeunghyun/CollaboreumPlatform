@@ -52,7 +52,13 @@ export function CommunityPostList({
 
     // 로딩 상태
     if (isLoading) {
-        return <SkeletonCard count={6} />
+        return (
+            <div className="space-y-4">
+                {Array.from({ length: 6 }).map((_, index) => (
+                    <SkeletonCard key={index} />
+                ))}
+            </div>
+        )
     }
 
     // 에러 상태
