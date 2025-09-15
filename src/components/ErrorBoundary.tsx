@@ -1,197 +1,86 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
+import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from './ui/button';
-import { RetryButton } from './ui/retry-button';
+import { Card, CardContent } from './ui/card';
 
 interface Props {
     children: ReactNode;
     fallback?: ReactNode;
-    onError?: (error: Error, errorInfo: ErrorInfo) => void;
-    showDetails?: boolean;
 }
 
 interface State {
     hasError: boolean;
-    error: Error | null;
-    errorInfo: ErrorInfo | null;
-    retryCount: number;
+    error?: Error;
+    errorInfo?: ErrorInfo;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-    private maxRetries = 3;
-
     constructor(props: Props) {
         super(props);
-        this.state = {
-            hasError: false,
-            error: null,
-            errorInfo: null,
-            retryCount: 0,
-        };
+        this.state = { hasError: false };
     }
 
-    static getDerivedStateFromError(error: Error): Partial<State> {
-        return {
-            hasError: true,
-            error,
-        };
+    static getDerivedStateFromError(error: Error): State {
+        return { hasError: true, error };
     }
 
     override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        this.setState({
-            error,
-            errorInfo,
-        });
-
-        // 에러 로깅
         console.error('ErrorBoundary caught an error:', error, errorInfo);
-
-        // 커스텀 에러 핸들러 호출
-        this.props.onError?.(error, errorInfo);
-
-        // 에러 리포팅 서비스에 전송 (예: Sentry, LogRocket 등)
-        // this.reportError(error, errorInfo);
+        this.setState({ error, errorInfo });
     }
 
-    private handleRetry = () => {
-        if (this.state.retryCount < this.maxRetries) {
-            this.setState(prevState => ({
-                hasError: false,
-                error: null,
-                errorInfo: null,
-                retryCount: prevState.retryCount + 1,
-            }));
-        }
-    };
-
-    private handleReload = () => {
-        window.location.reload();
-    };
-
-    private handleGoHome = () => {
-        window.location.href = '/';
-    };
-
-    private handleReportBug = () => {
-        const { error, errorInfo } = this.state;
-        const bugReport = {
-            error: error?.message,
-            stack: error?.stack,
-            componentStack: errorInfo?.componentStack,
-            timestamp: new Date().toISOString(),
-            userAgent: navigator.userAgent,
-            url: window.location.href,
-        };
-
-        // 버그 리포트를 서버로 전송하거나 클립보드에 복사
-        navigator.clipboard.writeText(JSON.stringify(bugReport, null, 2))
-            .then(() => {
-                alert('버그 리포트가 클립보드에 복사되었습니다. 개발팀에 전달해주세요.');
-            })
-            .catch(() => {
-                alert('버그 리포트가 콘솔에 출력되었습니다.');
-            });
+    handleRetry = () => {
+        this.setState({ hasError: false, error: undefined, errorInfo: undefined });
     };
 
     override render() {
         if (this.state.hasError) {
-            // 커스텀 fallback이 있으면 사용
             if (this.props.fallback) {
                 return this.props.fallback;
             }
 
-            const { error, retryCount } = this.state;
-            const isMaxRetriesReached = retryCount >= this.maxRetries;
-
             return (
-                <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-950/20 dark:via-orange-950/20 dark:to-yellow-950/20 flex items-center justify-center p-4">
-                    <div className="max-w-2xl w-full">
-                        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-red-200 dark:border-red-800 p-8 text-center">
-                            {/* 에러 아이콘 */}
-                            <div className="flex justify-center mb-6">
-                                <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-                                    <AlertTriangle className="w-10 h-10 text-red-600 dark:text-red-400" />
-                                </div>
-                            </div>
-
-                            {/* 에러 제목 */}
-                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                                문제가 발생했습니다
-                            </h1>
-
-                            {/* 에러 메시지 */}
-                            <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-                                예상치 못한 오류가 발생했습니다.
-                                {isMaxRetriesReached
-                                    ? ' 여러 번 시도했지만 문제가 지속되고 있습니다.'
-                                    : ' 잠시 후 다시 시도해주세요.'
-                                }
-                            </p>
-
-                            {/* 에러 상세 정보 (개발 모드에서만) */}
-                            {this.props.showDetails && error && (
-                                <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-6 text-left">
-                                    <details>
-                                        <summary className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            기술적 세부사항
-                                        </summary>
-                                        <pre className="text-xs text-red-600 dark:text-red-400 overflow-auto max-h-40">
-                                            {error.message}
-                                            {error.stack && `\n\n${error.stack}`}
+                <Card className="border-red-200 bg-red-50">
+                    <CardContent className="p-6 text-center">
+                        <div className="flex flex-col items-center space-y-4">
+                            <AlertCircle className="h-12 w-12 text-red-500" />
+                            <div>
+                                <h3 className="text-lg font-semibold text-red-800 mb-2">
+                                    오류가 발생했습니다
+                                </h3>
+                                <p className="text-red-600 mb-4">
+                                    페이지를 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.
+                                </p>
+                                {process.env.NODE_ENV === 'development' && this.state.error && (
+                                    <details className="text-left text-sm text-red-700 bg-red-100 p-3 rounded mt-2">
+                                        <summary className="cursor-pointer font-medium">에러 상세 정보</summary>
+                                        <pre className="mt-2 whitespace-pre-wrap">
+                                            {this.state.error.toString()}
+                                            {this.state.errorInfo?.componentStack}
                                         </pre>
                                     </details>
-                                </div>
-                            )}
-
-                            {/* 액션 버튼들 */}
-                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                )}
+                            </div>
+                            <div className="flex gap-2">
                                 <Button
-                                    variant="default"
-                                    size="lg"
-                                    onClick={this.handleReload}
-                                    className="flex items-center gap-2"
+                                    onClick={this.handleRetry}
+                                    variant="outline"
+                                    className="border-red-300 text-red-700 hover:bg-red-100"
                                 >
-                                    <RefreshCw className="w-4 h-4" />
+                                    <RefreshCw className="w-4 h-4 mr-2" />
+                                    다시 시도
+                                </Button>
+                                <Button
+                                    onClick={() => window.location.reload()}
+                                    variant="default"
+                                    className="bg-red-600 hover:bg-red-700"
+                                >
                                     페이지 새로고침
                                 </Button>
-
-                                <Button
-                                    variant="outline"
-                                    size="lg"
-                                    onClick={this.handleGoHome}
-                                    className="flex items-center gap-2"
-                                >
-                                    <Home className="w-4 h-4" />
-                                    홈으로 이동
-                                </Button>
-
-                                <Button
-                                    variant="ghost"
-                                    size="lg"
-                                    onClick={this.handleReportBug}
-                                    className="flex items-center gap-2 text-gray-600 dark:text-gray-400"
-                                >
-                                    <Bug className="w-4 h-4" />
-                                    버그 리포트
-                                </Button>
-                            </div>
-
-                            {/* 재시도 횟수 표시 */}
-                            {retryCount > 0 && (
-                                <div className="mt-6 text-sm text-gray-500 dark:text-gray-400">
-                                    재시도 횟수: {retryCount}/{this.maxRetries}
-                                </div>
-                            )}
-
-                            {/* 도움말 */}
-                            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    문제가 지속되면 브라우저 캐시를 삭제하거나 다른 브라우저를 시도해보세요.
-                                </p>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </CardContent>
+                </Card>
             );
         }
 
@@ -199,43 +88,71 @@ export class ErrorBoundary extends Component<Props, State> {
     }
 }
 
-// 함수형 컴포넌트를 위한 에러 바운더리 래퍼
-interface ErrorBoundaryWrapperProps {
-    children: ReactNode;
-    fallback?: ReactNode;
-    onError?: (error: Error, errorInfo: ErrorInfo) => void;
-    showDetails?: boolean;
-}
+// 함수형 컴포넌트용 에러 경계 (React 18+)
+export const ErrorBoundaryFunction: React.FC<Props> = ({ children, fallback }) => {
+    const [hasError, setHasError] = React.useState(false);
+    const [error, setError] = React.useState<Error | null>(null);
 
-export function ErrorBoundaryWrapper({
-    children,
-    fallback,
-    onError,
-    showDetails = process.env.NODE_ENV === 'development',
-}: ErrorBoundaryWrapperProps) {
-    return (
-        <ErrorBoundary
-            fallback={fallback}
-            onError={onError}
-            showDetails={showDetails}
-        >
-            {children}
-        </ErrorBoundary>
-    );
-}
+    React.useEffect(() => {
+        const handleError = (event: ErrorEvent) => {
+            setHasError(true);
+            setError(new Error(event.message));
+        };
 
-// 특정 컴포넌트를 감싸는 HOC
-export function withErrorBoundary<P extends object>(
-    Component: React.ComponentType<P>,
-    errorBoundaryProps?: Omit<Props, 'children'>
-) {
-    const WrappedComponent = (props: P) => (
-        <ErrorBoundary {...errorBoundaryProps}>
-            <Component {...props} />
-        </ErrorBoundary>
-    );
+        const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+            setHasError(true);
+            setError(new Error(event.reason));
+        };
 
-    WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
+        window.addEventListener('error', handleError);
+        window.addEventListener('unhandledrejection', handleUnhandledRejection);
 
-    return WrappedComponent;
-}
+        return () => {
+            window.removeEventListener('error', handleError);
+            window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+        };
+    }, []);
+
+    if (hasError) {
+        if (fallback) {
+            return <>{fallback}</>;
+        }
+
+        return (
+            <Card className="border-red-200 bg-red-50">
+                <CardContent className="p-6 text-center">
+                    <div className="flex flex-col items-center space-y-4">
+                        <AlertCircle className="h-12 w-12 text-red-500" />
+                        <div>
+                            <h3 className="text-lg font-semibold text-red-800 mb-2">
+                                오류가 발생했습니다
+                            </h3>
+                            <p className="text-red-600 mb-4">
+                                페이지를 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.
+                            </p>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button
+                                onClick={() => setHasError(false)}
+                                variant="outline"
+                                className="border-red-300 text-red-700 hover:bg-red-100"
+                            >
+                                <RefreshCw className="w-4 h-4 mr-2" />
+                                다시 시도
+                            </Button>
+                            <Button
+                                onClick={() => window.location.reload()}
+                                variant="default"
+                                className="bg-red-600 hover:bg-red-700"
+                            >
+                                페이지 새로고침
+                            </Button>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    return <>{children}</>;
+};

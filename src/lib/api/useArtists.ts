@@ -35,6 +35,8 @@ export const usePopularArtists = (limit?: number) => {
         queryKey: ['artists', 'popular', limit],
         queryFn: () => artistAPI.getPopularArtists(limit),
         staleTime: 10 * 60 * 1000, // 10분
+        retry: 1, // 재시도 1회만
+        retryDelay: 1000
     });
 };
 

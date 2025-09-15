@@ -66,7 +66,7 @@ export function CommunityPostList({
     }
 
     // 빈 상태
-    if (!data?.posts || data.posts.length === 0) {
+    if (!data || !(data as any)?.posts || (data as any).posts.length === 0) {
         return (
             <EmptyState
                 title="게시글이 없습니다"
@@ -92,7 +92,7 @@ export function CommunityPostList({
 
     return (
         <div className="space-y-4">
-            {data.posts.map((post) => (
+            {(data as any).posts.map((post: any) => (
                 <Card
                     key={post.id}
                     className="cursor-pointer hover:shadow-md transition-shadow"
@@ -131,7 +131,7 @@ export function CommunityPostList({
                         {/* 태그 */}
                         {post.tags.length > 0 && (
                             <div className="flex flex-wrap gap-1 mb-4">
-                                {post.tags.map((tag) => (
+                                {post.tags.map((tag: any) => (
                                     <Badge key={tag} variant="secondary" size="sm">
                                         <Tag className="h-3 w-3 mr-1" />
                                         {tag}

@@ -15,6 +15,8 @@ export const useCommunityPosts = (query: CommunityPostListQuery = {}) => {
         queryFn: () => communityApi.getPosts(query),
         staleTime: 5 * 60 * 1000, // 5분
         gcTime: 10 * 60 * 1000, // 10분
+        retry: 1, // 재시도 1회만
+        retryDelay: 1000
     })
 }
 

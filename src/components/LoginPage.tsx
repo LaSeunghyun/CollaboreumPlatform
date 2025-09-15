@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { ArrowLeft, Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/api';
+import { useSearchParams } from 'react-router-dom';
 
 interface LoginPageProps {
   onBack: () => void;
@@ -32,6 +33,10 @@ export function LoginPage({ onBack, onLogin, onSignupClick }: LoginPageProps) {
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
+  // 리다이렉트 URL 처리
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -40,8 +45,10 @@ export function LoginPage({ onBack, onLogin, onSignupClick }: LoginPageProps) {
       const response = await authAPI.login(formData) as any;
 
       if (response.success) {
-        // AuthContext의 login 함수 호출 (자동으로 페이지 이동 처리됨)
+        // AuthContext의 login 함수 호출
         login(response.data.token, response.data.user);
+        // 로그인 성공 후 리다이렉트 URL로 이동
+        window.location.href = redirectUrl;
       } else {
         setErrorMessage(response.message);
         setShowErrorModal(true);

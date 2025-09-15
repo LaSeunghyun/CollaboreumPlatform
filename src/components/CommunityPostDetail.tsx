@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { authAPI, communityAPI, communityPostAPI } from '../services/api';
 import { ApiResponse } from '../types';
 import { useDeleteCommunityPost } from '../features/community/hooks/useCommunityPosts';
+import { useAuthRedirect } from '../hooks/useAuthRedirect';
 import { ArrowLeft, Heart, MessageCircle, Eye, Trash2, MoreVertical, Copy, Share2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -28,6 +29,54 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from './ui/alert-dialog';
+
+// 댓글 데이터 변환 함수 (컴포넌트 외부로 이동)
+const transformComments = (comments: any[]): Comment[] => {
+    if (!Array.isArray(comments)) return [];
+
+    return comments
+        .filter((comment: any) => comment && typeof comment === 'object') // 유효한 객체만 필터링
+        .map((comment: any) => {
+            try {
+                // 안전한 날짜 처리
+                let createdAt: Date;
+                try {
+                    createdAt = new Date(comment.createdAt);
+                    if (isNaN(createdAt.getTime())) {
+                        createdAt = new Date();
+                    }
+                } catch {
+                    createdAt = new Date();
+                }
+
+                return {
+                    id: String(comment.id || comment._id || ''),
+                    author: typeof comment.author === 'string'
+                        ? comment.author
+                        : (comment.author?.name || comment.author?.username || comment.authorName || 'Unknown'),
+                    authorId: String(comment.authorId || (typeof comment.author === 'string' ? comment.author : comment.author?.id) || comment.authorName || ''),
+                    content: String(comment.content || ''),
+                    timeAgo: comment.timeAgo || formatDistanceToNow(createdAt, { addSuffix: true, locale: ko }),
+                    createdAt: createdAt,
+                    replies: Array.isArray(comment.replies) ? transformComments(comment.replies) : [],
+                    parentId: comment.parentId ? String(comment.parentId) : undefined
+                };
+            } catch (error) {
+                console.error('댓글 변환 중 오류:', error, comment);
+                // 오류 발생 시 기본값 반환
+                return {
+                    id: String(comment.id || comment._id || ''),
+                    author: 'Unknown',
+                    authorId: '',
+                    content: String(comment.content || ''),
+                    timeAgo: '방금 전',
+                    createdAt: new Date(),
+                    replies: [],
+                    parentId: undefined
+                };
+            }
+        });
+};
 
 interface Comment {
     id: string;
@@ -72,6 +121,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
     onBack
 }) => {
     const { user } = useAuth();
+    const { requireAuth } = useAuthRedirect();
     const deletePostMutation = useDeleteCommunityPost();
     const [post, setPost] = useState<PostDetail | null>(null);
     const [comment, setComment] = useState('');
@@ -119,6 +169,338 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         }
     };
 
+
+    const fetchPostDetail = useCallback(async () => {
+        if (!postId || postId === 'undefined') {
+            setError('유효하지 않은 게시글 ID입니다.');
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+            const response = await authAPI.get(`/community/posts/${postId}`) as ApiResponse<PostDetail>;
+
+            if (response.success && response.data) {
+                const postData = response.data;
+
+                // 댓글 데이터를 안전하게 변환
+                let transformedComments: Comment[] = [];
+
+                if (postData.comments) {
+                    if (Array.isArray(postData.comments)) {
+                        try {
+                            transformedComments = transformComments(postData.comments);
+                        } catch (error) {
+                            console.error('댓글 변환 오류:', error);
+                            transformedComments = [];
+                        }
+                    } else {
+                        console.warn('댓글 데이터가 배열이 아닙니다:', typeof postData.comments);
+                        transformedComments = [];
+                    }
+                }
+
+                const formattedPost: PostDetail = {
+                    id: postData.id || (postData as any)._id || postId, // _id를 id로 매핑
+                    title: postData.title || '',
+                    category: postData.category || '',
+                    author: typeof postData.author === 'string' ? postData.author : (postData.author as any)?.name || 'Unknown',
+                    authorId: typeof postData.author === 'string' ? postData.author : (postData.author as any)?.id || postData.author,
+                    content: postData.content || '',
+                    images: Array.isArray(postData.images) ? postData.images : [],
+                    timeAgo: formatDistanceToNow(new Date(postData.createdAt), { addSuffix: true, locale: ko }),
+                    replies: postData.replies || 0,
+                    likes: Array.isArray(postData.likes) ? postData.likes.length : (postData.likes || 0),
+                    dislikes: Array.isArray(postData.dislikes) ? postData.dislikes.length : (postData.dislikes || 0),
+                    isLiked: false,
+                    isDisliked: false,
+                    isHot: (Array.isArray(postData.likes) ? postData.likes.length : (postData.likes || 0)) > 20,
+                    viewCount: postData.views || postData.viewCount || 0,
+                    views: postData.views || postData.viewCount || 0,
+                    createdAt: new Date(postData.createdAt),
+                    updatedAt: new Date(postData.updatedAt),
+                    comments: transformedComments
+                };
+                setPost(formattedPost);
+
+                // 사용자별 반응 상태 확인
+                if (user && formattedPost.id) {
+                    try {
+                        const reactionsResponse = await communityPostAPI.getPostReactions(formattedPost.id) as ApiResponse<any>;
+                        if (reactionsResponse?.success && reactionsResponse?.data) {
+                            const data = reactionsResponse.data;
+                            setPost((prev: any) => prev ? {
+                                ...prev,
+                                isLiked: data?.isLiked || false,
+                                isDisliked: data?.isDisliked || false,
+                                likes: data?.likes || 0,
+                                dislikes: data?.dislikes || 0
+                            } : null);
+                        }
+                    } catch (err) {
+                        console.error('반응 상태 확인 실패:', err);
+                    }
+                }
+            } else {
+                setError('포스트를 불러올 수 없습니다.');
+            }
+        } catch (error) {
+            console.error('포스트 상세 조회 오류:', error);
+            setError('포스트 조회 중 오류가 발생했습니다.');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [postId, user]);
+
+    // 조회수 증가 함수
+    const incrementViewCount = useCallback(async () => {
+        if (!postId || postId === 'undefined') {
+            return;
+        }
+
+        try {
+            await authAPI.post(`/community/posts/${postId}/views`);
+        } catch (error) {
+            console.error('조회수 증가 실패:', error);
+            // 조회수 증가 실패는 사용자에게 보여주지 않음
+        }
+    }, [postId]);
+
+    const handleLike = async () => {
+        requireAuth(async () => {
+            if (!user || !post) return;
+
+            try {
+                setIsLiking(true);
+
+                // 이미 좋아요가 되어 있다면 취소, 아니면 좋아요
+                const action = post.isLiked ? 'unlike' : 'like';
+
+                const response = await authAPI.post(`/community/posts/${postId}/reaction`, {
+                    type: action
+                }) as ApiResponse<any>;
+
+                if (response.success && response.data) {
+                    // 좋아요 상태를 즉시 업데이트
+                    setPost((prev: any) => prev ? {
+                        ...prev,
+                        likes: response.data.likes,
+                        dislikes: response.data.dislikes,
+                        isLiked: !prev.isLiked, // 토글
+                        isDisliked: false, // 좋아요를 누르면 싫어요는 자동으로 취소
+                        isHot: response.data.likes > 20
+                    } : null);
+                }
+            } catch (error) {
+                console.error('좋아요 처리 오류:', error);
+            } finally {
+                setIsLiking(false);
+            }
+        });
+    };
+
+    const handleDislike = async () => {
+        requireAuth(async () => {
+            if (!user || !post) return;
+
+            try {
+                setIsDisliking(true);
+
+                // 이미 싫어요가 되어 있다면 취소, 아니면 싫어요
+                const action = post.isDisliked ? 'undislike' : 'dislike';
+
+                const response = await authAPI.post(`/community/posts/${postId}/reaction`, {
+                    type: action
+                }) as ApiResponse<any>;
+
+                if (response.success && response.data) {
+                    // 싫어요 상태를 즉시 업데이트
+                    setPost((prev: any) => prev ? {
+                        ...prev,
+                        likes: response.data.likes,
+                        dislikes: response.data.dislikes,
+                        isLiked: false, // 싫어요를 누르면 좋아요는 자동으로 취소
+                        isDisliked: !prev.isDisliked // 토글
+                    } : null);
+                }
+            } catch (error) {
+                console.error('싫어요 처리 오류:', error);
+            } finally {
+                setIsDisliking(false);
+            }
+        });
+    };
+
+    const handleCommentSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!comment.trim() || !post) return;
+
+        requireAuth(async () => {
+            if (!user) return;
+
+            try {
+                setIsSubmittingComment(true);
+                const response = await authAPI.post(`/communities/posts/${postId}/comments`, {
+                    content: comment.trim()
+                }) as ApiResponse<any>;
+
+                if (response.success && response.data) {
+                    setComment('');
+                    // 댓글 목록 새로고침
+                    fetchPostDetail();
+                }
+            } catch (error) {
+                console.error('댓글 작성 오류:', error);
+            } finally {
+                setIsSubmittingComment(false);
+            }
+        });
+    };
+
+    const handleCommentDelete = async (commentId: string) => {
+        requireAuth(async () => {
+            if (!user || !post) return;
+
+            try {
+                const response = await authAPI.delete(`/communities/posts/${postId}/comments/${commentId}`) as ApiResponse<any>;
+
+                if (response.success) {
+                    // 댓글 목록 새로고침
+                    fetchPostDetail();
+                }
+            } catch (error) {
+                console.error('댓글 삭제 오류:', error);
+            }
+        });
+    };
+
+    // 대댓글 작성 함수
+    const handleReplySubmit = async (e: React.FormEvent, parentCommentId: string) => {
+        e.preventDefault();
+        if (!replyContent.trim() || !post) return;
+
+        requireAuth(async () => {
+            if (!user) return;
+
+            try {
+                setIsSubmittingReply(true);
+                const response = await communityAPI.replyToComment(postId, parentCommentId, replyContent.trim()) as ApiResponse<any>;
+
+                if (response.success && response.data) {
+                    setReplyContent('');
+                    setReplyingTo(null);
+                    // 댓글 목록 새로고침
+                    fetchPostDetail();
+                }
+            } catch (error) {
+                console.error('대댓글 작성 오류:', error);
+            } finally {
+                setIsSubmittingReply(false);
+            }
+        });
+    };
+
+    // 대댓글 작성 취소
+    const cancelReply = () => {
+        setReplyingTo(null);
+        setReplyContent('');
+    };
+
+    // 대댓글 표시 함수
+    const renderReplies = (replies: Comment[] = []) => {
+        if (!Array.isArray(replies) || replies.length === 0) return null;
+
+        return (
+            <div className="ml-8 mt-3 space-y-3 border-l-2 border-gray-200 pl-4">
+                {replies.map((reply) => {
+                    // reply가 유효한 객체인지 확인
+                    if (!reply || typeof reply !== 'object' || !reply.id) {
+                        return null;
+                    }
+
+                    return (
+                        <div key={reply.id} className="flex gap-3 p-3 bg-gray-100 rounded-lg">
+                            <Avatar className="w-8 h-8">
+                                <AvatarFallback>{getFirstChar(reply.author || 'U')}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-medium text-sm">{typeof reply.author === 'string' ? reply.author : (reply.author as any)?.name || 'Unknown'}</span>
+                                        <span className="text-xs text-gray-500">{reply.timeAgo || '방금 전'}</span>
+                                    </div>
+                                    {canDeleteComment(reply.authorId || '') && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleCommentDelete(reply.id)}
+                                            className="text-red-500 hover:text-red-700 p-1 h-auto"
+                                        >
+                                            <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                    )}
+                                </div>
+                                <p className="text-gray-700 text-sm">{reply.content || ''}</p>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
+
+    const canDeleteComment = (commentAuthorId: string) => {
+        return user && (user.id === commentAuthorId || user.id === post?.authorId);
+    };
+
+    const canDeletePost = () => {
+        return user && post && (user.id === post.authorId || user.role === 'admin');
+    };
+
+    const handleDeletePost = async () => {
+        if (!user || !post) return;
+
+        try {
+            await deletePostMutation.mutateAsync(postId);
+            // 삭제 성공 시 목록으로 돌아가기
+            handleBack();
+        } catch (error) {
+            console.error('게시글 삭제 오류:', error);
+            setError('게시글 삭제 중 오류가 발생했습니다.');
+        } finally {
+            setShowDeleteDialog(false);
+        }
+    };
+
+    // 이전 페이지로 돌아가기
+    const handleBack = useCallback(() => {
+        if (onBack) {
+            onBack();
+        } else {
+            // 더 확실한 뒤로가기 방법
+            try {
+                // 세션 스토리지에서 이전 페이지 정보 확인
+                const previousPage = sessionStorage.getItem('previousPage');
+
+                if (previousPage && previousPage !== window.location.href) {
+                    // 이전 페이지로 이동
+                    window.location.href = previousPage;
+                } else if (window.history.length > 1) {
+                    // 브라우저 히스토리에서 이전 페이지로 이동
+                    window.history.back();
+                } else {
+                    // 모두 실패하면 홈으로 이동
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('뒤로가기 실패:', error);
+                // 에러 발생 시 홈으로 이동
+                window.location.href = '/';
+            }
+        }
+    }, [onBack]);
+
     useEffect(() => {
         // postId가 유효하지 않은 경우 처리
         if (!postId || postId === 'undefined') {
@@ -151,316 +533,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         return () => {
             window.removeEventListener('popstate', handlePopState);
         };
-    }, [postId]);
-
-    const fetchPostDetail = async () => {
-        if (!postId || postId === 'undefined') {
-            setError('유효하지 않은 게시글 ID입니다.');
-            setIsLoading(false);
-            return;
-        }
-
-        try {
-            setIsLoading(true);
-            const response = await authAPI.get(`/community/posts/${postId}`) as ApiResponse<PostDetail>;
-
-            if (response.success && response.data) {
-                const postData = response.data;
-                // API 응답을 컴포넌트에서 사용하는 형식으로 변환
-                // 댓글 데이터 변환 함수
-                const transformComments = (comments: any[]): Comment[] => {
-                    if (!Array.isArray(comments)) return [];
-
-                    return comments.map((comment: any) => ({
-                        id: comment.id || comment._id || '',
-                        author: comment.author || comment.authorName || 'Unknown',
-                        authorId: comment.authorId || comment.author || comment.authorName || '',
-                        content: comment.content || '',
-                        timeAgo: comment.timeAgo || formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: ko }),
-                        createdAt: new Date(comment.createdAt),
-                        replies: comment.replies ? transformComments(comment.replies) : [],
-                        parentId: comment.parentId
-                    }));
-                };
-
-                const formattedPost: PostDetail = {
-                    id: postData.id || (postData as any)._id || postId, // _id를 id로 매핑
-                    title: postData.title,
-                    category: postData.category,
-                    author: typeof postData.author === 'string' ? postData.author : (postData.author as any)?.name || 'Unknown',
-                    authorId: typeof postData.author === 'string' ? postData.author : (postData.author as any)?.id || postData.author,
-                    content: postData.content,
-                    images: postData.images || [],
-                    timeAgo: formatDistanceToNow(new Date(postData.createdAt), { addSuffix: true, locale: ko }),
-                    replies: postData.replies || 0,
-                    likes: Array.isArray(postData.likes) ? postData.likes.length : (postData.likes || 0),
-                    dislikes: Array.isArray(postData.dislikes) ? postData.dislikes.length : (postData.dislikes || 0),
-                    isLiked: false,
-                    isDisliked: false,
-                    isHot: (Array.isArray(postData.likes) ? postData.likes.length : (postData.likes || 0)) > 20,
-                    viewCount: postData.views || postData.viewCount || 0,
-                    views: postData.views || postData.viewCount || 0,
-                    createdAt: new Date(postData.createdAt),
-                    updatedAt: new Date(postData.updatedAt),
-                    comments: transformComments(postData.comments || [])
-                };
-                setPost(formattedPost);
-
-                // 사용자별 반응 상태 확인
-                if (user && formattedPost.id) {
-                    try {
-                        const reactionsResponse = await communityPostAPI.getPostReactions(formattedPost.id) as ApiResponse<any>;
-                        if (reactionsResponse?.success && reactionsResponse?.data) {
-                            const data = reactionsResponse.data;
-                            setPost((prev: any) => prev ? {
-                                ...prev,
-                                isLiked: data?.isLiked || false,
-                                isDisliked: data?.isDisliked || false,
-                                likes: data?.likes || 0,
-                                dislikes: data?.dislikes || 0
-                            } : null);
-                        }
-                    } catch (err) {
-                        console.error('반응 상태 확인 실패:', err);
-                    }
-                }
-            } else {
-                setError('포스트를 불러올 수 없습니다.');
-            }
-        } catch (error) {
-            console.error('포스트 상세 조회 오류:', error);
-            setError('포스트 조회 중 오류가 발생했습니다.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    // 조회수 증가 함수
-    const incrementViewCount = async () => {
-        if (!postId || postId === 'undefined') {
-            return;
-        }
-
-        try {
-            await authAPI.post(`/community/posts/${postId}/views`);
-        } catch (error) {
-            console.error('조회수 증가 실패:', error);
-            // 조회수 증가 실패는 사용자에게 보여주지 않음
-        }
-    };
-
-    const handleLike = async () => {
-        if (!user || !post) return;
-
-        try {
-            setIsLiking(true);
-
-            // 이미 좋아요가 되어 있다면 취소, 아니면 좋아요
-            const action = post.isLiked ? 'unlike' : 'like';
-
-            const response = await authAPI.post(`/community/posts/${postId}/reaction`, {
-                type: action
-            }) as ApiResponse<any>;
-
-            if (response.success && response.data) {
-                // 좋아요 상태를 즉시 업데이트
-                setPost((prev: any) => prev ? {
-                    ...prev,
-                    likes: response.data.likes,
-                    dislikes: response.data.dislikes,
-                    isLiked: !prev.isLiked, // 토글
-                    isDisliked: false, // 좋아요를 누르면 싫어요는 자동으로 취소
-                    isHot: response.data.likes > 20
-                } : null);
-            }
-        } catch (error) {
-            console.error('좋아요 처리 오류:', error);
-        } finally {
-            setIsLiking(false);
-        }
-    };
-
-    const handleDislike = async () => {
-        if (!user || !post) return;
-
-        try {
-            setIsDisliking(true);
-
-            // 이미 싫어요가 되어 있다면 취소, 아니면 싫어요
-            const action = post.isDisliked ? 'undislike' : 'dislike';
-
-            const response = await authAPI.post(`/community/posts/${postId}/reaction`, {
-                type: action
-            }) as ApiResponse<any>;
-
-            if (response.success && response.data) {
-                // 싫어요 상태를 즉시 업데이트
-                setPost((prev: any) => prev ? {
-                    ...prev,
-                    likes: response.data.likes,
-                    dislikes: response.data.dislikes,
-                    isLiked: false, // 싫어요를 누르면 좋아요는 자동으로 취소
-                    isDisliked: !prev.isDisliked // 토글
-                } : null);
-            }
-        } catch (error) {
-            console.error('싫어요 처리 오류:', error);
-        } finally {
-            setIsDisliking(false);
-        }
-    };
-
-    const handleCommentSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!comment.trim() || !user || !post) return;
-
-        try {
-            setIsSubmittingComment(true);
-            const response = await authAPI.post(`/communities/posts/${postId}/comments`, {
-                content: comment.trim()
-            }) as ApiResponse<any>;
-
-            if (response.success && response.data) {
-                setComment('');
-                // 댓글 목록 새로고침
-                fetchPostDetail();
-            }
-        } catch (error) {
-            console.error('댓글 작성 오류:', error);
-        } finally {
-            setIsSubmittingComment(false);
-        }
-    };
-
-    const handleCommentDelete = async (commentId: string) => {
-        if (!user || !post) return;
-
-        try {
-            const response = await authAPI.delete(`/communities/posts/${postId}/comments/${commentId}`) as ApiResponse<any>;
-
-            if (response.success) {
-                // 댓글 목록 새로고침
-                fetchPostDetail();
-            }
-        } catch (error) {
-            console.error('댓글 삭제 오류:', error);
-        }
-    };
-
-    // 대댓글 작성 함수
-    const handleReplySubmit = async (e: React.FormEvent, parentCommentId: string) => {
-        e.preventDefault();
-        if (!replyContent.trim() || !user || !post) return;
-
-        try {
-            setIsSubmittingReply(true);
-            const response = await communityAPI.replyToComment(postId, parentCommentId, replyContent.trim()) as ApiResponse<any>;
-
-            if (response.success && response.data) {
-                setReplyContent('');
-                setReplyingTo(null);
-                // 댓글 목록 새로고침
-                fetchPostDetail();
-            }
-        } catch (error) {
-            console.error('대댓글 작성 오류:', error);
-        } finally {
-            setIsSubmittingReply(false);
-        }
-    };
-
-    // 대댓글 작성 취소
-    const cancelReply = () => {
-        setReplyingTo(null);
-        setReplyContent('');
-    };
-
-    // 대댓글 표시 함수
-    const renderReplies = (replies: Comment[] = []) => {
-        if (replies.length === 0) return null;
-
-        return (
-            <div className="ml-8 mt-3 space-y-3 border-l-2 border-gray-200 pl-4">
-                {replies.map((reply) => (
-                    <div key={reply.id} className="flex gap-3 p-3 bg-gray-100 rounded-lg">
-                        <Avatar className="w-8 h-8">
-                            <AvatarFallback>{getFirstChar(reply.author)}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                            <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                    <span className="font-medium text-sm">{getUsername(reply.author)}</span>
-                                    <span className="text-xs text-gray-500">{reply.timeAgo}</span>
-                                </div>
-                                {canDeleteComment(reply.authorId) && (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleCommentDelete(reply.id)}
-                                        className="text-red-500 hover:text-red-700 p-1 h-auto"
-                                    >
-                                        <Trash2 className="w-3 h-3" />
-                                    </Button>
-                                )}
-                            </div>
-                            <p className="text-gray-700 text-sm">{reply.content}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        );
-    };
-
-    const canDeleteComment = (commentAuthorId: string) => {
-        return user && (user.id === commentAuthorId || user.id === post?.authorId);
-    };
-
-    const canDeletePost = () => {
-        return user && post && (user.id === post.authorId || user.role === 'admin');
-    };
-
-    const handleDeletePost = async () => {
-        if (!user || !post) return;
-
-        try {
-            await deletePostMutation.mutateAsync(postId);
-            // 삭제 성공 시 목록으로 돌아가기
-            handleBack();
-        } catch (error) {
-            console.error('게시글 삭제 오류:', error);
-            setError('게시글 삭제 중 오류가 발생했습니다.');
-        } finally {
-            setShowDeleteDialog(false);
-        }
-    };
-
-    // 이전 페이지로 돌아가기
-    const handleBack = () => {
-        if (onBack) {
-            onBack();
-        } else {
-            // 더 확실한 뒤로가기 방법
-            try {
-                // 세션 스토리지에서 이전 페이지 정보 확인
-                const previousPage = sessionStorage.getItem('previousPage');
-
-                if (previousPage && previousPage !== window.location.href) {
-                    // 이전 페이지로 이동
-                    window.location.href = previousPage;
-                } else if (window.history.length > 1) {
-                    // 브라우저 히스토리에서 이전 페이지로 이동
-                    window.history.back();
-                } else {
-                    // 모두 실패하면 홈으로 이동
-                    window.location.href = '/';
-                }
-            } catch (error) {
-                console.error('뒤로가기 실패:', error);
-                // 에러 발생 시 홈으로 이동
-                window.location.href = '/';
-            }
-        }
-    };
+    }, [postId, fetchPostDetail, handleBack, incrementViewCount]);
 
     if (isLoading) {
         return (
@@ -515,9 +588,9 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                                             <Badge variant="destructive">HOT</Badge>
                                         )}
                                     </div>
-                                    <CardTitle className="text-2xl mb-2">{post.title}</CardTitle>
+                                    <CardTitle className="text-2xl mb-2">{post.title || '제목 없음'}</CardTitle>
                                     <div className="flex items-center gap-4 text-sm text-gray-500">
-                                        <span>작성자: {post.author}</span>
+                                        <span>작성자: {getUsername(post.author)}</span>
                                         <span>{post.timeAgo}</span>
                                         <span className="flex items-center gap-1">
                                             <Eye className="w-4 h-4" />
@@ -604,13 +677,13 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                         <CardContent>
                             {/* 포스트 내용 */}
                             <div className="prose max-w-none mb-6">
-                                <p className="text-gray-700 whitespace-pre-wrap">{post.content}</p>
+                                <p className="text-gray-700 whitespace-pre-wrap">{post.content || '내용 없음'}</p>
                             </div>
 
                             {/* 이미지 */}
                             {post.images && post.images.length > 0 && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                    {post.images.map((image, index) => (
+                                    {Array.isArray(post.images) && post.images.map((image, index) => (
                                         <img
                                             key={index}
                                             src={image}
@@ -630,7 +703,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                                     className={`flex items-center gap-2 ${isLiked ? 'text-red-500' : ''}`}
                                 >
                                     <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-                                    좋아요 {post.likes}
+                                    좋아요 {typeof post.likes === 'number' ? post.likes : 0}
                                 </Button>
                                 <Button
                                     variant="ghost"
@@ -641,11 +714,11 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                                     <svg className={`w-5 h-5 ${isDisliked ? 'fill-current' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 13l3 3 7-7" />
                                     </svg>
-                                    싫어요 {post.dislikes}
+                                    싫어요 {typeof post.dislikes === 'number' ? post.dislikes : 0}
                                 </Button>
                                 <div className="flex items-center gap-2 text-gray-500">
                                     <MessageCircle className="w-5 h-5" />
-                                    댓글 {post.replies}
+                                    댓글 {typeof post.replies === 'number' ? post.replies : 0}
                                 </div>
                             </div>
                         </CardContent>
@@ -655,7 +728,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                 {/* 댓글 섹션 */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">댓글 ({post.replies})</CardTitle>
+                        <CardTitle className="text-lg">댓글 ({typeof post.replies === 'number' ? post.replies : 0})</CardTitle>
                     </CardHeader>
 
                     <CardContent>
@@ -692,88 +765,101 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
 
                         {/* 댓글 목록 */}
                         <div className="space-y-4">
-                            {(Array.isArray(post.comments) ? post.comments : []).length === 0 ? (
-                                <p className="text-center text-gray-500 py-8">
-                                    아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!
-                                </p>
-                            ) : (
-                                (Array.isArray(post.comments) ? post.comments : []).map((comment) => (
-                                    <div key={comment.id} className="flex gap-3 p-4 bg-gray-50 rounded-lg">
-                                        <Avatar className="w-10 h-10">
-                                            <AvatarFallback>{getFirstChar(comment.author)}</AvatarFallback>
-                                        </Avatar>
-                                        <div className="flex-1">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-medium text-sm">{getUsername(comment.author)}</span>
-                                                    <span className="text-xs text-gray-500">{comment.timeAgo}</span>
+                            {(() => {
+                                const comments = Array.isArray(post.comments) ? post.comments : [];
+
+                                if (comments.length === 0) {
+                                    return (
+                                        <p className="text-center text-gray-500 py-8">
+                                            아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!
+                                        </p>
+                                    );
+                                }
+
+                                return comments.map((comment) => {
+                                    // comment가 유효한 객체인지 확인
+                                    if (!comment || typeof comment !== 'object' || !comment.id) {
+                                        return null;
+                                    }
+
+                                    return (
+                                        <div key={comment.id} className="flex gap-3 p-4 bg-gray-50 rounded-lg">
+                                            <Avatar className="w-10 h-10">
+                                                <AvatarFallback>{getFirstChar(comment.author || 'U')}</AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex-1">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-medium text-sm">{getUsername(comment.author || 'Unknown')}</span>
+                                                        <span className="text-xs text-gray-500">{comment.timeAgo || '방금 전'}</span>
+                                                    </div>
+                                                    {canDeleteComment(comment.authorId || '') && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleCommentDelete(comment.id)}
+                                                            className="text-red-500 hover:text-red-700 p-1 h-auto"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    )}
                                                 </div>
-                                                {canDeleteComment(comment.authorId) && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleCommentDelete(comment.id)}
-                                                        className="text-red-500 hover:text-red-700 p-1 h-auto"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </Button>
+                                                <p className="text-gray-700">{comment.content || ''}</p>
+
+                                                {/* 대댓글 작성 버튼 */}
+                                                {user && (
+                                                    <div className="mt-3">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => setReplyingTo(comment.id)}
+                                                            className="text-blue-600 hover:text-blue-700 text-sm"
+                                                        >
+                                                            답글 달기
+                                                        </Button>
+                                                    </div>
                                                 )}
+
+                                                {/* 대댓글 작성 폼 */}
+                                                {replyingTo === comment.id && (
+                                                    <form onSubmit={(e) => handleReplySubmit(e, comment.id)} className="mt-3">
+                                                        <div className="flex gap-2">
+                                                            <Input
+                                                                value={replyContent}
+                                                                onChange={(e) => setReplyContent(e.target.value)}
+                                                                placeholder={`${getUsername(comment.author || 'Unknown')}님에게 답글 달기...`}
+                                                                maxLength={500}
+                                                                disabled={isSubmittingReply}
+                                                                className="flex-1"
+                                                            />
+                                                            <Button
+                                                                type="submit"
+                                                                disabled={!replyContent.trim() || isSubmittingReply}
+                                                                size="sm"
+                                                            >
+                                                                {isSubmittingReply ? '작성 중...' : '답글'}
+                                                            </Button>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={cancelReply}
+                                                            >
+                                                                취소
+                                                            </Button>
+                                                        </div>
+                                                        <div className="text-xs text-gray-500 text-right mt-1">
+                                                            {replyContent.length}/500
+                                                        </div>
+                                                    </form>
+                                                )}
+
+                                                {renderReplies(comment.replies || [])}
                                             </div>
-                                            <p className="text-gray-700">{comment.content}</p>
-
-                                            {/* 대댓글 작성 버튼 */}
-                                            {user && (
-                                                <div className="mt-3">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => setReplyingTo(comment.id)}
-                                                        className="text-blue-600 hover:text-blue-700 text-sm"
-                                                    >
-                                                        답글 달기
-                                                    </Button>
-                                                </div>
-                                            )}
-
-                                            {/* 대댓글 작성 폼 */}
-                                            {replyingTo === comment.id && (
-                                                <form onSubmit={(e) => handleReplySubmit(e, comment.id)} className="mt-3">
-                                                    <div className="flex gap-2">
-                                                        <Input
-                                                            value={replyContent}
-                                                            onChange={(e) => setReplyContent(e.target.value)}
-                                                            placeholder={`${comment.author}님에게 답글 달기...`}
-                                                            maxLength={500}
-                                                            disabled={isSubmittingReply}
-                                                            className="flex-1"
-                                                        />
-                                                        <Button
-                                                            type="submit"
-                                                            disabled={!replyContent.trim() || isSubmittingReply}
-                                                            size="sm"
-                                                        >
-                                                            {isSubmittingReply ? '작성 중...' : '답글'}
-                                                        </Button>
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={cancelReply}
-                                                        >
-                                                            취소
-                                                        </Button>
-                                                    </div>
-                                                    <div className="text-xs text-gray-500 text-right mt-1">
-                                                        {replyContent.length}/500
-                                                    </div>
-                                                </form>
-                                            )}
-
-                                            {renderReplies(comment.replies)}
                                         </div>
-                                    </div>
-                                ))
-                            )}
+                                    );
+                                });
+                            })()}
                         </div>
                     </CardContent>
                 </Card>

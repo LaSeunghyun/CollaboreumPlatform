@@ -4,8 +4,10 @@ import { Calendar } from 'lucide-react';
 import { EventCard } from '../../components/molecules/EventCard';
 import { useEvents } from '../../lib/api/useEvents';
 import { LoadingState, ErrorState, EmptyEventsState, SkeletonGrid } from '../../components/organisms/States';
+import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 export const EventsPage: React.FC = () => {
+    const { requireAuth } = useAuthRedirect();
     const [activeFilter, setActiveFilter] = useState("ongoing");
 
     // API 훅
@@ -47,7 +49,13 @@ export const EventsPage: React.FC = () => {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {((events as any)?.data?.events || (events as any)?.events || []).map((event: any) => (
-                    <EventCard key={event.id} {...event} />
+                    <EventCard
+                        key={event.id}
+                        {...event}
+                        onClick={() => requireAuth(() => {
+                            window.location.href = `/events/${event.id}`;
+                        })}
+                    />
                 ))}
             </div>
         );

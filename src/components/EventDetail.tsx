@@ -340,7 +340,7 @@ export function EventDetail({ eventId, onBack }: EventDetailProps) {
                     <div className="mt-6">
                       <h4 className="font-medium mb-3">태그</h4>
                       <div className="flex flex-wrap gap-2">
-                        {event.tags.map((tag: string, index: number) => (
+                        {Array.isArray(event.tags) && event.tags.map((tag: string, index: number) => (
                           <Badge key={index} variant="secondary">
                             {tag}
                           </Badge>
@@ -358,7 +358,7 @@ export function EventDetail({ eventId, onBack }: EventDetailProps) {
               <CardContent className="p-6">
                 <h3 className="text-xl font-semibold mb-4">참가자 목록</h3>
                 <div className="space-y-3">
-                  {event.participants?.map((participant: any, index: number) => (
+                  {Array.isArray(event.participants) && event.participants.map((participant: any, index: number) => (
                     <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                       <div className="flex items-center gap-3">
                         <Avatar className="w-8 h-8">
@@ -385,7 +385,7 @@ export function EventDetail({ eventId, onBack }: EventDetailProps) {
               <CardContent className="p-6">
                 <h3 className="text-xl font-semibold mb-4">이벤트 일정</h3>
                 <div className="space-y-4">
-                  {event.schedule?.map((item: any, index: number) => (
+                  {Array.isArray(event.schedule) && event.schedule.map((item: any, index: number) => (
                     <div key={index} className="flex gap-4 p-3 border rounded-lg">
                       <div className="text-center min-w-[80px]">
                         <p className="font-medium text-sm">{item.time}</p>

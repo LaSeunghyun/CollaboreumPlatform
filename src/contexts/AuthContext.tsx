@@ -97,8 +97,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.setItem('authToken', newToken);
     localStorage.setItem('authUser', JSON.stringify(newUser));
 
-    // 로그인 성공 시 페이지 새로고침 (React Router 없이)
-    window.location.href = '/';
+    // 리다이렉트는 호출하는 쪽에서 처리하도록 변경
   };
 
   // 로그아웃 함수

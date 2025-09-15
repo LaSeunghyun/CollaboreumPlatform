@@ -185,7 +185,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
           <div className="relative aspect-video">
             <ImageWithFallback
               src={project.image}
-              alt={project.title}
+              alt={project.title || '프로젝트 이미지'}
               className="w-full h-full object-cover"
             />
             {project.featured && (
@@ -194,14 +194,14 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
               </Badge>
             )}
             <Badge className={`absolute top-4 right-4 ${getCategoryColorClass(project.category)}`}>
-              {project.category}
+              {project.category || '기타'}
             </Badge>
           </div>
 
           <CardContent className="p-8">
             <div className="flex items-start justify-between mb-6">
               <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">{project.title}</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-4">{project.title || '제목 없음'}</h1>
                 <div className="flex items-center gap-4 mb-4">
                   <Avatar className="w-12 h-12">
                     <AvatarImage src={project.artistAvatar} alt={project.artist} />
@@ -238,7 +238,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
               </div>
             </div>
 
-            <p className="text-lg text-gray-700 mb-6">{project.description}</p>
+            <p className="text-lg text-gray-700 mb-6">{project.description || '설명 없음'}</p>
 
             {/* Progress Section */}
             <div className="bg-gray-50 rounded-lg p-6 mb-6">
@@ -252,7 +252,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
                   <p className="text-sm text-gray-600">목표 금액</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">{project.backers}</p>
+                  <p className="text-2xl font-bold text-gray-900">{typeof project.backers === 'number' ? project.backers : 0}</p>
                   <p className="text-sm text-gray-600">후원자 수</p>
                 </div>
                 <div className="text-center">
@@ -325,11 +325,11 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
               <CardContent className="p-6">
                 <h3 className="text-xl font-semibold mb-4">후원 옵션</h3>
                 <div className="grid gap-4">
-                  {project.rewards?.map((reward: any, index: number) => (
+                  {Array.isArray(project.rewards) && project.rewards.map((reward: any, index: number) => (
                     <div key={index} className="border rounded-lg p-4">
                       <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-medium text-lg">₩{reward.amount?.toLocaleString()}</h4>
-                        <Badge variant="secondary">{reward.backers}명 후원</Badge>
+                        <h4 className="font-medium text-lg">₩{typeof reward.amount === 'number' ? reward.amount.toLocaleString() : '0'}</h4>
+                        <Badge variant="secondary">{typeof reward.backers === 'number' ? reward.backers : 0}명 후원</Badge>
                       </div>
                       <h5 className="font-medium text-gray-900 mb-2">{reward.title}</h5>
                       <p className="text-gray-600 mb-3">{reward.description}</p>
@@ -356,7 +356,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <div className="flex items-center gap-1">
                           <Heart className="w-4 h-4" />
-                          <span>{update.likes}</span>
+                          <span>{typeof update.likes === 'number' ? update.likes : 0}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <MessageCircle className="w-4 h-4" />

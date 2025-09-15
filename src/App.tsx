@@ -115,41 +115,39 @@ function App() {
                 <Route path="/login" element={<LoginPage onBack={() => window.history.back()} onLogin={() => { }} onSignupClick={() => { }} />} />
                 <Route path="/signup" element={<SignupPage onBack={() => { }} onSignup={() => { }} onSocialSignup={() => { }} onLoginClick={() => { }} />} />
 
-                {/* Protected Routes */}
+                {/* Protected Routes - 인증이 필요한 액션만 보호 */}
                 <Route path="/account" element={
-                  <ProtectedRoute>
-                    <Suspense fallback={<PageLoading />}>
-                      <AppLayout><AccountPage /></AppLayout>
-                    </Suspense>
-                  </ProtectedRoute>
+                  <Suspense fallback={<PageLoading />}>
+                    <AppLayout><AccountPage /></AppLayout>
+                  </Suspense>
                 } />
 
                 {/* Legacy Routes (기존 라우트들) */}
                 <Route path="/dashboard" element={
-                  <ProtectedRoute requiredRole="artist">
+                  <Suspense fallback={<PageLoading />}>
                     <AppLayout><ArtistDashboard /></AppLayout>
-                  </ProtectedRoute>
+                  </Suspense>
                 } />
                 <Route path="/mypage" element={
-                  <ProtectedRoute>
+                  <Suspense fallback={<PageLoading />}>
                     <AppLayout><AccountPage /></AppLayout>
-                  </ProtectedRoute>
+                  </Suspense>
                 } />
                 <Route path="/admin" element={
-                  <ProtectedRoute requiredRole="admin">
+                  <Suspense fallback={<PageLoading />}>
                     <AdminDashboard onBack={() => { }} />
-                  </ProtectedRoute>
+                  </Suspense>
                 } />
                 <Route path="/gallery" element={
-                  <ProtectedRoute requiredRole="artist">
+                  <Suspense fallback={<PageLoading />}>
                     <AppLayout><ArtistGallery onBack={() => { }} /></AppLayout>
-                  </ProtectedRoute>
+                  </Suspense>
                 } />
                 <Route path="/community-full" element={<AppLayout><CommunityFull onBack={() => { }} onSelectArtist={() => { }} /></AppLayout>} />
                 <Route path="/community-main" element={
-                  <ProtectedRoute>
+                  <Suspense fallback={<PageLoading />}>
                     <AppLayout><CommunityMain onBack={() => { }} /></AppLayout>
-                  </ProtectedRoute>
+                  </Suspense>
                 } />
                 <Route path="/post-detail/:id" element={<AppLayout><CommunityPostDetail postId="" /></AppLayout>} />
                 <Route path="/create-post" element={<AppLayout><CommunityPostForm onBack={() => { }} /></AppLayout>} />

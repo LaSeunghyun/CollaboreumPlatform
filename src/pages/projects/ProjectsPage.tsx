@@ -7,11 +7,14 @@ import { Plus, Clock, Star, TrendingUp } from 'lucide-react';
 import { FundingProjectCard } from '../../components/molecules/FundingProjectCard';
 import { useProjects } from '../../lib/api/useProjects';
 import { LoadingState, ErrorState, EmptyProjectsState, SkeletonGrid } from '../../components/organisms/States';
+import { useAuth } from '../../contexts/AuthContext';
+import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 export const ProjectsPage: React.FC = () => {
+    const { isAuthenticated } = useAuth();
+    const { requireAuth } = useAuthRedirect();
     const [activeTab, setActiveTab] = useState("ongoing");
     const [projectSort, setProjectSort] = useState("deadline");
-    const [isLoggedIn] = useState(true); // 실제로는 인증 상태에서 가져와야 함
 
     // API 훅들
     const { data: ongoingProjects, isLoading: ongoingLoading, error: ongoingError } = useProjects({
@@ -26,8 +29,10 @@ export const ProjectsPage: React.FC = () => {
     });
 
     const handleCreateProject = () => {
-        // 프로젝트 생성 페이지로 이동
-        window.location.href = '/funding/create';
+        requireAuth(() => {
+            // 프로젝트 생성 페이지로 이동
+            window.location.href = '/funding/create';
+        });
     };
 
     const renderProjects = (projects: any[], loading: boolean, error: any) => {
@@ -47,7 +52,7 @@ export const ProjectsPage: React.FC = () => {
         if (!projects || projects.length === 0) {
             return (
                 <EmptyProjectsState
-                    action={isLoggedIn ? {
+                    action={isAuthenticated ? {
                         label: "새 프로젝트 만들기",
                         onClick: handleCreateProject
                     } : undefined}
@@ -71,7 +76,7 @@ export const ProjectsPage: React.FC = () => {
                     <h1 className="text-3xl font-bold">펀딩 프로젝트</h1>
                     <p className="text-muted-foreground">아티스트의 꿈을 응원하고 함께 성장하세요</p>
                 </div>
-                {isLoggedIn && (
+                {isAuthenticated && (
                     <Button
                         className="bg-indigo hover:bg-indigo-hover hover-scale transition-button shadow-sm"
                         onClick={handleCreateProject}

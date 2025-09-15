@@ -34,6 +34,62 @@ import { format } from 'date-fns';
 import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
 import { safeArrayResponse, safeObjectResponse, getErrorMessage } from '../utils/apiUtils';
 
+// 댓글 데이터 변환 함수 (컴포넌트 외부로 이동)
+const transformComments = (comments: any[]): Comment[] => {
+  if (!Array.isArray(comments)) return [];
+
+  return comments
+    .filter((comment: any) => comment && typeof comment === 'object') // 유효한 객체만 필터링
+    .map((comment: any) => {
+      try {
+        // 안전한 날짜 처리
+        let createdAt: Date;
+        try {
+          createdAt = new Date(comment.createdAt);
+          if (isNaN(createdAt.getTime())) {
+            createdAt = new Date();
+          }
+        } catch {
+          createdAt = new Date();
+        }
+
+        return {
+          id: String(comment.id || comment._id || ''),
+          content: String(comment.content || ''),
+          author: {
+            id: String(comment.author?.id || comment.authorId || comment.author || ''),
+            username: String(comment.author?.username || comment.authorName || comment.author || 'Unknown'),
+            role: String(comment.author?.role || '사용자'),
+            avatar: comment.author?.avatar ? String(comment.author.avatar) : undefined
+          },
+          createdAt: createdAt,
+          likes: typeof comment.likes === 'number' ? comment.likes : (Array.isArray(comment.likes) ? comment.likes.length : 0),
+          dislikes: typeof comment.dislikes === 'number' ? comment.dislikes : (Array.isArray(comment.dislikes) ? comment.dislikes.length : 0),
+          replies: Array.isArray(comment.replies) ? transformComments(comment.replies) : [],
+          parentId: comment.parentId ? String(comment.parentId) : undefined
+        };
+      } catch (error) {
+        console.error('댓글 변환 중 오류:', error, comment);
+        // 오류 발생 시 기본값 반환
+        return {
+          id: String(comment.id || comment._id || ''),
+          content: String(comment.content || ''),
+          author: {
+            id: '',
+            username: 'Unknown',
+            role: '사용자',
+            avatar: undefined
+          },
+          createdAt: new Date(),
+          likes: 0,
+          dislikes: 0,
+          replies: [],
+          parentId: undefined
+        };
+      }
+    });
+};
+
 // Types
 interface CommunityPost {
   id: string;
@@ -73,26 +129,6 @@ interface Comment {
   parentId?: string;
 }
 
-// 댓글 데이터 변환 함수
-const transformComments = (comments: any[]): Comment[] => {
-  if (!Array.isArray(comments)) return [];
-
-  return comments.map((comment: any) => ({
-    id: comment.id || comment._id || '',
-    content: comment.content || '',
-    author: {
-      id: comment.author?.id || comment.authorId || comment.author || '',
-      username: comment.author?.username || comment.authorName || comment.author || 'Unknown',
-      role: comment.author?.role || '사용자',
-      avatar: comment.author?.avatar
-    },
-    createdAt: new Date(comment.createdAt),
-    likes: typeof comment.likes === 'number' ? comment.likes : (Array.isArray(comment.likes) ? comment.likes.length : 0),
-    dislikes: typeof comment.dislikes === 'number' ? comment.dislikes : (Array.isArray(comment.dislikes) ? comment.dislikes.length : 0),
-    replies: comment.replies ? transformComments(comment.replies) : [],
-    parentId: comment.parentId
-  }));
-};
 
 // Post Creation Form Component
 export const PostCreationForm: React.FC = () => {
@@ -417,7 +453,7 @@ export const PostList: React.FC = () => {
                           </span>
                         </div>
                         <h3 className="text-lg font-semibold hover:text-blue-600 cursor-pointer">
-                          {post.title}
+                          {post.title || '제목 없음'}
                         </h3>
                       </div>
                       <div className="flex items-center gap-1">
@@ -427,10 +463,10 @@ export const PostList: React.FC = () => {
                       </div>
                     </div>
 
-                    <p className="text-gray-600 line-clamp-2">{post.content}</p>
+                    <p className="text-gray-600 line-clamp-2">{post.content || '내용 없음'}</p>
 
                     <div className="flex flex-wrap gap-2">
-                      {post.tags.map(tag => (
+                      {Array.isArray(post.tags) && post.tags.map(tag => (
                         <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>
                       ))}
                     </div>
@@ -447,7 +483,7 @@ export const PostList: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
-                          {post.views}
+                          {typeof post.views === 'number' ? post.views : 0}
                         </div>
                       </div>
 
@@ -666,9 +702,9 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
                     {format(post.createdAt, 'PPP')}
                   </span>
                 </div>
-                <h1 className="text-2xl font-bold mb-3">{post.title}</h1>
+                <h1 className="text-2xl font-bold mb-3">{post.title || '제목 없음'}</h1>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {post.tags.map(tag => (
+                  {Array.isArray(post.tags) && post.tags.map(tag => (
                     <Badge key={tag} variant="secondary">{tag}</Badge>
                   ))}
                 </div>
@@ -690,12 +726,12 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
               </Avatar>
               <div>
                 <p className="font-medium">{getUsername(post.author)}</p>
-                <p className="text-sm text-gray-600">{post.author.role || '사용자'}</p>
+                <p className="text-sm text-gray-600">{post.author?.role || '사용자'}</p>
               </div>
             </div>
 
             <div className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{post.content}</p>
+              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{post.content || '내용 없음'}</p>
             </div>
 
             <div className="flex items-center justify-between pt-4">
@@ -718,7 +754,7 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
                 </Button>
               </div>
               <div className="text-sm text-gray-500">
-                조회수 {post.views} • 댓글 {post.commentCount}
+                조회수 {typeof post.views === 'number' ? post.views : 0} • 댓글 {typeof post.commentCount === 'number' ? post.commentCount : 0}
               </div>
             </div>
           </div>
@@ -762,8 +798,8 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
 
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium">{getUsername(comment.author)}</span>
-                      <Badge variant="outline" className="text-xs">{comment.author.role || '사용자'}</Badge>
+                      <span className="font-medium">{typeof comment.author === 'string' ? comment.author : comment.author?.username || 'Unknown'}</span>
+                      <Badge variant="outline" className="text-xs">{comment.author?.role || '사용자'}</Badge>
                       <span className="text-sm text-gray-500">
                         {format(comment.createdAt, 'MM/dd HH:mm')}
                       </span>

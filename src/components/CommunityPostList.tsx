@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+// import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { useAuth } from '../contexts/AuthContext';
 import { communityApi } from '../features/community/api/communityApi';
@@ -66,7 +66,7 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
     }
   };
 
-  const fetchPosts = async (page: number = 1, category: string = selectedCategory) => {
+  const fetchPosts = useCallback(async (page: number = 1, category: string = selectedCategory) => {
     setIsLoading(true);
     try {
       const response = await communityApi.getPosts({
@@ -107,12 +107,12 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedCategory, searchQuery]);
 
   useEffect(() => {
     fetchCategories();
     fetchPosts(1, selectedCategory);
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, searchQuery, fetchPosts]);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
@@ -171,12 +171,12 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
     }
   };
 
-  const formatContent = (content: string) => {
-    if (content.length > 100) {
-      return content.substring(0, 100) + '...';
-    }
-    return content;
-  };
+  // const formatContent = (content: string) => {
+  //   if (content.length > 100) {
+  //     return content.substring(0, 100) + '...';
+  //   }
+  //   return content;
+  // };
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">

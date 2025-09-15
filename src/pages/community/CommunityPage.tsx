@@ -15,6 +15,7 @@ import { useCommunityStats } from '../../lib/api/useStats';
 import { useCategories } from '../../lib/api/useCategories';
 import { Badge } from '../../components/ui/badge';
 import { DEFAULT_CATEGORIES, CATEGORY_LABELS } from '../../constants/categories';
+import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 // 카테고리별 게시글 컴포넌트
 const CategoryPosts: React.FC<{
@@ -22,6 +23,7 @@ const CategoryPosts: React.FC<{
     searchQuery: string;
     sortBy: "latest" | "popular" | "comments" | "views";
 }> = ({ categoryId, searchQuery, sortBy }) => {
+    const { requireAuth } = useAuthRedirect();
     const { data: categoryPosts, isLoading, error } = useCommunityPosts({
         category: categoryId,
         search: searchQuery || undefined,
@@ -42,7 +44,7 @@ const CategoryPosts: React.FC<{
         );
     }
 
-    if (!categoryPosts?.posts || categoryPosts.posts.length === 0) {
+    if (!categoryPosts || !(categoryPosts as any)?.posts || (categoryPosts as any).posts.length === 0) {
         return (
             <EmptyCommunityState
                 action={undefined}
@@ -64,7 +66,7 @@ const CategoryPosts: React.FC<{
             </div>
 
             {/* 게시글 목록 */}
-            {categoryPosts.posts.map((post: any, index: number) => {
+            {(categoryPosts as any).posts.map((post: any, index: number) => {
                 const postId = post.id || (post as any)._id;
                 if (!postId) return null;
 
@@ -78,12 +80,15 @@ const CategoryPosts: React.FC<{
                                 console.error('Invalid postId:', postId);
                                 return;
                             }
-                            window.location.href = `/community/post/${postId}`;
+
+                            requireAuth(() => {
+                                window.location.href = `/community/post/${postId}`;
+                            });
                         }}
                     >
                         {/* 번호 */}
                         <div className="col-span-1 text-center text-sm text-gray-500">
-                            {categoryPosts.posts.length - index}
+                            {(categoryPosts as any).posts.length - index}
                         </div>
 
                         {/* 제목 */}
@@ -100,9 +105,16 @@ const CategoryPosts: React.FC<{
                             </div>
                             <h3 className="text-sm font-medium line-clamp-1 hover:text-blue-600">
                                 {post.title}
-                                {(post.comments || post.replies) > 0 && (
-                                    <span className="text-blue-600 ml-1">[{post.comments || post.replies}]</span>
-                                )}
+                                {(() => {
+                                    const commentCount = typeof post.comments === 'number' ? post.comments :
+                                        (Array.isArray(post.comments) ? post.comments.length : 0);
+                                    const replyCount = typeof post.replies === 'number' ? post.replies :
+                                        (Array.isArray(post.replies) ? post.replies.length : 0);
+                                    const totalCount = commentCount + replyCount;
+                                    return totalCount > 0 ? (
+                                        <span className="text-blue-600 ml-1">[{totalCount}]</span>
+                                    ) : null;
+                                })()}
                             </h3>
                         </div>
 
@@ -144,9 +156,9 @@ const CategoryPosts: React.FC<{
             })}
 
             {/* 모바일 레이아웃 */}
-            {categoryPosts.posts.length > 0 && (
+            {(categoryPosts as any).posts.length > 0 && (
                 <div className="md:hidden space-y-2 p-4">
-                    {categoryPosts.posts.map((post: any, index: number) => {
+                    {(categoryPosts as any).posts.map((post: any, index: number) => {
                         const postId = post.id || (post as any)._id;
                         if (!postId) return null;
 
@@ -195,6 +207,7 @@ const CategoryPosts: React.FC<{
 
 export const CommunityPage: React.FC = () => {
     const { user } = useAuth();
+    const { requireAuth } = useAuthRedirect();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("all");
     const [searchQuery, setSearchQuery] = useState("");
@@ -226,7 +239,9 @@ export const CommunityPage: React.FC = () => {
     const { data: categories, isLoading: categoriesLoading } = useCategories();
 
     const handleCreatePost = () => {
-        setIsCreateModalOpen(true);
+        requireAuth(() => {
+            setIsCreateModalOpen(true);
+        });
     };
 
     const handlePostClick = (postId: string) => {
@@ -235,7 +250,10 @@ export const CommunityPage: React.FC = () => {
             console.error('Invalid postId:', postId);
             return;
         }
-        navigate(`/community/post/${postId}`);
+
+        requireAuth(() => {
+            navigate(`/community/post/${postId}`);
+        });
     };
 
 
@@ -347,9 +365,16 @@ export const CommunityPage: React.FC = () => {
                                 </div>
                                 <h3 className="text-sm font-medium line-clamp-1 hover:text-blue-600">
                                     {post.title}
-                                    {(post.comments || post.replies) > 0 && (
-                                        <span className="text-blue-600 ml-1">[{post.comments || post.replies}]</span>
-                                    )}
+                                    {(() => {
+                                        const commentCount = typeof post.comments === 'number' ? post.comments :
+                                            (Array.isArray(post.comments) ? post.comments.length : 0);
+                                        const replyCount = typeof post.replies === 'number' ? post.replies :
+                                            (Array.isArray(post.replies) ? post.replies.length : 0);
+                                        const totalCount = commentCount + replyCount;
+                                        return totalCount > 0 ? (
+                                            <span className="text-blue-600 ml-1">[{totalCount}]</span>
+                                        ) : null;
+                                    })()}
                                 </h3>
                             </div>
 

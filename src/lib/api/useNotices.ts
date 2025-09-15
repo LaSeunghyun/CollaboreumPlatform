@@ -19,6 +19,8 @@ export const useNotices = (params?: {
         }),
         staleTime: 10 * 60 * 1000, // 10분
         gcTime: 30 * 60 * 1000, // 30분
+        retry: 1, // 재시도 1회만
+        retryDelay: 1000
     });
 };
 

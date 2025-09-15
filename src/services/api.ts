@@ -40,6 +40,17 @@ export async function apiCall<T>(endpoint: string, options: RequestInit = {}): P
                 console.log('🔓 인증 토큰이 만료되어 자동 로그아웃');
             }
 
+            // 공개 데이터 조회 시 401 에러는 무시하고 빈 데이터 반환
+            if (response.status === 401 && (
+                endpoint.includes('/artists') ||
+                endpoint.includes('/funding/projects') ||
+                endpoint.includes('/community/posts') ||
+                endpoint.includes('/stats/platform')
+            )) {
+                console.warn(`공개 데이터 조회 실패 (401): ${endpoint}`);
+                return { success: false, data: [], message: '인증이 필요합니다' } as T;
+            }
+
             throw new Error(errorData.message || `API Error: ${response.status} ${response.statusText}`);
         }
 

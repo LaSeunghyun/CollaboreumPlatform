@@ -280,21 +280,21 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
                     </div>
 
                     <h3 className="font-medium text-gray-900 mb-2 hover:text-blue-600 transition-colors">
-                      {post.title}
+                      {post.title || '제목 없음'}
                     </h3>
 
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">{post.content}</p>
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">{post.content || '내용 없음'}</p>
 
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <Avatar className="w-6 h-6">
                           <AvatarImage
                             src={artists.find(a => a.id === post.artistId)?.avatar}
-                            alt={post.author}
+                            alt={getUsername(post.author)}
                           />
                           <AvatarFallback className="text-xs">{getFirstChar(post.author)}</AvatarFallback>
                         </Avatar>
-                        <span className="text-sm text-gray-600">by {post.author}</span>
+                        <span className="text-sm text-gray-600">by {getUsername(post.author)}</span>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-600">
                         <div className="flex items-center gap-1">

@@ -13,8 +13,10 @@ import { ArtistProfile } from '../../components/ArtistProfile';
 import { ArtistDashboard } from '../../components/ArtistDashboard';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
+import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 export const ArtistsPage: React.FC = () => {
+    const { requireAuth } = useAuthRedirect();
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [activeTab, setActiveTab] = useState("hot");
@@ -36,8 +38,10 @@ export const ArtistsPage: React.FC = () => {
     };
 
     const handleCreateProject = () => {
-        // 프로젝트 생성 페이지로 이동
-        window.location.href = '/funding/create';
+        requireAuth(() => {
+            // 프로젝트 생성 페이지로 이동
+            window.location.href = '/funding/create';
+        });
     };
 
     const handleCategoryChange = (category: string) => {
@@ -75,7 +79,9 @@ export const ArtistsPage: React.FC = () => {
                     <ArtistCard
                         key={artist.id}
                         {...artist}
-                        onClick={() => window.location.href = `/artists/${artist.id}`}
+                        onClick={() => requireAuth(() => {
+                            window.location.href = `/artists/${artist.id}`;
+                        })}
                     />
                 ))}
             </div>
