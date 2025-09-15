@@ -26,7 +26,7 @@ router.get('/posts', async (req, res) => {
         sortQuery = { createdAt: -1 };
         break;
       case 'popular':
-        sortQuery = { likes: -1, views: -1 };
+        sortQuery = { likes: -1, viewCount: -1 };
         break;
       case 'oldest':
         sortQuery = { createdAt: 1 };
@@ -66,12 +66,16 @@ router.get('/posts', async (req, res) => {
 router.get('/posts/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    console.log('포스트 조회 요청:', { id });
     
     const post = await CommunityPost.findById(id)
       .populate('author', 'name role avatar')
       .populate('comments.author', 'name role avatar');
 
+    console.log('조회된 포스트:', post ? '존재함' : '없음');
+
     if (!post) {
+      console.log('포스트를 찾을 수 없음:', id);
       return res.status(404).json({
         success: false,
         message: '포스트를 찾을 수 없습니다.'
@@ -79,6 +83,7 @@ router.get('/posts/:id', async (req, res) => {
     }
 
     if (!post.isActive) {
+      console.log('비활성 포스트:', id);
       return res.status(404).json({
         success: false,
         message: '삭제된 포스트입니다.'
@@ -86,8 +91,9 @@ router.get('/posts/:id', async (req, res) => {
     }
 
     // 조회수 증가
-    post.views += 1;
+    post.viewCount += 1;
     await post.save();
+    console.log('조회수 증가 완료:', post.viewCount);
 
     res.json({
       success: true,
@@ -97,7 +103,8 @@ router.get('/posts/:id', async (req, res) => {
     console.error('포스트 조회 실패:', error);
     res.status(500).json({
       success: false,
-      message: '포스트를 불러올 수 없습니다.'
+      message: '포스트를 불러올 수 없습니다.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -106,10 +113,13 @@ router.get('/posts/:id', async (req, res) => {
 router.post('/posts/:id/views', async (req, res) => {
   try {
     const { id } = req.params;
+    console.log('조회수 증가 요청:', { id });
     
     const post = await CommunityPost.findById(id);
+    console.log('조회된 포스트:', post ? '존재함' : '없음');
 
     if (!post) {
+      console.log('포스트를 찾을 수 없음:', id);
       return res.status(404).json({
         success: false,
         message: '포스트를 찾을 수 없습니다.'
@@ -117,6 +127,7 @@ router.post('/posts/:id/views', async (req, res) => {
     }
 
     if (!post.isActive) {
+      console.log('비활성 포스트:', id);
       return res.status(404).json({
         success: false,
         message: '삭제된 포스트입니다.'
@@ -124,21 +135,23 @@ router.post('/posts/:id/views', async (req, res) => {
     }
 
     // 조회수 증가
-    post.views += 1;
+    post.viewCount += 1;
     await post.save();
+    console.log('조회수 증가 완료:', post.viewCount);
 
     res.json({
       success: true,
       message: '조회수가 증가되었습니다.',
       data: {
-        views: post.views
+        views: post.viewCount
       }
     });
   } catch (error) {
     console.error('조회수 증가 실패:', error);
     res.status(500).json({
       success: false,
-      message: '조회수 증가에 실패했습니다.'
+      message: '조회수 증가에 실패했습니다.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -808,7 +821,7 @@ router.get('/posts/popular', async (req, res) => {
     
     const posts = await CommunityPost.find({ isActive: true })
       .populate('author', 'name role avatar')
-      .sort({ likes: -1, views: -1 })
+      .sort({ likes: -1, viewCount: -1 })
       .limit(parseInt(limit));
 
     res.json({

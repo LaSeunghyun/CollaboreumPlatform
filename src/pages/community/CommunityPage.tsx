@@ -14,7 +14,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCommunityStats } from '../../lib/api/useStats';
 import { useCategories } from '../../lib/api/useCategories';
 import { Badge } from '../../components/ui/badge';
-import { DEFAULT_CATEGORIES, CATEGORY_LABELS } from '../../constants/categories';
+import { DEFAULT_CATEGORIES, CATEGORY_LABELS, getCategoryLabel } from '../../constants/categories';
 import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 // 카테고리별 게시글 컴포넌트
@@ -22,8 +22,10 @@ const CategoryPosts: React.FC<{
     categoryId: string;
     searchQuery: string;
     sortBy: "latest" | "popular" | "comments" | "views";
-}> = ({ categoryId, searchQuery, sortBy }) => {
+    categories: any[];
+}> = ({ categoryId, searchQuery, sortBy, categories }) => {
     const { requireAuth } = useAuthRedirect();
+    const navigate = useNavigate();
     const { data: categoryPosts, isLoading, error } = useCommunityPosts({
         category: categoryId,
         search: searchQuery || undefined,
@@ -82,7 +84,7 @@ const CategoryPosts: React.FC<{
                             }
 
                             requireAuth(() => {
-                                window.location.href = `/community/post/${postId}`;
+                                navigate(`/community/post/${postId}`);
                             });
                         }}
                     >
@@ -95,7 +97,7 @@ const CategoryPosts: React.FC<{
                         <div className="col-span-5">
                             <div className="flex items-center gap-2 mb-1">
                                 <Badge variant="secondary" className="text-xs">
-                                    {post.category}
+                                    {getCategoryLabel(post.category)}
                                 </Badge>
                                 {post.isHot && (
                                     <Badge variant="destructive" className="text-xs">
@@ -132,7 +134,7 @@ const CategoryPosts: React.FC<{
                         <div className="col-span-1 text-center text-sm text-gray-500">
                             <div className="flex items-center justify-center gap-1">
                                 <span className="text-red-500">❤️</span>
-                                <span>{post.likes || 0}</span>
+                                <span>{typeof post.likes === 'number' ? post.likes : 0}</span>
                             </div>
                         </div>
 
@@ -140,7 +142,7 @@ const CategoryPosts: React.FC<{
                         <div className="col-span-1 text-center text-sm text-gray-500">
                             <div className="flex items-center justify-center gap-1">
                                 <span className="text-blue-500">👎</span>
-                                <span>{post.dislikes || 0}</span>
+                                <span>{typeof post.dislikes === 'number' ? post.dislikes : 0}</span>
                             </div>
                         </div>
 
@@ -172,12 +174,15 @@ const CategoryPosts: React.FC<{
                                         console.error('Invalid postId:', postId);
                                         return;
                                     }
-                                    window.location.href = `/community/post/${postId}`;
+
+                                    requireAuth(() => {
+                                        navigate(`/community/post/${postId}`);
+                                    });
                                 }}
                             >
                                 <div className="flex items-center gap-2 mb-2">
                                     <Badge variant="secondary" className="text-xs">
-                                        {post.category}
+                                        {getCategoryLabel(post.category)}
                                     </Badge>
                                     {post.isHot && (
                                         <Badge variant="destructive" className="text-xs">
@@ -234,6 +239,19 @@ export const CommunityPage: React.FC = () => {
     // const { data: communityStats, isLoading: statsLoading } = useCommunityStats();
     const communityStats = null;
     const statsLoading = false;
+
+    // 실제 게시글 데이터로 통계 계산
+    const actualPosts = (allPosts as any)?.posts || [];
+    const totalPosts = actualPosts.length;
+    const totalLikes = actualPosts.reduce((sum: number, post: any) => sum + (typeof post.likes === 'number' ? post.likes : 0), 0);
+    const avgLikes = totalPosts > 0 ? Math.round(totalLikes / totalPosts) : 0;
+    const totalComments = actualPosts.reduce((sum: number, post: any) => {
+        const commentCount = typeof post.comments === 'number' ? post.comments :
+            (Array.isArray(post.comments) ? post.comments.length : 0);
+        const replyCount = typeof post.replies === 'number' ? post.replies :
+            (Array.isArray(post.replies) ? post.replies.length : 0);
+        return sum + commentCount + replyCount;
+    }, 0);
 
     // 카테고리 목록 조회
     const { data: categories, isLoading: categoriesLoading } = useCategories();
@@ -355,7 +373,7 @@ export const CommunityPage: React.FC = () => {
                             <div className="col-span-5">
                                 <div className="flex items-center gap-2 mb-1">
                                     <Badge variant="secondary" className="text-xs">
-                                        {categories?.find(cat => cat.id === post.category)?.label || post.category}
+                                        {getCategoryLabel(post.category)}
                                     </Badge>
                                     {post.isHot && (
                                         <Badge variant="destructive" className="text-xs">
@@ -392,7 +410,7 @@ export const CommunityPage: React.FC = () => {
                             <div className="col-span-1 text-center text-sm text-gray-500">
                                 <div className="flex items-center justify-center gap-1">
                                     <span className="text-red-500">❤️</span>
-                                    <span>{post.likes || 0}</span>
+                                    <span>{typeof post.likes === 'number' ? post.likes : 0}</span>
                                 </div>
                             </div>
 
@@ -400,7 +418,7 @@ export const CommunityPage: React.FC = () => {
                             <div className="col-span-1 text-center text-sm text-gray-500">
                                 <div className="flex items-center justify-center gap-1">
                                     <span className="text-blue-500">👎</span>
-                                    <span>{post.dislikes || 0}</span>
+                                    <span>{typeof post.dislikes === 'number' ? post.dislikes : 0}</span>
                                 </div>
                             </div>
 
@@ -433,7 +451,7 @@ export const CommunityPage: React.FC = () => {
                                 >
                                     <div className="flex items-center gap-2 mb-2">
                                         <Badge variant="secondary" className="text-xs">
-                                            {categories?.find(cat => cat.id === post.category)?.label || post.category}
+                                            {getCategoryLabel(post.category)}
                                         </Badge>
                                         {post.isHot && (
                                             <Badge variant="destructive" className="text-xs">
@@ -448,8 +466,8 @@ export const CommunityPage: React.FC = () => {
                                         <span>{typeof post.author === 'string' ? post.author : post.author?.name || 'Unknown'}</span>
                                         <div className="flex items-center gap-3">
                                             <span>조회 {post.views || post.viewCount || 0}</span>
-                                            <span>❤️ {post.likes || 0}</span>
-                                            <span>👎 {post.dislikes || 0}</span>
+                                            <span>❤️ {typeof post.likes === 'number' ? post.likes : 0}</span>
+                                            <span>👎 {typeof post.dislikes === 'number' ? post.dislikes : 0}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -634,6 +652,7 @@ export const CommunityPage: React.FC = () => {
                                         categoryId={category.id}
                                         searchQuery={searchQuery}
                                         sortBy={sortBy}
+                                        categories={categories}
                                     />
                                 </TabsContent>
                             ))}
@@ -676,11 +695,10 @@ export const CommunityPage: React.FC = () => {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {((communityStats as any)?.data?.totalPosts || 0).toLocaleString()}
+                                    {totalPosts.toLocaleString()}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    {((communityStats as any)?.data?.postsGrowthRate || 0) > 0 ? '+' : ''}
-                                    {((communityStats as any)?.data?.postsGrowthRate || 0)}% 지난 주 대비
+                                    0% 지난 주 대비
                                 </p>
                             </CardContent>
                         </Card>
@@ -692,11 +710,10 @@ export const CommunityPage: React.FC = () => {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {((communityStats as any)?.data?.activeUsers || 0).toLocaleString()}
+                                    {new Set(actualPosts.map((post: any) => post.author?.id || post.author)).size}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    {((communityStats as any)?.data?.usersGrowthRate || 0) > 0 ? '+' : ''}
-                                    {((communityStats as any)?.data?.usersGrowthRate || 0)}% 지난 주 대비
+                                    0% 지난 주 대비
                                 </p>
                             </CardContent>
                         </Card>
@@ -708,7 +725,7 @@ export const CommunityPage: React.FC = () => {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {((communityStats as any)?.data?.totalComments || 0).toLocaleString()}
+                                    {totalComments.toLocaleString()}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
                                     커뮤니티 참여도
@@ -723,7 +740,7 @@ export const CommunityPage: React.FC = () => {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {((communityStats as any)?.data?.avgLikes || 0).toLocaleString()}
+                                    {avgLikes.toLocaleString()}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
                                     게시글당 평균

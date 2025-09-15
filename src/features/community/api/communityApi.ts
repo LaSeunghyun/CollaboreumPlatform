@@ -39,8 +39,13 @@ export const communityApi = {
 
     // 게시글 상세 조회
     getPost: async (postId: string): Promise<CommunityPost> => {
-        const response = await apiCall<{ success: boolean; data: CommunityPost }>(`${API_BASE}/posts/${postId}`)
-        return response.data
+        try {
+            const response = await apiCall<{ success: boolean; data: CommunityPost }>(`${API_BASE}/posts/${postId}`)
+            return response.data
+        } catch (error) {
+            console.error('게시글 상세 조회 실패:', error)
+            throw error
+        }
     },
 
     // 게시글 생성
@@ -85,10 +90,15 @@ export const communityApi = {
 
     // 게시글 조회수 증가
     viewPost: async (postId: string): Promise<{ views: number }> => {
-        const response = await apiCall<{ success: boolean; data: { views: number }; message: string }>(`${API_BASE}/posts/${postId}/views`, {
-            method: 'POST',
-        })
-        return { views: response.data.views }
+        try {
+            const response = await apiCall<{ success: boolean; data: { views: number }; message: string }>(`${API_BASE}/posts/${postId}/views`, {
+                method: 'POST',
+            })
+            return { views: response.data.views }
+        } catch (error) {
+            console.error('조회수 증가 실패:', error)
+            throw error
+        }
     },
 
     // 댓글 목록 조회

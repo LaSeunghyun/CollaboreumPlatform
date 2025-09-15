@@ -14,8 +14,8 @@ export const useProjects = (params?: {
     return useQuery({
         queryKey: ['projects', params],
         queryFn: () => fundingAPI.getProjects(params),
-    staleTime: 5 * 60 * 1000, // 5분
-    gcTime: 10 * 60 * 1000, // 10분
+        staleTime: 5 * 60 * 1000, // 5분
+        gcTime: 10 * 60 * 1000, // 10분
         retry: 1, // 재시도 1회만
         retryDelay: 1000
     });

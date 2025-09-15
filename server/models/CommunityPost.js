@@ -35,10 +35,6 @@ const communityPostSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
-  views: {
-    type: Number,
-    default: 0
-  },
   reports: [{
     reporter: {
       type: mongoose.Schema.Types.ObjectId,
