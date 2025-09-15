@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Tabs, TabsContent } from '../../components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '../../components/ui/dialog';
@@ -11,7 +11,6 @@ import { Search, Plus, MessageCircle, Users, MessageSquare, Heart } from 'lucide
 import { useCommunityPosts, useCreateCommunityPost } from '../../features/community/hooks/useCommunityPosts';
 import { LoadingState, ErrorState, EmptyCommunityState } from '../../components/organisms/States';
 import { useAuth } from '../../contexts/AuthContext';
-import { useCommunityStats } from '../../lib/api/useStats';
 import { useCategories } from '../../lib/api/useCategories';
 import { Badge } from '../../components/ui/badge';
 import { DEFAULT_CATEGORIES, CATEGORY_LABELS, getCategoryLabel } from '../../constants/categories';
@@ -77,7 +76,6 @@ const CategoryPosts: React.FC<{
                         key={postId}
                         className="hidden md:grid md:grid-cols-12 gap-4 p-4 border-b hover:bg-gray-50 transition-colors cursor-pointer"
                         onClick={() => {
-                            console.log('Post clicked with ID:', postId);
                             if (!postId || postId === 'undefined' || postId === 'null') {
                                 console.error('Invalid postId:', postId);
                                 return;
@@ -169,7 +167,6 @@ const CategoryPosts: React.FC<{
                                 key={postId}
                                 className="p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                                 onClick={() => {
-                                    console.log('Post clicked with ID:', postId);
                                     if (!postId || postId === 'undefined' || postId === 'null') {
                                         console.error('Invalid postId:', postId);
                                         return;
@@ -237,8 +234,6 @@ export const CommunityPage: React.FC = () => {
 
     // 커뮤니티 통계 조회 (임시 비활성화 - API 404 오류 해결 전까지)
     // const { data: communityStats, isLoading: statsLoading } = useCommunityStats();
-    const communityStats = null;
-    const statsLoading = false;
 
     // 실제 게시글 데이터로 통계 계산
     const actualPosts = (allPosts as any)?.posts || [];
@@ -263,7 +258,6 @@ export const CommunityPage: React.FC = () => {
     };
 
     const handlePostClick = (postId: string) => {
-        console.log('Post clicked with ID:', postId);
         if (!postId || postId === 'undefined' || postId === 'null') {
             console.error('Invalid postId:', postId);
             return;
@@ -351,7 +345,6 @@ export const CommunityPage: React.FC = () => {
                 {posts.map((post: any, index: number) => {
                     // postId 검증 및 로깅
                     const postId = post.id || (post as any)._id;
-                    console.log('Rendering post:', { postId, title: post.title, fullPost: post });
 
                     if (!postId) {
                         console.error('Post missing ID:', post);
@@ -671,7 +664,7 @@ export const CommunityPage: React.FC = () => {
                     </p>
                 </div>
 
-                {statsLoading ? (
+                {allLoading ? (
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                         {[...Array(4)].map((_, i) => (
                             <Card key={i}>

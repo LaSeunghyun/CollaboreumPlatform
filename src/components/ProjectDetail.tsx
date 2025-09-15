@@ -11,7 +11,7 @@ import { PaymentModal } from './PaymentModal';
 import { fundingAPI, interactionAPI } from '../services/api';
 import { useCategories } from '../lib/api/useCategories';
 import { getCategoryColor } from '../constants/categories';
-import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
+import { getFirstChar } from '../utils/typeGuards';
 import { ApiResponse } from '../types';
 
 interface ProjectDetailProps {

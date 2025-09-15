@@ -7,12 +7,10 @@ import { Search, Palette, BarChart3, Users, Heart, Star, Plus } from 'lucide-rea
 import { ArtistCard } from '../../components/molecules/ArtistCard';
 import { useArtists, usePopularArtists, useNewArtists } from '../../lib/api/useArtists';
 import { usePlatformStats } from '../../lib/api/useStats';
-import { LoadingState, ErrorState, EmptyArtistsState, SkeletonGrid } from '../../components/organisms/States';
+import { ErrorState, EmptyArtistsState, SkeletonGrid } from '../../components/organisms/States';
 import { ArtistGallery } from '../../components/ArtistGallery';
-import { ArtistProfile } from '../../components/ArtistProfile';
 import { ArtistDashboard } from '../../components/ArtistDashboard';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Badge } from '../../components/ui/badge';
 import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 export const ArtistsPage: React.FC = () => {

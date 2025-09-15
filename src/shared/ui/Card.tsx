@@ -155,12 +155,14 @@ const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
 CardHeader.displayName = "CardHeader"
 
 const CardTitle = forwardRef<HTMLParagraphElement, CardTitleProps>(
-    ({ className, size, ...props }, ref) => (
+    ({ className, size, children, ...props }, ref) => (
         <h3
             ref={ref}
             className={cn(cardTitleStyles({ size }), className)}
             {...props}
-        />
+        >
+            {children}
+        </h3>
     )
 )
 CardTitle.displayName = "CardTitle"

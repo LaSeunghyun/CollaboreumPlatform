@@ -14,14 +14,12 @@ import {
 } from 'lucide-react';
 import { ArtistCard } from '../../components/molecules/ArtistCard';
 import { FundingProjectCard } from '../../components/molecules/FundingProjectCard';
-import { NoticePost } from '../../components/organisms/NoticePost';
-import { CommunityBoardPost } from '../../components/organisms/CommunityBoardPost';
 import { StatCard } from '../../components/ui/StatCard';
 import { usePopularArtists } from '../../lib/api/useArtists';
 import { useProjects } from '../../lib/api/useProjects';
 import { useNotices } from '../../lib/api/useNotices';
 import { useCommunityPosts } from '../../features/community/hooks/useCommunityPosts';
-import { LoadingState, ErrorState, SkeletonGrid } from '../../components/organisms/States';
+import { LoadingState, SkeletonGrid } from '../../components/organisms/States';
 import { useQuery } from '@tanstack/react-query';
 import { statsAPI } from '../../services/api';
 import { ErrorBoundary } from '../../components/ErrorBoundary';

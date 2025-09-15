@@ -5,9 +5,9 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Search, Filter, MessageCircle, Heart, ArrowLeft } from "lucide-react";
-import { communityAPI, userAPI, categoryAPI } from "../services/api";
+import { communityAPI, userAPI } from "../services/api";
 import { KOREAN_CATEGORIES, getCategoryColor } from "../constants/categories";
-import { getFirstChar, getUsername, getAvatarUrl } from "../utils/typeGuards";
+import { getFirstChar, getUsername } from "../utils/typeGuards";
 import { ApiResponse } from "../types";
 
 interface CommunityFullProps {

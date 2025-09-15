@@ -91,7 +91,7 @@ export class ErrorBoundary extends Component<Props, State> {
 // 함수형 컴포넌트용 에러 경계 (React 18+)
 export const ErrorBoundaryFunction: React.FC<Props> = ({ children, fallback }) => {
     const [hasError, setHasError] = React.useState(false);
-    const [error, setError] = React.useState<Error | null>(null);
+    const [, setError] = React.useState<Error | null>(null);
 
     React.useEffect(() => {
         const handleError = (event: ErrorEvent) => {

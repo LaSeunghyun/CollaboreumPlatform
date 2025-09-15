@@ -3,7 +3,7 @@ import { Badge } from '../../components/ui/badge';
 import { Calendar } from 'lucide-react';
 import { EventCard } from '../../components/molecules/EventCard';
 import { useEvents } from '../../lib/api/useEvents';
-import { LoadingState, ErrorState, EmptyEventsState, SkeletonGrid } from '../../components/organisms/States';
+import { ErrorState, EmptyEventsState, SkeletonGrid } from '../../components/organisms/States';
 import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 export const EventsPage: React.FC = () => {

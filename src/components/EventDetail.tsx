@@ -8,7 +8,7 @@ import { Calendar, MapPin, Clock, Users, Star, Heart, Share2, Bookmark } from 'l
 import { ImageWithFallback } from './atoms/ImageWithFallback';
 import { eventManagementAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
-import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
+import { getFirstChar } from '../utils/typeGuards';
 import { ApiResponse } from '../types';
 
 interface EventDetailProps {

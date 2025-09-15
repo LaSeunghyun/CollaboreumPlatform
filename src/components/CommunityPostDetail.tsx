@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useAuth } from '../contexts/AuthContext';
-import { authAPI, communityAPI, communityPostAPI } from '../services/api';
+import { authAPI, communityAPI, communityPostAPI, apiCall } from '../services/api';
 import { ApiResponse } from '../types';
 import { useDeleteCommunityPost } from '../features/community/hooks/useCommunityPosts';
 import { useAuthRedirect } from '../hooks/useAuthRedirect';
@@ -179,7 +179,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
 
         try {
             setIsLoading(true);
-            const response = await authAPI.get(`/community/posts/${postId}`) as ApiResponse<PostDetail>;
+            const response = await apiCall(`/community/posts/${postId}`) as ApiResponse<PostDetail>;
 
             if (response.success && response.data) {
                 const postData = response.data;
@@ -260,7 +260,9 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         }
 
         try {
-            await authAPI.post(`/community/posts/${postId}/views`);
+            await apiCall(`/community/posts/${postId}/views`, {
+                method: 'POST'
+            });
         } catch (error) {
             console.error('조회수 증가 실패:', error);
             // 조회수 증가 실패는 사용자에게 보여주지 않음
@@ -277,8 +279,8 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                 // 이미 좋아요가 되어 있다면 취소, 아니면 좋아요
                 const action = post.isLiked ? 'unlike' : 'like';
 
-                const response = await authAPI.post(`/community/posts/${postId}/reaction`, {
-                    type: action
+                const response = await authAPI.post(`/community/posts/${postId}/reactions`, {
+                    reaction: action
                 }) as ApiResponse<any>;
 
                 if (response.success && response.data) {
@@ -310,8 +312,8 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                 // 이미 싫어요가 되어 있다면 취소, 아니면 싫어요
                 const action = post.isDisliked ? 'undislike' : 'dislike';
 
-                const response = await authAPI.post(`/community/posts/${postId}/reaction`, {
-                    type: action
+                const response = await authAPI.post(`/community/posts/${postId}/reactions`, {
+                    reaction: action
                 }) as ApiResponse<any>;
 
                 if (response.success && response.data) {
@@ -341,7 +343,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
 
             try {
                 setIsSubmittingComment(true);
-                const response = await authAPI.post(`/communities/posts/${postId}/comments`, {
+                const response = await authAPI.post(`/community/posts/${postId}/comments`, {
                     content: comment.trim()
                 }) as ApiResponse<any>;
 
@@ -363,7 +365,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
             if (!user || !post) return;
 
             try {
-                const response = await authAPI.delete(`/communities/posts/${postId}/comments/${commentId}`) as ApiResponse<any>;
+                const response = await authAPI.delete(`/community/posts/${postId}/comments/${commentId}`) as ApiResponse<any>;
 
                 if (response.success) {
                     // 댓글 목록 새로고침

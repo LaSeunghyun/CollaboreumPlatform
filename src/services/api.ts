@@ -37,7 +37,7 @@ export async function apiCall<T>(endpoint: string, options: RequestInit = {}): P
             if (response.status === 401) {
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('authUser');
-                console.log('🔓 인증 토큰이 만료되어 자동 로그아웃');
+                // 인증 토큰이 만료되어 자동 로그아웃
             }
 
             // 공개 데이터 조회 시 401 에러는 무시하고 빈 데이터 반환

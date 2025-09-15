@@ -33,10 +33,10 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4">빠른 링크</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">아티스트 등록</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">프로젝트 둘러보기</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">커뮤니티</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">이벤트</a></li>
+              <li><button className="text-gray-400 hover:text-white transition-colors">아티스트 등록</button></li>
+              <li><button className="text-gray-400 hover:text-white transition-colors">프로젝트 둘러보기</button></li>
+              <li><button className="text-gray-400 hover:text-white transition-colors">커뮤니티</button></li>
+              <li><button className="text-gray-400 hover:text-white transition-colors">이벤트</button></li>
             </ul>
           </div>
 
@@ -44,10 +44,10 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4">고객지원</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">도움말</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">펀딩 가이드</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">수수료 안내</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">문의하기</a></li>
+              <li><button className="text-gray-400 hover:text-white transition-colors">도움말</button></li>
+              <li><button className="text-gray-400 hover:text-white transition-colors">펀딩 가이드</button></li>
+              <li><button className="text-gray-400 hover:text-white transition-colors">수수료 안내</button></li>
+              <li><button className="text-gray-400 hover:text-white transition-colors">문의하기</button></li>
             </ul>
           </div>
 
@@ -58,8 +58,8 @@ export function Footer() {
               새로운 프로젝트와 이벤트 소식을 받아보세요
             </p>
             <div className="flex gap-2">
-              <Input 
-                placeholder="이메일 주소" 
+              <Input
+                placeholder="이메일 주소"
                 className="bg-gray-800 border-gray-700 text-white placeholder-gray-400"
               />
               <Button variant="secondary">구독</Button>

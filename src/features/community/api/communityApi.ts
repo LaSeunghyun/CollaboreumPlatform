@@ -81,9 +81,9 @@ export const communityApi = {
 
     // 게시글 좋아요
     likePost: async (postId: string): Promise<{ likes: number }> => {
-        const response = await apiCall<{ success: boolean; data: { likes: number; dislikes: number }; message: string }>(`${API_BASE}/posts/${postId}/reaction`, {
+        const response = await apiCall<{ success: boolean; data: { likes: number; dislikes: number }; message: string }>(`${API_BASE}/posts/${postId}/reactions`, {
             method: 'POST',
-            body: JSON.stringify({ type: 'like' }),
+            body: JSON.stringify({ reaction: 'like' }),
         })
         return { likes: response.data.likes }
     },

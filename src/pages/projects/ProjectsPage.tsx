@@ -6,7 +6,7 @@ import { Badge } from '../../components/ui/badge';
 import { Plus, Clock, Star, TrendingUp } from 'lucide-react';
 import { FundingProjectCard } from '../../components/molecules/FundingProjectCard';
 import { useProjects } from '../../lib/api/useProjects';
-import { LoadingState, ErrorState, EmptyProjectsState, SkeletonGrid } from '../../components/organisms/States';
+import { ErrorState, EmptyProjectsState, SkeletonGrid } from '../../components/organisms/States';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 

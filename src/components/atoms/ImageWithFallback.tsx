@@ -33,7 +33,7 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
                     {showErrorIcon && (
                         <img
                             src={fallbackSrc}
-                            alt="Error loading image"
+                            alt=""
                             {...rest}
                             data-original-url={src}
                         />
