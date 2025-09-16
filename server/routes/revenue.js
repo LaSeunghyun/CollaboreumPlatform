@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const admin = require('../middleware/admin');
+const { adminMiddleware: admin } = require('../middleware/admin');
 const revenueService = require('../services/revenueService');
 const RevenueDistribution = require('../models/RevenueDistribution');
 const CreatorPayout = require('../models/CreatorPayout');
