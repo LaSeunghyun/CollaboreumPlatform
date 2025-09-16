@@ -240,7 +240,9 @@ const ModalTitle = forwardRef<HTMLHeadingElement, ModalTitleProps>(
             id={id}
             className={cn(modalTitleStyles, className)}
             {...props}
-        />
+        >
+            {props.children}
+        </h2>
     )
 )
 ModalTitle.displayName = "ModalTitle"

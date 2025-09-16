@@ -21,6 +21,8 @@ const categoryRoutes = require('./routes/categories');
 const statsRoutes = require('./routes/stats');
 const constantsRoutes = require('./routes/constants');
 const { router: notificationRoutes } = require('./routes/notifications');
+const paymentRoutes = require('./routes/payments');
+const revenueRoutes = require('./routes/revenue');
 
 // Middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -152,6 +154,8 @@ app.use('/api/constants', constantsRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/revenue', revenueRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

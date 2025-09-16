@@ -74,9 +74,9 @@ export function Footer() {
               © 2025 Collaboreum. All rights reserved.
             </div>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">개인정보처리방침</a>
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">이용약관</a>
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">쿠키 정책</a>
+              <button className="text-gray-400 hover:text-white text-sm transition-colors">개인정보처리방침</button>
+              <button className="text-gray-400 hover:text-white text-sm transition-colors">이용약관</button>
+              <button className="text-gray-400 hover:text-white text-sm transition-colors">쿠키 정책</button>
             </div>
           </div>
         </div>

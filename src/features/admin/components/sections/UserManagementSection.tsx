@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../../shared/ui/Card';
+import { Card, CardContent } from '../../../../shared/ui/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../../shared/ui/Table';
 import { Badge } from '../../../../shared/ui/Badge';
 import { Button } from '../../../../shared/ui/Button';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../../shared/ui/Avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../shared/ui/Select';
 import { Input } from '../../../../shared/ui/Input';
-import { Search, Eye, Ban, CheckCircle, UserCheck, UserX } from 'lucide-react';
+import { Search, Eye, Ban, CheckCircle } from 'lucide-react';
 import { useUsers, useUpdateUserStatus, useSuspendUser, useRestoreUser } from '../../hooks/useAdminData';
-import { getFirstChar, getUsername, getAvatarUrl } from '../../../../utils/typeGuards';
+import { getFirstChar } from '../../../../utils/typeGuards';
 import { User } from '../../types';
 
 export function UserManagementSection() {

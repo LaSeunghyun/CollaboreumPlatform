@@ -78,9 +78,10 @@ describe('LiveAndPointsSection', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Test Stream')).toBeInTheDocument()
-            expect(screen.getByText('by Test Artist')).toBeInTheDocument()
-            expect(screen.getByText('100명 시청 중')).toBeInTheDocument()
         })
+
+        expect(screen.getByText('by Test Artist')).toBeInTheDocument()
+        expect(screen.getByText('100명 시청 중')).toBeInTheDocument()
     })
 
     it('빈 데이터 상태를 올바르게 처리한다', () => {

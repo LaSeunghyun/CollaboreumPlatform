@@ -400,7 +400,7 @@ export const FundingProjectDetail: React.FC = () => {
                                 )}
 
                                 {/* 프로젝트 업데이트 */}
-                                {project.updates.length > 0 && (
+                                {project.updates && project.updates.length > 0 && (
                                     <Card>
                                         <CardHeader>
                                             <CardTitle>프로젝트 업데이트</CardTitle>

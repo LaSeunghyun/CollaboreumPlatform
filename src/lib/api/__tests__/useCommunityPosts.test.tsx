@@ -1,6 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useCommunityPosts, usePopularPosts, useRecentPosts } from '../useCommunityPosts';
+import { communityApi } from '../../../features/community/api/communityApi';
 
 // Mock the API modules
 jest.mock('../../../services/api', () => ({
@@ -15,7 +16,6 @@ jest.mock('../../../features/community/api/communityApi', () => ({
     },
 }));
 
-import { communityApi } from '../../../features/community/api/communityApi';
 const mockCommunityApi = communityApi as jest.Mocked<typeof communityApi>;
 
 const createTestQueryClient = () => new QueryClient({

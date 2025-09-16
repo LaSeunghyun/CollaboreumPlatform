@@ -22,7 +22,9 @@ export const VirtualizedList: React.FC<VirtualizedListProps> = ({
     const containerRef = useRef<HTMLDivElement>(null);
 
     // items가 undefined이거나 배열이 아닌 경우 빈 배열로 처리
-    const safeItems = Array.isArray(items) ? items : [];
+    const safeItems = useMemo(() => {
+        return Array.isArray(items) ? items : [];
+    }, [items]);
 
     const visibleRange = useMemo(() => {
         const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);

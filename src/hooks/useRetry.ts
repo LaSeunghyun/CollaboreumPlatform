@@ -163,7 +163,7 @@ export function useAutoRetry<T = any>(
             // 네트워크가 복구되고 에러가 있으면 자동 재시도
             retryHook.retry();
         }
-    }, [isOnline, wasOffline, retryHook.error, autoRetryOnNetworkRecovery]);
+    }, [isOnline, wasOffline, retryHook.error, autoRetryOnNetworkRecovery, retryHook]);
 
     return retryHook;
 }

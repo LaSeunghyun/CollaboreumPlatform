@@ -488,7 +488,7 @@ describe('Community Board System', () => {
             );
 
             // HTML 태그가 이스케이프되어 표시되어야 함
-            const titleElement = screen.getByTestId('post-detail').querySelector('h1');
+            const titleElement = screen.getByRole('heading', { level: 1 });
             expect(titleElement).toContainHTML('<script>alert("XSS")</script>');
         });
 

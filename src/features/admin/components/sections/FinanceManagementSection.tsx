@@ -1,7 +1,7 @@
 import { useFinancialData } from '../../hooks/useAdminData';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../shared/ui/Card';
 import { Badge } from '../../../../shared/ui/Badge';
-import { DollarSign, TrendingUp, CreditCard, AlertCircle, Calendar } from 'lucide-react';
+import { DollarSign, AlertCircle, Calendar } from 'lucide-react';
 
 export function FinanceManagementSection() {
     const { data: financialData, isLoading, error } = useFinancialData();

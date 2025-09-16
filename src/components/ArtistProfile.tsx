@@ -7,7 +7,7 @@ import { ArrowLeft, Users, Play, ExternalLink, MessageCircle, Heart, TrendingUp 
 import { ImageWithFallback } from "./atoms/ImageWithFallback";
 import { useEffect, useState } from "react";
 import { artistAPI } from '../services/api';
-import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
+import { getFirstChar } from '../utils/typeGuards';
 import { ApiResponse } from '../types';
 
 interface ArtistProfileProps {

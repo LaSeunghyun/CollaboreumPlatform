@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Card } from '../../../shared/ui/Card';
+// import { Card } from '../../../shared/ui/Card';
 import { Button } from '../../../shared/ui/Button';
 import { ArrowLeft } from 'lucide-react';
 

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../../shared/ui/Card';
+import { Card, CardContent } from '../../shared/ui/Card';
 import { Input } from '../../shared/ui/Input';
 import { Button } from '../../shared/ui/Button';
 import { Badge } from '../../shared/ui/Badge';
@@ -31,13 +31,7 @@ export const SearchPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState('all');
 
-    useEffect(() => {
-        if (query.trim()) {
-            performSearch();
-        }
-    }, [query]);
-
-    const performSearch = async () => {
+    const performSearch = useCallback(async () => {
         if (!query.trim()) return;
 
         try {
@@ -53,7 +47,13 @@ export const SearchPage: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [query]);
+
+    useEffect(() => {
+        if (query.trim()) {
+            performSearch();
+        }
+    }, [query, performSearch]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();

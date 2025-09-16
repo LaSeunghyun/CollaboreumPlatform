@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../../shared/ui/Card';
+import { Card, CardContent } from '../../../../shared/ui/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../../shared/ui/Table';
 import { Badge } from '../../../../shared/ui/Badge';
 import { Button } from '../../../../shared/ui/Button';
@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Input } from '../../../../shared/ui/Input';
 import { Search, Eye, CheckCircle, XCircle, MessageSquare, Users, TrendingUp } from 'lucide-react';
 import { useReports, useResolveReport } from '../../hooks/useAdminData';
-import { getFirstChar, getUsername, getAvatarUrl } from '../../../../utils/typeGuards';
+import { getFirstChar } from '../../../../utils/typeGuards';
 import { Report } from '../../types';
 
 export function CommunityManagementSection() {

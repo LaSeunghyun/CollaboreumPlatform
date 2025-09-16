@@ -246,8 +246,9 @@ describe('통합 테스트 - API 연결 및 컴포넌트 연동', () => {
             // 로그인 폼이 표시되는지 확인
             await waitFor(() => {
                 expect(screen.getByPlaceholderText('이메일')).toBeInTheDocument();
-                expect(screen.getByPlaceholderText('비밀번호')).toBeInTheDocument();
             });
+
+            expect(screen.getByPlaceholderText('비밀번호')).toBeInTheDocument();
 
             // 로그인 정보 입력
             const emailInput = screen.getByPlaceholderText('이메일');
@@ -300,9 +301,10 @@ describe('통합 테스트 - API 연결 및 컴포넌트 연동', () => {
             // 회원가입 폼이 표시되는지 확인
             await waitFor(() => {
                 expect(screen.getByPlaceholderText('이름')).toBeInTheDocument();
-                expect(screen.getByPlaceholderText('이메일')).toBeInTheDocument();
-                expect(screen.getByPlaceholderText('비밀번호')).toBeInTheDocument();
             });
+
+            expect(screen.getByPlaceholderText('이메일')).toBeInTheDocument();
+            expect(screen.getByPlaceholderText('비밀번호')).toBeInTheDocument();
 
             // 회원가입 정보 입력
             const nameInput = screen.getByPlaceholderText('이름');
@@ -349,8 +351,9 @@ describe('통합 테스트 - API 연결 및 컴포넌트 연동', () => {
             // 마이페이지가 로드되는지 확인
             await waitFor(() => {
                 expect(screen.getByText('테스트 사용자')).toBeInTheDocument();
-                expect(screen.getByText('test@example.com')).toBeInTheDocument();
             });
+
+            expect(screen.getByText('test@example.com')).toBeInTheDocument();
 
             // 탭들이 올바르게 표시되는지 확인
             expect(screen.getByText('프로필')).toBeInTheDocument();
@@ -511,10 +514,11 @@ describe('통합 테스트 - API 연결 및 컴포넌트 연동', () => {
             // 이벤트 데이터가 로드되는지 확인
             await waitFor(() => {
                 expect(screen.getByText('테스트 이벤트')).toBeInTheDocument();
-                expect(screen.getByText('테스트 이벤트 설명')).toBeInTheDocument();
-                expect(screen.getByText('서울')).toBeInTheDocument();
-                expect(screen.getByText('무료')).toBeInTheDocument();
             });
+
+            expect(screen.getByText('테스트 이벤트 설명')).toBeInTheDocument();
+            expect(screen.getByText('서울')).toBeInTheDocument();
+            expect(screen.getByText('무료')).toBeInTheDocument();
         });
     });
 
@@ -595,8 +599,9 @@ describe('통합 테스트 - API 연결 및 컴포넌트 연동', () => {
             // 에러 메시지가 표시되는지 확인
             await waitFor(() => {
                 expect(screen.getByText('데이터를 불러오는데 실패했습니다.')).toBeInTheDocument();
-                expect(screen.getByText('다시 시도')).toBeInTheDocument();
             });
+
+            expect(screen.getByText('다시 시도')).toBeInTheDocument();
         });
 
         test('네트워크 에러 시 적절한 에러 메시지가 표시되어야 한다', async () => {
@@ -621,8 +626,9 @@ describe('통합 테스트 - API 연결 및 컴포넌트 연동', () => {
             // 에러 메시지가 표시되는지 확인
             await waitFor(() => {
                 expect(screen.getByText('데이터를 불러오는데 실패했습니다.')).toBeInTheDocument();
-                expect(screen.getByText('다시 시도')).toBeInTheDocument();
             });
+
+            expect(screen.getByText('다시 시도')).toBeInTheDocument();
         });
     });
 
@@ -686,8 +692,9 @@ describe('통합 테스트 - API 연결 및 컴포넌트 연동', () => {
             // 모바일 메뉴가 열리는지 확인
             await waitFor(() => {
                 expect(screen.getByText('아티스트')).toBeInTheDocument();
-                expect(screen.getByText('커뮤니티')).toBeInTheDocument();
             });
+
+            expect(screen.getByText('커뮤니티')).toBeInTheDocument();
         });
     });
 });

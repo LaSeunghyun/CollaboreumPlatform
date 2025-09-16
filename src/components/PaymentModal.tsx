@@ -9,9 +9,6 @@ import { Checkbox } from './ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import {
   X,
-  CreditCard,
-  Smartphone,
-  Building2,
   Lock,
   Shield,
   AlertCircle,

@@ -5,9 +5,6 @@ import { Card, CardContent } from '../../../shared/ui/Card';
 import {
     AlertTriangle,
     Clock,
-    DollarSign,
-    Users,
-    Shield,
     X,
     Bell,
     CheckCircle
@@ -91,7 +88,7 @@ export function RealTimeAlerts() {
                 }, alert.autoClose);
             }
         });
-    }, [alerts]);
+    }, [alerts, dismissed]);
 
     const dismissAlert = (alertId: string) => {
         setDismissed(prev => new Set(prev).add(alertId));

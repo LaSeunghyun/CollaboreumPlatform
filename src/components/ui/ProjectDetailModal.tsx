@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getFirstChar, getUsername, getAvatarUrl } from '../../utils/typeGuards';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './dialog';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
@@ -56,13 +56,7 @@ export function ProjectDetailModal({ projectId, isOpen, onClose }: ProjectDetail
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'overview' | 'updates' | 'backers'>('overview');
 
-    useEffect(() => {
-        if (isOpen && projectId) {
-            fetchProjectDetails();
-        }
-    }, [isOpen, projectId]);
-
-    const fetchProjectDetails = async () => {
+    const fetchProjectDetails = useCallback(async () => {
         if (!projectId) return;
 
         try {
@@ -84,7 +78,13 @@ export function ProjectDetailModal({ projectId, isOpen, onClose }: ProjectDetail
         } finally {
             setLoading(false);
         }
-    };
+    }, [projectId]);
+
+    useEffect(() => {
+        if (isOpen && projectId) {
+            fetchProjectDetails();
+        }
+    }, [isOpen, projectId, fetchProjectDetails]);
 
     const getProjectStatusIcon = (status: string) => {
         switch (status) {

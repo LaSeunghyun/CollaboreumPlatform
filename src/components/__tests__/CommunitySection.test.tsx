@@ -219,10 +219,11 @@ describe('CommunitySection', () => {
 
         await waitFor(() => {
             expect(screen.getByText('인디음악 페스티벌 추천해주세요!')).toBeInTheDocument();
-            expect(screen.getByText('젊은 작가들의 현대미술 트렌드')).toBeInTheDocument();
-            expect(screen.getByText('홍대 인디밴드 합동공연')).toBeInTheDocument();
-            expect(screen.getByText('신진작가 그룹전 \'새로운 시선\'')).toBeInTheDocument();
         });
+
+        expect(screen.getByText('젊은 작가들의 현대미술 트렌드')).toBeInTheDocument();
+        expect(screen.getByText('홍대 인디밴드 합동공연')).toBeInTheDocument();
+        expect(screen.getByText('신진작가 그룹전 \'새로운 시선\'')).toBeInTheDocument();
     });
 
     it('빈 데이터 상태에서 적절한 메시지를 표시해야 한다', () => {
@@ -303,8 +304,9 @@ describe('CommunitySection', () => {
 
         await waitFor(() => {
             expect(screen.getAllByText('음악')).toHaveLength(2); // 포럼과 이벤트에서 각각 1개씩
-            expect(screen.getAllByText('미술')).toHaveLength(2); // 포럼과 이벤트에서 각각 1개씩
         });
+
+        expect(screen.getAllByText('미술')).toHaveLength(2); // 포럼과 이벤트에서 각각 1개씩
     });
 
     it('HOT 배지가 올바르게 표시되어야 한다', async () => {

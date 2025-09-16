@@ -1,6 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEvents, useEvent, useUpcomingEvents } from '../useEvents';
+import { eventManagementAPI } from '../../../services/api';
 
 // Mock the API modules
 jest.mock('../../../services/api', () => ({
@@ -11,7 +12,6 @@ jest.mock('../../../services/api', () => ({
     },
 }));
 
-import { eventManagementAPI } from '../../../services/api';
 const mockEventManagementAPI = eventManagementAPI as jest.Mocked<typeof eventManagementAPI>;
 
 const createTestQueryClient = () => new QueryClient({

@@ -1,16 +1,9 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../contexts/AuthContext';
 
-// Test wrapper component
-const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <BrowserRouter>
-        <AuthProvider>
-            {children}
-        </AuthProvider>
-    </BrowserRouter>
-);
+// Test wrapper component - removed unused component
 
 describe('이벤트 시스템 TDD 테스트', () => {
     beforeEach(() => {

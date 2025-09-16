@@ -2,9 +2,9 @@ import { useState, lazy, Suspense } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../shared/ui/Tabs';
 import { AdminLayout } from './AdminLayout';
 import { PermissionGuard } from './PermissionGuard';
-import { NotificationCenter } from './NotificationCenter';
+// import { NotificationCenter } from './NotificationCenter';
 import { RealTimeAlerts } from './RealTimeAlerts';
-import { LiveSystemMonitor } from './LiveSystemMonitor';
+// import { LiveSystemMonitor } from './LiveSystemMonitor';
 
 // 지연 로딩을 위한 컴포넌트들
 const OverviewSection = lazy(() => import('./sections/OverviewSection').then(m => ({ default: m.OverviewSection })));

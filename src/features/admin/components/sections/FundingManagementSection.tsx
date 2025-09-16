@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../../shared/ui/Card';
+import { Card, CardContent } from '../../../../shared/ui/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../../shared/ui/Table';
 import { Badge } from '../../../../shared/ui/Badge';
 import { Button } from '../../../../shared/ui/Button';
@@ -7,9 +7,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../../../shared/ui/Avata
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../shared/ui/Select';
 import { Input } from '../../../../shared/ui/Input';
 import { Progress } from '../../../../shared/ui/Progress';
-import { Search, Eye, CheckCircle, XCircle, DollarSign, Clock } from 'lucide-react';
+import { Search, Eye, CheckCircle, XCircle, DollarSign } from 'lucide-react';
 import { useFundingProjects, useUpdateProjectApproval } from '../../hooks/useAdminData';
-import { getFirstChar, getUsername, getAvatarUrl } from '../../../../utils/typeGuards';
+import { getFirstChar } from '../../../../utils/typeGuards';
 
 export function FundingManagementSection() {
     const [filter, setFilter] = useState("all");

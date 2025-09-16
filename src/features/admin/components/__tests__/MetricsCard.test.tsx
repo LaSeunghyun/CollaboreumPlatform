@@ -113,11 +113,11 @@ describe('MetricsCard 컴포넌트 테스트', () => {
         );
 
         // 아이콘 컨테이너가 존재하는지 확인
-        const iconContainer = document.querySelector('.w-12.h-12');
+        const iconContainer = screen.getByRole('img', { hidden: true });
         expect(iconContainer).toBeInTheDocument();
 
         // 아이콘이 렌더링되었는지 확인
-        const svgIcon = document.querySelector('svg');
+        const svgIcon = screen.getByRole('img', { hidden: true });
         expect(svgIcon).toBeInTheDocument();
     });
 

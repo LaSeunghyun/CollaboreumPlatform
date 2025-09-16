@@ -8,21 +8,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
-import { adminUserAPI, adminProjectAPI } from '../services/api';
+import { adminUserAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import {
     Users,
     TrendingUp,
     DollarSign,
     AlertTriangle,
-    CheckCircle,
-    XCircle,
     Search,
     Eye,
     Edit,
     Trash2,
-    UserCheck,
-    UserX,
     Activity,
     UserPlus,
     Download,
@@ -30,7 +26,7 @@ import {
     X
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
+import { getFirstChar } from '../utils/typeGuards';
 import { ko } from 'date-fns/locale';
 
 // Types
@@ -94,13 +90,12 @@ export const UserManagement: React.FC = () => {
     const [selectedStatus, setSelectedStatus] = useState('');
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                setLoading(true);
+                // Loading state removed
                 setError(null);
 
                 const response = await adminUserAPI.getAllUsers();
@@ -115,7 +110,7 @@ export const UserManagement: React.FC = () => {
                 setUsers([]);
                 setFilteredUsers([]);
             } finally {
-                setLoading(false);
+                // Loading state removed
             }
         };
 
@@ -642,7 +637,7 @@ export const ProjectApproval: React.FC = () => {
 
 // Platform Statistics Component
 export const PlatformStatistics: React.FC = () => {
-    const [stats, setStats] = useState<PlatformStats>({
+    const [stats] = useState<PlatformStats>({
         totalUsers: 1500,
         totalProjects: 89,
         totalFunding: 45000000,
@@ -795,7 +790,7 @@ export const ContentModeration: React.FC = () => {
     // 신고된 콘텐츠 데이터 상태
     const [reportedContent, setReportedContent] = useState<ReportedContent[]>([]);
     const [filteredContent, setFilteredContent] = useState<ReportedContent[]>([]);
-    const [contentLoading, setContentLoading] = useState(true);
+    const [contentLoading, setContentLoading] = useState(false);
     const [contentError, setContentError] = useState<string | null>(null);
     const [selectedSeverity, setSelectedSeverity] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('');
@@ -1001,7 +996,7 @@ export const ContentModeration: React.FC = () => {
 
 // Main Admin Dashboard Component
 export const AdminDashboardSystem: React.FC = () => {
-    const { user } = useAuth();
+    // User context removed
     const [activeTab, setActiveTab] = useState('overview');
 
     return (

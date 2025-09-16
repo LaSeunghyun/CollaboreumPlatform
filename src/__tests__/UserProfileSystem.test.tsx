@@ -1,16 +1,9 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../contexts/AuthContext';
 
-// Test wrapper component
-const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <BrowserRouter>
-        <AuthProvider>
-            {children}
-        </AuthProvider>
-    </BrowserRouter>
-);
+// Test wrapper component - removed unused component
 
 describe('권한별 마이페이지 시스템 TDD 테스트', () => {
     beforeEach(() => {
@@ -532,7 +525,7 @@ describe('권한별 마이페이지 시스템 TDD 테스트', () => {
             const nonAdmin = { id: 'user-1', role: 'fan', name: '일반 사용자' };
             try {
                 manageUser(users, 'user-1', 'activate', nonAdmin);
-                fail('권한 에러가 발생해야 합니다');
+                throw new Error('권한 에러가 발생해야 합니다');
             } catch (error: any) {
                 expect(error.message).toBe('관리자만 사용자를 관리할 수 있습니다');
             }
@@ -709,14 +702,14 @@ describe('권한별 마이페이지 시스템 TDD 테스트', () => {
             // 실패한 비밀번호 변경
             try {
                 changePassword(user, 'wrong123', 'NewPass123', 'NewPass123');
-                fail('현재 비밀번호 에러가 발생해야 합니다');
+                throw new Error('현재 비밀번호 에러가 발생해야 합니다');
             } catch (error: any) {
                 expect(error.message).toContain('현재 비밀번호가 올바르지 않습니다');
             }
 
             try {
                 changePassword(user, 'current123', 'weak', 'weak');
-                fail('비밀번호 강도 에러가 발생해야 합니다');
+                throw new Error('비밀번호 강도 에러가 발생해야 합니다');
             } catch (error: any) {
                 expect(error.message).toContain('새 비밀번호는 최소 8자 이상이어야 합니다');
             }
@@ -773,14 +766,14 @@ describe('권한별 마이페이지 시스템 TDD 테스트', () => {
             // 실패 케이스
             try {
                 deleteAccount(user, 'wrong123', '개인 사정');
-                fail('비밀번호 에러가 발생해야 합니다');
+                throw new Error('비밀번호 에러가 발생해야 합니다');
             } catch (error: any) {
                 expect(error.message).toBe('비밀번호가 올바르지 않습니다');
             }
 
             try {
                 deleteAccount(user, 'correct123', '짧음');
-                fail('사유 길이 에러가 발생해야 합니다');
+                throw new Error('사유 길이 에러가 발생해야 합니다');
             } catch (error: any) {
                 expect(error.message).toBe('계정 삭제 사유를 5자 이상 입력해주세요');
             }
