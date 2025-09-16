@@ -66,13 +66,22 @@ router.get('/posts', async (req, res) => {
 router.get('/posts/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    console.log('포스트 조회 요청:', { id });
+    console.log('포스트 조회 요청:', { id, timestamp: new Date().toISOString() });
     
+    // ObjectId 유효성 검사
+    if (!id || id.length !== 24) {
+      console.log('유효하지 않은 ObjectId:', id);
+      return res.status(400).json({
+        success: false,
+        message: '유효하지 않은 포스트 ID입니다.'
+      });
+    }
+
     const post = await CommunityPost.findById(id)
       .populate('author', 'name role avatar')
       .populate('comments.author', 'name role avatar');
 
-    console.log('조회된 포스트:', post ? '존재함' : '없음');
+    console.log('조회된 포스트:', post ? `존재함 (ID: ${post._id})` : '없음');
 
     if (!post) {
       console.log('포스트를 찾을 수 없음:', id);
@@ -100,7 +109,12 @@ router.get('/posts/:id', async (req, res) => {
       data: post
     });
   } catch (error) {
-    console.error('포스트 조회 실패:', error);
+    console.error('포스트 조회 실패:', {
+      error: error.message,
+      stack: error.stack,
+      id: req.params.id,
+      timestamp: new Date().toISOString()
+    });
     res.status(500).json({
       success: false,
       message: '포스트를 불러올 수 없습니다.',
