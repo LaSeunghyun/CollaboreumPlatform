@@ -3,6 +3,15 @@ const router = express.Router();
 const CommunityPost = require('../models/CommunityPost');
 const auth = require('../middleware/auth');
 
+// 디버그용 테스트 엔드포인트
+router.get('/posts/test', async (req, res) => {
+  res.json({
+    success: true,
+    message: '테스트 엔드포인트 작동 중',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // 커뮤니티 포스트 목록 조회
 router.get('/posts', async (req, res) => {
   try {
@@ -62,8 +71,59 @@ router.get('/posts', async (req, res) => {
   }
 });
 
-// 특정 포스트 조회
+// 인기 게시글 조회 (구체적인 라우트를 먼저 정의)
+router.get('/posts/popular', async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    
+    const posts = await CommunityPost.find({ isActive: true })
+      .populate('author', 'name role avatar')
+      .sort({ likes: -1, viewCount: -1 })
+      .limit(parseInt(limit));
+
+    res.json({
+      success: true,
+      data: posts
+    });
+  } catch (error) {
+    console.error('인기 게시글 조회 실패:', error);
+    res.status(500).json({
+      success: false,
+      message: '인기 게시글을 불러올 수 없습니다.'
+    });
+  }
+});
+
+// 최신 게시글 조회 (구체적인 라우트를 먼저 정의)
+router.get('/posts/recent', async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    
+    const posts = await CommunityPost.find({ isActive: true })
+      .populate('author', 'name role avatar')
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit));
+
+    res.json({
+      success: true,
+      data: posts
+    });
+  } catch (error) {
+    console.error('최신 게시글 조회 실패:', error);
+    res.status(500).json({
+      success: false,
+      message: '최신 게시글을 불러올 수 없습니다.'
+    });
+  }
+});
+
+// 특정 포스트 조회 (일반적인 라우트는 나중에 정의)
 router.get('/posts/:id', async (req, res) => {
+  console.log('=== 포스트 조회 라우트 진입 ===');
+  console.log('요청 URL:', req.url);
+  console.log('요청 파라미터:', req.params);
+  console.log('요청 쿼리:', req.query);
+  
   try {
     const { id } = req.params;
     console.log('포스트 조회 요청:', { id, timestamp: new Date().toISOString() });
@@ -77,10 +137,12 @@ router.get('/posts/:id', async (req, res) => {
       });
     }
 
+    console.log('데이터베이스 쿼리 시작...');
     const post = await CommunityPost.findById(id)
       .populate('author', 'name role avatar')
       .populate('comments.author', 'name role avatar');
 
+    console.log('데이터베이스 쿼리 완료');
     console.log('조회된 포스트:', post ? `존재함 (ID: ${post._id})` : '없음');
 
     if (!post) {
@@ -104,10 +166,12 @@ router.get('/posts/:id', async (req, res) => {
     await post.save();
     console.log('조회수 증가 완료:', post.viewCount);
 
+    console.log('응답 전송 중...');
     res.json({
       success: true,
       data: post
     });
+    console.log('응답 전송 완료');
   } catch (error) {
     console.error('포스트 조회 실패:', {
       error: error.message,
@@ -828,50 +892,5 @@ router.post('/posts/:id/comments/:commentId/reactions', auth, async (req, res) =
   }
 });
 
-// 인기 게시글 조회
-router.get('/posts/popular', async (req, res) => {
-  try {
-    const { limit = 10 } = req.query;
-    
-    const posts = await CommunityPost.find({ isActive: true })
-      .populate('author', 'name role avatar')
-      .sort({ likes: -1, viewCount: -1 })
-      .limit(parseInt(limit));
-
-    res.json({
-      success: true,
-      data: posts
-    });
-  } catch (error) {
-    console.error('인기 게시글 조회 실패:', error);
-    res.status(500).json({
-      success: false,
-      message: '인기 게시글을 불러올 수 없습니다.'
-    });
-  }
-});
-
-// 최신 게시글 조회
-router.get('/posts/recent', async (req, res) => {
-  try {
-    const { limit = 10 } = req.query;
-    
-    const posts = await CommunityPost.find({ isActive: true })
-      .populate('author', 'name role avatar')
-      .sort({ createdAt: -1 })
-      .limit(parseInt(limit));
-
-    res.json({
-      success: true,
-      data: posts
-    });
-  } catch (error) {
-    console.error('최신 게시글 조회 실패:', error);
-    res.status(500).json({
-      success: false,
-      message: '최신 게시글을 불러올 수 없습니다.'
-    });
-  }
-});
 
 module.exports = router;
