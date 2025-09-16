@@ -82,7 +82,7 @@ router.get('/posts', async (req, res) => {
 
     res.json({
       success: true,
-      data: posts,
+      posts: posts,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
@@ -432,10 +432,10 @@ router.delete('/posts/:id', auth, async (req, res) => {
 router.post('/posts/:id/reactions', auth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { reaction } = req.body; // 'like' 또는 'dislike'
+    const { reaction } = req.body; // 'like', 'dislike', 또는 'unlike'
     const userId = req.user._id;
 
-    if (!['like', 'dislike'].includes(reaction)) {
+    if (!['like', 'dislike', 'unlike'].includes(reaction)) {
       return res.status(400).json({
         success: false,
         message: '유효하지 않은 반응 타입입니다.'
@@ -459,7 +459,7 @@ router.post('/posts/:id/reactions', auth, async (req, res) => {
         // 싫어요에서 제거
         post.dislikes = post.dislikes.filter(id => id.toString() !== userId);
       }
-    } else {
+    } else if (reaction === 'dislike') {
       if (post.dislikes.includes(userId)) {
         post.dislikes = post.dislikes.filter(id => id.toString() !== userId);
       } else {
@@ -467,6 +467,13 @@ router.post('/posts/:id/reactions', auth, async (req, res) => {
         // 좋아요에서 제거
         post.likes = post.likes.filter(id => id.toString() !== userId);
       }
+    } else if (reaction === 'unlike') {
+      // unlike는 현재 좋아요 상태를 토글 (좋아요 취소)
+      if (post.likes.includes(userId)) {
+        post.likes = post.likes.filter(id => id.toString() !== userId);
+      }
+      // 싫어요도 함께 제거 (unlike는 모든 반응 제거)
+      post.dislikes = post.dislikes.filter(id => id.toString() !== userId);
     }
 
     await post.save();
@@ -840,10 +847,10 @@ router.delete('/posts/:id/comments/:commentId', auth, async (req, res) => {
 router.post('/posts/:id/comments/:commentId/reactions', auth, async (req, res) => {
   try {
     const { id, commentId } = req.params;
-    const { reaction } = req.body; // 'like' 또는 'dislike'
+    const { reaction } = req.body; // 'like', 'dislike', 또는 'unlike'
     const userId = req.user._id;
 
-    if (!['like', 'dislike'].includes(reaction)) {
+    if (!['like', 'dislike', 'unlike'].includes(reaction)) {
       return res.status(400).json({
         success: false,
         message: '유효하지 않은 반응 타입입니다.'
@@ -890,7 +897,7 @@ router.post('/posts/:id/comments/:commentId/reactions', auth, async (req, res) =
         comment.likes.push(userId);
         comment.dislikes.pull(userId); // 싫어요에서 제거
       }
-    } else {
+    } else if (reaction === 'dislike') {
       // 싫어요 처리
       if (comment.dislikes.includes(userId)) {
         comment.dislikes.pull(userId);
@@ -898,6 +905,13 @@ router.post('/posts/:id/comments/:commentId/reactions', auth, async (req, res) =
         comment.dislikes.push(userId);
         comment.likes.pull(userId); // 좋아요에서 제거
       }
+    } else if (reaction === 'unlike') {
+      // unlike는 현재 좋아요 상태를 토글 (좋아요 취소)
+      if (comment.likes.includes(userId)) {
+        comment.likes.pull(userId);
+      }
+      // 싫어요도 함께 제거 (unlike는 모든 반응 제거)
+      comment.dislikes.pull(userId);
     }
 
     await post.save();

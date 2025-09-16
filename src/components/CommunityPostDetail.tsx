@@ -5,9 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useAuth } from '../contexts/AuthContext';
-import { authAPI, communityAPI, communityPostAPI, apiCall } from '../services/api';
+import { communityAPI, communityPostAPI, apiCall } from '../services/api';
 import { ApiResponse } from '../types';
 import { useDeleteCommunityPost } from '../features/community/hooks/useCommunityPosts';
+import { usePostReaction, useIncrementPostViews } from '../lib/api/useCommunityReactions';
+import { useCreateComment, useDeleteComment, useCreateReply } from '../lib/api/useCommunityComments';
 import { useAuthRedirect } from '../hooks/useAuthRedirect';
 import { ArrowLeft, Heart, MessageCircle, Eye, Trash2, MoreVertical, Copy, Share2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -123,19 +125,25 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
     const { user } = useAuth();
     const { requireAuth } = useAuthRedirect();
     const deletePostMutation = useDeleteCommunityPost();
+    const postReactionMutation = usePostReaction();
+    const incrementViewsMutation = useIncrementPostViews();
+    const createCommentMutation = useCreateComment();
+    const deleteCommentMutation = useDeleteComment();
+    const createReplyMutation = useCreateReply();
     const [post, setPost] = useState<PostDetail | null>(null);
     const [comment, setComment] = useState('');
     const [isLoading, setIsLoading] = useState(true);
-    const [isSubmittingComment, setIsSubmittingComment] = useState(false);
-    const [isLiking, setIsLiking] = useState(false);
-    const [isDisliking, setIsDisliking] = useState(false);
+    // React Query 훅의 로딩 상태 사용
+    const isLiking = postReactionMutation.isPending;
+    const isDisliking = postReactionMutation.isPending;
+    const isSubmittingComment = createCommentMutation.isPending;
+    const isSubmittingReply = createReplyMutation.isPending;
     const [error, setError] = useState('');
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     // 대댓글 관련 상태
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
     const [replyContent, setReplyContent] = useState('');
-    const [isSubmittingReply, setIsSubmittingReply] = useState(false);
     const [copiedLink, setCopiedLink] = useState(false);
 
     // 링크 복사 기능
@@ -254,83 +262,73 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
     }, [postId, user]);
 
     // 조회수 증가 함수
-    const incrementViewCount = useCallback(async () => {
+    const incrementViewCount = useCallback(() => {
         if (!postId || postId === 'undefined') {
             return;
         }
 
-        try {
-            await apiCall(`/community/posts/${postId}/views`, {
-                method: 'POST'
-            });
-        } catch (error) {
-            console.error('조회수 증가 실패:', error);
-            // 조회수 증가 실패는 사용자에게 보여주지 않음
-        }
-    }, [postId]);
+        incrementViewsMutation.mutate(postId, {
+            onError: (error) => {
+                console.error('조회수 증가 실패:', error);
+                // 조회수 증가 실패는 사용자에게 보여주지 않음
+            }
+        });
+    }, [postId, incrementViewsMutation]);
 
-    const handleLike = async () => {
-        requireAuth(async () => {
+    const handleLike = () => {
+        requireAuth(() => {
             if (!user || !post) return;
 
-            try {
-                setIsLiking(true);
+            // 이미 좋아요가 되어 있다면 취소, 아니면 좋아요
+            const action = post.isLiked ? 'unlike' : 'like';
 
-                // 이미 좋아요가 되어 있다면 취소, 아니면 좋아요
-                const action = post.isLiked ? 'unlike' : 'like';
-
-                const response = await authAPI.post(`/community/posts/${postId}/reactions`, {
-                    reaction: action
-                }) as ApiResponse<any>;
-
-                if (response.success && response.data) {
-                    // 좋아요 상태를 즉시 업데이트
-                    setPost((prev: any) => prev ? {
-                        ...prev,
-                        likes: response.data.likes,
-                        dislikes: response.data.dislikes,
-                        isLiked: !prev.isLiked, // 토글
-                        isDisliked: false, // 좋아요를 누르면 싫어요는 자동으로 취소
-                        isHot: response.data.likes > 20
-                    } : null);
+            postReactionMutation.mutate(
+                { postId, reaction: action },
+                {
+                    onSuccess: (data: any) => {
+                        // 좋아요 상태를 즉시 업데이트
+                        setPost((prev: any) => prev ? {
+                            ...prev,
+                            likes: data.likes,
+                            dislikes: data.dislikes,
+                            isLiked: !prev.isLiked, // 토글
+                            isDisliked: false, // 좋아요를 누르면 싫어요는 자동으로 취소
+                            isHot: data.likes > 20
+                        } : null);
+                    },
+                    onError: (error) => {
+                        console.error('좋아요 처리 오류:', error);
+                    }
                 }
-            } catch (error) {
-                console.error('좋아요 처리 오류:', error);
-            } finally {
-                setIsLiking(false);
-            }
+            );
         });
     };
 
-    const handleDislike = async () => {
-        requireAuth(async () => {
+    const handleDislike = () => {
+        requireAuth(() => {
             if (!user || !post) return;
 
-            try {
-                setIsDisliking(true);
+            // 이미 싫어요가 되어 있다면 취소, 아니면 싫어요
+            const action = post.isDisliked ? 'unlike' : 'dislike';
 
-                // 이미 싫어요가 되어 있다면 취소, 아니면 싫어요
-                const action = post.isDisliked ? 'undislike' : 'dislike';
-
-                const response = await authAPI.post(`/community/posts/${postId}/reactions`, {
-                    reaction: action
-                }) as ApiResponse<any>;
-
-                if (response.success && response.data) {
-                    // 싫어요 상태를 즉시 업데이트
-                    setPost((prev: any) => prev ? {
-                        ...prev,
-                        likes: response.data.likes,
-                        dislikes: response.data.dislikes,
-                        isLiked: false, // 싫어요를 누르면 좋아요는 자동으로 취소
-                        isDisliked: !prev.isDisliked // 토글
-                    } : null);
+            postReactionMutation.mutate(
+                { postId, reaction: action },
+                {
+                    onSuccess: (data: any) => {
+                        // 싫어요 상태를 즉시 업데이트
+                        setPost((prev: any) => prev ? {
+                            ...prev,
+                            likes: data.likes,
+                            dislikes: data.dislikes,
+                            isLiked: false, // 싫어요를 누르면 좋아요는 자동으로 취소
+                            isDisliked: !prev.isDisliked // 토글
+                        } : null);
+                    },
+                    onError: (error) => {
+                        console.error('싫어요 처리 오류:', error);
+                    }
                 }
-            } catch (error) {
-                console.error('싫어요 처리 오류:', error);
-            } finally {
-                setIsDisliking(false);
-            }
+            );
         });
     };
 
@@ -338,68 +336,63 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         e.preventDefault();
         if (!comment.trim() || !post) return;
 
-        requireAuth(async () => {
+        requireAuth(() => {
             if (!user) return;
 
-            try {
-                setIsSubmittingComment(true);
-                const response = await authAPI.post(`/community/posts/${postId}/comments`, {
-                    content: comment.trim()
-                }) as ApiResponse<any>;
-
-                if (response.success && response.data) {
-                    setComment('');
-                    // 댓글 목록 새로고침
-                    fetchPostDetail();
+            createCommentMutation.mutate(
+                { postId, content: comment.trim() },
+                {
+                    onSuccess: () => {
+                        setComment('');
+                        // 댓글 목록 새로고침은 훅에서 자동 처리
+                    },
+                    onError: (error) => {
+                        console.error('댓글 작성 실패:', error);
+                    }
                 }
-            } catch (error) {
-                console.error('댓글 작성 오류:', error);
-            } finally {
-                setIsSubmittingComment(false);
-            }
+            );
         });
     };
 
-    const handleCommentDelete = async (commentId: string) => {
-        requireAuth(async () => {
+    const handleCommentDelete = (commentId: string) => {
+        requireAuth(() => {
             if (!user || !post) return;
 
-            try {
-                const response = await authAPI.delete(`/community/posts/${postId}/comments/${commentId}`) as ApiResponse<any>;
-
-                if (response.success) {
-                    // 댓글 목록 새로고침
-                    fetchPostDetail();
+            deleteCommentMutation.mutate(
+                { postId, commentId },
+                {
+                    onSuccess: () => {
+                        // 댓글 목록 새로고침은 훅에서 자동 처리
+                    },
+                    onError: (error) => {
+                        console.error('댓글 삭제 실패:', error);
+                    }
                 }
-            } catch (error) {
-                console.error('댓글 삭제 오류:', error);
-            }
+            );
         });
     };
 
     // 대댓글 작성 함수
-    const handleReplySubmit = async (e: React.FormEvent, parentCommentId: string) => {
+    const handleReplySubmit = (e: React.FormEvent, parentCommentId: string) => {
         e.preventDefault();
         if (!replyContent.trim() || !post) return;
 
-        requireAuth(async () => {
+        requireAuth(() => {
             if (!user) return;
 
-            try {
-                setIsSubmittingReply(true);
-                const response = await communityAPI.replyToComment(postId, parentCommentId, replyContent.trim()) as ApiResponse<any>;
-
-                if (response.success && response.data) {
-                    setReplyContent('');
-                    setReplyingTo(null);
-                    // 댓글 목록 새로고침
-                    fetchPostDetail();
+            createReplyMutation.mutate(
+                { postId, parentCommentId, content: replyContent.trim() },
+                {
+                    onSuccess: () => {
+                        setReplyContent('');
+                        setReplyingTo(null);
+                        // 댓글 목록 새로고침은 훅에서 자동 처리
+                    },
+                    onError: (error) => {
+                        console.error('대댓글 작성 실패:', error);
+                    }
                 }
-            } catch (error) {
-                console.error('대댓글 작성 오류:', error);
-            } finally {
-                setIsSubmittingReply(false);
-            }
+            );
         });
     };
 

@@ -346,7 +346,7 @@ export const PostList: React.FC = () => {
     setFilteredPosts(filtered);
   }, [posts, searchTerm, selectedCategory, sortBy]);
 
-  const handlePostReaction = async (postId: string, reaction: 'like' | 'dislike') => {
+  const handlePostReaction = async (postId: string, reaction: 'like' | 'dislike' | 'unlike') => {
     if (!user?.id) return;
 
     try {
@@ -615,7 +615,7 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
     }
   };
 
-  const handlePostReaction = async (reaction: 'like' | 'dislike') => {
+  const handlePostReaction = async (reaction: 'like' | 'dislike' | 'unlike') => {
     if (!user?.id) return;
 
     try {
@@ -631,7 +631,7 @@ export const PostDetail: React.FC<{ postId: string }> = ({ postId }) => {
     }
   };
 
-  const handleCommentReaction = async (commentId: string, reaction: 'like' | 'dislike') => {
+  const handleCommentReaction = async (commentId: string, reaction: 'like' | 'dislike' | 'unlike') => {
     if (!user?.id) return;
 
     try {

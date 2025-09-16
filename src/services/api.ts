@@ -673,7 +673,7 @@ export const communityPostAPI = {
         }),
 
     // 게시글 좋아요/싫어요
-    togglePostReaction: (postId: string, reaction: 'like' | 'dislike') =>
+    togglePostReaction: (postId: string, reaction: 'like' | 'dislike' | 'unlike') =>
         apiCall(`/community/posts/${postId}/reactions`, {
             method: 'POST',
             body: JSON.stringify({ reaction })
@@ -724,7 +724,7 @@ export const communityCommentAPI = {
         }),
 
     // 댓글 좋아요/싫어요
-    toggleCommentReaction: (postId: string, commentId: string, reaction: 'like' | 'dislike') =>
+    toggleCommentReaction: (postId: string, commentId: string, reaction: 'like' | 'dislike' | 'unlike') =>
         apiCall(`/community/posts/${postId}/comments/${commentId}/reactions`, {
             method: 'POST',
             body: JSON.stringify({ reaction })

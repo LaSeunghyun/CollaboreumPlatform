@@ -523,7 +523,7 @@ export const CommunityPage: React.FC = () => {
                                                         <SelectItem value="loading" disabled>카테고리 로딩 중...</SelectItem>
                                                     ) : (
                                                         categories?.map((category) => (
-                                                            <SelectItem key={category.id} value={category.id}>
+                                                            <SelectItem key={category.value} value={category.value}>
                                                                 {category.label}
                                                             </SelectItem>
                                                         ))
@@ -640,9 +640,9 @@ export const CommunityPage: React.FC = () => {
                             </TabsContent>
 
                             {categories?.map((category) => (
-                                <TabsContent key={category.id} value={category.id} className="space-y-6">
+                                <TabsContent key={category.value} value={category.value} className="space-y-6">
                                     <CategoryPosts
-                                        categoryId={category.id}
+                                        categoryId={category.value}
                                         searchQuery={searchQuery}
                                         sortBy={sortBy}
                                         categories={categories}

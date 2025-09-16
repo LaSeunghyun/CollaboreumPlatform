@@ -30,9 +30,26 @@ export const communityApi = {
         const queryString = params.toString()
         const endpoint = queryString ? `${API_BASE}/posts?${queryString}` : `${API_BASE}/posts`
 
-        const response = await apiCall<{ success: boolean; data: CommunityPost[]; pagination: any }>(endpoint)
+        const response = await apiCall<{ success: boolean; posts: any[]; pagination: any }>(endpoint)
+
+        // 데이터 변환 및 정규화
+        const normalizedPosts = response.posts.map(post => ({
+            ...post,
+            id: post.id || post._id,
+            views: post.viewCount || post.views || 0,
+            likes: Array.isArray(post.likes) ? post.likes.length : (post.likes || 0),
+            dislikes: Array.isArray(post.dislikes) ? post.dislikes.length : (post.dislikes || 0),
+            replies: Array.isArray(post.comments) ? post.comments.length : (post.replies || 0),
+            author: typeof post.author === 'string' ? { id: post.author, name: post.authorName || 'Unknown', role: 'user' } : post.author,
+            isHot: (Array.isArray(post.likes) ? post.likes.length : post.likes || 0) > 10 || (post.viewCount || post.views || 0) > 100,
+            isPinned: false,
+            status: 'published' as const,
+            createdAt: post.createdAt || new Date().toISOString(),
+            updatedAt: post.updatedAt || new Date().toISOString()
+        }))
+
         return {
-            posts: response.data,
+            posts: normalizedPosts,
             pagination: response.pagination
         }
     },
@@ -40,8 +57,26 @@ export const communityApi = {
     // 게시글 상세 조회
     getPost: async (postId: string): Promise<CommunityPost> => {
         try {
-            const response = await apiCall<{ success: boolean; data: CommunityPost }>(`${API_BASE}/posts/${postId}`)
-            return response.data
+            const response = await apiCall<{ success: boolean; data: any }>(`${API_BASE}/posts/${postId}`)
+
+            // 데이터 변환 및 정규화
+            const post = response.data
+            const normalizedPost: CommunityPost = {
+                ...post,
+                id: post.id || post._id,
+                views: post.viewCount || post.views || 0,
+                likes: Array.isArray(post.likes) ? post.likes.length : (post.likes || 0),
+                dislikes: Array.isArray(post.dislikes) ? post.dislikes.length : (post.dislikes || 0),
+                replies: Array.isArray(post.comments) ? post.comments.length : (post.replies || 0),
+                author: typeof post.author === 'string' ? { id: post.author, name: post.authorName || 'Unknown', role: 'user' } : post.author,
+                isHot: post.likes > 10 || post.views > 100,
+                isPinned: false,
+                status: 'published' as const,
+                createdAt: post.createdAt || new Date().toISOString(),
+                updatedAt: post.updatedAt || new Date().toISOString()
+            }
+
+            return normalizedPost
         } catch (error) {
             console.error('게시글 상세 조회 실패:', error)
             throw error
