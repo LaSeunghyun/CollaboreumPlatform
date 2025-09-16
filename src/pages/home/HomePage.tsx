@@ -18,6 +18,8 @@ import { StatCard } from '../../components/ui/StatCard';
 import { usePopularArtists } from '../../lib/api/useArtists';
 import { useProjects } from '../../lib/api/useProjects';
 import { useNotices } from '../../lib/api/useNotices';
+import { useCategories } from '../../lib/api/useCategories';
+import { getCategoryInfo } from '../../utils/categoryUtils';
 import { useCommunityPosts } from '../../features/community/hooks/useCommunityPosts';
 import { LoadingState, SkeletonGrid } from '../../components/organisms/States';
 import { useQuery } from '@tanstack/react-query';
@@ -45,6 +47,7 @@ export const HomePage: React.FC = () => {
         sortBy: 'likes',
         order: 'desc'
     });
+    const { data: categories = [] } = useCategories();
 
     // 플랫폼 통계 조회 - 에러 발생 시 기본값 사용
     const { data: platformStats, isLoading: statsLoading } = useQuery({
@@ -481,14 +484,9 @@ export const HomePage: React.FC = () => {
                                                 <div className="flex items-center gap-2">
                                                     <Badge
                                                         variant="secondary"
-                                                        className={`text-xs ${post.category === "review" ? "bg-green-100 text-green-700" :
-                                                            post.category === "question" ? "bg-blue-100 text-blue-700" :
-                                                                "bg-gray-100 text-gray-700"
-                                                            }`}
+                                                        className={`text-xs ${getCategoryInfo(post.category, categories).color}`}
                                                     >
-                                                        {post.category === "review" && "후기"}
-                                                        {post.category === "question" && "질문"}
-                                                        {post.category === "free" && "자유"}
+                                                        {getCategoryInfo(post.category, categories).label}
                                                     </Badge>
                                                     {post.isHot && (
                                                         <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs">

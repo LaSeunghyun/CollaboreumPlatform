@@ -12,6 +12,34 @@ router.get('/posts/test', async (req, res) => {
   });
 });
 
+// 카테고리 목록 조회
+router.get('/categories', async (req, res) => {
+  try {
+    const categories = [
+      { value: '자유', label: '자유', color: 'bg-blue-100 text-blue-700' },
+      { value: '질문', label: '질문', color: 'bg-yellow-100 text-yellow-700' },
+      { value: '음악', label: '음악', color: 'bg-purple-100 text-purple-700' },
+      { value: '미술', label: '미술', color: 'bg-pink-100 text-pink-700' },
+      { value: '문학', label: '문학', color: 'bg-green-100 text-green-700' },
+      { value: '공연', label: '공연', color: 'bg-orange-100 text-orange-700' },
+      { value: '사진', label: '사진', color: 'bg-indigo-100 text-indigo-700' },
+      { value: '기술', label: '기술', color: 'bg-cyan-100 text-cyan-700' },
+      { value: '기타', label: '기타', color: 'bg-gray-100 text-gray-700' }
+    ];
+
+    res.json({
+      success: true,
+      data: categories
+    });
+  } catch (error) {
+    console.error('카테고리 조회 실패:', error);
+    res.status(500).json({
+      success: false,
+      message: '카테고리를 불러올 수 없습니다.'
+    });
+  }
+});
+
 // 커뮤니티 포스트 목록 조회
 router.get('/posts', async (req, res) => {
   try {

@@ -3,6 +3,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { Eye, MessageCircle, ThumbsUp } from 'lucide-react';
 import { ShareButton } from '../atoms/ShareButton';
+import { useCategories } from '../../lib/api/useCategories';
+import { getCategoryInfo } from '../../utils/categoryUtils';
 
 interface CommunityBoardPostProps {
     id: string;
@@ -13,7 +15,7 @@ interface CommunityBoardPostProps {
         avatar?: string;
         isVerified?: boolean;
     };
-    category: "notice" | "free" | "question" | "review";
+    category: string;
     createdAt: string;
     views: number;
     likes: number;
@@ -39,23 +41,7 @@ export const CommunityBoardPost: React.FC<CommunityBoardPostProps> = ({
     rank,
     onClick
 }) => {
-    const getCategoryLabel = () => {
-        switch (category) {
-            case "notice": return "공지";
-            case "free": return "자유";
-            case "question": return "질문";
-            case "review": return "후기";
-        }
-    };
-
-    const getCategoryColor = () => {
-        switch (category) {
-            case "notice": return "bg-red-100 text-red-700";
-            case "free": return "bg-blue-100 text-blue-700";
-            case "question": return "bg-yellow-100 text-yellow-700";
-            case "review": return "bg-green-100 text-green-700";
-        }
-    };
+    const { data: categories = [] } = useCategories();
 
     const timeAgo = (date: string) => {
         const now = new Date();
@@ -99,8 +85,8 @@ export const CommunityBoardPost: React.FC<CommunityBoardPostProps> = ({
                                     🔥 HOT
                                 </Badge>
                             )}
-                            <Badge className={`${getCategoryColor()} text-xs px-2 py-1`}>
-                                {getCategoryLabel()}
+                            <Badge className={`${getCategoryInfo(category, categories).color} text-xs px-2 py-1`}>
+                                {getCategoryInfo(category, categories).label}
                             </Badge>
                         </div>
                     </div>
@@ -184,8 +170,8 @@ export const CommunityBoardPost: React.FC<CommunityBoardPostProps> = ({
                                         🔥
                                     </Badge>
                                 )}
-                                <Badge className={`${getCategoryColor()} text-xs px-1.5 py-0.5`}>
-                                    {getCategoryLabel()}
+                                <Badge className={`${getCategoryInfo(category, categories).color} text-xs px-1.5 py-0.5`}>
+                                    {getCategoryInfo(category, categories).label}
                                 </Badge>
                             </div>
 
