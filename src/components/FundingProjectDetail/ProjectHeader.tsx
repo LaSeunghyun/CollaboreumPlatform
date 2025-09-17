@@ -7,10 +7,10 @@ import {
     ArrowLeft,
     Heart,
     Share2,
-    Calendar,
-    Target,
-    Users,
-    TrendingUp
+    // Calendar,
+    // Target,
+    // Users,
+    // TrendingUp
 } from 'lucide-react';
 import { FundingProject } from '../../types/fundingProject';
 

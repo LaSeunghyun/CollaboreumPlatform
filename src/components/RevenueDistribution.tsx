@@ -125,19 +125,19 @@ export const RevenueDistribution: React.FC<RevenueDistributionProps> = ({
     };
 
     // 분배 내역서 다운로드
-    const handleDownloadReport = () => {
+    const handleDownloadReport = async () => {
         // CSV 형태로 분배 내역서 생성
-        const csvContent = generateCSVReport();
-        downloadCSV(csvContent, `revenue_distribution_${projectId}.csv`);
+        const csvContent = await generateCSVReport();
+        await downloadCSV(csvContent, `revenue_distribution_${projectId}.csv`);
     };
 
-    const generateCSVReport = () => {
-        const { generateRevenueDistributionCsv } = require('../utils/csvUtils');
+    const generateCSVReport = async () => {
+        const { generateRevenueDistributionCsv } = await import('../utils/csvUtils');
         return generateRevenueDistributionCsv(revenueDistribution.distributions, projectId);
     };
 
-    const downloadCSV = (content: string, filename: string) => {
-        const { downloadCsv } = require('../utils/csvUtils');
+    const downloadCSV = async (content: string, filename: string) => {
+        const { downloadCsv } = await import('../utils/csvUtils');
         downloadCsv(content, filename);
     };
 

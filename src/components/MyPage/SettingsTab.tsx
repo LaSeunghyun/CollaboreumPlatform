@@ -72,7 +72,7 @@ export function SettingsTab({
       });
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
-    } catch (_error) {
+        } catch {
       setShowError(true);
       setTimeout(() => setShowError(false), 3000);
     }

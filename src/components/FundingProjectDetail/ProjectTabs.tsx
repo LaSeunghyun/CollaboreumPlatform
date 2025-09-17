@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarFallback } from '../ui/avatar';
-import { FileText, DollarSign, CheckCircle, Clock, TrendingUp } from 'lucide-react';
+import { FileText, DollarSign, CheckCircle, TrendingUp } from 'lucide-react';
 import { FundingProject } from '../../types/fundingProject';
 
 interface ProjectTabsProps {

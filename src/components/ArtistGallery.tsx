@@ -14,7 +14,7 @@ interface ArtistGalleryProps {
   onSelectArtwork?: (artworkId: number) => void;
 }
 
-export function ArtistGallery({ onBack, onSelectArtwork }: ArtistGalleryProps) {
+export function ArtistGallery({ onBack, _onSelectArtwork }: ArtistGalleryProps) {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [sortBy, setSortBy] = useState("최신순");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -38,7 +38,7 @@ export function ArtistGallery({ onBack, onSelectArtwork }: ArtistGalleryProps) {
           // 히스토리가 없으면 홈으로 이동
           window.location.href = '/';
         }
-      } catch (error) {
+      } catch (_error) {
         // 에러 발생 시 홈으로 이동
         window.location.href = '/';
       }
@@ -61,7 +61,7 @@ export function ArtistGallery({ onBack, onSelectArtwork }: ArtistGalleryProps) {
         setArtworks(artworks);
         setCategories(categories);
         // 기본 정렬 옵션 사용 (API에서 제공되지 않는 경우)
-      } catch (error) {
+      } catch (_error) {
         // API 실패 시 빈 데이터로 설정
         setArtworks([]);
         setCategories([]);
