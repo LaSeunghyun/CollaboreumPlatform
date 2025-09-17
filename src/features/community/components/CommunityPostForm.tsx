@@ -85,7 +85,7 @@ export function CommunityPostForm({
         }
     })
 
-    const watchedTags = watch('tags')
+    const _watchedTags = watch('tags')
 
     const onSubmit = async (data: PostFormData) => {
         if (!user) {
