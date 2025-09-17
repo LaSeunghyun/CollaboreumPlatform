@@ -6,7 +6,7 @@ import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
 import { Label } from '../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { ArrowLeft, Upload, Calendar, DollarSign, Users, Target } from 'lucide-react';
+import { ArrowLeft, Upload, DollarSign, Target } from 'lucide-react';
 import { fundingAPI } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -24,6 +24,24 @@ export const CreateProjectPage: React.FC = () => {
     tags: '',
     image: null as File | null
   });
+
+  // 숫자 포맷팅 함수 (3자리마다 콤마)
+  const formatNumber = (value: string) => {
+    const num = value.replace(/,/g, '');
+    if (isNaN(Number(num))) return value;
+    return Number(num).toLocaleString();
+  };
+
+  // 숫자 입력을 위한 함수
+  const handleNumberChange = (field: string, value: string) => {
+    const num = value.replace(/,/g, '');
+    if (num === '' || !isNaN(Number(num))) {
+      setFormData(prev => ({
+        ...prev,
+        [field]: num
+      }));
+    }
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -46,7 +64,7 @@ export const CreateProjectPage: React.FC = () => {
     e.preventDefault();
 
     if (!user?.id) {
-      alert('로그인이 필요합니다.');
+      window.alert('로그인이 필요합니다.');
       return;
     }
 
@@ -57,24 +75,24 @@ export const CreateProjectPage: React.FC = () => {
         title: formData.title,
         description: formData.description,
         category: formData.category,
-        goal: parseInt(formData.goal),
+        goal: parseInt(formData.goal.replace(/,/g, '')),
         duration: parseInt(formData.duration),
         revenueShare: parseInt(formData.revenueShare),
-        tags: formData.tags.split(',').map(tag => tag.trim()),
+        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
         artistId: user.id
       };
 
       const response = await fundingAPI.createProject(projectData) as any;
 
       if (response.success) {
-        alert('프로젝트가 성공적으로 등록되었습니다.');
+        window.alert('프로젝트가 성공적으로 등록되었습니다.');
         navigate('/projects');
       } else {
-        alert('프로젝트 등록에 실패했습니다.');
+        window.alert('프로젝트 등록에 실패했습니다.');
       }
     } catch (error) {
       console.error('프로젝트 등록 오류:', error);
-      alert('프로젝트 등록 중 오류가 발생했습니다.');
+      window.alert('프로젝트 등록 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -98,40 +116,19 @@ export const CreateProjectPage: React.FC = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* 기본 정보 */}
+          {/* 카테고리 선택 */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="w-5 h-5" />
-                기본 정보
+                카테고리 선택
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent>
               <div>
-                <Label htmlFor="title">프로젝트 제목 *</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
-                  placeholder="프로젝트 제목을 입력하세요"
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="description">프로젝트 설명 *</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="프로젝트에 대한 상세한 설명을 입력하세요"
-                  rows={6}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="category">카테고리 *</Label>
+                <Label htmlFor="category" className="text-red-500 font-semibold">
+                  카테고리 <span className="text-red-500">*</span>
+                </Label>
                 <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="카테고리를 선택하세요" />
@@ -145,6 +142,44 @@ export const CreateProjectPage: React.FC = () => {
                     <SelectItem value="other">기타</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 기본 정보 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="w-5 h-5" />
+                기본 정보
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <Label htmlFor="title" className="text-red-500 font-semibold">
+                  프로젝트 제목 <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  placeholder="프로젝트 제목을 입력하세요"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="description" className="text-red-500 font-semibold">
+                  프로젝트 설명 <span className="text-red-500">*</span>
+                </Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  placeholder="프로젝트에 대한 상세한 설명을 입력하세요"
+                  rows={6}
+                  required
+                />
               </div>
 
               <div>
@@ -169,41 +204,56 @@ export const CreateProjectPage: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <Label htmlFor="goal">목표 금액 (원) *</Label>
+                <Label htmlFor="goal" className="text-red-500 font-semibold">
+                  목표 금액 (원) <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="goal"
-                  type="number"
-                  value={formData.goal}
-                  onChange={(e) => handleInputChange('goal', e.target.value)}
-                  placeholder="1000000"
+                  value={formData.goal ? formatNumber(formData.goal) : ''}
+                  onChange={(e) => handleNumberChange('goal', e.target.value)}
+                  placeholder="1,000,000"
                   required
                 />
+                <p className="text-sm text-gray-500 mt-1">
+                  숫자만 입력하세요. 자동으로 콤마가 추가됩니다.
+                </p>
               </div>
 
               <div>
-                <Label htmlFor="duration">펀딩 기간 (일) *</Label>
+                <Label htmlFor="duration" className="text-red-500 font-semibold">
+                  펀딩 기간 (일) <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="duration"
                   type="number"
                   value={formData.duration}
                   onChange={(e) => handleInputChange('duration', e.target.value)}
                   placeholder="30"
+                  min="1"
+                  max="365"
                   required
                 />
+                <p className="text-sm text-gray-500 mt-1">
+                  1일부터 365일까지 설정 가능합니다.
+                </p>
               </div>
 
               <div>
-                <Label htmlFor="revenueShare">수익 공유율 (%) *</Label>
+                <Label htmlFor="revenueShare" className="text-red-500 font-semibold">
+                  수익 공유율 (%) <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="revenueShare"
                   type="number"
                   value={formData.revenueShare}
                   onChange={(e) => handleInputChange('revenueShare', e.target.value)}
                   placeholder="10"
+                  min="1"
+                  max="100"
                   required
                 />
                 <p className="text-sm text-gray-500 mt-1">
-                  후원자들에게 분배할 수익의 비율을 입력하세요.
+                  후원자들에게 분배할 수익의 비율을 입력하세요. (1% ~ 100%)
                 </p>
               </div>
             </CardContent>

@@ -6,7 +6,7 @@ import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
 import { Label } from '../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { ArrowLeft, MessageSquare, Tag, Upload } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Upload } from 'lucide-react';
 import { communityPostAPI } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -48,7 +48,21 @@ export const CreatePostPage: React.FC = () => {
     e.preventDefault();
 
     if (!user?.id) {
-      alert('로그인이 필요합니다.');
+      window.alert('로그인이 필요합니다.');
+      return;
+    }
+
+    // 필수 필드 검증
+    if (!formData.title.trim()) {
+      window.alert('제목을 입력해주세요.');
+      return;
+    }
+    if (!formData.content.trim()) {
+      window.alert('내용을 입력해주세요.');
+      return;
+    }
+    if (!formData.category) {
+      window.alert('카테고리를 선택해주세요.');
       return;
     }
 
@@ -56,24 +70,29 @@ export const CreatePostPage: React.FC = () => {
       setLoading(true);
 
       const postData = {
-        title: formData.title,
-        content: formData.content,
+        title: formData.title.trim(),
+        content: formData.content.trim(),
         category: formData.category,
-        tags: formData.tags.split(',').map(tag => tag.trim()),
-        authorId: user.id
+        tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
+        authorId: user.id,
+        authorName: user.name || user.email || '사용자'
       };
+
+      console.warn('게시글 작성 요청 데이터:', postData);
 
       const response = await communityPostAPI.createPost(postData) as any;
 
+      console.warn('게시글 작성 응답:', response);
+
       if (response.success) {
-        alert('게시글이 성공적으로 작성되었습니다.');
+        window.alert('게시글이 성공적으로 작성되었습니다.');
         navigate('/community');
       } else {
-        alert('게시글 작성에 실패했습니다.');
+        window.alert(`게시글 작성에 실패했습니다: ${response.message || '알 수 없는 오류'}`);
       }
     } catch (error) {
       console.error('게시글 작성 오류:', error);
-      alert('게시글 작성 중 오류가 발생했습니다.');
+      window.alert(`게시글 작성 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
     } finally {
       setLoading(false);
     }
@@ -107,7 +126,9 @@ export const CreatePostPage: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <Label htmlFor="title">제목 *</Label>
+                <Label htmlFor="title" className="text-red-500 font-semibold">
+                  제목 <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="title"
                   value={formData.title}
@@ -118,7 +139,9 @@ export const CreatePostPage: React.FC = () => {
               </div>
 
               <div>
-                <Label htmlFor="category">카테고리 *</Label>
+                <Label htmlFor="category" className="text-red-500 font-semibold">
+                  카테고리 <span className="text-red-500">*</span>
+                </Label>
                 <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="카테고리를 선택하세요" />
@@ -135,7 +158,9 @@ export const CreatePostPage: React.FC = () => {
               </div>
 
               <div>
-                <Label htmlFor="content">내용 *</Label>
+                <Label htmlFor="content" className="text-red-500 font-semibold">
+                  내용 <span className="text-red-500">*</span>
+                </Label>
                 <Textarea
                   id="content"
                   value={formData.content}
