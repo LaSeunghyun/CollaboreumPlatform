@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, DependencyList } from 'react';
 
 /**
  * 메모이제이션된 콜백 훅
@@ -6,9 +6,9 @@ import { useCallback, useRef } from 'react';
  */
 export function useMemoizedCallback<T extends (...args: any[]) => any>(
     callback: T,
-    deps: React.DependencyList
+    deps: DependencyList
 ): T {
-    const ref = useRef<{ callback: T; deps: React.DependencyList }>();
+    const ref = useRef<{ callback: T; deps: DependencyList }>();
 
     if (!ref.current || !areDepsEqual(ref.current.deps, deps)) {
         ref.current = { callback, deps };
@@ -20,7 +20,7 @@ export function useMemoizedCallback<T extends (...args: any[]) => any>(
 /**
  * 의존성 배열이 동일한지 확인하는 헬퍼 함수
  */
-function areDepsEqual(deps1: React.DependencyList, deps2: React.DependencyList): boolean {
+function areDepsEqual(deps1: DependencyList, deps2: DependencyList): boolean {
     if (deps1.length !== deps2.length) return false;
 
     for (let i = 0; i < deps1.length; i++) {

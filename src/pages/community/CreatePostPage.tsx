@@ -10,6 +10,25 @@ import { ArrowLeft, MessageSquare, Upload } from 'lucide-react';
 import { communityPostAPI } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 
+// 타입 정의
+declare global {
+  interface Window {
+    alert: (message?: any) => void;
+  }
+}
+
+// 상수 정의
+const ERROR_MESSAGES = {
+  LOGIN_REQUIRED: '로그인이 필요합니다.',
+  TITLE_REQUIRED: '제목을 입력해주세요.',
+  CONTENT_REQUIRED: '내용을 입력해주세요.',
+  CATEGORY_REQUIRED: '카테고리를 선택해주세요.',
+  POST_SUCCESS: '게시글이 성공적으로 작성되었습니다.',
+  POST_FAILED: '게시글 작성에 실패했습니다:',
+  POST_ERROR: '게시글 작성 중 오류가 발생했습니다:',
+  UNKNOWN_ERROR: '알 수 없는 오류'
+} as const;
+
 export const CreatePostPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -48,21 +67,21 @@ export const CreatePostPage: React.FC = () => {
     e.preventDefault();
 
     if (!user?.id) {
-      window.alert('로그인이 필요합니다.');
+      window.alert(ERROR_MESSAGES.LOGIN_REQUIRED);
       return;
     }
 
     // 필수 필드 검증
     if (!formData.title.trim()) {
-      window.alert('제목을 입력해주세요.');
+      window.alert(ERROR_MESSAGES.TITLE_REQUIRED);
       return;
     }
     if (!formData.content.trim()) {
-      window.alert('내용을 입력해주세요.');
+      window.alert(ERROR_MESSAGES.CONTENT_REQUIRED);
       return;
     }
     if (!formData.category) {
-      window.alert('카테고리를 선택해주세요.');
+      window.alert(ERROR_MESSAGES.CATEGORY_REQUIRED);
       return;
     }
 
@@ -85,14 +104,14 @@ export const CreatePostPage: React.FC = () => {
       console.warn('게시글 작성 응답:', response);
 
       if (response.success) {
-        window.alert('게시글이 성공적으로 작성되었습니다.');
+        window.alert(ERROR_MESSAGES.POST_SUCCESS);
         navigate('/community');
       } else {
-        window.alert(`게시글 작성에 실패했습니다: ${response.message || '알 수 없는 오류'}`);
+        window.alert(`${ERROR_MESSAGES.POST_FAILED} ${response.message || ERROR_MESSAGES.UNKNOWN_ERROR}`);
       }
     } catch (error) {
       console.error('게시글 작성 오류:', error);
-      window.alert(`게시글 작성 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
+      window.alert(`${ERROR_MESSAGES.POST_ERROR} ${error instanceof Error ? error.message : ERROR_MESSAGES.UNKNOWN_ERROR}`);
     } finally {
       setLoading(false);
     }

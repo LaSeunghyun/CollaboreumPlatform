@@ -10,6 +10,13 @@ import { ArrowLeft, Upload, DollarSign, Target } from 'lucide-react';
 import { fundingAPI } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 
+// 타입 정의
+declare global {
+  interface Window {
+    alert: (message?: any) => void;
+  }
+}
+
 export const CreateProjectPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();

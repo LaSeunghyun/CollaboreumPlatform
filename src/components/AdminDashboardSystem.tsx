@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { adminUserAPI, adminProjectAPI, adminAPI } from '../services/api';
-import { useAuth } from '../contexts/AuthContext';
+// import { useAuth } from '../contexts/AuthContext';
 import {
     Users,
     TrendingUp,
@@ -90,14 +90,13 @@ export const UserManagement: React.FC = () => {
     const [selectedStatus, setSelectedStatus] = useState('');
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [_error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 // Loading state removed
                 setError(null);
-
                 const response = await adminUserAPI.getAllUsers() as any;
                 // API 응답 구조에 따른 방어 코드
                 const usersData = Array.isArray(response) ? response : response?.data || [];
@@ -773,8 +772,8 @@ export const ContentModeration: React.FC = () => {
     // 신고된 콘텐츠 데이터 상태
     const [reportedContent, setReportedContent] = useState<ReportedContent[]>([]);
     const [filteredContent, setFilteredContent] = useState<ReportedContent[]>([]);
-    const [contentLoading, setContentLoading] = useState(false);
-    const [contentError, setContentError] = useState<string | null>(null);
+    const [_contentLoading, setContentLoading] = useState(false);
+    const [_contentError, setContentError] = useState<string | null>(null);
     const [selectedSeverity, setSelectedSeverity] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('');
 
