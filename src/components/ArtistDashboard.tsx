@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -7,12 +8,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Calendar, TrendingUp, Users, DollarSign, Plus, Edit, Trash2, AlertCircle } from "lucide-react";
+import { artistAPI } from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
 
 export function ArtistDashboard() {
   const [artistData, setArtistData] = useState<any>(null);
   const [projects, setProjects] = useState<any[]>([]);
   const [wbsItems, setWbsItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   // 아티스트 데이터 로드
   useEffect(() => {
@@ -20,30 +24,31 @@ export function ArtistDashboard() {
       try {
         setLoading(true);
 
-        // 실제 API 호출로 변경
-        const [artistResponse, projectsResponse, wbsResponse] = await Promise.all([
-          fetch('/api/artists/profile'),
-          fetch('/api/artists/projects'),
-          fetch('/api/artists/wbs')
-        ]);
-
-        if (!artistResponse.ok || !projectsResponse.ok || !wbsResponse.ok) {
-          throw new Error('아티스트 데이터를 불러올 수 없습니다.');
+        if (!user?.id) {
+          throw new Error('사용자 정보를 찾을 수 없습니다.');
         }
 
-        const [artistData, projectsData, wbsData] = await Promise.all([
-          artistResponse.json(),
-          projectsResponse.json(),
-          wbsResponse.json()
+        // API 서비스를 사용한 데이터 로드
+        const [artistResponse, projectsResponse] = await Promise.all([
+          artistAPI.getArtistById(user.id.toString()),
+          artistAPI.getProjects(parseInt(user.id))
         ]);
 
-        if (artistData.success && projectsData.success && wbsData.success) {
-          setArtistData(artistData.data);
-          setProjects(projectsData.data);
-          setWbsItems(wbsData.data);
+        if ((artistResponse as any).success && (artistResponse as any).data) {
+          setArtistData((artistResponse as any).data);
         } else {
-          throw new Error('아티스트 데이터를 불러올 수 없습니다.');
+          throw new Error('아티스트 정보를 불러올 수 없습니다.');
         }
+
+        if ((projectsResponse as any).success && (projectsResponse as any).data) {
+          setProjects((projectsResponse as any).data);
+        } else {
+          setProjects([]);
+        }
+
+        // WBS 데이터는 임시로 빈 배열 설정
+        setWbsItems([]);
+
       } catch (error) {
         console.error('아티스트 데이터 로드 실패:', error);
 
@@ -57,7 +62,7 @@ export function ArtistDashboard() {
     };
 
     loadArtistData();
-  }, []);
+  }, [user]);
 
   if (loading || !artistData) {
     return (
@@ -76,7 +81,7 @@ export function ArtistDashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">아티스트 대시보드</h1>
-          <p className="text-gray-600">안녕하세요, {artistData.name}님! 현재 진행 상황을 확인해보세요.</p>
+          <p className="text-gray-600">안녕하세요, {artistData.name || user?.name || '사용자'}님! 현재 진행 상황을 확인해보세요.</p>
         </div>
 
         {/* Overview Cards */}
@@ -86,7 +91,7 @@ export function ArtistDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">총 프로젝트</p>
-                  <p className="text-2xl font-bold">{artistData.totalProjects}</p>
+                  <p className="text-2xl font-bold">{artistData.totalProjects || projects.length}</p>
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                   <TrendingUp className="w-6 h-6 text-blue-600" />
@@ -100,7 +105,7 @@ export function ArtistDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">총 펀딩 금액</p>
-                  <p className="text-2xl font-bold">₩{(artistData.totalFunding / 1000000).toFixed(1)}M</p>
+                  <p className="text-2xl font-bold">₩{((artistData.totalFunding || 0) / 1000000).toFixed(1)}M</p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                   <DollarSign className="w-6 h-6 text-green-600" />
@@ -114,7 +119,7 @@ export function ArtistDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">팔로워</p>
-                  <p className="text-2xl font-bold">{artistData.followers.toLocaleString()}</p>
+                  <p className="text-2xl font-bold">{(artistData.followers || 0).toLocaleString()}</p>
                 </div>
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                   <Users className="w-6 h-6 text-purple-600" />
@@ -128,7 +133,7 @@ export function ArtistDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">월 성장률</p>
-                  <p className="text-2xl font-bold">+{artistData.monthlyGrowth}%</p>
+                  <p className="text-2xl font-bold">+{artistData.monthlyGrowth || 0}%</p>
                 </div>
                 <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                   <Calendar className="w-6 h-6 text-yellow-600" />
@@ -158,116 +163,127 @@ export function ArtistDashboard() {
             </div>
 
             <div className="space-y-6">
-              {projects.map((project) => {
-                const progressPercentage = (project.raised / project.goal) * 100;
-                const isCompleted = project.status === "완료";
+              {projects.length === 0 ? (
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <p className="text-gray-500 mb-4">아직 등록된 프로젝트가 없습니다.</p>
+                    <Button>
+                      <Plus className="w-4 h-4 mr-2" />
+                      첫 번째 프로젝트 등록하기
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                projects.map((project) => {
+                  const progressPercentage = (project.raised / project.goal) * 100;
+                  const isCompleted = project.status === "완료";
 
-                return (
-                  <Card key={project.id}>
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="mb-2">{project.title}</CardTitle>
-                          <Badge
-                            className={
-                              project.status === "진행중" ? "bg-blue-100 text-blue-800" :
-                                "bg-green-100 text-green-800"
-                            }
-                          >
-                            {project.status}
-                          </Badge>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button variant="outline" size="sm" className="text-red-600 border-red-600">
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {!isCompleted && (
-                          <>
-                            <div>
-                              <div className="flex justify-between items-center mb-2">
-                                <span className="text-sm text-gray-600">펀딩 진행률</span>
-                                <span className="text-sm font-medium">{Math.round(progressPercentage)}%</span>
-                              </div>
-                              <Progress value={progressPercentage} className="h-3" />
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-4 text-center">
-                              <div>
-                                <p className="text-sm text-gray-600">목표 금액</p>
-                                <p className="font-bold">₩{(project.goal / 1000000)}M</p>
-                              </div>
-                              <div>
-                                <p className="text-sm text-gray-600">모금액</p>
-                                <p className="font-bold text-blue-600">₩{(project.raised / 1000000).toFixed(1)}M</p>
-                              </div>
-                              <div>
-                                <p className="text-sm text-gray-600">후원자</p>
-                                <p className="font-bold">{project.backers}명</p>
-                              </div>
-                            </div>
-
-                            <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
-                              <span className="text-sm text-yellow-800">
-                                수익 공유율: <strong>{project.revenueShare}%</strong>
-                              </span>
-                              <span className="text-sm text-yellow-800">
-                                마감까지 <strong>{project.daysLeft}일</strong>
-                              </span>
-                            </div>
-                          </>
-                        )}
-
-                        {isCompleted && (
-                          <div className="grid grid-cols-2 gap-6">
-                            <div className="space-y-3">
-                              <h4 className="font-medium">펀딩 결과</h4>
-                              <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                  <span>목표 금액:</span>
-                                  <span>₩{(project.goal / 1000000)}M</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span>최종 모금액:</span>
-                                  <span className="text-green-600 font-medium">₩{(project.raised / 1000000).toFixed(1)}M</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span>후원자 수:</span>
-                                  <span>{project.backers}명</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="space-y-3">
-                              <h4 className="font-medium">수익 현황</h4>
-                              <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                  <span>총 매출:</span>
-                                  <span>₩{(project.totalRevenue! / 1000000).toFixed(1)}M</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span>후원자 분배:</span>
-                                  <span className="text-blue-600">₩{(project.sharedRevenue! / 1000000).toFixed(1)}M</span>
-                                </div>
-                                <div className="flex justify-between font-medium">
-                                  <span>순 수익:</span>
-                                  <span className="text-green-600">₩{((project.totalRevenue! - project.sharedRevenue!) / 1000000).toFixed(1)}M</span>
-                                </div>
-                              </div>
-                            </div>
+                  return (
+                    <Card key={project.id}>
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="mb-2">{project.title}</CardTitle>
+                            <Badge
+                              className={
+                                project.status === "진행중" ? "bg-blue-100 text-blue-800" :
+                                  "bg-green-100 text-green-800"
+                              }
+                            >
+                              {project.status}
+                            </Badge>
                           </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm">
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button variant="outline" size="sm" className="text-red-600 border-red-600">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          {!isCompleted && (
+                            <>
+                              <div>
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className="text-sm text-gray-600">펀딩 진행률</span>
+                                  <span className="text-sm font-medium">{Math.round(progressPercentage)}%</span>
+                                </div>
+                                <Progress value={progressPercentage} className="h-3" />
+                              </div>
+
+                              <div className="grid grid-cols-3 gap-4 text-center">
+                                <div>
+                                  <p className="text-sm text-gray-600">목표 금액</p>
+                                  <p className="font-bold">₩{(project.goal / 1000000)}M</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-600">모금액</p>
+                                  <p className="font-bold text-blue-600">₩{(project.raised / 1000000).toFixed(1)}M</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-600">후원자</p>
+                                  <p className="font-bold">{project.backers}명</p>
+                                </div>
+                              </div>
+
+                              <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                                <span className="text-sm text-yellow-800">
+                                  수익 공유율: <strong>{project.revenueShare}%</strong>
+                                </span>
+                                <span className="text-sm text-yellow-800">
+                                  마감까지 <strong>{project.daysLeft}일</strong>
+                                </span>
+                              </div>
+                            </>
+                          )}
+
+                          {isCompleted && (
+                            <div className="grid grid-cols-2 gap-6">
+                              <div className="space-y-3">
+                                <h4 className="font-medium">펀딩 결과</h4>
+                                <div className="space-y-2 text-sm">
+                                  <div className="flex justify-between">
+                                    <span>목표 금액:</span>
+                                    <span>₩{(project.goal / 1000000)}M</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>최종 모금액:</span>
+                                    <span className="text-green-600 font-medium">₩{(project.raised / 1000000).toFixed(1)}M</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>후원자 수:</span>
+                                    <span>{project.backers}명</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="space-y-3">
+                                <h4 className="font-medium">수익 현황</h4>
+                                <div className="space-y-2 text-sm">
+                                  <div className="flex justify-between">
+                                    <span>총 매출:</span>
+                                    <span>₩{(project.totalRevenue! / 1000000).toFixed(1)}M</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>후원자 분배:</span>
+                                    <span className="text-blue-600">₩{(project.sharedRevenue! / 1000000).toFixed(1)}M</span>
+                                  </div>
+                                  <div className="flex justify-between font-medium">
+                                    <span>순 수익:</span>
+                                    <span className="text-green-600">₩{((project.totalRevenue! - project.sharedRevenue!) / 1000000).toFixed(1)}M</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                }))}
             </div>
           </TabsContent>
 
@@ -291,64 +307,73 @@ export function ArtistDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {wbsItems.map((item) => (
-                    <div key={item.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-3 h-3 rounded-full ${item.status === "완료" ? "bg-green-500" :
-                            item.status === "진행중" ? "bg-blue-500" :
-                              "bg-gray-300"
-                            }`} />
-                          <h4 className="font-medium">{item.task}</h4>
-                          <Badge
-                            className={`text-xs ${item.status === "완료" ? "bg-green-100 text-green-800" :
-                              item.status === "진행중" ? "bg-blue-100 text-blue-800" :
-                                "bg-gray-100 text-gray-800"
-                              }`}
-                          >
-                            {item.status}
-                          </Badge>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button variant="outline" size="sm" className="text-red-600">
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="grid md:grid-cols-4 gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-600">시작일:</span>
-                          <p>{item.startDate}</p>
-                        </div>
-                        <div>
-                          <span className="text-gray-600">종료일:</span>
-                          <p>{item.endDate}</p>
-                        </div>
-                        <div>
-                          <span className="text-gray-600">담당자:</span>
-                          <p>{item.responsible}</p>
-                        </div>
-                        <div>
-                          <span className="text-gray-600">진행률:</span>
-                          <div className="flex items-center gap-2">
-                            <Progress value={item.progress} className="flex-1 h-2" />
-                            <span className="font-medium">{item.progress}%</span>
+                  {wbsItems.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500 mb-4">아직 등록된 작업이 없습니다.</p>
+                      <Button>
+                        <Plus className="w-4 h-4 mr-2" />
+                        첫 번째 작업 추가하기
+                      </Button>
+                    </div>
+                  ) : (
+                    wbsItems.map((item) => (
+                      <div key={item.id} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-3 h-3 rounded-full ${item.status === "완료" ? "bg-green-500" :
+                              item.status === "진행중" ? "bg-blue-500" :
+                                "bg-gray-300"
+                              }`} />
+                            <h4 className="font-medium">{item.task}</h4>
+                            <Badge
+                              className={`text-xs ${item.status === "완료" ? "bg-green-100 text-green-800" :
+                                item.status === "진행중" ? "bg-blue-100 text-blue-800" :
+                                  "bg-gray-100 text-gray-800"
+                                }`}
+                            >
+                              {item.status}
+                            </Badge>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm">
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button variant="outline" size="sm" className="text-red-600">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
-                      </div>
 
-                      {item.status === "진행중" && (
-                        <div className="mt-3 p-2 bg-blue-50 rounded text-sm text-blue-800">
-                          <AlertCircle className="w-4 h-4 inline mr-2" />
-                          진행 중인 작업입니다. 상태를 업데이트해주세요.
+                        <div className="grid md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <span className="text-gray-600">시작일:</span>
+                            <p>{item.startDate}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">종료일:</span>
+                            <p>{item.endDate}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">담당자:</span>
+                            <p>{item.responsible}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">진행률:</span>
+                            <div className="flex items-center gap-2">
+                              <Progress value={item.progress} className="flex-1 h-2" />
+                              <span className="font-medium">{item.progress}%</span>
+                            </div>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  ))}
+
+                        {item.status === "진행중" && (
+                          <div className="mt-3 p-2 bg-blue-50 rounded text-sm text-blue-800">
+                            <AlertCircle className="w-4 h-4 inline mr-2" />
+                            진행 중인 작업입니다. 상태를 업데이트해주세요.
+                          </div>
+                        )}
+                      </div>
+                    )))}
                 </div>
               </CardContent>
             </Card>

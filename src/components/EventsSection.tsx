@@ -1,3 +1,5 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -92,6 +94,8 @@ interface EventsSectionProps {
 }
 
 export function EventsSection({ onBack }: EventsSectionProps) {
+  const navigate = useNavigate();
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/10 to-muted/20">
       {/* Header */}
@@ -253,7 +257,11 @@ export function EventsSection({ onBack }: EventsSectionProps) {
                 무료로 이벤트를 등록하고 통합 스케줄러의 혜택을 누리세요.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl">
+                <Button 
+                  size="lg" 
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl"
+                  onClick={() => navigate('/events/create')}
+                >
                   이벤트 등록하기
                 </Button>
                 <Button variant="outline" size="lg" className="rounded-xl">

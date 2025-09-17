@@ -31,6 +31,12 @@ const EventsPage = lazy(() => import('./pages/events/EventsPage').then(module =>
 const AccountPage = lazy(() => import('./pages/account/AccountPage').then(module => ({ default: module.AccountPage })));
 const SearchPage = lazy(() => import('./pages/search/SearchPage').then(module => ({ default: module.SearchPage })));
 
+// CRUD Pages
+const CreateProjectPage = lazy(() => import('./pages/projects/CreateProjectPage').then(module => ({ default: module.CreateProjectPage })));
+const CreateEventPage = lazy(() => import('./pages/events/CreateEventPage').then(module => ({ default: module.CreateEventPage })));
+const CreateArtworkPage = lazy(() => import('./pages/gallery/CreateArtworkPage').then(module => ({ default: module.CreateArtworkPage })));
+const CreatePostPage = lazy(() => import('./pages/community/CreatePostPage').then(module => ({ default: module.CreatePostPage })));
+
 // Loading component
 const PageLoading = () => (
   <div className="min-h-screen flex items-center justify-center">
@@ -79,15 +85,25 @@ function App() {
                     <AppLayout><ProjectsPage /></AppLayout>
                   </Suspense>
                 } />
+                <Route path="/projects/create" element={
+                  <Suspense fallback={<PageLoading />}>
+                    <AppLayout><CreateProjectPage /></AppLayout>
+                  </Suspense>
+                } />
                 <Route path="/projects/:slug" element={<AppLayout><ProjectDetail projectId={0} onBack={() => { }} /></AppLayout>} />
                 <Route path="/funding/create" element={
                   <Suspense fallback={<PageLoading />}>
-                    <AppLayout><ProjectsPage /></AppLayout>
+                    <AppLayout><CreateProjectPage /></AppLayout>
                   </Suspense>
                 } />
                 <Route path="/community" element={
                   <Suspense fallback={<PageLoading />}>
                     <AppLayout><CommunityPage /></AppLayout>
+                  </Suspense>
+                } />
+                <Route path="/community/create" element={
+                  <Suspense fallback={<PageLoading />}>
+                    <AppLayout><CreatePostPage /></AppLayout>
                   </Suspense>
                 } />
                 <Route path="/community/post/:id" element={<AppLayout><CommunityPostDetailWrapper /></AppLayout>} />
@@ -100,6 +116,11 @@ function App() {
                 <Route path="/events" element={
                   <Suspense fallback={<PageLoading />}>
                     <AppLayout><EventsPage /></AppLayout>
+                  </Suspense>
+                } />
+                <Route path="/events/create" element={
+                  <Suspense fallback={<PageLoading />}>
+                    <AppLayout><CreateEventPage /></AppLayout>
                   </Suspense>
                 } />
                 <Route path="/events/:id" element={<AppLayout><EventDetail eventId="" onBack={() => { }} /></AppLayout>} />
@@ -139,6 +160,11 @@ function App() {
                 <Route path="/gallery" element={
                   <Suspense fallback={<PageLoading />}>
                     <AppLayout><ArtistGallery onBack={() => { }} /></AppLayout>
+                  </Suspense>
+                } />
+                <Route path="/gallery/create" element={
+                  <Suspense fallback={<PageLoading />}>
+                    <AppLayout><CreateArtworkPage /></AppLayout>
                   </Suspense>
                 } />
                 <Route path="/community-full" element={<AppLayout><CommunityFull onBack={() => { }} onSelectArtist={() => { }} /></AppLayout>} />

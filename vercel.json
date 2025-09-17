@@ -16,11 +16,13 @@
     }
   ],
   "env": {
+    "VITE_API_BASE_URL": "https://collaboreumplatform-production.up.railway.app/api",
     "REACT_APP_API_URL": "https://collaboreumplatform-production.up.railway.app/api",
     "REACT_APP_ENVIRONMENT": "production"
   },
   "build": {
     "env": {
+      "VITE_API_BASE_URL": "https://collaboreumplatform-production.up.railway.app/api",
       "REACT_APP_API_URL": "https://collaboreumplatform-production.up.railway.app/api",
       "REACT_APP_ENVIRONMENT": "production"
     }

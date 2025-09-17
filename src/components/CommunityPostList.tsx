@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 // import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -38,6 +39,7 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
   onWritePost,
   onPostClick
 }) => {
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('전체');
@@ -112,7 +114,7 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
   useEffect(() => {
     fetchCategories();
     fetchPosts(1, selectedCategory);
-  }, [selectedCategory, searchQuery, fetchPosts]);
+  }, [selectedCategory, searchQuery]); // fetchPosts 의존성 제거로 무한루프 방지
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
@@ -234,7 +236,7 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
             </Button>
             {isAuthenticated && (
               <Button
-                onClick={onWritePost}
+                onClick={() => navigate('/community/create')}
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 새 글 작성

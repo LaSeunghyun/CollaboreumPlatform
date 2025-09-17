@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useAuth } from '../contexts/AuthContext';
-import { communityAPI, communityPostAPI, apiCall } from '../services/api';
+import { communityPostAPI, apiCall } from '../services/api';
 import { ApiResponse } from '../types';
 import { useDeleteCommunityPost } from '../features/community/hooks/useCommunityPosts';
 import { usePostReaction, useIncrementPostViews } from '../lib/api/useCommunityReactions';
@@ -146,6 +146,9 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
     const [replyContent, setReplyContent] = useState('');
     const [copiedLink, setCopiedLink] = useState(false);
 
+    // 조회수 증가 추적을 위한 ref
+    const viewCountIncremented = useRef(false);
+
     // 링크 복사 기능
     const handleCopyLink = async () => {
         const link = `${window.location.origin}/community/post/${postId}`;
@@ -232,48 +235,46 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                 };
                 setPost(formattedPost);
 
-                // 사용자별 반응 상태 확인
-                if (user && formattedPost.id) {
-                    try {
-                        const reactionsResponse = await communityPostAPI.getPostReactions(formattedPost.id) as ApiResponse<any>;
-                        if (reactionsResponse?.success && reactionsResponse?.data) {
-                            const data = reactionsResponse.data;
-                            setPost((prev: any) => prev ? {
-                                ...prev,
-                                isLiked: data?.isLiked || false,
-                                isDisliked: data?.isDisliked || false,
-                                likes: data?.likes || 0,
-                                dislikes: data?.dislikes || 0
-                            } : null);
-                        }
-                    } catch (err) {
-                        console.error('반응 상태 확인 실패:', err);
-                    }
-                }
+                // 사용자별 반응 상태 확인은 별도 useEffect에서 처리
             } else {
                 setError('포스트를 불러올 수 없습니다.');
             }
         } catch (error) {
             console.error('포스트 상세 조회 오류:', error);
-            setError('포스트 조회 중 오류가 발생했습니다.');
+
+            // 에러 타입에 따른 메시지 설정
+            let errorMessage = '포스트 조회 중 오류가 발생했습니다.';
+            if (error instanceof Error) {
+                if (error.message.includes('서버 리소스가 부족합니다')) {
+                    errorMessage = '서버가 일시적으로 과부하 상태입니다. 잠시 후 다시 시도해주세요.';
+                } else if (error.message.includes('요청 시간이 초과되었습니다')) {
+                    errorMessage = '요청 시간이 초과되었습니다. 네트워크 연결을 확인해주세요.';
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage = '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요.';
+                }
+            }
+
+            setError(errorMessage);
         } finally {
             setIsLoading(false);
         }
-    }, [postId, user]);
+    }, [postId]); // user 의존성 제거
 
     // 조회수 증가 함수
     const incrementViewCount = useCallback(() => {
-        if (!postId || postId === 'undefined') {
+        if (!postId || postId === 'undefined' || viewCountIncremented.current) {
             return;
         }
 
+        viewCountIncremented.current = true;
         incrementViewsMutation.mutate(postId, {
             onError: (error) => {
                 console.error('조회수 증가 실패:', error);
-                // 조회수 증가 실패는 사용자에게 보여주지 않음
+                // 실패 시 다시 시도할 수 있도록 플래그 리셋
+                viewCountIncremented.current = false;
             }
         });
-    }, [postId, incrementViewsMutation]);
+    }, [postId]);
 
     const handleLike = () => {
         requireAuth(() => {
@@ -504,6 +505,9 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
             return;
         }
 
+        // postId가 변경되면 조회수 증가 플래그 리셋
+        viewCountIncremented.current = false;
+
         // 현재 페이지 정보를 세션 스토리지에 저장
         const currentPage = window.location.href;
         const previousPage = sessionStorage.getItem('currentPage');
@@ -515,8 +519,11 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         sessionStorage.setItem('currentPage', currentPage);
 
         fetchPostDetail();
-        // 조회수 증가
-        incrementViewCount();
+        
+        // 조회수 증가 (한 번만 실행)
+        if (!viewCountIncremented.current) {
+            incrementViewCount();
+        }
 
         // 브라우저 뒤로가기 버튼 처리
         const handlePopState = () => {
@@ -528,7 +535,36 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         return () => {
             window.removeEventListener('popstate', handlePopState);
         };
-    }, [postId, fetchPostDetail, handleBack, incrementViewCount]);
+    }, [postId]); // 의존성 배열에서 함수들 제거
+
+    // 사용자 반응 상태 확인을 위한 별도 useEffect
+    useEffect(() => {
+        if (user && post?.id) {
+            communityPostAPI.getPostReactions(post.id)
+                .then((reactionsResponse: unknown) => {
+                    const response = reactionsResponse as ApiResponse<any>;
+                    if (response?.success && response?.data) {
+                        const data = response.data;
+                        setPost((prev: any) => prev ? {
+                            ...prev,
+                            isLiked: data?.isLiked || false,
+                            isDisliked: data?.isDisliked || false,
+                            likes: data?.likes || prev.likes,
+                            dislikes: data?.dislikes || prev.dislikes
+                        } : null);
+                    }
+                })
+                .catch((err) => {
+                    console.error('반응 상태 확인 실패:', err);
+                    // 반응 상태 확인 실패 시에도 기본값으로 설정
+                    setPost((prev: any) => prev ? {
+                        ...prev,
+                        isLiked: false,
+                        isDisliked: false
+                    } : null);
+                });
+        }
+    }, [user, post?.id]);
 
     if (isLoading) {
         return (
@@ -552,9 +588,14 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                     </div>
                     <h2 className="text-xl font-semibold text-gray-900 mb-2">오류가 발생했습니다</h2>
                     <p className="text-gray-600 mb-4">{error || '포스트를 찾을 수 없습니다.'}</p>
-                    <Button onClick={handleBack} variant="outline">
-                        ← 목록으로 돌아가기
-                    </Button>
+                    <div className="flex gap-3 justify-center">
+                        <Button onClick={fetchPostDetail} variant="outline">
+                            🔄 다시 시도
+                        </Button>
+                        <Button onClick={handleBack} variant="outline">
+                            ← 목록으로 돌아가기
+                        </Button>
+                    </div>
                 </div>
             </div>
         );

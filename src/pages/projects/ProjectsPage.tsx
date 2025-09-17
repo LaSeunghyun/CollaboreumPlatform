@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { SegmentedTabs } from '../../components/ui/SegmentedTabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
@@ -11,6 +12,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 export const ProjectsPage: React.FC = () => {
+    const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
     const { requireAuth } = useAuthRedirect();
     const [activeTab, setActiveTab] = useState("ongoing");
@@ -31,7 +33,7 @@ export const ProjectsPage: React.FC = () => {
     const handleCreateProject = () => {
         requireAuth(() => {
             // 프로젝트 생성 페이지로 이동
-            window.location.href = '/funding/create';
+            navigate('/projects/create');
         });
     };
 

@@ -57,7 +57,6 @@ export const Header: React.FC = () => {
   };
 
   const navigationItems = [
-    { path: '/', label: '홈' },
     { path: '/artists', label: '아티스트' },
     { path: '/projects', label: '프로젝트' },
     { path: '/notices', label: '공지사항' },

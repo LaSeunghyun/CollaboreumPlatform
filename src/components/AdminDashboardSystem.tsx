@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
-import { adminUserAPI } from '../services/api';
+import { adminUserAPI, adminProjectAPI, adminAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import {
     Users,
@@ -98,9 +98,9 @@ export const UserManagement: React.FC = () => {
                 // Loading state removed
                 setError(null);
 
-                const response = await adminUserAPI.getAllUsers();
+                const response = await adminUserAPI.getAllUsers() as any;
                 // API 응답 구조에 따른 방어 코드
-                const usersData = Array.isArray(response) ? response : (response as any)?.data || [];
+                const usersData = Array.isArray(response) ? response : response?.data || [];
                 setUsers(usersData);
                 setFilteredUsers(usersData);
             } catch (err) {
@@ -151,16 +151,8 @@ export const UserManagement: React.FC = () => {
         ));
         // 사용자 권한 변경 API 호출
         try {
-            const response = await fetch(`/api/admin/users/${userId}/role`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                },
-                body: JSON.stringify({ role: newRole })
-            });
-
-            if (!response.ok) {
+            const response = await adminUserAPI.updateUserRole(userId, newRole) as any;
+            if (!response.success) {
                 console.error('사용자 권한 변경 실패');
             }
         } catch (error) {
@@ -388,10 +380,9 @@ export const ProjectApproval: React.FC = () => {
         const fetchProjects = async () => {
             // API에서 프로젝트 목록 가져오기
             try {
-                const response = await fetch('/api/admin/projects');
-                if (response.ok) {
-                    const data = await response.json();
-                    setProjects(data.data || []);
+                const response = await adminProjectAPI.getAllProjects() as any;
+                if (response.success) {
+                    setProjects(response.data || []);
                 }
             } catch (error) {
                 console.error('프로젝트 목록 로드 실패:', error);
@@ -426,16 +417,8 @@ export const ProjectApproval: React.FC = () => {
         ));
         // API 호출하여 프로젝트 승인/거절
         try {
-            const response = await fetch(`/api/admin/projects/${projectId}/status`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                },
-                body: JSON.stringify({ status: newStatus })
-            });
-
-            if (response.ok) {
+            const response = await adminProjectAPI.updateProjectStatus(projectId, newStatus as 'approved' | 'rejected') as any;
+            if (response.success) {
                 setProjects(prev => prev.map(project =>
                     project.id === projectId ? { ...project, status: newStatus as any } : project
                 ));
@@ -803,17 +786,12 @@ export const ContentModeration: React.FC = () => {
                 setContentError(null);
 
                 // 실제 API 호출로 변경
-                const response = await fetch('/api/admin/reported-content');
-                if (!response.ok) {
-                    throw new Error('신고된 콘텐츠 데이터를 불러올 수 없습니다.');
-                }
-
-                const data = await response.json();
-                if (data.success) {
-                    setReportedContent(data.data);
-                    setFilteredContent(data.data);
+                const response = await adminAPI.getReportedContent() as any;
+                if (response.success) {
+                    setReportedContent(response.data);
+                    setFilteredContent(response.data);
                 } else {
-                    throw new Error(data.message || '신고된 콘텐츠 데이터를 불러올 수 없습니다.');
+                    throw new Error(response.message || '신고된 콘텐츠 데이터를 불러올 수 없습니다.');
                 }
             } catch (error) {
                 console.error('신고된 콘텐츠 데이터 로드 실패:', error);
@@ -848,16 +826,8 @@ export const ContentModeration: React.FC = () => {
         ));
         // API 호출하여 조치 실행
         try {
-            const response = await fetch(`/api/admin/users/${userId}/action`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                },
-                body: JSON.stringify({ action, reason })
-            });
-
-            if (response.ok) {
+            const response = await adminAPI.handleUserAction(userId, action, reason) as any;
+            if (response.success) {
                 alert(`사용자에게 ${action} 조치가 실행되었습니다.`);
                 // 사용자 목록 새로고침
                 window.location.reload();

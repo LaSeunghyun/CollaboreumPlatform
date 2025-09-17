@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -16,6 +17,7 @@ interface CommunityFullProps {
 }
 
 export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedArtist, setSelectedArtist] = useState<number | null>(null);
@@ -221,7 +223,7 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
                   <Filter className="w-4 h-4 mr-2" />
                   정렬
                 </Button>
-                <Button>새 글 작성</Button>
+                <Button onClick={() => navigate('/community/create')}>새 글 작성</Button>
               </div>
             </div>
 

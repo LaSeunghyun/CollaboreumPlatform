@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '../../shared/ui/Card';
 import { Input } from '../../shared/ui/Input';
@@ -7,7 +7,7 @@ import { Badge } from '../../shared/ui/Badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../../shared/ui/Avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../shared/ui/Tabs';
 import { Search, ArrowLeft, User, Palette, Calendar, MessageSquare } from 'lucide-react';
-import { interactionAPI } from '../../services/api';
+import { useSearch } from '../../lib/api/useUser';
 import { format } from 'date-fns';
 
 interface SearchResult {
@@ -26,40 +26,34 @@ export const SearchPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
     const [query, setQuery] = useState(searchParams.get('q') || '');
-    const [results, setResults] = useState<SearchResult[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState('all');
 
-    const performSearch = useCallback(async () => {
-        if (!query.trim()) return;
-
-        try {
-            setLoading(true);
-            setError(null);
-
-            const response = await interactionAPI.search(query.trim());
-            setResults(response as SearchResult[]);
-        } catch (err) {
-            console.error('검색 실패:', err);
-            setError('검색 중 오류가 발생했습니다.');
-            setResults([]);
-        } finally {
-            setLoading(false);
-        }
-    }, [query]);
+    // 디바운싱된 검색어
+    const [debouncedQuery, setDebouncedQuery] = useState(query);
 
     useEffect(() => {
-        if (query.trim()) {
-            performSearch();
+        const timer = setTimeout(() => {
+            setDebouncedQuery(query);
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [query]);
+
+    // React Query를 사용한 검색 (디바운싱된 쿼리 사용)
+    const { data: searchResults, isLoading, error, refetch, isError, failureCount } = useSearch(debouncedQuery.trim());
+
+    // URL 파라미터와 동기화
+    useEffect(() => {
+        const urlQuery = searchParams.get('q') || '';
+        if (urlQuery !== query) {
+            setQuery(urlQuery);
         }
-    }, [query, performSearch]);
+    }, [searchParams]); // query 의존성 제거로 무한루프 방지
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (query.trim()) {
             setSearchParams({ q: query.trim() });
-            performSearch();
         }
     };
 
@@ -67,6 +61,8 @@ export const SearchPage: React.FC = () => {
         navigate(-1);
     };
 
+    // 검색 결과 처리
+    const results = (searchResults as SearchResult[]) || [];
     const filteredResults = activeTab === 'all'
         ? results
         : results.filter(result => result.type === activeTab);
@@ -114,15 +110,22 @@ export const SearchPage: React.FC = () => {
                 </form>
             </div>
 
-            {loading ? (
+            {isLoading ? (
                 <div className="text-center py-12">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                     <p className="text-gray-600">검색 중...</p>
                 </div>
-            ) : error ? (
+            ) : isError ? (
                 <div className="text-center py-12">
-                    <p className="text-red-500">{error}</p>
-                    <Button onClick={performSearch} className="mt-4">다시 시도</Button>
+                    <p className="text-red-500">
+                        {error?.message || '검색 중 오류가 발생했습니다.'}
+                    </p>
+                    {failureCount > 0 && (
+                        <p className="text-sm text-gray-500 mt-2">
+                            재시도 횟수: {failureCount}/3
+                        </p>
+                    )}
+                    <Button onClick={() => refetch()} className="mt-4">다시 시도</Button>
                 </div>
             ) : results.length === 0 && query ? (
                 <div className="text-center py-12">

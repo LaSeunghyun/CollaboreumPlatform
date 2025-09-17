@@ -167,8 +167,27 @@ export const useDeleteNotification = () => {
 export const useSearch = (query: string, type?: 'artists' | 'projects' | 'events' | 'posts') => {
     return useQuery({
         queryKey: ['search', query, type],
-        queryFn: () => interactionAPI.search(query, type),
+        queryFn: async () => {
+            try {
+                const result = await interactionAPI.search(query, type);
+                return result;
+            } catch (error) {
+                // 네트워크 연결 상태 확인
+                if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+                    throw new Error('네트워크 연결을 확인해주세요.');
+                }
+                throw error;
+            }
+        },
         enabled: !!query && query.length > 0,
         staleTime: 2 * 60 * 1000, // 2분
+        retry: (failureCount, error) => {
+            // 네트워크 에러인 경우 3회까지 재시도
+            if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+                return failureCount < 3;
+            }
+            return false;
+        },
+        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     });
 };

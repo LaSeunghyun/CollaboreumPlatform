@@ -47,6 +47,8 @@
 - **Tailwind CSS** + **shadcn/ui** 컴포넌트
 - **React Router** 네비게이션
 - **React Testing Library** + **Jest** (TDD)
+- **Pact** (계약 테스트)
+- **Cypress** (E2E 테스트)
 
 ### Backend
 - **Node.js** + **Express.js**
@@ -170,6 +172,48 @@ npm start
 - **확장성**: 모듈화된 구조로 새로운 기능 추가 용이
 - **사용자 경험**: 직관적인 UI/UX 및 단계별 가이드
 
+## 🔧 Pre-deploy Checklist (자동화)
+
+CI가 다음 항목들을 강제합니다. 실패 시 PR 머지 불가:
+
+- [x] **Lint / Format / Typecheck** 통과
+- [x] **Semgrep** (팀 커스텀 룰 포함) 통과
+- [x] **Depcheck** 이상 없음
+- [x] **Unit & Pact 계약 테스트** 통과
+- [x] **Env (.env.example)** 검증 통과
+- [x] **Build 성공** (FE/BE)
+- [x] **Security Audit** 통과
+- [x] **E2E 테스트** 통과 (PR에서만)
+
+> CI가 위 항목을 강제합니다. 실패 시 PR 머지 불가.
+
+## 🧪 Quick Commands
+
+### 전체 점검 (로컬)
+```bash
+# Frontend
+npm run lint && npm run typecheck && npm run format && npm run semgrep && npm run depcheck && npm run test && npm run env:verify
+
+# Backend
+cd server
+npm run lint && npm run typecheck && npm run format && npm run semgrep && npm run depcheck && npm run test && npm run env:verify
+```
+
+### 계약 타입 생성
+```bash
+npm run openapi:gen
+```
+
+### 계약 테스트
+```bash
+npm run pact:test
+```
+
+### E2E 테스트
+```bash
+npm run cypress:ci
+```
+
 ## 🤝 기여하기
 
 1. Fork the Project
@@ -177,6 +221,25 @@ npm start
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+### CI 체크 목록과 실패 시 조치
+
+#### 필수 통과 기준
+- **Lint/Type/Format**: 오류 0, 경고 기준은 팀 합의치 이하
+- **Semgrep**: 커스텀 규칙 + 기본 CI rulepack 위반 0
+- **Depcheck**: 미사용/누락 의존성 0
+- **Unit/Contract Tests**: 실패 0, Pact 계약 검증 통과
+- **Env Verify**: .env.example 기준 누락 없음
+- **Build**: FE/BE 빌드 성공
+- **Security Audit**: 보안 취약점 0
+
+#### 실패 시 조치
+1. **Lint 실패**: `npm run lint:fix` 실행 후 재커밋
+2. **Format 실패**: `npm run format:fix` 실행 후 재커밋
+3. **Type 실패**: TypeScript 오류 수정 후 재커밋
+4. **Test 실패**: 테스트 코드 수정 후 재커밋
+5. **Build 실패**: 빌드 오류 수정 후 재커밋
+6. **Security 실패**: 보안 취약점 해결 후 재커밋
 
 ## 📝 라이선스
 

@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Separator } from './ui/separator';
 import { useAuth } from '../contexts/AuthContext';
-import { artistAPI } from '../services/api';
+import { artistAPI, userAPI } from '../services/api';
 import { LoadingState, ErrorState } from './organisms/States';
 import { ApiResponse } from '../types';
 import {
@@ -32,7 +32,6 @@ import {
 import { format } from 'date-fns';
 import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
 import { ko } from 'date-fns/locale';
-import { userProfileAPI } from '../services/api';
 import { dynamicConstantsService } from '../services/constantsService';
 
 // Types
@@ -204,29 +203,13 @@ export const PasswordChangeForm: React.FC = () => {
     if (validateForm()) {
       // API 호출하여 비밀번호 변경
       try {
-        const response = await fetch('/api/users/change-password', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          },
-          body: JSON.stringify({
-            currentPassword: formData.currentPassword,
-            newPassword: formData.newPassword
-          })
+        // TODO: changePassword API 구현 필요
+        alert('비밀번호 변경 기능은 준비 중입니다.');
+        setFormData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
         });
-
-        if (response.ok) {
-          alert('비밀번호가 성공적으로 변경되었습니다.');
-          setFormData({
-            currentPassword: '',
-            newPassword: '',
-            confirmPassword: ''
-          });
-        } else {
-          const errorData = await response.json();
-          alert(`비밀번호 변경 실패: ${errorData.message || '알 수 없는 오류가 발생했습니다.'}`);
-        }
       } catch (error) {
         console.error('비밀번호 변경 실패:', error);
         alert('비밀번호 변경 중 오류가 발생했습니다.');
@@ -596,6 +579,7 @@ export const ArtistMyPage: React.FC = () => {
 
 // Fan MyPage Component
 export const FanMyPage: React.FC = () => {
+  const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile>({
     id: '',
     username: '',
@@ -614,10 +598,9 @@ export const FanMyPage: React.FC = () => {
     // API에서 백킹 정보 가져오기
     const fetchBackingInfo = async () => {
       try {
-        const response = await fetch('/api/users/backing-info');
-        if (response.ok) {
-          const data = await response.json();
-          setBackings(data.data || []);
+        const response = await userAPI.getInvestments(user?.id || '') as any;
+        if (response.success) {
+          setBackings(response.data || []);
         }
       } catch (error) {
         console.error('백킹 정보 로드 실패:', error);
@@ -632,16 +615,9 @@ export const FanMyPage: React.FC = () => {
     setProfile(prev => ({ ...prev, ...data }));
     // API 호출하여 프로필 업데이트
     try {
-      const response = await fetch('/api/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        },
-        body: JSON.stringify(data)
-      });
+      const response = await userAPI.updateProfile(profile.id, data) as any;
 
-      if (response.ok) {
+      if (response.success) {
         alert('프로필이 성공적으로 업데이트되었습니다.');
       } else {
         alert('프로필 업데이트에 실패했습니다.');
@@ -806,6 +782,7 @@ export const FanMyPage: React.FC = () => {
 
 // Admin MyPage Component
 export const AdminMyPage: React.FC = () => {
+  const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile>({
     id: 'admin1',
     username: '관리자',
@@ -823,16 +800,9 @@ export const AdminMyPage: React.FC = () => {
     setProfile(prev => ({ ...prev, ...data }));
     // API 호출하여 프로필 업데이트
     try {
-      const response = await fetch('/api/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        },
-        body: JSON.stringify(data)
-      });
+      const response = await userAPI.updateProfile(profile.id, data) as any;
 
-      if (response.ok) {
+      if (response.success) {
         alert('프로필이 성공적으로 업데이트되었습니다.');
       } else {
         alert('프로필 업데이트에 실패했습니다.');

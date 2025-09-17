@@ -2,6 +2,7 @@
 
 // API Base URL
 const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL ||
+    (import.meta as any).env?.REACT_APP_API_URL ||
     (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
 
 
@@ -10,55 +11,127 @@ const getAuthToken = (): string | null => {
     return localStorage.getItem('authToken');
 };
 
-// Generic API function with better error handling and automatic token inclusion
-export async function apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    try {
-        const token = getAuthToken();
+// 재시도 로직을 위한 헬퍼 함수
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-        const headers: HeadersInit = {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        };
+// 동시 요청 제한을 위한 큐
+class RequestQueue {
+    private queue: Array<() => Promise<any>> = [];
+    private running = 0;
+    private maxConcurrent = 5; // 최대 동시 요청 수
 
-        // 토큰이 있으면 Authorization 헤더에 추가
-        if (token) {
-            (headers as any)['Authorization'] = `Bearer ${token}`;
-        }
-
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-            ...options,
-            headers,
+    async add<T>(request: () => Promise<T>): Promise<T> {
+        return new Promise((resolve, reject) => {
+            this.queue.push(async () => {
+                try {
+                    const result = await request();
+                    resolve(result);
+                } catch (error) {
+                    reject(error);
+                } finally {
+                    this.running--;
+                    this.processNext();
+                }
+            });
+            this.processNext();
         });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-
-            // 401 Unauthorized 오류 시 토큰 제거
-            if (response.status === 401) {
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('authUser');
-                // 인증 토큰이 만료되어 자동 로그아웃
-            }
-
-            // 공개 데이터 조회 시 401 에러는 무시하고 빈 데이터 반환
-            if (response.status === 401 && (
-                endpoint.includes('/artists') ||
-                endpoint.includes('/funding/projects') ||
-                endpoint.includes('/community/posts') ||
-                endpoint.includes('/stats/platform')
-            )) {
-                console.warn(`공개 데이터 조회 실패 (401): ${endpoint}`);
-                return { success: false, data: [], message: '인증이 필요합니다' } as T;
-            }
-
-            throw new Error(errorData.message || `API Error: ${response.status} ${response.statusText}`);
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error('API call failed:', error);
-        throw error;
     }
+
+    private processNext() {
+        if (this.running < this.maxConcurrent && this.queue.length > 0) {
+            this.running++;
+            const request = this.queue.shift()!;
+            request();
+        }
+    }
+}
+
+const requestQueue = new RequestQueue();
+
+// Generic API function with better error handling and automatic token inclusion
+export async function apiCall<T>(endpoint: string, options: RequestInit = {}, retryCount = 0): Promise<T> {
+    const maxRetries = 3;
+    const retryDelay = 1000; // 1초
+    const timeout = 10000; // 10초 타임아웃
+
+    // 동시 요청 제한을 위해 큐에 추가
+    return requestQueue.add(async () => {
+        try {
+            const token = getAuthToken();
+
+            const headers: HeadersInit = {
+                'Content-Type': 'application/json',
+                ...options.headers,
+            };
+
+            // 토큰이 있으면 Authorization 헤더에 추가
+            if (token) {
+                (headers as any)['Authorization'] = `Bearer ${token}`;
+            }
+
+            // AbortController를 사용한 타임아웃 설정
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                ...options,
+                headers,
+                signal: controller.signal,
+            });
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+
+                // 401 Unauthorized 오류 시 토큰 제거
+                if (response.status === 401) {
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('authUser');
+                    // 인증 토큰이 만료되어 자동 로그아웃
+                }
+
+                // 공개 데이터 조회 시 401 에러는 무시하고 빈 데이터 반환
+                if (response.status === 401 && (
+                    endpoint.includes('/artists') ||
+                    endpoint.includes('/funding/projects') ||
+                    endpoint.includes('/community/posts') ||
+                    endpoint.includes('/stats/platform')
+                )) {
+                    console.warn(`공개 데이터 조회 실패 (401): ${endpoint}`);
+                    return { success: false, data: [], message: '인증이 필요합니다' } as T;
+                }
+
+                throw new Error(errorData.message || `API Error: ${response.status} ${response.statusText}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('API call failed:', error);
+
+            // 타임아웃 에러 처리
+            if (error instanceof Error && error.name === 'AbortError') {
+                throw new Error('요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
+            }
+
+            // ERR_INSUFFICIENT_RESOURCES는 재시도하면 안 되는 에러
+            if (error instanceof TypeError && error.message.includes('ERR_INSUFFICIENT_RESOURCES')) {
+                throw new Error('서버 리소스가 부족합니다. 잠시 후 다시 시도해주세요.');
+            }
+
+            // 네트워크 에러이고 재시도 횟수가 남아있으면 재시도
+            if (retryCount < maxRetries && (
+                (error instanceof TypeError && error.message.includes('Failed to fetch')) ||
+                (error instanceof TypeError && error.message.includes('NetworkError'))
+            )) {
+                console.log(`API 호출 재시도 중... (${retryCount + 1}/${maxRetries})`);
+                await delay(retryDelay * (retryCount + 1)); // 지수 백오프
+                return apiCall<T>(endpoint, options, retryCount + 1);
+            }
+
+            throw error;
+        }
+    });
 }
 
 // Artist APIs with improved error handling
@@ -127,6 +200,7 @@ export const adminAPI = {
     getInquiries: () => apiCall('/admin/inquiries'),
     getMatchingRequests: () => apiCall('/admin/matching-requests'),
     getFinancialData: () => apiCall('/admin/financial-data'),
+    getReportedContent: () => apiCall('/admin/reported-content'),
     updateInquiryStatus: (id: number, status: string) =>
         apiCall(`/admin/inquiries/${id}/status`, {
             method: 'PUT',
@@ -136,6 +210,11 @@ export const adminAPI = {
         apiCall(`/admin/inquiries/${id}/assign`, {
             method: 'PUT',
             body: JSON.stringify({ assignedTo })
+        }),
+    handleUserAction: (userId: string, action: string, reason?: string) =>
+        apiCall(`/admin/users/${userId}/action`, {
+            method: 'POST',
+            body: JSON.stringify({ action, reason })
         }),
 };
 

@@ -253,7 +253,7 @@ export const CommunityPage: React.FC = () => {
 
     const handleCreatePost = () => {
         requireAuth(() => {
-            setIsCreateModalOpen(true);
+            navigate('/community/create');
         });
     };
 

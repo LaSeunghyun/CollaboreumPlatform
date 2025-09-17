@@ -1,10 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-echo "🔍 Pre-commit: 빠른 검증 시작"
-
-# 빠른 포맷팅 및 린트 수정
-npm run fix:format
-npm run fix:lint
-
-echo "✅ Pre-commit 검증 완료"
+npx lint-staged
