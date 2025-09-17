@@ -724,14 +724,14 @@ router.put('/posts/:id/comments/:commentId', auth, async (req, res) => {
 
     // 댓글 찾기 (일반 댓글 또는 대댓글)
     let comment = post.comments.id(commentId);
-    let isReply = false;
+    let _isReply = false;
 
     if (!comment) {
       // 대댓글인지 확인
-      for (let parentComment of post.comments) {
+      for (const parentComment of post.comments) {
         comment = parentComment.replies.id(commentId);
         if (comment) {
-          isReply = true;
+          _isReply = true;
           break;
         }
       }
@@ -790,15 +790,15 @@ router.delete('/posts/:id/comments/:commentId', auth, async (req, res) => {
 
     // 댓글 찾기 (일반 댓글 또는 대댓글)
     let comment = post.comments.id(commentId);
-    let isReply = false;
+    let _isReply = false;
     let parentComment = null;
 
     if (!comment) {
       // 대댓글인지 확인
-      for (let pc of post.comments) {
+      for (const pc of post.comments) {
         comment = pc.replies.id(commentId);
         if (comment) {
-          isReply = true;
+          _isReply = true;
           parentComment = pc;
           break;
         }
@@ -821,7 +821,7 @@ router.delete('/posts/:id/comments/:commentId', auth, async (req, res) => {
     }
 
     // 댓글 삭제
-    if (isReply && parentComment) {
+    if (_isReply && parentComment) {
       parentComment.replies.pull(commentId);
     } else {
       post.comments.pull(commentId);
@@ -868,14 +868,14 @@ router.post('/posts/:id/comments/:commentId/reactions', auth, async (req, res) =
 
     // 댓글 찾기 (일반 댓글 또는 대댓글)
     let comment = post.comments.id(commentId);
-    let isReply = false;
+    let _isReply = false;
 
     if (!comment) {
       // 대댓글인지 확인
-      for (let parentComment of post.comments) {
+      for (const parentComment of post.comments) {
         comment = parentComment.replies.id(commentId);
         if (comment) {
-          isReply = true;
+          _isReply = true;
           break;
         }
       }

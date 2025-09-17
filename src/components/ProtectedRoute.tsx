@@ -12,7 +12,7 @@ interface ProtectedRouteProps {
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     children,
-    fallback,
+    fallback: _fallback,
     requireAuth = true,
     requiredRole,
     onNavigateToLogin,

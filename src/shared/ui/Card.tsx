@@ -1,6 +1,6 @@
+import React, { forwardRef } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "../lib/cn"
-import { forwardRef } from "react"
 
 const cardStyles = cva(
     "bg-card text-card-foreground flex flex-col gap-6 rounded-3xl border border-border/50 shadow-apple",

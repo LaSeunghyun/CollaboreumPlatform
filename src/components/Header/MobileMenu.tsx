@@ -1,3 +1,4 @@
+import React from "react";
 import { Button } from "../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { User, Search, Bell } from "lucide-react";
@@ -17,10 +18,10 @@ interface MobileMenuProps {
   onNotificationClick?: () => void;
 }
 
-export function MobileMenu({ 
-  isLoggedIn, 
-  userRole, 
-  onNavigate, 
+export function MobileMenu({
+  isLoggedIn,
+  userRole,
+  onNavigate,
   onLogin,
   searchQuery = '',
   onSearchQueryChange,

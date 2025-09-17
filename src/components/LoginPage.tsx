@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import React, { useState } from "react";
+import { Button } from "@/shared/ui/Button";
+import { Input } from "@/shared/ui/Input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/Card";
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/api';
@@ -18,7 +18,7 @@ interface LoginData {
   password: string;
 }
 
-export function LoginPage({ onBack, onLogin, onSignupClick }: LoginPageProps) {
+export function LoginPage({ onBack: _onBack, onLogin: _onLogin, onSignupClick }: LoginPageProps) {
   const [formData, setFormData] = useState<LoginData>({
     email: "",
     password: ""

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/Card';
 import { Badge } from '@/shared/ui/Badge';
 import { Button } from '@/shared/ui/Button';
@@ -1222,4 +1222,6 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
       </Dialog>
     </div>
   );
-}
+};
+
+export default AdminDashboard;

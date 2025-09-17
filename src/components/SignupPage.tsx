@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Separator } from "./ui/separator";
-import { Checkbox } from "./ui/checkbox";
-import { Badge } from "./ui/badge";
+import React, { useState, useEffect, useCallback } from "react";
+import { Button } from "@/shared/ui/Button";
+import { Input } from "@/shared/ui/Input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/Card";
+import { Separator } from "@/shared/ui/Separator";
+import { Checkbox } from "@/shared/ui/Checkbox";
+import { Badge } from "@/shared/ui/Badge";
 import { ArrowLeft, Mail, Lock, Eye, EyeOff, User, Palette, Heart, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { authAPI } from '../services/api';
 import { TermsOfService } from './TermsOfService';
@@ -450,7 +450,7 @@ export function SignupPage({ onBack, onSignup, onSocialSignup, onLoginClick }: S
                       <Checkbox
                         id="terms"
                         checked={formData.agreeTerms}
-                        onCheckedChange={(checked) => setFormData({ ...formData, agreeTerms: checked as boolean })}
+                        onChange={(e) => setFormData({ ...formData, agreeTerms: e.target.checked })}
                       />
                       <div className="flex-1">
                         <label htmlFor="terms" className="text-sm font-medium text-gray-900 cursor-pointer">
@@ -474,7 +474,7 @@ export function SignupPage({ onBack, onSignup, onSocialSignup, onLoginClick }: S
                       <Checkbox
                         id="privacy"
                         checked={formData.agreePrivacy}
-                        onCheckedChange={(checked) => setFormData({ ...formData, agreePrivacy: checked as boolean })}
+                        onChange={(e) => setFormData({ ...formData, agreePrivacy: e.target.checked })}
                       />
                       <div className="flex-1">
                         <label htmlFor="privacy" className="text-sm font-medium text-gray-900 cursor-pointer">
@@ -498,7 +498,7 @@ export function SignupPage({ onBack, onSignup, onSocialSignup, onLoginClick }: S
                       <Checkbox
                         id="marketing"
                         checked={formData.agreeMarketing}
-                        onCheckedChange={(checked) => setFormData({ ...formData, agreeMarketing: checked as boolean })}
+                        onChange={(e) => setFormData({ ...formData, agreeMarketing: e.target.checked })}
                       />
                       <div className="flex-1">
                         <label htmlFor="marketing" className="text-sm font-medium text-gray-900 cursor-pointer">

@@ -432,6 +432,19 @@ export const userAPI = {
     getUserProfile: (userId: string) => apiCall(`/users/${userId}/profile`),
     getInvestments: (userId: string) => apiCall(`/users/${userId}/investments`),
     getPoints: (userId: string) => apiCall(`/users/${userId}/points`),
+    getPointsHistory: (userId: string, params?: {
+        page?: number;
+        limit?: number;
+        type?: string;
+    }) => {
+        const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+        return apiCall(`/users/${userId}/points/history${queryParams}`);
+    },
+    investWithPoints: (userId: string, data: { projectId: string; amount: number }) =>
+        apiCall(`/users/${userId}/points/invest`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        }),
     getFollowingArtists: (userId: string) => apiCall(`/users/${userId}/following`),
     // 팔로우하는 아티스트의 펀딩 프로젝트 히스토리 조회
     getFollowingArtistsFundingHistory: (userId: string, params?: {
@@ -729,6 +742,7 @@ export const communityPostAPI = {
     },
 
     // 게시글 상세 조회
+    getPost: (postId: string) => apiCall(`/community/posts/${postId}`),
     getPostById: (postId: string) => apiCall(`/community/posts/${postId}`),
 
     // 게시글 생성
@@ -766,7 +780,45 @@ export const communityPostAPI = {
 
     // 게시글 사용자별 반응 상태 확인
     getPostReactions: (postId: string) =>
-        apiCall(`/community/posts/${postId}/reactions`)
+        apiCall(`/community/posts/${postId}/reactions`),
+
+    // 게시글 좋아요
+    likePost: (postId: string, action: 'like' | 'unlike') =>
+        apiCall(`/community/posts/${postId}/like`, {
+            method: 'POST',
+            body: JSON.stringify({ action })
+        }),
+
+    // 게시글 북마크
+    bookmarkPost: (postId: string, action: 'bookmark' | 'unbookmark') =>
+        apiCall(`/community/posts/${postId}/bookmark`, {
+            method: 'POST',
+            body: JSON.stringify({ action })
+        }),
+
+    // 카테고리 목록 조회
+    getCategories: () => apiCall('/community/categories'),
+
+    // 통계 조회
+    getStats: () => apiCall('/community/stats'),
+
+    // 내 게시글 조회
+    getMyPosts: (params?: any) => {
+        const queryParams = new URLSearchParams();
+        if (params?.page) queryParams.append('page', params.page.toString());
+        if (params?.limit) queryParams.append('limit', params.limit.toString());
+        const queryString = queryParams.toString();
+        return apiCall(`/community/posts/my${queryString ? `?${queryString}` : ''}`);
+    },
+
+    // 북마크한 게시글 조회
+    getBookmarkedPosts: (params?: any) => {
+        const queryParams = new URLSearchParams();
+        if (params?.page) queryParams.append('page', params.page.toString());
+        if (params?.limit) queryParams.append('limit', params.limit.toString());
+        const queryString = queryParams.toString();
+        return apiCall(`/community/posts/bookmarked${queryString ? `?${queryString}` : ''}`);
+    }
 };
 
 // Community Comment APIs
@@ -807,7 +859,23 @@ export const communityCommentAPI = {
         apiCall(`/community/posts/${postId}/comments/${commentId}/reactions`, {
             method: 'POST',
             body: JSON.stringify({ reaction })
-        })
+        }),
+
+    // 댓글 좋아요
+    likeComment: (commentId: string, action: 'like' | 'unlike') =>
+        apiCall(`/community/comments/${commentId}/like`, {
+            method: 'POST',
+            body: JSON.stringify({ action })
+        }),
+
+    // 내 댓글 조회
+    getMyComments: (params?: any) => {
+        const queryParams = new URLSearchParams();
+        if (params?.page) queryParams.append('page', params.page.toString());
+        if (params?.limit) queryParams.append('limit', params.limit.toString());
+        const queryString = queryParams.toString();
+        return apiCall(`/community/comments/my${queryString ? `?${queryString}` : ''}`);
+    }
 };
 
 // Event Management APIs

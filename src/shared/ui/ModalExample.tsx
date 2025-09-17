@@ -105,8 +105,8 @@ export function ModalExample() {
                         <div className="space-y-2">
                             <h4 className="font-medium">Accessibility:</h4>
                             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                                <li>aria-modal="true"</li>
-                                <li>role="dialog"</li>
+                                <li>aria-modal=&quot;true&quot;</li>
+                                <li>role=&quot;dialog&quot;</li>
                                 <li>aria-labelledby and aria-describedby</li>
                                 <li>Focus restoration on close</li>
                                 <li>Keyboard navigation support</li>

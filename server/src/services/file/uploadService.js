@@ -3,7 +3,7 @@ const sharp = require('sharp');
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs').promises;
-const { FileUploadError, ValidationError } = require('../../errors/AppError');
+const { FileUploadError } = require('../../errors/AppError');
 const { businessLogger } = require('../../middleware/logger');
 
 /**
@@ -101,7 +101,6 @@ class UploadService {
         width = 1200,
         height = 1200,
         quality = 85,
-        format = 'jpeg',
         generateThumbnail = true,
       } = options;
 
@@ -347,7 +346,7 @@ class UploadService {
         const thumbnailPath = filePath.replace('/images/', '/images/thumbnails/');
         try {
           await fs.unlink(thumbnailPath);
-        } catch (error) {
+        } catch {
           // 썸네일이 없어도 에러가 아님
         }
       }
@@ -370,7 +369,7 @@ class UploadService {
         createdAt: stats.birthtime,
         modifiedAt: stats.mtime,
       };
-    } catch (error) {
+    } catch {
       return {
         exists: false,
       };
@@ -418,7 +417,7 @@ class UploadService {
           fileCount++;
         }
       }
-    } catch (error) {
+    } catch {
       // 디렉토리를 읽을 수 없는 경우 무시
     }
 

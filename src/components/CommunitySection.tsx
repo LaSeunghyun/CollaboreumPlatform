@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent } from "../shared/ui/Card";
 import { Badge } from "../shared/ui/Badge";
 import { Button } from "../shared/ui/Button";

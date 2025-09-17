@@ -3,7 +3,7 @@ import { getRequestContext } from '../logger/request-context';
 import { Request, Response, NextFunction } from 'express';
 
 export function errorHandler(err: any, _req: Request, res: Response, _next: NextFunction) {
-    let error = { ...err };
+    const error = { ...err };
     error.message = err.message;
 
     // Mongoose validation error

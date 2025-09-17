@@ -94,11 +94,11 @@ export const featureFlags: FeatureFlags = {
 // Feature Flag 체크 헬퍼 함수들
 export const isFeatureEnabled = (path: string): boolean => {
     const keys = path.split('.')
-    let current: any = featureFlags
+    let current: unknown = featureFlags
 
     for (const key of keys) {
-        if (current && typeof current === 'object' && key in current) {
-            current = current[key]
+        if (current && typeof current === 'object' && current !== null && key in current) {
+            current = (current as Record<string, unknown>)[key]
         } else {
             return false
         }
@@ -122,7 +122,7 @@ if (process.env.NODE_ENV === 'development') {
         Object.keys(featureFlags[category as keyof FeatureFlags]).forEach(feature => {
             const path = `${category}.${feature}` as keyof FeatureFlags[keyof FeatureFlags]
             if (typeof featureFlags[category as keyof FeatureFlags][path as keyof typeof featureFlags[keyof FeatureFlags]] === 'boolean') {
-                (featureFlags[category as keyof FeatureFlags] as any)[path] = true
+                (featureFlags[category as keyof FeatureFlags] as Record<string, boolean>)[path] = true
             }
         })
     })

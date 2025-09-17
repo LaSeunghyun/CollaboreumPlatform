@@ -169,8 +169,7 @@ export const useSearch = (query: string, type?: 'artists' | 'projects' | 'events
         queryKey: ['search', query, type],
         queryFn: async () => {
             try {
-                const result = await interactionAPI.search(query, type);
-                return result;
+                return await interactionAPI.search(query, type);
             } catch (error) {
                 // 네트워크 연결 상태 확인
                 if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
@@ -189,5 +188,43 @@ export const useSearch = (query: string, type?: 'artists' | 'projects' | 'events
             return false;
         },
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    });
+};
+
+// 포인트 조회
+export const useUserPoints = (userId: string) => {
+    return useQuery({
+        queryKey: ['user', 'points', userId],
+        queryFn: () => userAPI.getPoints(userId),
+        enabled: !!userId,
+        staleTime: 5 * 60 * 1000, // 5분
+    });
+};
+
+// 포인트 사용 내역 조회
+export const useUserPointsHistory = (userId: string, params?: {
+    page?: number;
+    limit?: number;
+    type?: string;
+}) => {
+    return useQuery({
+        queryKey: ['user', 'points', 'history', userId, params],
+        queryFn: () => userAPI.getPointsHistory(userId, params),
+        enabled: !!userId,
+        staleTime: 2 * 60 * 1000, // 2분
+    });
+};
+
+// 포인트로 투자하기
+export const useInvestWithPoints = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ userId, data }: { userId: string; data: { projectId: string; amount: number } }) =>
+            userAPI.investWithPoints(userId, data),
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['user', 'points', variables.userId] });
+            queryClient.invalidateQueries({ queryKey: ['user', 'backings', variables.userId] });
+        },
     });
 };

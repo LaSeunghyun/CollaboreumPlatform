@@ -7,11 +7,10 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { 
-  Calendar, 
-  TrendingUp, 
-  CheckCircle, 
-  Clock, 
+import {
+  TrendingUp,
+  CheckCircle,
+  Clock,
   AlertCircle,
   Plus,
   Edit3,
@@ -118,13 +117,13 @@ export const ExecutionStatus: React.FC<ExecutionStatusProps> = ({
       setError(null);
 
       let updatedStages: ExecutionStage[];
-      
+
       if (editingStage.id.startsWith('stage_')) {
         // 새 단계 추가
         updatedStages = [...stages, { ...editingStage, id: `stage_${Date.now()}` }];
       } else {
         // 기존 단계 수정
-        updatedStages = stages.map(stage => 
+        updatedStages = stages.map(stage =>
           stage.id === editingStage.id ? editingStage : stage
         );
       }
@@ -134,13 +133,16 @@ export const ExecutionStatus: React.FC<ExecutionStatusProps> = ({
         stages: updatedStages
       });
 
-      if ((response as any).success) {
+      if (response && typeof response === 'object' && 'success' in response && response.success) {
         setStages(updatedStages);
         setIsEditing(false);
         setEditingStage(null);
         onUpdate();
       } else {
-        setError((response as any).message || '집행 계획 업데이트에 실패했습니다.');
+        const errorMessage = response && typeof response === 'object' && 'message' in response
+          ? String(response.message)
+          : '집행 계획 업데이트에 실패했습니다.';
+        setError(errorMessage);
       }
     } catch (error) {
       console.error('집행 계획 업데이트 오류:', error);
@@ -158,9 +160,9 @@ export const ExecutionStatus: React.FC<ExecutionStatusProps> = ({
 
   const handleStageStatusChange = async (stageId: string, newStatus: string, newProgress: number) => {
     try {
-      const updatedStages = stages.map(stage => 
-        stage.id === stageId 
-          ? { ...stage, status: newStatus as any, progress: newProgress }
+      const updatedStages = stages.map(stage =>
+        stage.id === stageId
+          ? { ...stage, status: newStatus as '계획' | '진행중' | '완료' | '지연', progress: newProgress }
           : stage
       );
 
@@ -168,7 +170,7 @@ export const ExecutionStatus: React.FC<ExecutionStatusProps> = ({
         stages: updatedStages
       });
 
-      if ((response as any).success) {
+      if (response && typeof response === 'object' && 'success' in response && response.success) {
         setStages(updatedStages);
         onUpdate();
       }
@@ -249,7 +251,7 @@ export const ExecutionStatus: React.FC<ExecutionStatusProps> = ({
                 <Label htmlFor="stageStatus" className="text-sm font-medium">상태</Label>
                 <Select
                   value={editingStage.status}
-                  onValueChange={(value) => setEditingStage(prev => prev ? { ...prev, status: value as any } : null)}
+                  onValueChange={(value) => setEditingStage(prev => prev ? { ...prev, status: value as '계획' | '진행중' | '완료' | '지연' } : null)}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -376,7 +378,7 @@ export const ExecutionStatus: React.FC<ExecutionStatusProps> = ({
                     </div>
                     <h4 className="text-lg font-medium mb-2">{stage.name}</h4>
                     <p className="text-gray-600 mb-3">{stage.description}</p>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div>
                         <span className="text-gray-500">예산:</span>
@@ -394,7 +396,7 @@ export const ExecutionStatus: React.FC<ExecutionStatusProps> = ({
                       </div>
                     </div>
                   </div>
-                  
+
                   {canEdit && (
                     <Button
                       variant="ghost"
@@ -436,7 +438,7 @@ export const ExecutionStatus: React.FC<ExecutionStatusProps> = ({
                         </SelectContent>
                       </Select>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <Label htmlFor={`progress-${stage.id}`} className="text-sm">진행률:</Label>
                       <Input

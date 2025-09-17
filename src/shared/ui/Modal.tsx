@@ -1,6 +1,6 @@
+import React, { forwardRef, useEffect, useRef, useState, useCallback } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "../lib/cn"
-import { forwardRef, useEffect, useRef, useState, useCallback } from "react"
 import { createPortal } from "react-dom"
 
 export const modalStyles = cva(

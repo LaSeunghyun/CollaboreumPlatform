@@ -94,14 +94,16 @@ export const ErrorBoundaryFunction: React.FC<Props> = ({ children, fallback }) =
     const [, setError] = React.useState<Error | null>(null);
 
     React.useEffect(() => {
-        const handleError = (event: ErrorEvent) => {
+        const handleError = (event: any) => {
             setHasError(true);
-            setError(new Error(event.message));
+            const errorEvent = event as any;
+            setError(new Error(errorEvent.message || 'Unknown error'));
         };
 
-        const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+        const handleUnhandledRejection = (event: any) => {
             setHasError(true);
-            setError(new Error(event.reason));
+            const rejectionEvent = event as any;
+            setError(new Error(rejectionEvent.reason || 'Unhandled promise rejection'));
         };
 
         window.addEventListener('error', handleError);

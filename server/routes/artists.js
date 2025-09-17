@@ -43,7 +43,7 @@ async function calculateMonthlyEarnings(artistId) {
 }
 
 // 팔로잉 수 계산 함수
-async function calculateFollowingCount(artistId) {
+async function calculateFollowingCount(_artistId) {
   try {
     // 아티스트가 팔로우하는 다른 아티스트 수 계산
     // 현재는 간단히 0으로 반환 (실제 팔로잉 시스템이 구현되면 수정)
@@ -428,12 +428,12 @@ router.get('/:id/dashboard', async (req, res) => {
         completedProjects: completedProjects,
         activeProjects: activeProjects,
         totalEarnings: artistProfile?.totalEarned || 0,
-        monthlyEarnings: await calculateMonthlyEarnings(artistId),
+        monthlyEarnings: await calculateMonthlyEarnings(artist._id),
         followers: artistProfile?.followers || 0,
-        following: await calculateFollowingCount(artistId),
+        following: await calculateFollowingCount(artist._id),
         rating: artistProfile?.rating || 0
       },
-      recentActivity: await getRecentActivity(artistId)
+      recentActivity: await getRecentActivity(artist._id)
     };
 
     console.log(`✅ 아티스트 대시보드 조회 성공: ${artist.name} (${artist.email})`);

@@ -1,4 +1,4 @@
-const { BusinessLogicError, ValidationError } = require('../../errors/AppError');
+const { BusinessLogicError, _ValidationError } = require('../../errors/AppError');
 const { FundingProject } = require('../../models/FundingProject');
 const { Distribution } = require('../../models/Distribution');
 const { eventStore } = require('./eventStore');
@@ -223,7 +223,7 @@ class DistributionService {
   /**
    * 분배 항목 처리
    */
-  async processDistributionItem(item, executedBy) {
+  async processDistributionItem(_item, _executedBy) {
     // 실제 구현에서는 여기서 결제 게이트웨이 API 호출
     // 예: 토스페이먼츠, 카카오페이, 네이버페이 등
     
@@ -295,7 +295,7 @@ class DistributionService {
   async getDistributionStats(projectId = null) {
     const matchStage = projectId ? { projectId } : {};
 
-    const stats = await Distribution.aggregate([
+    return await Distribution.aggregate([
       { $match: matchStage },
       {
         $group: {
@@ -305,8 +305,6 @@ class DistributionService {
         },
       },
     ]);
-
-    return stats;
   }
 
   /**

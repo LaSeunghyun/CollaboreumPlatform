@@ -5,16 +5,11 @@ import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
 import {
     DollarSign,
-    Users,
-    TrendingUp,
     CheckCircle,
     Clock,
     AlertCircle,
     Download,
-    FileText,
     Calculator,
-    PieChart,
-    BarChart3,
     XCircle,
     Calendar,
     PlayCircle

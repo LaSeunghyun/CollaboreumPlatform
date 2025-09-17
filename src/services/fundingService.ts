@@ -12,6 +12,26 @@ interface ApiResponse<T> {
     message?: string;
 }
 
+// 프로젝트 업데이트 타입 정의
+interface ProjectUpdate {
+    id: string;
+    title: string;
+    content: string;
+    date: string;
+    type?: string;
+    createdAt?: string;
+}
+
+// 프로젝트 후원자 타입 정의
+interface ProjectBacker {
+    id: string;
+    userId: string;
+    userName: string;
+    amount: number;
+    date: string;
+    status: string;
+}
+
 // 펀딩 서비스 API
 export const fundingService = {
     // 팔로우하는 아티스트의 펀딩 프로젝트 히스토리 조회
@@ -76,9 +96,9 @@ export const fundingService = {
     },
 
     // 프로젝트 업데이트 조회
-    getProjectUpdates: async (projectId: string): Promise<any[]> => {
+    getProjectUpdates: async (projectId: string): Promise<ProjectUpdate[]> => {
         try {
-            const response = await apiCall<ApiResponse<any[]>>(`/funding/projects/${projectId}/updates`);
+            const response = await apiCall<ApiResponse<ProjectUpdate[]>>(`/funding/projects/${projectId}/updates`);
 
             if (response.success && response.data) {
                 return response.data;
@@ -92,9 +112,9 @@ export const fundingService = {
     },
 
     // 프로젝트 후원자 목록 조회
-    getProjectBackers: async (projectId: string): Promise<any[]> => {
+    getProjectBackers: async (projectId: string): Promise<ProjectBacker[]> => {
         try {
-            const response = await apiCall<ApiResponse<any[]>>(`/funding/projects/${projectId}/backers`);
+            const response = await apiCall<ApiResponse<ProjectBacker[]>>(`/funding/projects/${projectId}/backers`);
 
             if (response.success && response.data) {
                 return response.data;

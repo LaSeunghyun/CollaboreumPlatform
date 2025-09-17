@@ -1,6 +1,6 @@
+import React, { forwardRef } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "../lib/cn"
-import { forwardRef } from "react"
 
 const textareaStyles = cva(
     "flex min-h-[80px] w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 disabled:cursor-not-allowed disabled:opacity-50",

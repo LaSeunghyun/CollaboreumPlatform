@@ -1,13 +1,20 @@
 import { constantsService } from '../services/constants';
 
+// 상수 정의
+const DEFAULT_STATUS_COLOR = 'bg-gray-100 text-gray-800';
+const DEFAULT_STATUS_ICON = 'Clock';
+const DEFAULT_TEXT_COLOR = 'text-gray-600';
+const DEFAULT_BG_COLOR = 'bg-gray-50';
+const DEFAULT_PROGRESS_COLOR = 'bg-gray-500';
+
 // 상태별 색상 반환 (백엔드에서 가져오기)
 export const getStatusColor = async (status: string): Promise<string> => {
     try {
         const statusColors = await constantsService.getStatusColors();
-        return statusColors[status] || 'bg-gray-100 text-gray-800'; // 기본값
+        return statusColors[status] || DEFAULT_STATUS_COLOR; // 기본값
     } catch (error) {
         console.error('상태 색상을 가져오는데 실패했습니다:', error);
-        return 'bg-gray-100 text-gray-800'; // 기본값
+        return DEFAULT_STATUS_COLOR; // 기본값
     }
 };
 
@@ -15,10 +22,10 @@ export const getStatusColor = async (status: string): Promise<string> => {
 export const getStatusIcon = async (status: string): Promise<string> => {
     try {
         const statusIcons = await constantsService.getStatusIcons();
-        return statusIcons[status] || 'Clock';
+        return statusIcons[status] || DEFAULT_STATUS_ICON;
     } catch (error) {
         console.error('상태 아이콘을 가져오는데 실패했습니다:', error);
-        return 'Clock'; // 기본값
+        return DEFAULT_STATUS_ICON; // 기본값
     }
 };
 
@@ -27,12 +34,12 @@ export const getStatusTextColor = async (status: string): Promise<string> => {
     try {
         const statusColors = await constantsService.getStatusColors();
         // 색상에서 텍스트 색상 부분만 추출
-        const color = statusColors[status] || 'text-gray-600';
+        const color = statusColors[status] || DEFAULT_TEXT_COLOR;
         const textColorMatch = color.match(/text-[a-z]+-\d+/);
-        return textColorMatch ? textColorMatch[0] : 'text-gray-600';
+        return textColorMatch ? textColorMatch[0] : DEFAULT_TEXT_COLOR;
     } catch (error) {
         console.error('상태 텍스트 색상을 가져오는데 실패했습니다:', error);
-        return 'text-gray-600';
+        return DEFAULT_TEXT_COLOR;
     }
 };
 
@@ -41,12 +48,12 @@ export const getStatusBgColor = async (status: string): Promise<string> => {
     try {
         const statusColors = await constantsService.getStatusColors();
         // 색상에서 배경 색상 부분만 추출
-        const color = statusColors[status] || 'bg-gray-50';
+        const color = statusColors[status] || DEFAULT_BG_COLOR;
         const bgColorMatch = color.match(/bg-[a-z]+-\d+/);
-        return bgColorMatch ? bgColorMatch[0] : 'bg-gray-50';
+        return bgColorMatch ? bgColorMatch[0] : DEFAULT_BG_COLOR;
     } catch (error) {
         console.error('상태 배경 색상을 가져오는데 실패했습니다:', error);
-        return 'bg-gray-50';
+        return DEFAULT_BG_COLOR;
     }
 };
 
@@ -54,17 +61,17 @@ export const getStatusBgColor = async (status: string): Promise<string> => {
 export const getProgressColor = async (status: string): Promise<string> => {
     try {
         const statusColors = await constantsService.getStatusColors();
-        const color = statusColors[status] || 'bg-gray-500';
+        const color = statusColors[status] || DEFAULT_PROGRESS_COLOR;
         // 색상을 진행률 색상으로 변환
         if (color.includes('blue')) return 'bg-blue-500';
         if (color.includes('green')) return 'bg-green-500';
         if (color.includes('yellow')) return 'bg-yellow-500';
         if (color.includes('orange')) return 'bg-orange-500';
         if (color.includes('red')) return 'bg-red-500';
-        return 'bg-gray-500';
+        return DEFAULT_PROGRESS_COLOR;
     } catch (error) {
         console.error('상태 진행률 색상을 가져오는데 실패했습니다:', error);
-        return 'bg-gray-500';
+        return DEFAULT_PROGRESS_COLOR;
     }
 };
 

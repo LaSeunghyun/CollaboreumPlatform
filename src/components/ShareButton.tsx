@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Link, Share, Check } from "lucide-react";
 
@@ -12,11 +12,11 @@ interface ShareButtonProps {
   onClick?: (e: React.MouseEvent) => void;
 }
 
-export function ShareButton({ 
-  url, 
-  title, 
-  description, 
-  variant = "ghost", 
+export function ShareButton({
+  url,
+  title,
+  description,
+  variant = "ghost",
   size = "sm",
   className,
   onClick: onClickProp
@@ -27,7 +27,7 @@ export function ShareButton({
     e.stopPropagation(); // Prevent parent click events
     onClickProp?.(e); // Call the optional onClick prop
     const fullUrl = `${window.location.origin}${url}`;
-    
+
     // Try native share API first (mobile)
     if (navigator.share && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
       try {
@@ -41,12 +41,12 @@ export function ShareButton({
         // Fall back to copy URL if share is cancelled or fails
       }
     }
-    
+
     // Copy URL to clipboard
     try {
       await navigator.clipboard.writeText(fullUrl);
       setIsShared(true);
-      
+
       // Reset icon after 2 seconds
       setTimeout(() => setIsShared(false), 2000);
     } catch (error) {

@@ -1,10 +1,11 @@
+import React from "react";
 import { Button } from "../shared/ui/Button";
 import { Card, CardContent } from "../shared/ui/Card";
 import { Badge } from "../shared/ui/Badge";
 import { Users, Star, MessageCircle, ChevronLeft, ChevronRight, Users2, Target, DollarSign, Heart } from "lucide-react";
 import { ImageWithFallback } from "./atoms/ImageWithFallback";
 import { StatCard } from "./ui/StatCard";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { usePlatformStats } from "../lib/api/useStats";
 import { useArtists } from "../lib/api/useArtists";
 import { useCategories } from "../lib/api/useCategories";

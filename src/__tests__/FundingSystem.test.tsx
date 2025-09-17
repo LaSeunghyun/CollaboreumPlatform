@@ -1683,15 +1683,13 @@ describe('TDD 방법론에 따른 완벽한 테스트 커버리지', () => {
                 }
 
                 // 결제 처리 시뮬레이션
-                const paymentResult = {
+                return {
                     success: true,
                     transactionId: `txn_${Date.now()}`,
                     amount: paymentData.amount,
                     status: 'completed',
                     timestamp: new Date().toISOString()
                 };
-
-                return paymentResult;
             };
 
             const validPaymentData = {
@@ -1764,7 +1762,7 @@ describe('TDD 방법론에 따른 완벽한 테스트 커버리지', () => {
                 }
 
                 // 환불 처리 시뮬레이션
-                const refundResult = {
+                return {
                     success: true,
                     refundId: `refund_${Date.now()}`,
                     transactionId,
@@ -1773,8 +1771,6 @@ describe('TDD 방법론에 따른 완벽한 테스트 커버리지', () => {
                     status: 'completed',
                     timestamp: new Date().toISOString()
                 };
-
-                return refundResult;
             };
 
             const result = await processRefund('txn_123456', 50000, '고객 요청');
@@ -1791,15 +1787,13 @@ describe('TDD 방법론에 따른 완벽한 테스트 커버리지', () => {
     describe('5. 실시간 업데이트 완벽 테스트', () => {
         test('후원 실시간 반영이 올바르게 작동해야 한다', () => {
             const updateProjectInRealTime = (project: any, newBacking: any) => {
-                const updatedProject = {
+                return {
                     ...project,
                     currentAmount: project.currentAmount + newBacking.amount,
                     backers: project.backers + 1,
                     progressPercentage: Math.round(((project.currentAmount + newBacking.amount) / project.goalAmount) * 100),
                     lastUpdated: new Date().toISOString()
                 };
-
-                return updatedProject;
             };
 
             const project = {
@@ -1821,7 +1815,7 @@ describe('TDD 방법론에 따른 완벽한 테스트 커버리지', () => {
 
         test('프로젝트 상태 변경 알림이 올바르게 작동해야 한다', () => {
             const notifyStatusChange = (projectId: string, oldStatus: string, newStatus: string) => {
-                const notification = {
+                return {
                     id: `notif_${Date.now()}`,
                     projectId,
                     oldStatus,
@@ -1830,8 +1824,6 @@ describe('TDD 방법론에 따른 완벽한 테스트 커버리지', () => {
                     timestamp: new Date().toISOString(),
                     type: 'status_change'
                 };
-
-                return notification;
             };
 
             const notification = notifyStatusChange('project-1', '진행중', '성공');
@@ -1900,14 +1892,12 @@ describe('TDD 방법론에 따른 완벽한 테스트 커버리지', () => {
                 });
 
                 // 수정된 프로젝트 반환
-                const updatedProject = {
+                return {
                     ...originalProject,
                     ...protectedUpdates,
                     updatedAt: new Date().toISOString(),
                     updatedBy: userId
                 };
-
-                return updatedProject;
             };
 
             const originalProject = {

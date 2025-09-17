@@ -59,7 +59,7 @@ class ApiClient {
         const url = `${API_CONFIG.baseURL}${endpoint}`;
         const token = this.tokenManager.getToken();
 
-        const requestHeaders: HeadersInit = {
+        const requestHeaders: Record<string, string> = {
             'Content-Type': 'application/json',
             ...headers,
         };
@@ -68,10 +68,10 @@ class ApiClient {
             requestHeaders['Authorization'] = `Bearer ${token}`;
         }
 
-        const requestOptions: RequestInit = {
+        const requestOptions: Record<string, unknown> = {
             method,
             headers: requestHeaders,
-            signal: AbortSignal.timeout(timeout),
+            signal: (window as any).AbortSignal?.timeout?.(timeout),
         };
 
         if (body && method !== 'GET') {

@@ -26,7 +26,7 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
                     <div className="prose prose-lg max-w-none">
                         <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. 개인정보의 처리 목적</h2>
                         <p className="text-gray-700 mb-4">
-                            Collaboreum(이하 "회사")은 다음의 목적을 위하여 개인정보를 처리하고 있으며, 다음의 목적 이외의 용도로는 이용하지 않습니다.
+                            Collaboreum(이하 &quot;회사&quot;)은 다음의 목적을 위하여 개인정보를 처리하고 있으며, 다음의 목적 이외의 용도로는 이용하지 않습니다.
                         </p>
                         <div className="space-y-2 mb-4">
                             <p className="text-gray-700">• 회원가입 및 관리: 회원 가입의사 확인, 회원제 서비스 제공에 따른 본인 식별·인증, 회원자격 유지·관리, 서비스 부정이용 방지, 만14세 미만 아동 개인정보 수집 시 법정 대리인 동의여부 확인, 각종 고지·통지, 고충처리 목적으로 개인정보를 처리합니다.</p>

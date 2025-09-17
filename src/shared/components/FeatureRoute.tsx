@@ -7,14 +7,12 @@ interface FeatureRouteProps {
     feature: string
     children: ReactNode
     fallback?: ReactNode
-    redirectTo?: string
 }
 
 export function FeatureRoute({
     feature,
     children,
-    fallback,
-    redirectTo = '/coming-soon'
+    fallback
 }: FeatureRouteProps) {
     const isEnabled = isFeatureEnabled(feature)
 

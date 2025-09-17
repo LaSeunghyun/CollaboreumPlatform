@@ -21,7 +21,7 @@ export enum UserRole {
     FAN = 'fan'
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
     success: boolean;
     data?: T;
     message?: string;
@@ -51,11 +51,11 @@ export interface ApiError {
     message: string;
     code?: string;
     statusCode?: number;
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
 }
 
 // 폼 상태 타입
-export interface FormState<T = any> {
+export interface FormState<T = unknown> {
     data: T;
     errors: Record<string, string>;
     isSubmitting: boolean;
@@ -87,7 +87,7 @@ export interface Notification extends BaseEntity {
     message: string;
     type: NotificationType;
     isRead: boolean;
-    data?: Record<string, any>;
+    data?: Record<string, unknown>;
 }
 
 export enum NotificationType {

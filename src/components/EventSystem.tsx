@@ -7,12 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from './ui/badge';
 import { Calendar } from './ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+// import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { eventManagementAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { dynamicConstantsService } from '../services/constantsService';
-import { CalendarIcon, Users, MapPin, Clock, Tag, Search, Filter, Plus, UserPlus, UserMinus, Eye, Edit } from 'lucide-react';
+import { CalendarIcon, Users, MapPin, Search, UserPlus, Eye, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
@@ -92,7 +92,7 @@ export const EventCreationForm: React.FC = () => {
     fetchCategories();
   }, []);
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | number | Date) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -315,8 +315,8 @@ const EventList: React.FC = () => {
     const fetchEvents = async () => {
       try {
         setLoading(true);
-        const eventsData = await eventManagementAPI.getEvents() as any;
-        setEvents(eventsData);
+        const eventsData = await eventManagementAPI.getEvents();
+        setEvents(eventsData as Event[]);
       } catch (error) {
         console.error('이벤트를 가져오는 중 오류 발생:', error);
       } finally {
@@ -456,8 +456,8 @@ const MyEventsList: React.FC = () => {
     const fetchMyEvents = async () => {
       try {
         setLoading(true);
-        const events = await eventManagementAPI.getEvents() as any;
-        setMyEvents(events);
+        const events = await eventManagementAPI.getEvents();
+        setMyEvents(events as Event[]);
       } catch (error) {
         console.error('내 이벤트를 가져오는 중 오류 발생:', error);
       } finally {

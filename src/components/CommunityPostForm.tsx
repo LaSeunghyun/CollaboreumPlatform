@@ -120,8 +120,8 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
       const imageUrls: string[] = [];
 
       if (formData.images.length > 0) {
-        const formDataForImages = new FormData();
-        formData.images.forEach((image, index) => {
+        const formDataForImages = new (window as any).FormData();
+        formData.images.forEach((image) => {
           formDataForImages.append('images', image);
         });
 
@@ -163,9 +163,10 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
         images: []
       });
       onBack(); // 포스트 생성 성공 시 뒤로가기
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('포스트 생성 오류:', error);
-      setError((error.response as any)?.data?.message || error.message || '포스트 생성 중 오류가 발생했습니다.');
+      const errorMessage = error instanceof Error ? error.message : '포스트 생성 중 오류가 발생했습니다.';
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

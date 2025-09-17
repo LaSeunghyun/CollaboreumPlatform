@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const CommunityPost = require('./models/CommunityPost');
-const User = require('./models/User');
 
 async function checkDetailedPosts() {
   try {

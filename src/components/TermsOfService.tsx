@@ -26,15 +26,15 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
                     <div className="prose prose-lg max-w-none">
                         <h2 className="text-2xl font-semibold text-gray-900 mb-4">제1조 (목적)</h2>
                         <p className="text-gray-700 mb-4">
-                            이 약관은 Collaboreum(이하 "회사")이 제공하는 아티스트와 팬을 연결하는 창작 플랫폼 서비스(이하 "서비스")의 이용과 관련하여 회사와 회원과의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
+                            이 약관은 Collaboreum(이하 &quot;회사&quot;)이 제공하는 아티스트와 팬을 연결하는 창작 플랫폼 서비스(이하 &quot;서비스&quot;)의 이용과 관련하여 회사와 회원과의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
                         </p>
 
                         <h2 className="text-2xl font-semibold text-gray-900 mb-4">제2조 (정의)</h2>
                         <div className="space-y-2 mb-4">
-                            <p className="text-gray-700">1. "서비스"라 함은 회사가 제공하는 아티스트와 팬을 연결하는 창작 플랫폼 서비스를 의미합니다.</p>
-                            <p className="text-gray-700">2. "회원"이라 함은 회사의 서비스에 접속하여 이 약관에 따라 회사와 이용계약을 체결하고 회사가 제공하는 서비스를 이용하는 고객을 말합니다.</p>
-                            <p className="text-gray-700">3. "아티스트"라 함은 창작 활동을 하는 회원을 의미합니다.</p>
-                            <p className="text-gray-700">4. "팬"이라 함은 아티스트의 작품을 감상하고 후원하는 회원을 의미합니다.</p>
+                            <p className="text-gray-700">1. &quot;서비스&quot;라 함은 회사가 제공하는 아티스트와 팬을 연결하는 창작 플랫폼 서비스를 의미합니다.</p>
+                            <p className="text-gray-700">2. &quot;회원&quot;이라 함은 회사의 서비스에 접속하여 이 약관에 따라 회사와 이용계약을 체결하고 회사가 제공하는 서비스를 이용하는 고객을 말합니다.</p>
+                            <p className="text-gray-700">3. &quot;아티스트&quot;라 함은 창작 활동을 하는 회원을 의미합니다.</p>
+                            <p className="text-gray-700">4. &quot;팬&quot;이라 함은 아티스트의 작품을 감상하고 후원하는 회원을 의미합니다.</p>
                         </div>
 
                         <h2 className="text-2xl font-semibold text-gray-900 mb-4">제3조 (약관의 효력 및 변경)</h2>

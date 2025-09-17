@@ -1,4 +1,4 @@
-import { Card, CardContent } from "./ui/card";
+import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Star, ExternalLink, Play, Users } from "lucide-react";
@@ -65,8 +65,8 @@ export function ArtistSection() {
             <Card key={artist.id} className="overflow-hidden hover:shadow-apple-lg transition-all duration-300 group border-border/50">
               {/* Cover Image */}
               <div className="relative h-36">
-                <ImageWithFallback 
-                  src={artist.coverImage} 
+                <ImageWithFallback
+                  src={artist.coverImage}
                   alt={`${artist.name} cover`}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -78,8 +78,8 @@ export function ArtistSection() {
                 {/* Profile Image */}
                 <div className="absolute -top-12 left-6">
                   <div className="w-24 h-24 rounded-full border-4 border-background overflow-hidden shadow-apple">
-                    <ImageWithFallback 
-                      src={artist.profileImage} 
+                    <ImageWithFallback
+                      src={artist.profileImage}
                       alt={artist.name}
                       className="w-full h-full object-cover"
                     />

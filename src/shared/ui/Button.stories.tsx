@@ -1,7 +1,21 @@
 // import type { Meta, StoryObj } from '@storybook/react';
+import React from 'react';
 import { Button } from './Button';
 
-const meta: any = {
+const meta: {
+    title: string;
+    component: typeof Button;
+    parameters: {
+        layout: string;
+        docs: {
+            description: {
+                component: string;
+            };
+        };
+    };
+    argTypes: Record<string, unknown>;
+    tags: string[];
+} = {
     title: 'UI/Button',
     component: Button,
     parameters: {
@@ -41,7 +55,23 @@ const meta: any = {
 };
 
 export default meta;
-type Story = any;
+type Story = {
+    args?: {
+        children?: string;
+        variant?: 'solid' | 'outline' | 'ghost' | 'link';
+        size?: 'sm' | 'md' | 'lg' | 'icon';
+        tone?: 'default' | 'success' | 'warning' | 'danger';
+        disabled?: boolean;
+    };
+    render?: () => React.ReactElement;
+    parameters?: {
+        docs?: {
+            description?: {
+                story?: string;
+            };
+        };
+    };
+};
 
 // 기본 버튼
 export const Default: Story = {

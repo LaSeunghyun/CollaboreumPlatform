@@ -1,4 +1,4 @@
-const { performanceLogger } = require('../../middleware/logger');
+// const { performanceLogger } = require('../../middleware/logger');
 
 /**
  * 메트릭 수집 서비스

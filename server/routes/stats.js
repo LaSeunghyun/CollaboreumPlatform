@@ -181,7 +181,7 @@ router.get('/projects', async (req, res) => {
   try {
     const { category, status, timeframe } = req.query;
 
-    let matchStage = {};
+    const matchStage = {};
     
     if (category) {
       matchStage.category = category;

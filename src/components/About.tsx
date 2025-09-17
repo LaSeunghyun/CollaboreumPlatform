@@ -1,3 +1,4 @@
+import React from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { TrendingUp, Award, Users, ChevronLeft, ArrowRight, Users2, Target, DollarSign, Heart } from "lucide-react";

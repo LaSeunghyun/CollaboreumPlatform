@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Progress } from "./ui/progress";
-import { Separator } from "./ui/separator";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/Card";
+import { Badge } from "@/shared/ui/Badge";
+import { Button } from "@/shared/ui/Button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/Avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/Tabs";
+import { Progress } from "@/shared/ui/Progress";
+import { Separator } from "@/shared/ui/Separator";
 import { DollarSign, TrendingUp, Users, Calendar, BarChart3, Eye, Edit, Plus, MessageCircle, Heart, Star, Target } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { getFirstChar, getUsername, getAvatarUrl } from "../utils/typeGuards";
@@ -351,7 +351,7 @@ export function ArtistMyPage() {
                                 {recentActivities.map((activity) => (
                                   <div key={activity.id} className="flex items-start gap-3">
                                     <div className={`w-2 h-2 rounded-full mt-2 ${activity.type === 'funding' ? 'bg-green-500' :
-                                        activity.type === 'comment' ? 'bg-blue-500' : 'bg-purple-500'
+                                      activity.type === 'comment' ? 'bg-blue-500' : 'bg-purple-500'
                                       }`} />
                                     <div className="flex-1">
                                       <p className="text-sm text-gray-900">{activity.message}</p>

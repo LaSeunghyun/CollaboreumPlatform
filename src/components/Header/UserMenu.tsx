@@ -1,7 +1,8 @@
+import React from "react";
 import { Button } from "@/shared/ui/Button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/Avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { User, BarChart3, Palette, Shield, Settings, LogOut, Bell, BellRing, CreditCard, Wallet, Bell as BellIcon } from "lucide-react";
+import { User, Palette, Shield, Settings, LogOut, Bell, BellRing, CreditCard, Bell as BellIcon } from "lucide-react";
 import { getRoleBadge, getUserAvatar } from "./utils";
 import { useNotifications } from "../../lib/api/useUser";
 import { useAuth } from "../../contexts/AuthContext";
@@ -31,7 +32,7 @@ export function UserMenu({ onNavigate, onLogout }: UserMenuProps) {
   const userRole = user?.role || 'fan';
 
   // 알림 데이터 로드
-  const { data: notifications, isLoading: notificationsLoading } = useNotifications({
+  const { data: notifications, isLoading: _notificationsLoading } = useNotifications({
     read: false,
     limit: 10
   });

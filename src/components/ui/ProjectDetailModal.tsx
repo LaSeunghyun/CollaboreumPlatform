@@ -31,27 +31,12 @@ interface ProjectDetailModalProps {
     onClose: () => void;
 }
 
-interface ProjectUpdate {
-    id: number;
-    title: string;
-    content: string;
-    date: string;
-    images?: string[];
-}
-
-interface ProjectBacker {
-    id: number;
-    name: string;
-    avatar?: string;
-    amount: number;
-    date: string;
-    reward?: string;
-}
+import { ProjectUpdate, Backer } from '../../types/fundingProject';
 
 export function ProjectDetailModal({ projectId, isOpen, onClose }: ProjectDetailModalProps) {
     const [project, setProject] = useState<FundingProject | null>(null);
     const [updates, setUpdates] = useState<ProjectUpdate[]>([]);
-    const [backers, setBackers] = useState<ProjectBacker[]>([]);
+    const [backers, setBackers] = useState<Backer[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'overview' | 'updates' | 'backers'>('overview');
@@ -304,18 +289,6 @@ export function ProjectDetailModal({ projectId, isOpen, onClose }: ProjectDetail
                                                     <span className="text-sm text-gray-500">{formatDate(update.date)}</span>
                                                 </div>
                                                 <p className="text-gray-700 mb-3">{update.content}</p>
-                                                {update.images && update.images.length > 0 && (
-                                                    <div className="grid grid-cols-2 gap-2">
-                                                        {update.images.map((image, imgIndex) => (
-                                                            <img
-                                                                key={imgIndex}
-                                                                src={image}
-                                                                alt={`업데이트 이미지 ${imgIndex + 1}`}
-                                                                className="w-full h-24 object-cover rounded-lg"
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                )}
                                                 <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
                                                     <button className="flex items-center gap-1 hover:text-blue-600">
                                                         <Heart className="w-4 h-4" />
@@ -348,14 +321,10 @@ export function ProjectDetailModal({ projectId, isOpen, onClose }: ProjectDetail
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex items-center gap-3">
                                                         <Avatar className="w-10 h-10">
-                                                            <AvatarImage src={backer.avatar} alt={backer.name} />
-                                                            <AvatarFallback>{getFirstChar(backer.name)}</AvatarFallback>
+                                                            <AvatarFallback>{getFirstChar(backer.userName)}</AvatarFallback>
                                                         </Avatar>
                                                         <div>
-                                                            <p className="font-medium text-gray-900">{backer.name}</p>
-                                                            {backer.reward && (
-                                                                <p className="text-sm text-gray-600">{backer.reward}</p>
-                                                            )}
+                                                            <p className="font-medium text-gray-900">{backer.userName}</p>
                                                         </div>
                                                     </div>
                                                     <div className="text-right">

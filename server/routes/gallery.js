@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const Artwork = require('../models/Artwork');
-const User = require('../models/User');
+const _User = require('../models/User');
 const Category = require('../models/Category');
 
 // 모든 작품 조회 (필터링 및 정렬 포함)
@@ -11,7 +11,7 @@ router.get('/artworks', async (req, res) => {
     const { category, search, sortBy, page = 1, limit = 20 } = req.query;
     
     // 쿼리 빌더
-    let query = {};
+    const query = {};
     
     // 카테고리 필터
     if (category && category !== "전체") {

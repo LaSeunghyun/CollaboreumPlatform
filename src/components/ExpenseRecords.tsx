@@ -8,14 +8,10 @@ import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import {
     Plus,
-    FileText,
     Receipt,
-    DollarSign,
-    Calendar,
     Edit3,
     Save,
     X,
-    Upload,
     Eye,
     Download,
     PieChart,
@@ -173,13 +169,16 @@ export const ExpenseRecords: React.FC<ExpenseRecordsProps> = ({
                 stageId: editingExpense.stage
             });
 
-            if ((response as any).success) {
+            if (response && typeof response === 'object' && 'success' in response && response.success) {
                 setExpenses(updatedExpenses);
                 setIsAdding(false);
                 setEditingExpense(null);
                 onUpdate();
             } else {
-                setError((response as any).message || '비용 내역 저장에 실패했습니다.');
+                const errorMessage = response && typeof response === 'object' && 'message' in response
+                    ? String(response.message)
+                    : '비용 내역 저장에 실패했습니다.';
+                setError(errorMessage);
             }
         } catch (error) {
             console.error('비용 내역 저장 오류:', error);
@@ -199,8 +198,8 @@ export const ExpenseRecords: React.FC<ExpenseRecordsProps> = ({
         const file = event.target.files?.[0];
         if (file) {
             // 실제로는 파일 업로드 API 호출
-            const reader = new FileReader();
-            reader.onload = (e) => {
+            const reader = new (window as any).FileReader();
+            reader.onload = (e: any) => {
                 if (editingExpense) {
                     setEditingExpense({
                         ...editingExpense,
@@ -228,7 +227,7 @@ export const ExpenseRecords: React.FC<ExpenseRecordsProps> = ({
                             <Label htmlFor="expenseCategory" className="text-sm font-medium">카테고리 *</Label>
                             <Select
                                 value={editingExpense.category}
-                                onValueChange={(value) => setEditingExpense(prev => prev ? { ...prev, category: value as any } : null)}
+                                onValueChange={(value) => setEditingExpense(prev => prev ? { ...prev, category: value as '인건비' | '재료비' | '장비비' | '마케팅비' | '기타' } : null)}
                             >
                                 <SelectTrigger>
                                     <SelectValue />

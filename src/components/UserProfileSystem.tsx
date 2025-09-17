@@ -3,34 +3,26 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Separator } from './ui/separator';
 import { useAuth } from '../contexts/AuthContext';
 import { artistAPI, userAPI } from '../services/api';
 import { LoadingState, ErrorState } from './organisms/States';
 import { ApiResponse } from '../types';
 import {
   User,
-  Settings,
-  Edit,
   Lock,
   Trash2,
   Plus,
   Eye,
-  Calendar,
-  DollarSign,
   Users,
-  Star,
   TrendingUp,
   Shield,
   LogOut
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { getFirstChar, getUsername, getAvatarUrl } from '../utils/typeGuards';
+import { getFirstChar } from '../utils/typeGuards';
 import { ko } from 'date-fns/locale';
 import { dynamicConstantsService } from '../services/constantsService';
 

@@ -161,7 +161,7 @@ export const CommunityPostList: React.FC<CommunityPostListProps> = ({
         }));
         setPosts(mappedPosts);
       }
-    } catch (error) {
+    } catch {
       // 에러 발생 시 클라이언트 사이드 정렬로 폴백
       const sortedPosts = [...posts];
       if (sort === 'popular') {

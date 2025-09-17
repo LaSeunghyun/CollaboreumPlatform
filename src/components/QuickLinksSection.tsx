@@ -1,4 +1,4 @@
-import { Button } from "./ui/button";
+import React from "react";
 import { Card, CardContent } from "./ui/card";
 import { Calendar, Image, Trophy, Headphones, ArrowRight } from "lucide-react";
 
@@ -55,7 +55,7 @@ export function QuickLinksSection({ onNavigate }: QuickLinksSectionProps) {
           {quickLinks.map((link) => {
             const IconComponent = link.icon;
             return (
-              <Card 
+              <Card
                 key={link.id}
                 className="group hover:shadow-apple-lg transition-all duration-300 cursor-pointer border-0 rounded-2xl overflow-hidden bg-gradient-to-br from-background to-secondary/30"
                 onClick={() => onNavigate?.(link.id)}
@@ -64,15 +64,15 @@ export function QuickLinksSection({ onNavigate }: QuickLinksSectionProps) {
                   <div className={`w-16 h-16 ${link.color} rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}>
                     <IconComponent className="w-8 h-8" />
                   </div>
-                  
+
                   <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-300">
                     {link.title}
                   </h3>
-                  
+
                   <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
                     {link.description}
                   </p>
-                  
+
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
                       {link.stats}

@@ -332,7 +332,7 @@ class EventStore {
    * 이벤트 통계
    */
   async getEventStats() {
-    const stats = await EventLog.aggregate([
+    return await EventLog.aggregate([
       {
         $group: {
           _id: {
@@ -355,8 +355,6 @@ class EventStore {
         },
       },
     ]);
-
-    return stats;
   }
 
   /**

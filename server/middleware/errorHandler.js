@@ -1,5 +1,5 @@
 const errorHandler = (err, req, res, _next) => {
-  let error = { ...err };
+  const error = { ...err };
   error.message = err.message;
 
   // Mongoose validation error

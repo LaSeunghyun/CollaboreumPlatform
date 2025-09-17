@@ -14,8 +14,8 @@ module.exports = [
       },
     },
     rules: {
-      // console.log 사용 금지 (console.error는 허용)
-      'no-console': ['error', { allow: ['error'] }],
+      // console.log 사용 허용 (개발 중 디버깅용)
+      'no-console': 'off',
       
       // 사용하지 않는 변수 경고
       'no-unused-vars': ['error', { 

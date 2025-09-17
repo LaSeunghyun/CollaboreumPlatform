@@ -1,3 +1,4 @@
+import React from "react";
 import { Badge } from "../ui/badge";
 import { USER_AVATARS } from "./constants";
 
