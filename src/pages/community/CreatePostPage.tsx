@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
+import { Button } from '../../shared/ui/Button';
 import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
 import { Label } from '../../components/ui/label';
@@ -235,7 +235,8 @@ export const CreatePostPage: React.FC = () => {
                         />
                         <Button
                           type="button"
-                          variant="destructive"
+                          variant="solid"
+                          tone="danger"
                           size="sm"
                           className="absolute top-2 right-2"
                           onClick={() => removeImage(index)}
@@ -262,7 +263,7 @@ export const CreatePostPage: React.FC = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="bg-indigo hover:bg-indigo/90"
+              variant="indigo"
             >
               {loading ? '작성 중...' : '게시글 작성하기'}
             </Button>

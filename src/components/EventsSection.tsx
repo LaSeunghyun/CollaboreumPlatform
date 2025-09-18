@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+import { Button } from "../shared/ui/Button";
 import { Calendar, MapPin, Clock, Users, Filter, Search, ChevronLeft } from "lucide-react";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
@@ -95,7 +95,7 @@ interface EventsSectionProps {
 
 export function EventsSection({ onBack }: EventsSectionProps) {
   const navigate = useNavigate();
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/10 to-muted/20">
       {/* Header */}
@@ -103,9 +103,9 @@ export function EventsSection({ onBack }: EventsSectionProps) {
         <div className="sticky top-20 z-40 bg-background/80 backdrop-blur-apple border-b border-border/50">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
             <div className="flex items-center gap-4">
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={onBack}
                 className="hover:bg-secondary/60 rounded-xl"
               >
@@ -139,8 +139,8 @@ export function EventsSection({ onBack }: EventsSectionProps) {
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input 
-                  placeholder="이벤트명, 장소, 주최자 검색..." 
+                <Input
+                  placeholder="이벤트명, 장소, 주최자 검색..."
                   className="pl-10 bg-input-background/80 border-border rounded-2xl"
                 />
               </div>
@@ -171,22 +171,21 @@ export function EventsSection({ onBack }: EventsSectionProps) {
               <Card key={event.id} className="group overflow-hidden hover:shadow-apple-lg transition-all duration-300 cursor-pointer border-0 rounded-2xl">
                 <div className="relative">
                   <div className="h-48 bg-secondary/20 overflow-hidden">
-                    <ImageWithFallback 
-                      src={event.image} 
+                    <ImageWithFallback
+                      src={event.image}
                       alt={event.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  <Badge 
-                    className={`absolute top-4 left-4 text-white font-medium ${
-                      event.category === "음악" ? "bg-chart-1" :
-                      event.category === "미술" ? "bg-chart-5" :
-                      event.category === "문학" ? "bg-chart-2" :
-                      event.category === "공연" ? "bg-chart-4" :
-                      event.category === "사진" ? "bg-chart-3" :
-                      "bg-muted-foreground"
-                    }`}
+                  <Badge
+                    className={`absolute top-4 left-4 text-white font-medium ${event.category === "음악" ? "bg-chart-1" :
+                        event.category === "미술" ? "bg-chart-5" :
+                          event.category === "문학" ? "bg-chart-2" :
+                            event.category === "공연" ? "bg-chart-4" :
+                              event.category === "사진" ? "bg-chart-3" :
+                                "bg-muted-foreground"
+                      }`}
                   >
                     {event.category}
                   </Badge>
@@ -207,7 +206,7 @@ export function EventsSection({ onBack }: EventsSectionProps) {
                   <h3 className="font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors duration-300">
                     {event.title}
                   </h3>
-                  
+
                   <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
                     {event.description}
                   </p>
@@ -219,17 +218,17 @@ export function EventsSection({ onBack }: EventsSectionProps) {
                       <Clock className="w-4 h-4 ml-2 text-primary" />
                       <span>{event.time}</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4 text-primary" />
                       <span className="line-clamp-1">{event.location}</span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between pt-2">
                       <span className="text-xs text-muted-foreground">주최: {event.organizer}</span>
                     </div>
                   </div>
-                  
+
                   <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl">
                     참석하기
                   </Button>
@@ -253,13 +252,13 @@ export function EventsSection({ onBack }: EventsSectionProps) {
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-4">이벤트를 등록하고 싶으신가요?</h3>
               <p className="text-muted-foreground mb-6 leading-relaxed">
-                당신의 창작 이벤트를 Collaboreum에서 홍보하고 더 많은 관객을 만나보세요. 
+                당신의 창작 이벤트를 Collaboreum에서 홍보하고 더 많은 관객을 만나보세요.
                 무료로 이벤트를 등록하고 통합 스케줄러의 혜택을 누리세요.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
-                  size="lg" 
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl"
+                <Button
+                  size="lg"
+                  className="bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl"
                   onClick={() => navigate('/events/create')}
                 >
                   이벤트 등록하기

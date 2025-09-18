@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from '../../components/ui/button';
+import { Button } from '../../shared/ui/Button';
 import { Input } from '../../components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
@@ -67,7 +67,7 @@ export const AccountPage: React.FC = () => {
             <div className="text-center py-12">
                 <h2 className="text-2xl font-bold mb-4">로그인이 필요합니다</h2>
                 <p className="text-muted-foreground mb-6">마이페이지를 이용하려면 로그인해주세요.</p>
-                <Button className="bg-indigo hover:bg-indigo-hover">
+                <Button variant="indigo">
                     로그인하기
                 </Button>
             </div>
@@ -125,7 +125,7 @@ export const AccountPage: React.FC = () => {
                                     </p>
                                 </div>
                                 <Button
-                                    className="bg-indigo hover:bg-indigo/90"
+                                    variant="indigo"
                                     onClick={() => setActiveTab('settings')}
                                 >
                                     <Settings className="w-4 h-4 mr-2" />
@@ -211,7 +211,7 @@ export const AccountPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                         <h3 className="text-xl font-semibold">내 프로젝트</h3>
                         <Button
-                            className="bg-indigo hover:bg-indigo/90"
+                            variant="indigo"
                             onClick={handleCreateProject}
                         >
                             <Plus className="w-4 h-4 mr-2" />
@@ -239,7 +239,7 @@ export const AccountPage: React.FC = () => {
                                         </p>
                                     </div>
                                     <Button
-                                        className="bg-indigo hover:bg-indigo/90"
+                                        variant="indigo"
                                         onClick={handleCreateProject}
                                     >
                                         <Plus className="w-4 h-4 mr-2" />
@@ -265,7 +265,7 @@ export const AccountPage: React.FC = () => {
                                             </p>
                                         </div>
                                         <Button
-                                            className="bg-indigo hover:bg-indigo/90"
+                                            variant="indigo"
                                             onClick={handleCreateProject}
                                         >
                                             프로젝트 만들기
@@ -353,7 +353,7 @@ export const AccountPage: React.FC = () => {
                                     </label>
                                 </div>
                             </div>
-                            <Button className="bg-indigo hover:bg-indigo/90">
+                            <Button variant="indigo">
                                 설정 저장
                             </Button>
                         </CardContent>

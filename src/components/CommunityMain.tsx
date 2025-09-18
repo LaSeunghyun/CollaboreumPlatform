@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from './ui/button';
+import { Button } from '../shared/ui/Button';
 import { CommunityPostForm } from './CommunityPostForm';
 import { CommunityPostList } from './CommunityPostList';
 import { CommunityPostDetail } from './CommunityPostDetail';

@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/Avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/Tabs";
 import { Progress } from "@/shared/ui/Progress";
 // import { Separator } from "@/shared/ui/Separator";
-import { DollarSign, TrendingUp, Users, BarChart3, Eye, Edit, Plus, MessageCircle, Heart } from "lucide-react";
+import { DollarSign, TrendingUp, Users, BarChart3, Eye, Edit, Plus, MessageCircle, Heart, Target } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { getFirstChar } from "../utils/typeGuards";
 

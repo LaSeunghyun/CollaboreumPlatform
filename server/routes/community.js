@@ -432,10 +432,10 @@ router.delete('/posts/:id', auth, async (req, res) => {
 router.post('/posts/:id/reactions', auth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { reaction } = req.body; // 'like', 'dislike', 또는 'unlike'
+    const { reaction } = req.body; // 'like', 'dislike', 'unlike', 'undislike'
     const userId = req.user._id;
 
-    if (!['like', 'dislike', 'unlike'].includes(reaction)) {
+    if (!['like', 'dislike', 'unlike', 'undislike'].includes(reaction)) {
       return res.status(400).json({
         success: false,
         message: '유효하지 않은 반응 타입입니다.'
@@ -450,39 +450,50 @@ router.post('/posts/:id/reactions', auth, async (req, res) => {
       });
     }
 
-    // 기존 반응 제거
+    // 현재 사용자의 반응 상태 확인
+    const isLiked = post.likes.includes(userId);
+    const isDisliked = post.dislikes.includes(userId);
+
+    // 반응 처리 로직
     if (reaction === 'like') {
-      if (post.likes.includes(userId)) {
+      if (isLiked) {
+        // 이미 좋아요를 누른 상태면 취소
         post.likes = post.likes.filter(id => id.toString() !== userId);
       } else {
+        // 좋아요 추가하고 싫어요 제거 (상호 배타적)
         post.likes.push(userId);
-        // 싫어요에서 제거
         post.dislikes = post.dislikes.filter(id => id.toString() !== userId);
       }
     } else if (reaction === 'dislike') {
-      if (post.dislikes.includes(userId)) {
+      if (isDisliked) {
+        // 이미 싫어요를 누른 상태면 취소
         post.dislikes = post.dislikes.filter(id => id.toString() !== userId);
       } else {
+        // 싫어요 추가하고 좋아요 제거 (상호 배타적)
         post.dislikes.push(userId);
-        // 좋아요에서 제거
         post.likes = post.likes.filter(id => id.toString() !== userId);
       }
     } else if (reaction === 'unlike') {
-      // unlike는 현재 좋아요 상태를 토글 (좋아요 취소)
-      if (post.likes.includes(userId)) {
-        post.likes = post.likes.filter(id => id.toString() !== userId);
-      }
-      // 싫어요도 함께 제거 (unlike는 모든 반응 제거)
+      // 좋아요만 취소 (싫어요는 유지)
+      post.likes = post.likes.filter(id => id.toString() !== userId);
+    } else if (reaction === 'undislike') {
+      // 싫어요만 취소 (좋아요는 유지)
       post.dislikes = post.dislikes.filter(id => id.toString() !== userId);
     }
 
     await post.save();
 
+    // 업데이트된 사용자 반응 상태 확인
+    const updatedIsLiked = post.likes.includes(userId);
+    const updatedIsDisliked = post.dislikes.includes(userId);
+
     res.json({
       success: true,
       data: {
         likes: post.likes.length,
-        dislikes: post.dislikes.length
+        dislikes: post.dislikes.length,
+        isLiked: updatedIsLiked,
+        isDisliked: updatedIsDisliked
       },
       message: '반응이 업데이트되었습니다.'
     });

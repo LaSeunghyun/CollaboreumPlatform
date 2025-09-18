@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
+import { Button } from '../shared/ui/Button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
@@ -557,7 +557,7 @@ export const ArtistMyPage: React.FC = () => {
                 <p className="text-gray-600 mb-4">
                   계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
                 </p>
-                <Button variant="destructive">
+                <Button variant="solid" tone="danger">
                   계정 삭제
                 </Button>
               </CardContent>
@@ -760,7 +760,7 @@ export const FanMyPage: React.FC = () => {
                 <p className="text-gray-600 mb-4">
                   계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
                 </p>
-                <Button variant="destructive">
+                <Button variant="solid" tone="danger">
                   계정 삭제
                 </Button>
               </CardContent>

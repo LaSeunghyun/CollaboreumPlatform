@@ -11,8 +11,8 @@ import {
     CommentListResponse,
     PostDetailResponse,
     CategoryListResponse,
-    CommunityPost,
-    CommunityComment,
+    // CommunityPost,
+    // CommunityComment,
     CommunityStats
 } from '../types/index';
 
@@ -82,10 +82,24 @@ export const useLikeCommunityPost = () => {
 
     return useMutation({
         mutationFn: ({ postId, action }: { postId: string; action: 'like' | 'dislike' | 'unlike' | 'undislike' }) =>
-            communityPostAPI.likePost(postId, action as 'like' | 'unlike'),
-        onSuccess: (_, { postId }) => {
+            communityPostAPI.togglePostReaction(postId, action),
+        onSuccess: (data: any, { postId }) => {
+            // 게시글 상세 캐시 업데이트
+            queryClient.setQueryData(['community', 'post', postId], (old: any) => {
+                if (old) {
+                    return {
+                        ...old,
+                        likes: data.likes || old.likes,
+                        dislikes: data.dislikes || old.dislikes,
+                        isLiked: data.isLiked ?? old.isLiked,
+                        isDisliked: data.isDisliked ?? old.isDisliked,
+                    };
+                }
+                return old;
+            });
+
+            // 게시글 목록 캐시 무효화
             queryClient.invalidateQueries({ queryKey: ['community', 'posts'] });
-            queryClient.invalidateQueries({ queryKey: ['community', 'post', postId] });
         },
     });
 };

@@ -1,4 +1,4 @@
-import { Button } from "./ui/button";
+import { Button } from "../shared/ui/Button";
 import { Input } from "./ui/input";
 import { Instagram, Twitter, Youtube, Facebook } from "lucide-react";
 

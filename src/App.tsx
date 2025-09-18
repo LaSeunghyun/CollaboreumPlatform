@@ -36,6 +36,7 @@ const CreateProjectPage = lazy(() => import('./pages/projects/CreateProjectPage'
 const CreateEventPage = lazy(() => import('./pages/events/CreateEventPage').then(module => ({ default: module.CreateEventPage })));
 const CreateArtworkPage = lazy(() => import('./pages/gallery/CreateArtworkPage').then(module => ({ default: module.CreateArtworkPage })));
 const CreatePostPage = lazy(() => import('./pages/community/CreatePostPage').then(module => ({ default: module.CreatePostPage })));
+const EditPostPage = lazy(() => import('./pages/community/EditPostPage').then(module => ({ default: module.EditPostPage })));
 
 // Loading component
 const PageLoading = () => (
@@ -104,6 +105,11 @@ function App() {
                 <Route path="/community/create" element={
                   <Suspense fallback={<PageLoading />}>
                     <AppLayout><CreatePostPage /></AppLayout>
+                  </Suspense>
+                } />
+                <Route path="/community/edit/:postId" element={
+                  <Suspense fallback={<PageLoading />}>
+                    <AppLayout><EditPostPage /></AppLayout>
                   </Suspense>
                 } />
                 <Route path="/community/post/:id" element={<AppLayout><CommunityPostDetailWrapper /></AppLayout>} />

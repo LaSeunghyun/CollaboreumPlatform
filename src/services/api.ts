@@ -766,7 +766,7 @@ export const communityPostAPI = {
         }),
 
     // 게시글 좋아요/싫어요
-    togglePostReaction: (postId: string, reaction: 'like' | 'dislike' | 'unlike') =>
+    togglePostReaction: (postId: string, reaction: 'like' | 'dislike' | 'unlike' | 'undislike') =>
         apiCall(`/community/posts/${postId}/reactions`, {
             method: 'POST',
             body: JSON.stringify({ reaction })

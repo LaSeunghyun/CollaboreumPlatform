@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
+import { Button } from '../../shared/ui/Button';
 import { Card, CardContent } from '../ui/card';
 import { Progress } from '../ui/progress';
 import { Clock, Users } from 'lucide-react';
@@ -109,7 +109,8 @@ export const FundingProjectCard: React.FC<FundingProjectCardProps> = ({
                 </div>
 
                 <Button
-                    className="w-full bg-indigo hover:bg-indigo-hover hover-scale transition-button shadow-sm"
+                    className="w-full hover-scale transition-button shadow-sm"
+                    variant="indigo"
                     onClick={(e) => {
                         e.stopPropagation();
                         // Handle backing logic

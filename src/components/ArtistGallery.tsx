@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardContent } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Card, CardContent } from "../shared/ui/Card";
+import { Badge } from "../shared/ui/Badge";
+import { Button } from "../shared/ui/Button";
+import { Input } from "../shared/ui/Input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../shared/ui/Select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../shared/ui/Tabs";
 import { ArrowLeft, Search, Play, Heart, Eye, Share, Grid3X3, List, Music, Palette, BookOpen, Mic, Video, Camera, Building } from "lucide-react";
 import { ImageWithFallback } from "./atoms/ImageWithFallback";
-import { galleryAPI } from '../services/api';
+import { useGalleryArtworks, useGalleryCategories, type Artwork, type Category } from "../lib/api/gallery";
 
 interface ArtistGalleryProps {
   onBack?: () => void;
   onSelectArtwork?: (artworkId: number) => void;
+  _onSelectArtwork?: (artworkId: number) => void;
 }
 
 export function ArtistGallery({ onBack, _onSelectArtwork }: ArtistGalleryProps) {
@@ -19,10 +20,14 @@ export function ArtistGallery({ onBack, _onSelectArtwork }: ArtistGalleryProps) 
   const [sortBy, setSortBy] = useState("최신순");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
-  const [artworks, setArtworks] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
   const [sortOptions] = useState<string[]>(["최신순", "인기순", "조회수순"]);
-  const [loading, setLoading] = useState(true);
+
+  // React Query 훅 사용
+  const { data: artworks = [], isLoading: artworksLoading, error: artworksError } = useGalleryArtworks();
+  const { data: categories = [], isLoading: categoriesLoading, error: categoriesError } = useGalleryCategories();
+
+  // 로딩 상태 계산
+  const loading = artworksLoading || categoriesLoading;
 
   // 이전 페이지로 돌아가기
   const handleBack = () => {
@@ -45,45 +50,17 @@ export function ArtistGallery({ onBack, _onSelectArtwork }: ArtistGalleryProps) 
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [artworksData, categoriesData] = await Promise.all([
-          galleryAPI.getAllArtworks(),
-          galleryAPI.getGalleryCategories()
-        ]);
-
-        // API 응답 구조에 맞게 데이터 추출
-        const artworks = (artworksData as any)?.data?.artworks || (artworksData as any)?.artworks || [];
-        const categories = (categoriesData as any)?.data || categoriesData || [];
-
-        setArtworks(artworks);
-        setCategories(categories);
-        // 기본 정렬 옵션 사용 (API에서 제공되지 않는 경우)
-      } catch (_error) {
-        // API 실패 시 빈 데이터로 설정
-        setArtworks([]);
-        setCategories([]);
-        // 기본 정렬 옵션 유지
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const filteredArtworks = artworks.filter(artwork => {
+  const filteredArtworks = artworks.filter((artwork: Artwork) => {
     const categoryMatch = selectedCategory === "전체" || artwork.category === selectedCategory;
+    const artistName = typeof artwork.artist === 'string' ? artwork.artist : artwork.artist?.name || '';
     const searchMatch = artwork.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (artwork.artist?.name || artwork.artist)?.toLowerCase().includes(searchQuery.toLowerCase());
+      artistName.toLowerCase().includes(searchQuery.toLowerCase());
     return categoryMatch && searchMatch;
   });
 
   const getCategoryIcon = (category: string) => {
     // 카테고리에서 아이콘 정보 찾기
-    const categoryData = categories.find(cat => cat.id === category);
+    const categoryData = (categories as Category[]).find((cat: Category) => cat.id === category);
     if (categoryData?.icon) {
       switch (categoryData.icon) {
         case "Music": return <Music className="w-4 h-4" />;
@@ -108,7 +85,7 @@ export function ArtistGallery({ onBack, _onSelectArtwork }: ArtistGalleryProps) 
 
   const getCategoryCount = (category: string) => {
     if (category === "전체") return artworks.length;
-    return artworks.filter(artwork => artwork.category === category).length;
+    return artworks.filter((artwork: Artwork) => artwork.category === category).length;
   };
 
   if (loading) {
@@ -122,7 +99,20 @@ export function ArtistGallery({ onBack, _onSelectArtwork }: ArtistGalleryProps) 
     );
   }
 
-  const renderArtworkCard = (artwork: any) => (
+  if (artworksError || categoriesError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">데이터를 불러올 수 없습니다</h2>
+          <p className="text-gray-600 mb-4">잠시 후 다시 시도해주세요</p>
+          <Button onClick={() => window.location.reload()}>새로고침</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const renderArtworkCard = (artwork: Artwork) => (
     <Card key={artwork.id} className="group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden">
       <div className="relative aspect-square">
         <ImageWithFallback
@@ -150,7 +140,7 @@ export function ArtistGallery({ onBack, _onSelectArtwork }: ArtistGalleryProps) 
 
       <CardContent className="p-4">
         <h3 className="font-medium text-gray-900 mb-1 line-clamp-1">{artwork.title}</h3>
-        <p className="text-sm text-gray-600 mb-2">by {artwork.artist}</p>
+        <p className="text-sm text-gray-600 mb-2">by {typeof artwork.artist === 'string' ? artwork.artist : artwork.artist?.name || 'Unknown'}</p>
         <p className="text-xs text-gray-500 mb-3 line-clamp-2">{artwork.description}</p>
 
         <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
@@ -174,7 +164,7 @@ export function ArtistGallery({ onBack, _onSelectArtwork }: ArtistGalleryProps) 
     </Card>
   );
 
-  const renderArtworkList = (artwork: any) => (
+  const renderArtworkList = (artwork: Artwork) => (
     <Card key={artwork.id} className="hover:shadow-lg transition-shadow cursor-pointer">
       <CardContent className="p-6">
         <div className="flex gap-6">
@@ -190,7 +180,7 @@ export function ArtistGallery({ onBack, _onSelectArtwork }: ArtistGalleryProps) 
             <div className="flex items-start justify-between mb-2">
               <div>
                 <h3 className="font-medium text-gray-900 mb-1">{artwork.title}</h3>
-                <p className="text-sm text-gray-600">by {artwork.artist}</p>
+                <p className="text-sm text-gray-600">by {typeof artwork.artist === 'string' ? artwork.artist : artwork.artist?.name || 'Unknown'}</p>
               </div>
               <Badge className="bg-blue-100 text-blue-800">
                 {artwork.category}
@@ -269,7 +259,7 @@ export function ArtistGallery({ onBack, _onSelectArtwork }: ArtistGalleryProps) 
 
             <div className="flex border border-gray-200 rounded-lg p-1 h-10">
               <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
+                variant={viewMode === "grid" ? "solid" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("grid")}
                 className="px-3 h-8"
@@ -277,7 +267,7 @@ export function ArtistGallery({ onBack, _onSelectArtwork }: ArtistGalleryProps) 
                 <Grid3X3 className="w-4 h-4" />
               </Button>
               <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
+                variant={viewMode === "list" ? "solid" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("list")}
                 className="px-3 h-8"
@@ -291,7 +281,7 @@ export function ArtistGallery({ onBack, _onSelectArtwork }: ArtistGalleryProps) 
         {/* Category Tabs */}
         <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-8">
           <TabsList className="grid grid-cols-5 w-full max-w-2xl">
-            {categories.map((category) => (
+            {(categories as Category[]).map((category: Category) => (
               <TabsTrigger key={category.id} value={category.id} className="flex items-center gap-2">
                 {getCategoryIcon(category.id)}
                 <span className="hidden sm:inline">{category.label}</span>
@@ -303,7 +293,7 @@ export function ArtistGallery({ onBack, _onSelectArtwork }: ArtistGalleryProps) 
             ))}
           </TabsList>
 
-          {categories.map((category) => (
+          {(categories as Category[]).map((category: Category) => (
             <TabsContent key={category.id} value={category.id} className="mt-6">
               <div className="mb-6">
                 <div className="flex items-center justify-between">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from '../../components/ui/button';
+import { Button } from '../../shared/ui/Button';
 import { Input } from '../../components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
@@ -95,7 +95,8 @@ export const ArtistsPage: React.FC = () => {
                         <p className="text-muted-foreground">재능 있는 아티스트들을 발견하고 팔로우하세요</p>
                     </div>
                     <Button
-                        className="bg-indigo hover:bg-indigo-hover hover-scale transition-button shadow-sm"
+                        variant="indigo"
+                        className="hover-scale transition-button shadow-sm"
                         onClick={handleCreateProject}
                     >
                         <Plus className="w-4 h-4 mr-2" />

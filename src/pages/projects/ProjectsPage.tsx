@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../../components/ui/button';
+import { Button } from '../../shared/ui/Button';
 import { SegmentedTabs } from '../../components/ui/SegmentedTabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Badge } from '../../components/ui/badge';
@@ -80,7 +80,8 @@ export const ProjectsPage: React.FC = () => {
                 </div>
                 {isAuthenticated && (
                     <Button
-                        className="bg-indigo hover:bg-indigo-hover hover-scale transition-button shadow-sm"
+                        variant="indigo"
+                        className="hover-scale transition-button shadow-sm"
                         onClick={handleCreateProject}
                     >
                         <Plus className="w-4 h-4 mr-2" />

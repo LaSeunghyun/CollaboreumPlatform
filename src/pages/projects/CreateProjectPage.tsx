@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
+import { Button } from '../../shared/ui/Button';
 import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
 import { Label } from '../../components/ui/label';
@@ -75,18 +75,43 @@ export const CreateProjectPage: React.FC = () => {
       return;
     }
 
+    // 클라이언트 검증
+    if (!formData.title || !formData.description || !formData.category || !formData.goal || !formData.duration) {
+      window.alert('제목, 설명, 카테고리, 목표 금액, 기간을 모두 입력해주세요.');
+      return;
+    }
+
+    const goalAmount = parseInt(formData.goal.replace(/,/g, ''));
+    const duration = parseInt(formData.duration);
+
+    if (goalAmount < 100000) {
+      window.alert('목표 금액은 10만원 이상이어야 합니다.');
+      return;
+    }
+
+    if (duration < 1) {
+      window.alert('기간은 1일 이상이어야 합니다.');
+      return;
+    }
+
     try {
       setLoading(true);
+
+      // 현재 날짜와 종료 날짜 계산
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + duration);
 
       const projectData = {
         title: formData.title,
         description: formData.description,
         category: formData.category,
-        goal: parseInt(formData.goal.replace(/,/g, '')),
-        duration: parseInt(formData.duration),
-        revenueShare: parseInt(formData.revenueShare),
+        goalAmount: goalAmount,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
-        artistId: user.id
+        rewards: [], // 기본 보상 없음
+        executionPlan: formData.description // 실행 계획은 설명으로 대체
       };
 
       const response = await fundingAPI.createProject(projectData) as any;
@@ -311,7 +336,7 @@ export const CreateProjectPage: React.FC = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="bg-indigo hover:bg-indigo/90"
+              variant="indigo"
             >
               {loading ? '등록 중...' : '프로젝트 등록하기'}
             </Button>

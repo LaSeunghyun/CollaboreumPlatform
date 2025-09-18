@@ -1,6 +1,6 @@
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+import { Button } from "../shared/ui/Button";
 import { Star, ExternalLink, Play, Users } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 

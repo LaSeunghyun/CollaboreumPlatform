@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Button } from './ui/button';
+import { Button } from '../shared/ui/Button';
 import { Input } from './ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
@@ -287,13 +287,13 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
                 { postId, reaction: action },
                 {
                     onSuccess: (data: any) => {
-                        // 좋아요 상태를 즉시 업데이트
+                        // 서버에서 반환된 상태로 업데이트
                         setPost((prev: any) => prev ? {
                             ...prev,
                             likes: data.likes,
                             dislikes: data.dislikes,
-                            isLiked: !prev.isLiked, // 토글
-                            isDisliked: false, // 좋아요를 누르면 싫어요는 자동으로 취소
+                            isLiked: data.isLiked,
+                            isDisliked: data.isDisliked,
                             isHot: data.likes > 20
                         } : null);
                     },
@@ -310,19 +310,19 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
             if (!user || !post) return;
 
             // 이미 싫어요가 되어 있다면 취소, 아니면 싫어요
-            const action = post.isDisliked ? 'unlike' : 'dislike';
+            const action = post.isDisliked ? 'undislike' : 'dislike';
 
             postReactionMutation.mutate(
                 { postId, reaction: action },
                 {
                     onSuccess: (data: any) => {
-                        // 싫어요 상태를 즉시 업데이트
+                        // 서버에서 반환된 상태로 업데이트
                         setPost((prev: any) => prev ? {
                             ...prev,
                             likes: data.likes,
                             dislikes: data.dislikes,
-                            isLiked: false, // 싫어요를 누르면 좋아요는 자동으로 취소
-                            isDisliked: !prev.isDisliked // 토글
+                            isLiked: data.isLiked,
+                            isDisliked: data.isDisliked
                         } : null);
                     },
                     onError: (error) => {
@@ -519,7 +519,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         sessionStorage.setItem('currentPage', currentPage);
 
         fetchPostDetail();
-        
+
         // 조회수 증가 (한 번만 실행)
         if (!viewCountIncremented.current) {
             incrementViewCount();

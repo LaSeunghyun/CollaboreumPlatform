@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/Tabs';
-import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/Select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/Card';
-import { Badge } from '@/shared/ui/Badge';
-import { Search, Plus, Filter, TrendingUp, MessageCircle, Users } from 'lucide-react';
+import { Card, CardContent } from '@/shared/ui/Card';
+import { Search, TrendingUp, MessageCircle, Users } from 'lucide-react';
 import { PostList } from './PostList';
 import { PostForm } from './PostForm';
-import { useCommunityPosts, useCommunityStats, useCommunityCategories } from '../hooks/useCommunity';
+import { useCommunityStats, useCommunityCategories, useLikeCommunityPost, useDeleteCommunityPost } from '../hooks/useCommunity';
 import { CommunityPost, PostListParams, PostSortOptions } from '../types/index';
 
 interface CommunityMainProps {
@@ -31,6 +29,8 @@ export function CommunityMain({
     // API 훅들
     const { data: stats } = useCommunityStats();
     const { data: categoriesData } = useCommunityCategories();
+    const likePostMutation = useLikeCommunityPost();
+    const deletePostMutation = useDeleteCommunityPost();
 
     // 게시글 목록 파라미터
     const listParams: PostListParams = {
@@ -47,16 +47,16 @@ export function CommunityMain({
         // 검색은 자동으로 실행됨 (useCommunityPosts가 params 변경을 감지)
     };
 
-    const handleSortChange = (field: 'createdAt' | 'likes' | 'views' | 'comments') => {
-        if (sortBy === field) {
-            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortBy(field);
-            setSortOrder('desc');
-        }
-    };
+    // const handleSortChange = (field: 'createdAt' | 'likes' | 'views' | 'comments') => {
+    //     if (sortBy === field) {
+    //         setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    //     } else {
+    //         setSortBy(field);
+    //         setSortOrder('desc');
+    //     }
+    // };
 
-    const handleCreatePost = (data: any) => {
+    const handleCreatePost = (_data: any) => {
         // 게시글 생성 로직은 부모 컴포넌트에서 처리
         if (onCreatePost) {
             onCreatePost();
@@ -66,6 +66,38 @@ export function CommunityMain({
 
     const handleCancelCreate = () => {
         setActiveTab('list');
+    };
+
+    const handleLike = (postId: string) => {
+        // PostCard에서 현재 상태를 확인하고 적절한 액션을 결정하도록 함
+        // 여기서는 단순히 like 액션만 전달
+        likePostMutation.mutate({ postId, action: 'like' });
+    };
+
+    const handleDislike = (postId: string) => {
+        // PostCard에서 현재 상태를 확인하고 적절한 액션을 결정하도록 함
+        // 여기서는 단순히 dislike 액션만 전달
+        likePostMutation.mutate({ postId, action: 'dislike' });
+    };
+
+    const handleEdit = (postId: string) => {
+        // 게시글 수정 페이지로 이동
+        window.location.href = `/community/edit/${postId}`;
+    };
+
+    const handleDelete = (postId: string) => {
+        // 게시글 삭제 확인 후 삭제
+        if (window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+            deletePostMutation.mutate(postId, {
+                onSuccess: () => {
+                    alert('게시글이 삭제되었습니다.');
+                },
+                onError: (error) => {
+                    console.error('게시글 삭제 실패:', error);
+                    alert('게시글 삭제에 실패했습니다.');
+                }
+            });
+        }
     };
 
     return (
@@ -205,6 +237,10 @@ export function CommunityMain({
                                 <PostList
                                     params={listParams}
                                     onPostClick={onPostClick}
+                                    onLike={handleLike}
+                                    onDislike={handleDislike}
+                                    onEdit={handleEdit}
+                                    onDelete={handleDelete}
                                     showActions={true}
                                 />
                             </div>
@@ -223,6 +259,10 @@ export function CommunityMain({
                             <PostList
                                 params={{ ...listParams, author: 'me' }}
                                 onPostClick={onPostClick}
+                                onLike={handleLike}
+                                onDislike={handleDislike}
+                                onEdit={handleEdit}
+                                onDelete={handleDelete}
                                 showActions={true}
                                 emptyMessage="작성한 게시글이 없습니다."
                             />

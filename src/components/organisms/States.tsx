@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
+import { Button } from '../../shared/ui/Button';
 import {
     Loader2,
     AlertCircle,
@@ -86,7 +86,7 @@ export const EmptyState: React.FC<StateProps & { icon?: React.ReactNode }> = ({
                 {action && (
                     <Button
                         onClick={action.onClick}
-                        className="bg-indigo hover:bg-indigo-hover"
+                        variant="indigo"
                     >
                         {action.label}
                     </Button>

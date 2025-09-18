@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button } from './ui/button';
+import { Button } from '../shared/ui/Button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import {
   DropdownMenu,
@@ -214,7 +214,8 @@ export const Header: React.FC = () => {
                   </Button>
                   <Button
                     size="sm"
-                    className="bg-indigo hover:bg-indigo-hover hover:scale-105 transition-all shadow-sm"
+                    variant="indigo"
+                    className="hover:scale-105 transition-all shadow-sm"
                     onClick={() => navigate('/signup')}
                   >
                     회원가입
@@ -338,7 +339,8 @@ export const Header: React.FC = () => {
                     로그인
                   </Button>
                   <Button
-                    className="flex-1 bg-indigo hover:bg-indigo-hover"
+                    className="flex-1"
+                    variant="indigo"
                     onClick={() => {
                       navigate('/signup');
                       setIsMenuOpen(false);

@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+import { Button } from "../shared/ui/Button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { ArrowLeft, Users, Play, ExternalLink, MessageCircle, Heart, TrendingUp } from "lucide-react";

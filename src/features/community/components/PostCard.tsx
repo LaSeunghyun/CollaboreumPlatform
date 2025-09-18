@@ -11,12 +11,15 @@ import {
     Flag,
     MoreHorizontal,
     Calendar,
-    Eye
+    Eye,
+    Edit,
+    Trash2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { getFirstChar } from '../../../utils/typeGuards';
 import { PostCardProps } from '../types/index';
+import { useLikeCommunityPost } from '../hooks/useCommunity';
 
 export function PostCard({
     post,
@@ -29,15 +32,25 @@ export function PostCard({
     showActions = true,
     compact = false
 }: PostCardProps) {
+    const likePostMutation = useLikeCommunityPost();
+
     const handleLike = () => {
         if (onLike) {
             onLike(post.id);
+        } else {
+            // PostCard에서 직접 처리하는 경우
+            const action = post.isLiked ? 'unlike' : 'like';
+            likePostMutation.mutate({ postId: post.id, action });
         }
     };
 
     const handleDislike = () => {
         if (onDislike) {
             onDislike(post.id);
+        } else {
+            // PostCard에서 직접 처리하는 경우
+            const action = post.isDisliked ? 'undislike' : 'dislike';
+            likePostMutation.mutate({ postId: post.id, action });
         }
     };
 
@@ -97,10 +110,20 @@ export function PostCard({
 
                     {showActions && (
                         <div className="flex items-center space-x-1">
-                            <Button variant="ghost" size="sm" onClick={handleReport}>
+                            {onEdit && (
+                                <Button variant="ghost" size="sm" onClick={handleEdit} title="수정">
+                                    <Edit className="w-4 h-4" />
+                                </Button>
+                            )}
+                            {onDelete && (
+                                <Button variant="ghost" size="sm" onClick={handleDelete} title="삭제">
+                                    <Trash2 className="w-4 h-4" />
+                                </Button>
+                            )}
+                            <Button variant="ghost" size="sm" onClick={handleReport} title="신고">
                                 <Flag className="w-4 h-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" title="더보기">
                                 <MoreHorizontal className="w-4 h-4" />
                             </Button>
                         </div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
+import { Button } from '../../shared/ui/Button';
 import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
 import { Label } from '../../components/ui/label';
@@ -301,7 +301,7 @@ export const CreateEventPage: React.FC = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="bg-indigo hover:bg-indigo/90"
+              variant="indigo"
             >
               {loading ? '등록 중...' : '이벤트 등록하기'}
             </Button>

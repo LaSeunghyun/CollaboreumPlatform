@@ -6,7 +6,7 @@ export const usePostReaction = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ postId, reaction }: { postId: string; reaction: 'like' | 'dislike' | 'unlike' }) =>
+        mutationFn: ({ postId, reaction }: { postId: string; reaction: 'like' | 'dislike' | 'unlike' | 'undislike' }) =>
             communityPostAPI.togglePostReaction(postId, reaction),
         onSuccess: (data: any, { postId }) => {
             // 게시글 상세 캐시 업데이트
