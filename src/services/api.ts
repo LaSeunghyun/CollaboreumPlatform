@@ -1,10 +1,7 @@
-
+import { resolveApiBaseUrl } from '@/lib/config/env';
 
 // API Base URL
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL ||
-    (import.meta as any).env?.REACT_APP_API_URL ||
-    (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
-
+const API_BASE_URL = resolveApiBaseUrl();
 
 // 토큰 가져오기 함수
 const getAuthToken = (): string | null => {
