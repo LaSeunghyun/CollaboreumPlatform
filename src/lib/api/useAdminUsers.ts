@@ -52,7 +52,7 @@ export const useAdminUser = (userId: string) => {
   return useQuery<{ success: boolean; data: AdminUser }>({
     queryKey: ['admin', 'users', userId],
     queryFn: async () => {
-      return await adminUserAPI.getUser(userId);
+      return await adminUserAPI.getAllUsers({ search: userId, limit: 1 });
     },
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,
@@ -94,13 +94,13 @@ export const useUpdateUserRole = () => {
   });
 };
 
-// 사용자 삭제
+// 사용자 삭제 (영구 차단으로 대체)
 export const useDeleteUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (userId: string) => {
-      return await adminUserAPI.deleteUser(userId);
+      return await adminUserAPI.banUser(userId, '관리자에 의한 계정 삭제');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
