@@ -1,29 +1,28 @@
+/** @type {import('jest').Config} */
 module.exports = {
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   reporters: ['default', ['jest-junit', { outputDirectory: 'reports/junit' }]],
-  transform: {
-    '^.+\\.(t|j)sx?$': ['ts-jest', { tsconfig: 'tsconfig.json' }]
+  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
+  transform: {
+    '^.+\\.(t|j)sx?$': 'babel-jest',
+  },
+  transformIgnorePatterns: ['node_modules/(?!(.*\\.mjs$))'],
   testMatch: [
     '**/__tests__/**/*.(ts|tsx|js)',
     '**/*.(test|spec).(ts|tsx|js)',
-    '**/pact/**/*.test.(ts|tsx|js)'
+    '**/pact/**/*.test.(ts|tsx|js)',
   ],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
     '!src/**/*.stories.{ts,tsx}',
     '!src/**/__tests__/**',
-    '!src/**/__mocks__/**'
+    '!src/**/__mocks__/**',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
-  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
-  moduleNameMapping: {
-    '^@/(.*)$': '<rootDir>/src/$1'
-  },
-  transformIgnorePatterns: [
-    'node_modules/(?!(.*\\.mjs$))'
-  ],
-  testTimeout: 10000
+  testTimeout: 10000,
 };

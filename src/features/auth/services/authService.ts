@@ -1,8 +1,9 @@
+import { resolveApiBaseUrl } from '@/lib/config/env';
 import { AuthResponse, RefreshTokenResponse, LoginCredentials, SignupData, PasswordResetRequest, PasswordReset } from '../types';
 import { ApiResponse } from '../../../shared/types';
 // import { fetch } from '../../../utils/fetch';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = resolveApiBaseUrl();
 
 class AuthService {
     private baseUrl = `${API_BASE_URL}/auth`;
