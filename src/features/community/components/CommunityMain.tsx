@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/Tabs';
-import { Input } from '@/shared/ui/Input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/Select';
-import { Card, CardContent } from '@/shared/ui/Card';
 import { Search, TrendingUp, MessageCircle, Users } from 'lucide-react';
 import { PostList } from './PostList';
 import { PostForm } from './PostForm';
 import { useCommunityStats, useCommunityCategories, useLikeCommunityPost, useDeleteCommunityPost } from '../hooks/useCommunity';
 import { CommunityPost, PostListParams, PostSortOptions } from '../types/index';
+import { Tabs, Input, Select, Card } from '@/shared/ui';
 
 interface CommunityMainProps {
     onPostClick?: (post: CommunityPost) => void;

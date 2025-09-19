@@ -1,26 +1,19 @@
 import React, { useState, useMemo } from 'react';
-import { Card, CardContent } from '@/shared/ui/Card';
-import { Badge } from '@/shared/ui/Badge';
-import { Button } from '@/shared/ui/Button';
-import { Progress } from '@/shared/ui/Progress';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/Avatar';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@/shared/ui/Select';
-import { Input } from '@/shared/ui/Input';
 import {
-    Heart,
-    Calendar,
-    MapPin,
-    Search,
-    Star,
-    Target,
-    Eye,
-} from 'lucide-react';
+        Heart,
+        Calendar,
+        MapPin,
+        Search,
+        Star,
+        Target,
+        Eye,
+    } from 'lucide-react';
 import { ImageWithFallback } from './atoms/ImageWithFallback';
 import { PaymentModal } from './PaymentModal';
 import {
@@ -32,6 +25,7 @@ import { useCategories } from '../lib/api/useCategories';
 import { getFirstChar } from '../utils/typeGuards';
 import { KOREAN_CATEGORIES } from '../constants/categories';
 import { ACTION_LABELS } from '../constants/strings';
+import { Card, Badge, Button, Progress, Avatar, Select, Input } from '@/shared/ui';
 
 interface FundingProjectsProps {
     onViewProject?: (projectId: number) => void;

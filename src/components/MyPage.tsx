@@ -1,9 +1,4 @@
 import React, { useState } from "react";
-import { Card, CardContent } from "@/shared/ui/Card";
-import { Badge } from "@/shared/ui/Badge";
-import { Button } from "@/shared/ui/Button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/Tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/Avatar";
 import { Edit, Settings, Camera } from "lucide-react";
 import { getFirstChar } from "../utils/typeGuards";
 import { useAuth } from "../contexts/AuthContext";
@@ -14,15 +9,14 @@ import {
   useNotifications,
   useUpdateUserProfile
 } from "../lib/api/useUser";
-import { Skeleton } from "@/shared/ui/Skeleton";
-import { ErrorMessage } from "@/shared/ui/ErrorMessage";
 import { OverviewTab } from "./MyPage/OverviewTab";
 import { InvestmentsTab } from "./MyPage/InvestmentsTab";
 import { FollowingTab } from "./MyPage/FollowingTab";
 import { PointsTab } from "./MyPage/PointsTab";
 import { SettingsTab } from "./MyPage/SettingsTab";
 import {
-  UserProfile,
+import { Card, Badge, Button, Tabs, Avatar, Skeleton, ErrorMessage } from '@/shared/ui';
+UserProfile,
   BackingsResponse,
   FollowingResponse,
   NotificationsResponse,

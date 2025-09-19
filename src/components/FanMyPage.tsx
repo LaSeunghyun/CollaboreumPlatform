@@ -1,13 +1,7 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/Card";
-import { Badge } from "@/shared/ui/Badge";
-import { Button } from "@/shared/ui/Button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/Avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/Tabs";
-import { Progress } from "@/shared/ui/Progress";
-import { Separator } from "@/shared/ui/Separator";
 import { Heart, TrendingUp, Wallet, DollarSign, BarChart3, Users, MessageCircle, ExternalLink, Eye } from "lucide-react";
 import { getFirstChar } from "../utils/typeGuards";
+import { Card, Badge, Button, Avatar, Tabs, Progress, Separator } from '@/shared/ui';
 
 const fanData = {
   name: "김팬심",

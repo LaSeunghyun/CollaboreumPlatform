@@ -1,11 +1,9 @@
 import React, { useState } from "react";
-import { Button } from "@/shared/ui/Button";
-import { Input } from "@/shared/ui/Input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/Card";
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/api';
 import { useSearchParams } from 'react-router-dom';
+import { Button, Input, Card } from '@/shared/ui';
 
 interface LoginPageProps {
   onBack: () => void;

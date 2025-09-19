@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/Card';
-import { Button } from '@/shared/ui/Button';
-import { Input } from '@/shared/ui/Input';
-import { Textarea } from '@/shared/ui/Textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/Select';
-import { Badge } from '@/shared/ui/Badge';
 import { X, Plus } from 'lucide-react';
 import { useCommunityCategories } from '../hooks/useCommunity';
 import { PostFormProps, CreatePostData } from '../types/index';
+import { Card, Button, Input, Textarea, Select, Badge } from '@/shared/ui';
 
 export function PostForm({
     initialData,

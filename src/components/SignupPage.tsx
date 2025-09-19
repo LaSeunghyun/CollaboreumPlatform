@@ -1,15 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Button } from "@/shared/ui/Button";
-import { Input } from "@/shared/ui/Input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/Card";
-import { Separator } from "@/shared/ui/Separator";
-import { Checkbox } from "@/shared/ui/Checkbox";
-import { Badge } from "@/shared/ui/Badge";
 import { ArrowLeft, Mail, Lock, Eye, EyeOff, User, Palette, Heart, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { authAPI } from '../services/api';
 import { TermsOfService } from './TermsOfService';
 import { PrivacyPolicy } from './PrivacyPolicy';
 import { SignupSuccessPage } from './SignupSuccessPage';
+import { Button, Input, Card, Separator, Checkbox, Badge } from '@/shared/ui';
 
 interface SignupPageProps {
   onBack: () => void;

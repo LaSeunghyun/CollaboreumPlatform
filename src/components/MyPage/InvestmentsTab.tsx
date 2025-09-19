@@ -1,9 +1,6 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/Card";
-import { Badge } from "@/shared/ui/Badge";
-import { Skeleton } from "@/shared/ui/Skeleton";
-import { ErrorMessage } from "@/shared/ui/ErrorMessage";
 import { BackingsResponse, Backing } from './types';
+import { Card, Badge, Skeleton, ErrorMessage } from '@/shared/ui';
 
 interface InvestmentsTabProps {
   backingsData: BackingsResponse | undefined;

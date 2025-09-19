@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/Card';
-import { Badge } from '@/shared/ui/Badge';
-import { Button } from '@/shared/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from '@/shared/ui.ts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import {
   Select,
@@ -45,7 +43,7 @@ import { dynamicConstantsService } from '../services/constantsService';
 import { getFirstChar } from '../utils/typeGuards';
 import { ACTION_LABELS } from '../constants/strings';
 
-// 상태별 색상 상수
+// ?�태�??�상 ?�수
 const BG_RED_100 = 'bg-red-100';
 const TEXT_RED_800 = 'text-red-800';
 const BG_YELLOW_100 = 'bg-yellow-100';
@@ -64,22 +62,22 @@ const STATUS_COLORS = {
 } as const;
 
 const _STATUS_LABELS = {
-  WAITING: '대기중',
-  IN_PROGRESS: '진행중',
-  COMPLETED: '완료',
+  WAITING: '?�기중',
+  IN_PROGRESS: '진행�?,
+  COMPLETED: '?�료',
 } as const;
 
-// 색상 클래스 상수 (사용하지 않으므로 제거)
+// ?�상 ?�래???�수 (?�용?��? ?�으므�??�거)
 
-// 타입 정의
+// ?�???�의
 interface Inquiry {
   id: string;
   subject: string;
   artist: string;
   artistAvatar?: string;
   category: string;
-  priority: '높음' | '중간' | '낮음';
-  status: '대기' | '진행중' | '완료';
+  priority: '?�음' | '중간' | '??��';
+  status: '?��? | '진행�? | '?�료';
   assignedTo?: string;
   date: string;
 }
@@ -93,7 +91,7 @@ interface MatchingRequest {
   preferredCategory: string;
   budget: string;
   timeline: string;
-  status: '대기' | '진행중' | '완료';
+  status: '?��? | '진행�? | '?�료';
   applications: number;
   date: string;
 }
@@ -137,7 +135,7 @@ interface Artwork {
 
 export function AdminDashboard({ onBack }: AdminDashboardProps) {
   const [selectedTab, setSelectedTab] = useState('overview');
-  const [inquiryFilter, setInquiryFilter] = useState('전체');
+  const [inquiryFilter, setInquiryFilter] = useState('?�체');
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [matchingRequests, setMatchingRequests] = useState<MatchingRequest[]>(
     [],
@@ -145,11 +143,11 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
   const [financialData, setFinancialData] = useState<FinancialData[]>([]);
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState(true);
-  const [artworkFilter, setArtworkFilter] = useState('전체');
+  const [artworkFilter, setArtworkFilter] = useState('?�체');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null);
 
-  // 새 작품 등록을 위한 상태
+  // ???�품 ?�록???�한 ?�태
   const [newArtwork, setNewArtwork] = useState({
     title: '',
     artist: '',
@@ -165,23 +163,23 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
     [],
   );
 
-  // 이전 페이지로 돌아가기
+  // ?�전 ?�이지�??�아가�?
   const handleBack = () => {
     if (onBack) {
       onBack();
     } else {
-      // 더 안정적인 뒤로가기 방법
+      // ???�정?�인 ?�로가�?방법
       try {
-        // 브라우저 히스토리에서 이전 페이지로 이동
+        // 브라?��? ?�스?�리?�서 ?�전 ?�이지�??�동
         if (window.history.length > 1) {
           window.history.back();
         } else {
-          // 히스토리가 없으면 홈으로 이동
+          // ?�스?�리가 ?�으�??�으�??�동
           window.location.href = '/';
         }
       } catch (error) {
-        console.error('뒤로가기 실패:', error);
-        // 에러 발생 시 홈으로 이동
+        console.error('?�로가�??�패:', error);
+        // ?�러 발생 ???�으�??�동
         window.location.href = '/';
       }
     }
@@ -206,7 +204,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
         setArtworkCategories(categoriesData);
       } catch (error) {
         console.error('Failed to fetch admin data:', error);
-        // API 실패 시 빈 데이터로 설정 (더미 데이터 사용 금지)
+        // API ?�패 ??�??�이?�로 ?�정 (?��? ?�이???�용 금�?)
         setInquiries([]);
         setMatchingRequests([]);
         setFinancialData([]);
@@ -222,12 +220,12 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
 
   const filteredInquiries = inquiries.filter(
     (inquiry: Inquiry) =>
-      inquiryFilter === '전체' || inquiry.status === inquiryFilter,
+      inquiryFilter === '?�체' || inquiry.status === inquiryFilter,
   );
 
   const filteredArtworks = artworks.filter(artwork => {
     const matchesFilter =
-      artworkFilter === '전체' || artwork.status === artworkFilter;
+      artworkFilter === '?�체' || artwork.status === artworkFilter;
     const matchesSearch =
       artwork.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       artwork.artist?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -290,14 +288,14 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
     switch (status) {
       case 'pending':
         return (
-          <Badge className='bg-warning-100 text-warning-800'>대기중</Badge>
+          <Badge className='bg-warning-100 text-warning-800'>?�기중</Badge>
         );
       case 'approved':
         return (
-          <Badge className='bg-success-100 text-success-800'>승인됨</Badge>
+          <Badge className='bg-success-100 text-success-800'>?�인??/Badge>
         );
       case 'rejected':
-        return <Badge className='bg-danger-100 text-danger-800'>거부됨</Badge>;
+        return <Badge className='bg-danger-100 text-danger-800'>거�???/Badge>;
       default:
         return (
           <Badge className='bg-neutral-100 text-neutral-800'>{status}</Badge>
@@ -314,7 +312,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
             onClick={() => handleArtworkStatusChange(artwork.id, 'approved')}
           >
             <CheckCircle2 className='mr-1 h-4 w-4' />
-            승인
+            ?�인
           </Button>
           <Button
             size='sm'
@@ -323,7 +321,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
             onClick={() => handleArtworkStatusChange(artwork.id, 'rejected')}
           >
             <XCircle className='mr-1 h-4 w-4' />
-            거부
+            거�?
           </Button>
         </div>
       );
@@ -335,7 +333,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
         onClick={() => handleArtworkStatusChange(artwork.id, 'pending')}
       >
         <Clock className='mr-1 h-4 w-4' />
-        재검토
+        ?��???
       </Button>
     );
   };
@@ -345,7 +343,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
       <div className='flex min-h-screen items-center justify-center bg-background'>
         <div className='text-center'>
           <div className='mx-auto h-32 w-32 animate-spin rounded-full border-b-2 border-primary-600'></div>
-          <p className='mt-4 text-muted-foreground'>데이터를 불러오는 중...</p>
+          <p className='mt-4 text-muted-foreground'>?�이?��? 불러?�는 �?..</p>
         </div>
       </div>
     );
@@ -361,10 +359,10 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
           </Button>
           <div>
             <h1 className='text-3xl font-bold text-foreground'>
-              관리자 대시보드
+              관리자 ?�?�보??
             </h1>
             <p className='text-muted-foreground'>
-              플랫폼 운영 현황을 관리하고 모니터링하세요
+              ?�랫???�영 ?�황??관리하�?모니?�링?�세??
             </p>
           </div>
         </div>
@@ -376,12 +374,12 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
         >
           <TabsList className='grid w-full grid-cols-7'>
             <TabsTrigger value='overview'>개요</TabsTrigger>
-            <TabsTrigger value='inquiries'>문의사항</TabsTrigger>
-            <TabsTrigger value='matching'>매칭관리</TabsTrigger>
-            <TabsTrigger value='gallery'>작품갤러리</TabsTrigger>
-            <TabsTrigger value='add-artwork'>새작품등록</TabsTrigger>
-            <TabsTrigger value='finance'>재정관리</TabsTrigger>
-            <TabsTrigger value='users'>사용자관리</TabsTrigger>
+            <TabsTrigger value='inquiries'>문의?�항</TabsTrigger>
+            <TabsTrigger value='matching'>매칭관�?/TabsTrigger>
+            <TabsTrigger value='gallery'>?�품갤러�?/TabsTrigger>
+            <TabsTrigger value='add-artwork'>?�작?�등�?/TabsTrigger>
+            <TabsTrigger value='finance'>?�정관�?/TabsTrigger>
+            <TabsTrigger value='users'>?�용?��?�?/TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -393,10 +391,10 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                   <div className='flex items-center justify-between'>
                     <div>
                       <p className='text-sm text-muted-foreground'>
-                        미처리 문의
+                        미처�?문의
                       </p>
                       <p className='text-2xl font-bold text-danger-600'>
-                        {inquiries.filter(i => i.status === '대기').length}
+                        {inquiries.filter(i => i.status === '?��?).length}
                       </p>
                     </div>
                     <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-danger-100'>
@@ -410,10 +408,10 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                 <CardContent className='p-6'>
                   <div className='flex items-center justify-between'>
                     <div>
-                      <p className='text-sm text-muted-foreground'>매칭 대기</p>
+                      <p className='text-sm text-muted-foreground'>매칭 ?��?/p>
                       <p className='text-2xl font-bold text-warning-600'>
                         {
-                          matchingRequests.filter(r => r.status === '대기')
+                          matchingRequests.filter(r => r.status === '?��?)
                             .length
                         }
                       </p>
@@ -430,7 +428,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                   <div className='flex items-center justify-between'>
                     <div>
                       <p className='text-sm text-muted-foreground'>
-                        대기중 작품
+                        ?�기중 ?�품
                       </p>
                       <p className='text-2xl font-bold text-primary-600'>
                         {artworks.filter(a => a.status === 'pending').length}
@@ -448,10 +446,10 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                   <div className='flex items-center justify-between'>
                     <div>
                       <p className='text-sm text-muted-foreground'>
-                        이번 달 매출
+                        ?�번 ??매출
                       </p>
                       <p className='text-2xl font-bold text-success-600'>
-                        ₩
+                        ??
                         {(() => {
                           const firstData = financialData[0];
                           return firstData
@@ -473,7 +471,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
             <div className='grid gap-6 lg:grid-cols-2'>
               <Card>
                 <CardHeader>
-                  <CardTitle>최근 문의사항</CardTitle>
+                  <CardTitle>최근 문의?�항</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className='space-y-4'>
@@ -501,9 +499,9 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                         </div>
                         <Badge
                           className={
-                            inquiry.status === '대기'
+                            inquiry.status === '?��?
                               ? STATUS_COLORS.WAITING
-                              : inquiry.status === '진행중'
+                              : inquiry.status === '진행�?
                                 ? STATUS_COLORS.IN_PROGRESS
                                 : STATUS_COLORS.COMPLETED
                           }
@@ -518,7 +516,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>최근 등록된 작품</CardTitle>
+                  <CardTitle>최근 ?�록???�품</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className='space-y-4'>
@@ -536,11 +534,11 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                             {getStatusBadge(artwork.status)}
                           </div>
                           <p className='mb-2 text-xs text-gray-600'>
-                            {artwork.artist} • {artwork.category}
+                            {artwork.artist} ??{artwork.category}
                           </p>
                           <p className='text-sm'>
                             {artwork.description?.substring(0, 60) ||
-                              '설명 없음'}
+                              '?�명 ?�음'}
                             ...
                           </p>
                         </div>
@@ -554,22 +552,22 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
           {/* Inquiries Tab */}
           <TabsContent value='inquiries' className='space-y-6'>
             <div className='flex items-center justify-between'>
-              <h2 className='text-2xl font-bold'>문의사항 관리</h2>
+              <h2 className='text-2xl font-bold'>문의?�항 관�?/h2>
               <div className='flex gap-3'>
                 <Select value={inquiryFilter} onValueChange={setInquiryFilter}>
                   <SelectTrigger className='w-32'>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='전체'>전체</SelectItem>
-                    <SelectItem value='대기'>대기</SelectItem>
-                    <SelectItem value='진행중'>진행중</SelectItem>
-                    <SelectItem value='완료'>완료</SelectItem>
+                    <SelectItem value='?�체'>?�체</SelectItem>
+                    <SelectItem value='?��?>?��?/SelectItem>
+                    <SelectItem value='진행�?>진행�?/SelectItem>
+                    <SelectItem value='?�료'>?�료</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button variant='outline'>
                   <Filter className='mr-2 h-4 w-4' />
-                  필터
+                  ?�터
                 </Button>
               </div>
             </div>
@@ -579,14 +577,14 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>아티스트</TableHead>
+                      <TableHead>?�티?�트</TableHead>
                       <TableHead>카테고리</TableHead>
-                      <TableHead>제목</TableHead>
-                      <TableHead>우선순위</TableHead>
-                      <TableHead>상태</TableHead>
-                      <TableHead>담당자</TableHead>
-                      <TableHead>날짜</TableHead>
-                      <TableHead>액션</TableHead>
+                      <TableHead>?�목</TableHead>
+                      <TableHead>?�선?�위</TableHead>
+                      <TableHead>?�태</TableHead>
+                      <TableHead>?�당??/TableHead>
+                      <TableHead>?�짜</TableHead>
+                      <TableHead>?�션</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -617,7 +615,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                         <TableCell>
                           <Badge
                             className={
-                              inquiry.priority === '높음'
+                              inquiry.priority === '?�음'
                                 ? RED_COLOR_CLASS
                                 : inquiry.priority === '중간'
                                   ? YELLOW_COLOR_CLASS
@@ -630,9 +628,9 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                         <TableCell>
                           <Badge
                             className={
-                              inquiry.status === '대기'
+                              inquiry.status === '?��?
                                 ? 'bg-red-100 text-red-800'
-                                : inquiry.status === '진행중'
+                                : inquiry.status === '진행�?
                                   ? 'bg-yellow-100 text-yellow-800'
                                   : 'bg-green-100 text-green-800'
                             }
@@ -642,7 +640,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                         </TableCell>
                         <TableCell>
                           {inquiry.assignedTo || (
-                            <span className='text-gray-400'>미배정</span>
+                            <span className='text-gray-400'>미배??/span>
                           )}
                         </TableCell>
                         <TableCell>{inquiry.date}</TableCell>
@@ -651,11 +649,11 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                             <Button
                               size='sm'
                               variant='outline'
-                              title='자세히 보기'
+                              title='?�세??보기'
                             >
                               <Eye className='h-4 w-4' />
                             </Button>
-                            <Button size='sm' variant='outline' title='수정'>
+                            <Button size='sm' variant='outline' title='?�정'>
                               <Edit className='h-4 w-4' />
                             </Button>
                           </div>
@@ -671,8 +669,8 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
           {/* Matching Tab */}
           <TabsContent value='matching' className='space-y-6'>
             <div className='flex items-center justify-between'>
-              <h2 className='text-2xl font-bold'>아티스트 매칭 관리</h2>
-              <Button>새 매칭 생성</Button>
+              <h2 className='text-2xl font-bold'>?�티?�트 매칭 관�?/h2>
+              <Button>??매칭 ?�성</Button>
             </div>
 
             <div className='space-y-6'>
@@ -687,7 +685,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                           </h3>
                           <Badge
                             className={
-                              request.status === '대기'
+                              request.status === '?��?
                                 ? 'bg-red-100 text-red-800'
                                 : 'bg-blue-100 text-blue-800'
                             }
@@ -696,14 +694,14 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                           </Badge>
                         </div>
                         <p className='text-gray-600'>
-                          요청자: <strong>{request.requester}</strong> (
+                          ?�청?? <strong>{request.requester}</strong> (
                           {request.requesterCategory})
                         </p>
                       </div>
                       <div className='text-right'>
                         <p className='text-sm text-gray-600'>{request.date}</p>
                         <p className='text-sm text-blue-600'>
-                          {request.applications}개 지원
+                          {request.applications}�?지??
                         </p>
                       </div>
                     </div>
@@ -713,14 +711,14 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                     <div className='mb-4 grid gap-4 text-sm md:grid-cols-3'>
                       <div>
                         <span className='font-medium text-gray-900'>
-                          희망 분야:
+                          ?�망 분야:
                         </span>
                         <p className='text-gray-600'>
                           {request.preferredCategory}
                         </p>
                       </div>
                       <div>
-                        <span className='font-medium text-gray-900'>예산:</span>
+                        <span className='font-medium text-gray-900'>?�산:</span>
                         <p className='text-gray-600'>{request.budget}</p>
                       </div>
                       <div>
@@ -732,14 +730,14 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                     <div className='flex items-center justify-between'>
                       <div className='flex gap-2'>
                         <Button size='sm' variant='outline'>
-                          지원자 보기
+                          지?�자 보기
                         </Button>
                         <Button size='sm' variant='outline'>
-                          매칭 제안
+                          매칭 ?�안
                         </Button>
                       </div>
                       <div className='flex gap-2'>
-                        <Button size='sm'>승인</Button>
+                        <Button size='sm'>?�인</Button>
                         <Button size='sm' variant='outline'>
                           보류
                         </Button>
@@ -754,16 +752,16 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
           {/* Gallery Tab */}
           <TabsContent value='gallery' className='space-y-6'>
             <div className='flex items-center justify-between'>
-              <h2 className='text-2xl font-bold'>작품 갤러리 관리</h2>
+              <h2 className='text-2xl font-bold'>?�품 갤러�?관�?/h2>
             </div>
 
-            {/* 필터 및 검색 */}
+            {/* ?�터 �?검??*/}
             <div className='flex items-center gap-4'>
               <div className='flex-1'>
                 <div className='relative'>
                   <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400' />
                   <Input
-                    placeholder='작품명, 아티스트, 카테고리로 검색...'
+                    placeholder='?�품�? ?�티?�트, 카테고리�?검??..'
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                     className='pl-10'
@@ -775,28 +773,28 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value='전체'>전체</SelectItem>
-                  <SelectItem value='pending'>대기중</SelectItem>
-                  <SelectItem value='approved'>승인됨</SelectItem>
-                  <SelectItem value='rejected'>거부됨</SelectItem>
+                  <SelectItem value='?�체'>?�체</SelectItem>
+                  <SelectItem value='pending'>?�기중</SelectItem>
+                  <SelectItem value='approved'>?�인??/SelectItem>
+                  <SelectItem value='rejected'>거�???/SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {/* 작품 목록 */}
+            {/* ?�품 목록 */}
             <Card>
               <CardContent className='p-0'>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>작품</TableHead>
-                      <TableHead>아티스트</TableHead>
+                      <TableHead>?�품</TableHead>
+                      <TableHead>?�티?�트</TableHead>
                       <TableHead>카테고리</TableHead>
-                      <TableHead>가격</TableHead>
-                      <TableHead>상태</TableHead>
-                      <TableHead>조회수</TableHead>
-                      <TableHead>등록일</TableHead>
-                      <TableHead>액션</TableHead>
+                      <TableHead>가�?/TableHead>
+                      <TableHead>?�태</TableHead>
+                      <TableHead>조회??/TableHead>
+                      <TableHead>?�록??/TableHead>
+                      <TableHead>?�션</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -818,7 +816,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                             <div>
                               <p className='font-medium'>{artwork.title}</p>
                               <p className='text-sm text-gray-600'>
-                                {artwork.medium} • {artwork.dimensions}
+                                {artwork.medium} ??{artwork.dimensions}
                               </p>
                             </div>
                           </div>
@@ -842,7 +840,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                         </TableCell>
                         <TableCell>
                           <span className='font-medium'>
-                            ₩{artwork.price?.toLocaleString() || '0'}
+                            ??artwork.price?.toLocaleString() || '0'}
                           </span>
                         </TableCell>
                         <TableCell>{getStatusBadge(artwork.status)}</TableCell>
@@ -859,11 +857,11 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                               size='sm'
                               variant='outline'
                               onClick={() => setSelectedArtwork(artwork)}
-                              title='자세히 보기'
+                              title='?�세??보기'
                             >
                               <Eye className='h-4 w-4' />
                             </Button>
-                            <Button size='sm' variant='outline' title='수정'>
+                            <Button size='sm' variant='outline' title='?�정'>
                               <Edit className='h-4 w-4' />
                             </Button>
                             {getStatusActions(artwork)}
@@ -872,7 +870,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                               variant='outline'
                               tone='danger'
                               onClick={() => handleDeleteArtwork(artwork.id)}
-                              title='삭제'
+                              title='??��'
                             >
                               <Trash2 className='h-4 w-4' />
                             </Button>
@@ -889,7 +887,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
           {/* Add Artwork Tab */}
           <TabsContent value='add-artwork' className='space-y-6'>
             <div className='flex items-center justify-between'>
-              <h2 className='text-2xl font-bold'>새 작품 등록</h2>
+              <h2 className='text-2xl font-bold'>???�품 ?�록</h2>
             </div>
 
             <Card>
@@ -897,7 +895,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                 <div className='space-y-6'>
                   <div className='grid grid-cols-2 gap-4'>
                     <div>
-                      <Label htmlFor='title'>작품명 *</Label>
+                      <Label htmlFor='title'>?�품�?*</Label>
                       <Input
                         id='title'
                         value={newArtwork.title}
@@ -907,11 +905,11 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                             title: e.target.value,
                           }))
                         }
-                        placeholder='작품명을 입력하세요'
+                        placeholder='?�품명을 ?�력?�세??
                       />
                     </div>
                     <div>
-                      <Label htmlFor='artist'>아티스트 *</Label>
+                      <Label htmlFor='artist'>?�티?�트 *</Label>
                       <Input
                         id='artist'
                         value={newArtwork.artist}
@@ -921,7 +919,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                             artist: e.target.value,
                           }))
                         }
-                        placeholder='아티스트명을 입력하세요'
+                        placeholder='?�티?�트명을 ?�력?�세??
                       />
                     </div>
                   </div>
@@ -935,7 +933,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                         }
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder='카테고리 선택' />
+                          <SelectValue placeholder='카테고리 ?�택' />
                         </SelectTrigger>
                         <SelectContent>
                           {artworkCategories.map(category => (
@@ -947,7 +945,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor='medium'>재료</Label>
+                      <Label htmlFor='medium'>?�료</Label>
                       <Input
                         id='medium'
                         value={newArtwork.medium}
@@ -957,11 +955,11 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                             medium: e.target.value,
                           }))
                         }
-                        placeholder='재료를 입력하세요'
+                        placeholder='?�료�??�력?�세??
                       />
                     </div>
                     <div>
-                      <Label htmlFor='dimensions'>크기</Label>
+                      <Label htmlFor='dimensions'>?�기</Label>
                       <Input
                         id='dimensions'
                         value={newArtwork.dimensions}
@@ -971,12 +969,12 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                             dimensions: e.target.value,
                           }))
                         }
-                        placeholder='예: 100x80cm'
+                        placeholder='?? 100x80cm'
                       />
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor='price'>가격</Label>
+                    <Label htmlFor='price'>가�?/Label>
                     <Input
                       id='price'
                       type='number'
@@ -987,11 +985,11 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                           price: parseInt(e.target.value) || 0,
                         }))
                       }
-                      placeholder='가격을 입력하세요'
+                      placeholder='가격을 ?�력?�세??
                     />
                   </div>
                   <div>
-                    <Label htmlFor='description'>설명</Label>
+                    <Label htmlFor='description'>?�명</Label>
                     <Textarea
                       id='description'
                       value={newArtwork.description}
@@ -1001,12 +999,12 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                           description: e.target.value,
                         }))
                       }
-                      placeholder='작품에 대한 설명을 입력하세요'
+                      placeholder='?�품???�???�명???�력?�세??
                       rows={3}
                     />
                   </div>
                   <div>
-                    <Label htmlFor='tags'>태그</Label>
+                    <Label htmlFor='tags'>?�그</Label>
                     <Input
                       id='tags'
                       value={newArtwork.tags}
@@ -1016,11 +1014,11 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                           tags: e.target.value,
                         }))
                       }
-                      placeholder='쉼표로 구분하여 태그를 입력하세요'
+                      placeholder='?�표�?구분?�여 ?�그�??�력?�세??
                     />
                   </div>
                   <div>
-                    <Label htmlFor='imageUrl'>이미지 URL</Label>
+                    <Label htmlFor='imageUrl'>?��?지 URL</Label>
                     <Input
                       id='imageUrl'
                       value={newArtwork.imageUrl}
@@ -1030,7 +1028,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                           imageUrl: e.target.value,
                         }))
                       }
-                      placeholder='이미지 URL을 입력하세요'
+                      placeholder='?��?지 URL???�력?�세??
                     />
                   </div>
                   <div className='flex justify-end gap-2 pt-4'>
@@ -1050,11 +1048,11 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                         });
                       }}
                     >
-                      초기화
+                      초기??
                     </Button>
                     <Button onClick={handleAddArtwork}>
                       <Plus className='mr-2 h-4 w-4' />
-                      작품 등록
+                      ?�품 ?�록
                     </Button>
                   </div>
                 </div>
@@ -1064,50 +1062,50 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
 
           {/* Finance Tab */}
           <TabsContent value='finance' className='space-y-6'>
-            <h2 className='text-2xl font-bold'>재정 관리</h2>
+            <h2 className='text-2xl font-bold'>?�정 관�?/h2>
 
             <div className='space-y-6'>
               {financialData.map((data, _index) => (
                 <Card key={data.month}>
                   <CardHeader>
-                    <CardTitle>{data.month} 재정 현황</CardTitle>
+                    <CardTitle>{data.month} ?�정 ?�황</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className='grid gap-6 md:grid-cols-5'>
                       <div className='rounded-lg bg-blue-50 p-4 text-center'>
-                        <p className='mb-1 text-sm text-gray-600'>총 매출</p>
+                        <p className='mb-1 text-sm text-gray-600'>�?매출</p>
                         <p className='text-xl font-bold text-blue-600'>
-                          ₩{(data.totalRevenue / 1000000).toFixed(1)}M
+                          ??(data.totalRevenue / 1000000).toFixed(1)}M
                         </p>
                       </div>
                       <div className='rounded-lg bg-green-50 p-4 text-center'>
                         <p className='mb-1 text-sm text-gray-600'>
-                          플랫폼 수수료
+                          ?�랫???�수�?
                         </p>
                         <p className='text-xl font-bold text-green-600'>
-                          ₩{(data.platformFee / 1000000).toFixed(1)}M
+                          ??(data.platformFee / 1000000).toFixed(1)}M
                         </p>
                       </div>
                       <div className='rounded-lg bg-purple-50 p-4 text-center'>
                         <p className='mb-1 text-sm text-gray-600'>
-                          아티스트 정산
+                          ?�티?�트 ?�산
                         </p>
                         <p className='text-xl font-bold text-purple-600'>
-                          ₩{(data.artistPayouts / 1000000).toFixed(1)}M
+                          ??(data.artistPayouts / 1000000).toFixed(1)}M
                         </p>
                       </div>
                       <div className='rounded-lg bg-yellow-50 p-4 text-center'>
                         <p className='mb-1 text-sm text-gray-600'>
-                          투자자 수익
+                          ?�자???�익
                         </p>
                         <p className='text-xl font-bold text-yellow-600'>
-                          ₩{(data.investorReturns / 1000000).toFixed(1)}M
+                          ??(data.investorReturns / 1000000).toFixed(1)}M
                         </p>
                       </div>
                       <div className='rounded-lg bg-red-50 p-4 text-center'>
                         <p className='mb-1 text-sm text-gray-600'>보류 결제</p>
                         <p className='text-xl font-bold text-red-600'>
-                          ₩{(data.pendingPayments / 1000000).toFixed(1)}M
+                          ??(data.pendingPayments / 1000000).toFixed(1)}M
                         </p>
                       </div>
                     </div>
@@ -1121,14 +1119,14 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
           <TabsContent value='users' className='space-y-6'>
             <div className='py-12 text-center'>
               <p className='text-gray-500'>
-                사용자 관리 기능을 준비 중입니다...
+                ?�용??관�?기능??준�?중입?�다...
               </p>
             </div>
           </TabsContent>
         </Tabs>
       </div>
 
-      {/* 작품 상세보기 다이얼로그 */}
+      {/* ?�품 ?�세보기 ?�이?�로�?*/}
       <Dialog
         open={!!selectedArtwork}
         onOpenChange={() => setSelectedArtwork(null)}
@@ -1142,7 +1140,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
               <div className='grid grid-cols-2 gap-4'>
                 <div>
                   <Label className='text-sm font-medium text-gray-700'>
-                    아티스트
+                    ?�티?�트
                   </Label>
                   <p className='text-gray-900'>{selectedArtwork.artist}</p>
                 </div>
@@ -1154,27 +1152,27 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                 </div>
                 <div>
                   <Label className='text-sm font-medium text-gray-700'>
-                    재료
+                    ?�료
                   </Label>
                   <p className='text-gray-900'>{selectedArtwork.medium}</p>
                 </div>
                 <div>
                   <Label className='text-sm font-medium text-gray-700'>
-                    크기
+                    ?�기
                   </Label>
                   <p className='text-gray-900'>{selectedArtwork.dimensions}</p>
                 </div>
                 <div>
                   <Label className='text-sm font-medium text-gray-700'>
-                    가격
+                    가�?
                   </Label>
                   <p className='text-gray-900'>
-                    ₩{selectedArtwork.price?.toLocaleString() || '0'}
+                    ??selectedArtwork.price?.toLocaleString() || '0'}
                   </p>
                 </div>
                 <div>
                   <Label className='text-sm font-medium text-gray-700'>
-                    상태
+                    ?�태
                   </Label>
                   <div className='mt-1'>
                     {getStatusBadge(selectedArtwork.status)}
@@ -1183,7 +1181,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
               </div>
               <div>
                 <Label className='text-sm font-medium text-gray-700'>
-                  설명
+                  ?�명
                 </Label>
                 <p className='mt-1 text-gray-900'>
                   {selectedArtwork.description}
@@ -1191,7 +1189,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
               </div>
               <div>
                 <Label className='text-sm font-medium text-gray-700'>
-                  태그
+                  ?�그
                 </Label>
                 <div className='mt-1 flex flex-wrap gap-2'>
                   {selectedArtwork.tags?.map((tag, index) => (
@@ -1213,7 +1211,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
                     handleArtworkStatusChange(selectedArtwork.id, 'approved')
                   }
                 >
-                  승인
+                  ?�인
                 </Button>
               </div>
             </div>

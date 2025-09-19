@@ -1,11 +1,9 @@
 import React from 'react';
 import { PostCard } from './PostCard';
-import { Skeleton } from '@/shared/ui/Skeleton';
-import { ErrorMessage } from '@/shared/ui/ErrorMessage';
-import { Button } from '@/shared/ui/Button';
 import { RefreshCw } from 'lucide-react';
 import { useCommunityPosts } from '../hooks/useCommunity';
 import { PostListParams, CommunityPost } from '../types/index';
+import { Skeleton, ErrorMessage, Button } from '@/shared/ui';
 
 interface PostListProps {
     params?: PostListParams;

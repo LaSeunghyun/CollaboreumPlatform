@@ -1,11 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/Card";
-import { Button } from "@/shared/ui/Button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/Avatar";
-import { Skeleton } from "@/shared/ui/Skeleton";
-import { ErrorMessage } from "@/shared/ui/ErrorMessage";
 import { getFirstChar } from "../../utils/typeGuards";
 import { FollowingResponse, Artist } from './types';
+import { Card, Button, Avatar, Skeleton, ErrorMessage } from '@/shared/ui';
 
 interface FollowingTabProps {
   followingData: FollowingResponse | undefined;

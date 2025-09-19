@@ -1,8 +1,4 @@
 import React from 'react';
-import { Card, CardContent, CardHeader } from '@/shared/ui/Card';
-import { Badge } from '@/shared/ui/Badge';
-import { Button } from '@/shared/ui/Button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/Avatar';
 import {
     ThumbsUp,
     ThumbsDown,
@@ -20,6 +16,7 @@ import { ko } from 'date-fns/locale';
 import { getFirstChar } from '../../../utils/typeGuards';
 import { PostCardProps } from '../types/index';
 import { useLikeCommunityPost } from '../hooks/useCommunity';
+import { Card, Badge, Button, Avatar } from '@/shared/ui';
 
 export function PostCard({
     post,

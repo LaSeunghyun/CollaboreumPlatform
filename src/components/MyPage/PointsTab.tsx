@@ -1,9 +1,4 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/Card";
-import { Button } from "@/shared/ui/Button";
-import { Skeleton } from "@/shared/ui/Skeleton";
-import { ErrorMessage } from "@/shared/ui/ErrorMessage";
-import { Badge } from "@/shared/ui/Badge";
 import {
   Wallet,
   TrendingUp,
@@ -17,6 +12,7 @@ import {
 } from "lucide-react";
 import { UserProfile } from './types';
 import { useUserPoints, useUserPointsHistory, useInvestWithPoints } from '../../lib/api/useUser';
+import { Card, Button, Skeleton, ErrorMessage, Badge } from '@/shared/ui';
 
 interface PointsTabProps {
   userData: UserProfile;

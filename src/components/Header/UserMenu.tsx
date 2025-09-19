@@ -1,11 +1,10 @@
 import React from "react";
-import { Button } from "@/shared/ui/Button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/Avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { User, Palette, Shield, Settings, LogOut, Bell, BellRing, CreditCard, Bell as BellIcon } from "lucide-react";
 import { getRoleBadge, getUserAvatar } from "./utils";
 import { useNotifications } from "../../lib/api/useUser";
 import { useAuth } from "../../contexts/AuthContext";
+import { Button, Avatar } from '@/shared/ui';
 
 // 알림 타입 정의
 interface NotificationResponse {

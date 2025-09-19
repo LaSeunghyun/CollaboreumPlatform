@@ -1,9 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/Card";
-import { Skeleton } from "@/shared/ui/Skeleton";
-import { ErrorMessage } from "@/shared/ui/ErrorMessage";
 import { TrendingUp, Gift, Heart } from "lucide-react";
 import { BackingsResponse, NotificationsResponse, Notification } from './types';
+import { Card, Skeleton, ErrorMessage } from '@/shared/ui';
 
 interface OverviewTabProps {
   backingsData: BackingsResponse | undefined;

@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/Card";
-import { Button } from "@/shared/ui/Button";
-import { Input } from "@/shared/ui/Input";
-import { Textarea } from "@/shared/ui/Textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/shared/ui/Badge";
-import { Separator } from "@/shared/ui/Separator";
 import {
   Bell,
   User,
@@ -20,6 +14,7 @@ import {
 } from "lucide-react";
 import { UserProfile, EditData } from './types';
 import { useUpdateUserProfile } from '../../lib/api/useUser';
+import { Card, Button, Input, Textarea, Badge, Separator } from '@/shared/ui';
 
 interface SettingsTabProps {
   userData: UserProfile;
