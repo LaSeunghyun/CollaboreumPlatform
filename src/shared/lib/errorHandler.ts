@@ -111,7 +111,7 @@ function classifyApiError(error: ApiError): ErrorClassification {
       return {
         type: ErrorType.API,
         level: ErrorLevel.MEDIUM,
-        retryable: error.status >= 500,
+        retryable: (error.status ?? 0) >= 500,
         userMessage: error.message || '요청 처리 중 오류가 발생했습니다.',
         technicalMessage: error.message,
       };
@@ -155,13 +155,15 @@ export function isNotFoundError(error: unknown): boolean {
 }
 
 export function isServerError(error: unknown): boolean {
-  return isApiError(error) && error.status >= 500;
+  return isApiError(error) && (error.status ?? 0) >= 500;
 }
 
 // 에러 로깅 함수
 export function logError(error: unknown, context?: Record<string, any>): void {
   const classification = classifyError(error);
   const errorData: AppError = {
+    success: false,
+    status: 500,
     code: classification.type,
     message: classification.technicalMessage,
     details: {
@@ -233,6 +235,8 @@ export function getUserFriendlyMessage(error: unknown): string {
 // 에러 경계용 에러 생성
 export function createErrorBoundaryError(error: Error, errorInfo: any): AppError {
   return {
+    success: false,
+    status: 500,
     code: 'ERROR_BOUNDARY',
     message: 'React Error Boundary caught an error',
     details: {
@@ -247,7 +251,7 @@ export function createErrorBoundaryError(error: Error, errorInfo: any): AppError
 // 에러 메트릭 수집
 export function collectErrorMetrics(error: unknown, context?: Record<string, any>): void {
   const classification = classifyError(error);
-  
+
   // 에러 메트릭 데이터 수집
   const metrics = {
     errorType: classification.type,
@@ -268,7 +272,7 @@ export function collectErrorMetrics(error: unknown, context?: Record<string, any
 // 에러 알림 전송
 export function sendErrorNotification(error: unknown, context?: Record<string, any>): void {
   const classification = classifyError(error);
-  
+
   // 중요한 에러인 경우 알림 전송
   if (classification.level === ErrorLevel.CRITICAL || classification.level === ErrorLevel.HIGH) {
     const notification = {

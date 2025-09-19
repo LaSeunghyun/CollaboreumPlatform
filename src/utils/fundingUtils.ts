@@ -101,3 +101,20 @@ export const getCategoryOrder = (category: FanFundingProjectCategory): number =>
     const order = { 음악: 1, 미술: 2, 문학: 3, 공연: 4 };
     return order[category];
 };
+
+// 프로젝트 데이터 정규화
+export const normalizeProjectData = (project: any) => {
+    return {
+        ...project,
+        id: project.id?.toString() || '',
+        targetAmount: Number(project.targetAmount) || 0,
+        currentAmount: Number(project.currentAmount) || 0,
+        backerCount: Number(project.backerCount) || 0,
+        progress: Number(project.progress) || 0,
+        daysLeft: Number(project.daysLeft) || 0,
+        createdAt: project.createdAt ? new Date(project.createdAt) : new Date(),
+        updatedAt: project.updatedAt ? new Date(project.updatedAt) : new Date(),
+        startDate: project.startDate ? new Date(project.startDate) : new Date(),
+        endDate: project.endDate ? new Date(project.endDate) : new Date(),
+    };
+};

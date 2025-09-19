@@ -1,5 +1,5 @@
 import React from 'react';
-import { PostCard } from './PostCard';
+import PostCard from './PostCard';
 import { RefreshCw } from 'lucide-react';
 import { useCommunityPosts } from '../hooks/useCommunity';
 import { PostListParams, CommunityPost } from '../types/index';

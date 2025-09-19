@@ -103,19 +103,18 @@ export function OptimizedImage({
         onLoad={handleLoad}
         onError={handleError}
         loading={lazy ? 'lazy' : 'eager'}
-        className={`transition-opacity duration-300 ${
-          isLoaded ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
         {...props}
       />
-      
+
       {/* 로딩 상태 */}
       {!isLoaded && !hasError && (
         <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
           <div className="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
         </div>
       )}
-      
+
       {/* 에러 상태 */}
       {hasError && (
         <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
@@ -156,13 +155,13 @@ export function ImageGallery({
   return (
     <div className={`relative ${className}`}>
       <OptimizedImage
-        src={images[currentIndex]}
+        src={images[currentIndex] || ''}
         alt={`${alt} ${currentIndex + 1}`}
         width={width}
         height={height}
         className="w-full h-full object-cover"
       />
-      
+
       {images.length > 1 && (
         <>
           <button
@@ -179,15 +178,14 @@ export function ImageGallery({
           >
             →
           </button>
-          
+
           <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
             {images.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  index === currentIndex ? 'bg-white' : 'bg-white bg-opacity-50'
-                }`}
+                className={`w-2 h-2 rounded-full transition-colors ${index === currentIndex ? 'bg-white' : 'bg-white bg-opacity-50'
+                  }`}
                 aria-label={`이미지 ${index + 1}로 이동`}
               />
             ))}

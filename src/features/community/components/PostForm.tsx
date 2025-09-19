@@ -1,89 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { X, Plus } from 'lucide-react';
-import { useCommunityCategories } from '../hooks/useCommunity';
-import { PostFormProps, CreatePostData } from '../types/index';
-import { Card, Button, Input, Textarea, Select, Badge } from '@/shared/ui';
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader } from "@/shared/ui/Card";
+import { Button } from "@/shared/ui/Button";
+import { Input } from "@/shared/ui/Input";
+import { Textarea } from "@/shared/ui/Textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/Select";
+import { CreateCommunityPostData } from "../types";
+import { Plus, X, Image as ImageIcon } from "lucide-react";
 
-export function PostForm({
-    initialData,
+interface PostFormProps {
+    onSubmit?: (data: CreateCommunityPostData) => void;
+    onCancel?: () => void;
+    initialData?: Partial<CreateCommunityPostData>;
+    isLoading?: boolean;
+}
+
+const PostForm: React.FC<PostFormProps> = ({
     onSubmit,
     onCancel,
-    isLoading = false,
-    mode = 'create'
-}: PostFormProps) {
-    const [formData, setFormData] = useState<CreatePostData>({
-        title: '',
-        content: '',
-        category: '',
-        tags: [],
-        status: 'published',
-        ...initialData
+    initialData,
+    isLoading = false
+}) => {
+    const [formData, setFormData] = useState<CreateCommunityPostData>({
+        title: initialData?.title || "",
+        content: initialData?.content || "",
+        category: initialData?.category || "",
+        tags: initialData?.tags || [],
+        images: initialData?.images || [],
+        status: initialData?.status || "published"
     });
 
-    const [tagInput, setTagInput] = useState('');
-    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [tagInput, setTagInput] = useState("");
+    const [imageInput, setImageInput] = useState("");
 
-    const { data: categoriesData } = useCommunityCategories();
-    const categories = categoriesData?.categories || [];
-
-    useEffect(() => {
-        if (initialData) {
-            setFormData(prev => ({ ...prev, ...initialData }));
-        }
-    }, [initialData]);
-
-    const validateForm = (): boolean => {
-        const newErrors: Record<string, string> = {};
-
-        if (!formData.title.trim()) {
-            newErrors.title = '제목을 입력해주세요.';
-        } else if (formData.title.length < 2) {
-            newErrors.title = '제목은 2자 이상 입력해주세요.';
-        } else if (formData.title.length > 100) {
-            newErrors.title = '제목은 100자 이하로 입력해주세요.';
-        }
-
-        if (!formData.content.trim()) {
-            newErrors.content = '내용을 입력해주세요.';
-        } else if (formData.content.length < 10) {
-            newErrors.content = '내용은 10자 이상 입력해주세요.';
-        }
-
-        if (!formData.category) {
-            newErrors.category = '카테고리를 선택해주세요.';
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!validateForm()) {
-            return;
-        }
-
-        onSubmit(formData);
-    };
-
-    const handleInputChange = (field: keyof CreatePostData, value: string) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-
-        // 에러 메시지 제거
-        if (errors[field]) {
-            setErrors(prev => ({ ...prev, [field]: '' }));
-        }
+    const handleInputChange = (field: keyof CreateCommunityPostData, value: any) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
     };
 
     const handleAddTag = () => {
-        const tag = tagInput.trim();
-        if (tag && !formData.tags.includes(tag) && formData.tags.length < 5) {
+        if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
             setFormData(prev => ({
                 ...prev,
-                tags: [...prev.tags, tag]
+                tags: [...prev.tags, tagInput.trim()]
             }));
-            setTagInput('');
+            setTagInput("");
         }
     };
 
@@ -94,173 +56,204 @@ export function PostForm({
         }));
     };
 
-    const handleKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && tagInput.trim()) {
-            e.preventDefault();
-            handleAddTag();
+    const handleAddImage = () => {
+        if (imageInput.trim() && !formData.images?.includes(imageInput.trim())) {
+            setFormData(prev => ({
+                ...prev,
+                images: [...(prev.images || []), imageInput.trim()]
+            }));
+            setImageInput("");
         }
     };
+
+    const handleRemoveImage = (imageToRemove: string) => {
+        setFormData(prev => ({
+            ...prev,
+            images: (prev.images || []).filter(image => image !== imageToRemove)
+        }));
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (onSubmit) {
+            onSubmit(formData);
+        }
+    };
+
+    const isFormValid = formData.title.trim() && formData.content.trim() && formData.category;
 
     return (
         <Card>
             <CardHeader>
-                <CardTitle>
-                    {mode === 'create' ? '새 게시글 작성' : '게시글 수정'}
-                </CardTitle>
+                <h2 className="text-xl font-semibold text-gray-900">새 게시글 작성</h2>
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* 제목 */}
-                    <div>
-                        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="space-y-2">
+                        <label htmlFor="title" className="text-sm font-medium text-gray-700">
                             제목 *
                         </label>
                         <Input
                             id="title"
                             value={formData.title}
-                            onChange={(e) => handleInputChange('title', e.target.value)}
+                            onChange={(e) => handleInputChange("title", e.target.value)}
                             placeholder="게시글 제목을 입력하세요"
-                            className={errors.title ? 'border-red-500' : ''}
-                            disabled={isLoading}
+                            required
                         />
-                        {errors.title && (
-                            <p className="mt-1 text-sm text-red-600">{errors.title}</p>
-                        )}
                     </div>
 
-                    {/* 카테고리 */}
-                    <div>
-                        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="space-y-2">
+                        <label htmlFor="category" className="text-sm font-medium text-gray-700">
                             카테고리 *
                         </label>
                         <Select
                             value={formData.category}
-                            onValueChange={(value) => handleInputChange('category', value)}
-                            disabled={isLoading}
+                            onValueChange={(value) => handleInputChange("category", value)}
                         >
-                            <SelectTrigger className={errors.category ? 'border-red-500' : ''}>
+                            <SelectTrigger>
                                 <SelectValue placeholder="카테고리를 선택하세요" />
                             </SelectTrigger>
                             <SelectContent>
-                                {categories.map((category) => (
-                                    <SelectItem key={category.id} value={category.id}>
-                                        {category.label}
-                                    </SelectItem>
-                                ))}
+                                <SelectItem value="general">일반</SelectItem>
+                                <SelectItem value="question">질문</SelectItem>
+                                <SelectItem value="discussion">토론</SelectItem>
+                                <SelectItem value="announcement">공지</SelectItem>
+                                <SelectItem value="collaboration">협업</SelectItem>
                             </SelectContent>
                         </Select>
-                        {errors.category && (
-                            <p className="mt-1 text-sm text-red-600">{errors.category}</p>
-                        )}
                     </div>
 
-                    {/* 태그 */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            태그 (최대 5개)
-                        </label>
-                        <div className="flex space-x-2 mb-2">
-                            <Input
-                                value={tagInput}
-                                onChange={(e) => setTagInput(e.target.value)}
-                                onKeyPress={handleKeyPress}
-                                placeholder="태그를 입력하세요"
-                                disabled={isLoading || formData.tags.length >= 5}
-                                className="flex-1"
-                            />
-                            <Button
-                                type="button"
-                                onClick={handleAddTag}
-                                disabled={!tagInput.trim() || formData.tags.includes(tagInput.trim()) || formData.tags.length >= 5 || isLoading}
-                                size="sm"
-                            >
-                                <Plus className="w-4 h-4" />
-                            </Button>
-                        </div>
-                        {formData.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
-                                {formData.tags.map((tag) => (
-                                    <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-                                        #{tag}
-                                        <button
-                                            type="button"
-                                            onClick={() => handleRemoveTag(tag)}
-                                            disabled={isLoading}
-                                            className="ml-1 hover:text-red-500"
-                                        >
-                                            <X className="w-3 h-3" />
-                                        </button>
-                                    </Badge>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* 내용 */}
-                    <div>
-                        <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="space-y-2">
+                        <label htmlFor="content" className="text-sm font-medium text-gray-700">
                             내용 *
                         </label>
                         <Textarea
                             id="content"
                             value={formData.content}
-                            onChange={(e) => handleInputChange('content', e.target.value)}
+                            onChange={(e) => handleInputChange("content", e.target.value)}
                             placeholder="게시글 내용을 입력하세요"
-                            rows={10}
-                            className={errors.content ? 'border-red-500' : ''}
-                            disabled={isLoading}
+                            rows={6}
+                            required
                         />
-                        {errors.content && (
-                            <p className="mt-1 text-sm text-red-600">{errors.content}</p>
-                        )}
-                        <p className="mt-1 text-sm text-gray-500">
-                            {formData.content.length} / 5000자
-                        </p>
                     </div>
 
-                    {/* 상태 (수정 모드에서만) */}
-                    {mode === 'edit' && (
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                게시 상태
-                            </label>
-                            <Select
-                                value={formData.status}
-                                onValueChange={(value: 'published' | 'draft') =>
-                                    setFormData(prev => ({ ...prev, status: value }))
-                                }
+                    <div className="space-y-2">
+                        <label htmlFor="tags" className="text-sm font-medium text-gray-700">
+                            태그
+                        </label>
+                        <div className="flex space-x-2">
+                            <Input
+                                value={tagInput}
+                                onChange={(e) => setTagInput(e.target.value)}
+                                placeholder="태그를 입력하세요"
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleAddTag();
+                                    }
+                                }}
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleAddTag}
+                                disabled={!tagInput.trim()}
+                            >
+                                <Plus className="w-4 h-4" />
+                            </Button>
+                        </div>
+                        {formData.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {formData.tags.map((tag, index) => (
+                                    <span
+                                        key={index}
+                                        className="inline-flex items-center space-x-1 bg-primary-100 text-primary-700 px-2 py-1 rounded-full text-sm"
+                                    >
+                                        <span>#{tag}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveTag(tag)}
+                                            className="hover:text-primary-900"
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <label htmlFor="images" className="text-sm font-medium text-gray-700">
+                            이미지 URL
+                        </label>
+                        <div className="flex space-x-2">
+                            <Input
+                                value={imageInput}
+                                onChange={(e) => setImageInput(e.target.value)}
+                                placeholder="이미지 URL을 입력하세요"
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleAddImage();
+                                    }
+                                }}
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleAddImage}
+                                disabled={!imageInput.trim()}
+                            >
+                                <ImageIcon className="w-4 h-4" />
+                            </Button>
+                        </div>
+                        {formData.images && formData.images.length > 0 && (
+                            <div className="space-y-2 mt-2">
+                                {formData.images.map((image, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex items-center justify-between bg-gray-50 p-2 rounded-md"
+                                    >
+                                        <span className="text-sm text-gray-600 truncate flex-1">
+                                            {image}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveImage(image)}
+                                            className="text-gray-400 hover:text-gray-600 ml-2"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex justify-end space-x-3 pt-4">
+                        {onCancel && (
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={onCancel}
                                 disabled={isLoading}
                             >
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="published">게시</SelectItem>
-                                    <SelectItem value="draft">임시저장</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    )}
-
-                    {/* 버튼 */}
-                    <div className="flex justify-end space-x-3">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={onCancel}
-                            disabled={isLoading}
-                        >
-                            취소
-                        </Button>
+                                취소
+                            </Button>
+                        )}
                         <Button
                             type="submit"
-                            disabled={isLoading}
+                            disabled={!isFormValid || isLoading}
+                            loading={isLoading}
                         >
-                            {isLoading ? '처리 중...' : mode === 'create' ? '게시하기' : '수정하기'}
+                            {isLoading ? "게시 중..." : "게시하기"}
                         </Button>
                     </div>
                 </form>
             </CardContent>
         </Card>
     );
-}
+};
+
+export default PostForm;

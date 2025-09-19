@@ -1,4 +1,4 @@
 export { FundingProjectList } from './FundingProjectList';
-export { ProjectFilters } from './ProjectFilters';
-export { ProjectGrid } from './ProjectGrid';
-export { ProjectPagination } from './ProjectPagination';
+export { default as ProjectFilters } from './ProjectFilters';
+export { default as ProjectGrid } from './ProjectGrid';
+export { default as ProjectPagination } from './ProjectPagination';

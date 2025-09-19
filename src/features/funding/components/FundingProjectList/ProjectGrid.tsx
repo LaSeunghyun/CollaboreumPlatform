@@ -1,204 +1,238 @@
-import React from 'react';
-import { Heart, Calendar, Users, Target } from 'lucide-react';
-import { FundingProject } from '../../types/funding.types';
-import { Card, Badge, Button, Progress, Avatar, OptimizedImage } from '@/shared/ui';
+import React from "react";
+import { Card, CardContent, CardHeader } from "@/shared/ui/Card";
+import { Button } from "@/shared/ui/Button";
+import { FundingProject } from "../../types";
+import { formatDistanceToNow } from "date-fns";
+import { ko } from "date-fns/locale";
+import { 
+    Heart, 
+    Users, 
+    Calendar, 
+    Target,
+    TrendingUp,
+    Clock
+} from "lucide-react";
 
 interface ProjectGridProps {
   projects: FundingProject[];
-  isLoading: boolean;
-  onProjectClick?: (projectId: number) => void;
+  isLoading?: boolean;
+  onProjectClick?: (projectId: string) => void;
 }
 
-export const ProjectGrid: React.FC<ProjectGridProps> = ({
+const ProjectGrid: React.FC<ProjectGridProps> = ({
   projects,
-  isLoading,
-  onProjectClick,
+  isLoading = false,
+  onProjectClick
 }) => {
+  const handleProjectClick = (project: FundingProject) => {
+    if (onProjectClick) {
+      onProjectClick(project.id);
+    }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('ko-KR', {
+      style: 'currency',
+      currency: 'KRW',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'collecting':
+        return 'bg-primary-100 text-primary-700';
+      case 'succeeded':
+        return 'bg-success-100 text-success-700';
+      case 'failed':
+        return 'bg-danger-100 text-danger-700';
+      case 'executing':
+        return 'bg-warning-100 text-warning-700';
+      case 'distributing':
+        return 'bg-info-100 text-info-700';
+      case 'closed':
+        return 'bg-gray-100 text-gray-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'collecting':
+        return '모금 중';
+      case 'succeeded':
+        return '성공';
+      case 'failed':
+        return '실패';
+      case 'executing':
+        return '집행 중';
+      case 'distributing':
+        return '분배 중';
+      case 'closed':
+        return '종료';
+      default:
+        return status;
+    }
+  };
+
   if (isLoading) {
-    return <ProjectGridSkeleton />;
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <Card key={index} className="animate-pulse">
+            <CardHeader className="pb-3">
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="h-20 bg-gray-200 rounded"></div>
+                <div className="h-3 bg-gray-200 rounded w-full"></div>
+                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                <div className="h-8 bg-gray-200 rounded"></div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
   }
 
   if (projects.length === 0) {
     return (
       <div className="text-center py-12">
         <div className="text-gray-500 mb-4">
-          조건에 맞는 프로젝트가 없습니다.
+          <Target className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <p className="text-lg font-medium">프로젝트가 없습니다</p>
+          <p className="text-sm">새로운 펀딩 프로젝트를 확인해보세요</p>
         </div>
-        <Button variant="outline" onClick={() => window.location.reload()}>
-          새로고침
-        </Button>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {projects.map((project) => (
-        <ProjectCard
-          key={project.id}
-          project={project}
-          onClick={() => onProjectClick?.(project.id)}
-        />
-      ))}
-    </div>
-  );
-};
-
-interface ProjectCardProps {
-  project: FundingProject;
-  onClick: () => void;
-}
-
-const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) => {
-  const progressPercentage = Math.min(
-    (project.currentAmount / project.targetAmount) * 100,
-    100
-  );
-
-  const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat('ko-KR', {
-      style: 'currency',
-      currency: 'KRW',
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800';
-      case 'completed':
-        return 'bg-blue-100 text-blue-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'active':
-        return '진행중';
-      case 'completed':
-        return '완료';
-      case 'cancelled':
-        return '취소';
-      default:
-        return '대기중';
-    }
-  };
-
-  return (
-    <Card 
-      className="cursor-pointer hover:shadow-lg transition-shadow duration-200"
-      onClick={onClick}
-    >
-      <CardContent className="p-0">
-        {/* 프로젝트 이미지 */}
-        <div className="relative">
-          <OptimizedImage
-            src={project.thumbnail}
-            alt={project.title}
-            width={300}
-            height={200}
-            className="w-full h-48 object-cover rounded-t-lg"
-          />
-          <div className="absolute top-2 left-2">
-            <Badge className={getStatusColor(project.status)}>
-              {getStatusText(project.status)}
-            </Badge>
-          </div>
-          <div className="absolute top-2 right-2">
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 bg-white/80 hover:bg-white"
-              onClick={(e) => {
-                e.stopPropagation();
-                // 좋아요 기능 구현
-              }}
-            >
-              <Heart className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* 프로젝트 정보 */}
-        <div className="p-4 space-y-3">
-          {/* 제목과 아티스트 */}
-          <div>
-            <h3 className="font-semibold text-lg line-clamp-2 mb-1">
-              {project.title}
-            </h3>
-            <div className="flex items-center space-x-2">
-              <Avatar className="h-6 w-6">
-                <AvatarImage src={`https://via.placeholder.com/24?text=${project.artist.charAt(0)}`} />
-                <AvatarFallback>{project.artist.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <span className="text-sm text-gray-600">{project.artist}</span>
-            </div>
-          </div>
-
-          {/* 카테고리 */}
-          <div>
-            <Badge variant="outline" className="text-xs">
-              {project.category}
-            </Badge>
-          </div>
-
-          {/* 진행률 */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">진행률</span>
-              <span className="font-medium">{progressPercentage.toFixed(1)}%</span>
-            </div>
-            <Progress value={progressPercentage} className="h-2" />
-          </div>
-
-          {/* 금액 정보 */}
-          <div className="space-y-1">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">모인 금액</span>
-              <span className="font-semibold text-lg">
-                {formatAmount(project.currentAmount)}
+        <Card 
+          key={project.id} 
+          className="hover:shadow-lg transition-all duration-200 cursor-pointer group"
+          onClick={() => handleProjectClick(project)}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-primary-600 transition-colors">
+                  {project.title}
+                </h3>
+                <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                  {project.shortDescription}
+                </p>
+              </div>
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
+                {getStatusText(project.status)}
               </span>
             </div>
-            <div className="flex justify-between text-sm text-gray-500">
-              <span>목표 금액</span>
-              <span>{formatAmount(project.targetAmount)}</span>
+            
+            <div className="flex items-center space-x-4 text-sm text-gray-500">
+              <div className="flex items-center space-x-1">
+                <Users className="w-4 h-4" />
+                <span>{project.backerCount}명</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <Calendar className="w-4 h-4" />
+                <span>
+                  {formatDistanceToNow(new Date(project.endDate), { 
+                    addSuffix: true, 
+                    locale: ko 
+                  })}
+                </span>
+              </div>
             </div>
-          </div>
+          </CardHeader>
 
-          {/* 통계 정보 */}
-          <div className="flex items-center justify-between text-sm text-gray-500 pt-2 border-t">
-            <div className="flex items-center space-x-1">
-              <Users className="h-4 w-4" />
-              <span>{project.backers}명</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Calendar className="h-4 w-4" />
-              <span>{project.daysLeft}일 남음</span>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
+          <CardContent className="pt-0">
+            <div className="space-y-4">
+              {/* 프로젝트 이미지 */}
+              {project.images.length > 0 && (
+                <div className="relative h-40 rounded-lg overflow-hidden bg-gray-100">
+                  <img
+                    src={project.images[0]}
+                    alt={project.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  />
+                  {project.isFeatured && (
+                    <div className="absolute top-2 left-2 bg-primary-600 text-white px-2 py-1 rounded-full text-xs font-medium">
+                      추천
+                    </div>
+                  )}
+                </div>
+              )}
 
-const ProjectGridSkeleton: React.FC = () => {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {Array.from({ length: 8 }).map((_, index) => (
-        <Card key={index} className="animate-pulse">
-          <CardContent className="p-0">
-            <div className="w-full h-48 bg-gray-200 rounded-t-lg" />
-            <div className="p-4 space-y-3">
-              <div className="h-6 bg-gray-200 rounded w-3/4" />
-              <div className="h-4 bg-gray-200 rounded w-1/2" />
-              <div className="h-2 bg-gray-200 rounded w-full" />
-              <div className="h-4 bg-gray-200 rounded w-1/3" />
+              {/* 진행률 바 */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">진행률</span>
+                  <span className="font-medium text-gray-900">{project.progress}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${Math.min(project.progress, 100)}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* 금액 정보 */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">모금액</span>
+                  <span className="font-semibold text-gray-900">
+                    {formatCurrency(project.currentAmount)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">목표액</span>
+                  <span className="text-sm text-gray-500">
+                    {formatCurrency(project.targetAmount)}
+                  </span>
+                </div>
+              </div>
+
+              {/* 태그 */}
+              {project.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {project.tags.slice(0, 3).map((tag, index) => (
+                    <span
+                      key={index}
+                      className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                  {project.tags.length > 3 && (
+                    <span className="text-xs text-gray-400">
+                      +{project.tags.length - 3}개
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* 액션 버튼 */}
+              <div className="pt-2">
+                <Button
+                  className="w-full"
+                  variant="solid"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleProjectClick(project);
+                  }}
+                >
+                  {project.status === 'collecting' ? '후원하기' : '자세히 보기'}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -206,3 +240,5 @@ const ProjectGridSkeleton: React.FC = () => {
     </div>
   );
 };
+
+export default ProjectGrid;

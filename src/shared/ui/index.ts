@@ -5,7 +5,7 @@ export type { ButtonProps } from "./Button"
 export { Input } from "./Input"
 export type { InputProps } from "./Input"
 
-export { Select, SelectContent, SelectItem } from "./Select"
+export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./Select"
 
 export { Textarea, textareaStyles } from "./Textarea"
 export type { TextareaProps } from "./Textarea"
@@ -31,6 +31,7 @@ export { ProjectListSkeleton } from "./ProjectListSkeleton"
 
 // 에러/빈 상태 컴포넌트들
 export { ErrorMessage } from "./ErrorMessage"
+export { ErrorBoundary } from "./ErrorBoundary"
 
 export { EmptyState } from "./EmptyState"
 
@@ -48,3 +49,6 @@ export { Progress } from "./Progress"
 export { ScrollArea, ScrollBar } from "./ScrollArea"
 export { Separator } from "./Separator"
 export { Dialog, DialogPortal, DialogOverlay, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "./Dialog"
+
+// 이미지 컴포넌트
+export { OptimizedImage } from "./OptimizedImage"

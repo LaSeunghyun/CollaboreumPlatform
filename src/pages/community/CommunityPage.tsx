@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CommunityMain } from '../../features/community/components/CommunityMain';
+import CommunityMain from '../../features/community/components/CommunityMain';
 import { CommunityPost } from '../../features/community/types/index';
 
 export const CommunityPage: React.FC = () => {

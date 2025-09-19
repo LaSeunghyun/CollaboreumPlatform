@@ -1,213 +1,235 @@
-import React from 'react';
+import React from "react";
+import { Card, CardContent, CardHeader } from "@/shared/ui/Card";
+import { Button } from "@/shared/ui/Button";
+import { CommunityPost } from "../types";
+import { formatDistanceToNow } from "date-fns";
+import { ko } from "date-fns/locale";
 import {
-    ThumbsUp,
-    ThumbsDown,
+    Heart,
     MessageCircle,
+    Share2,
     Bookmark,
-    Flag,
     MoreHorizontal,
-    Calendar,
     Eye,
-    Edit,
-    Trash2
-} from 'lucide-react';
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
-import { getFirstChar } from '../../../utils/typeGuards';
-import { PostCardProps } from '../types/index';
-import { useLikeCommunityPost } from '../hooks/useCommunity';
-import { Card, Badge, Button, Avatar } from '@/shared/ui';
+    ThumbsUp,
+    ThumbsDown
+} from "lucide-react";
 
-export function PostCard({
+interface PostCardProps {
+    post: CommunityPost;
+    onPostClick?: (post: CommunityPost) => void;
+    onLike?: (postId: string) => void;
+    onDislike?: (postId: string) => void;
+    onBookmark?: (postId: string) => void;
+    onComment?: (postId: string) => void;
+    onShare?: (postId: string) => void;
+    onEdit?: (postId: string) => void;
+    onDelete?: (postId: string) => void;
+    onReport?: (postId: string) => void;
+    showActions?: boolean;
+    compact?: boolean;
+}
+
+const PostCard: React.FC<PostCardProps> = ({
     post,
+    onPostClick,
     onLike,
     onDislike,
     onBookmark,
-    onReport,
+    onComment,
+    onShare,
     onEdit,
     onDelete,
+    onReport,
     showActions = true,
     compact = false
-}: PostCardProps) {
-    const likePostMutation = useLikeCommunityPost();
-
+}) => {
     const handleLike = () => {
-        if (onLike) {
-            onLike(post.id);
-        } else {
-            // PostCard에서 직접 처리하는 경우
-            const action = post.isLiked ? 'unlike' : 'like';
-            likePostMutation.mutate({ postId: post.id, action });
-        }
+        if (onLike) onLike(post.id);
     };
 
     const handleDislike = () => {
-        if (onDislike) {
-            onDislike(post.id);
-        } else {
-            // PostCard에서 직접 처리하는 경우
-            const action = post.isDisliked ? 'undislike' : 'dislike';
-            likePostMutation.mutate({ postId: post.id, action });
-        }
+        if (onDislike) onDislike(post.id);
     };
 
     const handleBookmark = () => {
-        if (onBookmark) {
-            onBookmark(post.id);
-        }
+        if (onBookmark) onBookmark(post.id);
     };
 
-    const handleReport = () => {
-        if (onReport) {
-            onReport(post.id);
-        }
+    const handleComment = () => {
+        if (onComment) onComment(post.id);
+    };
+
+    const handleShare = () => {
+        if (onShare) onShare(post.id);
     };
 
     const handleEdit = () => {
-        if (onEdit) {
-            onEdit(post.id);
-        }
+        if (onEdit) onEdit(post.id);
     };
 
     const handleDelete = () => {
-        if (onDelete) {
-            onDelete(post.id);
-        }
+        if (onDelete) onDelete(post.id);
+    };
+
+    const handleReport = () => {
+        if (onReport) onReport(post.id);
+    };
+
+    const handleCardClick = () => {
+        if (onPostClick) onPostClick(post);
     };
 
     return (
-        <Card className={`hover:shadow-md transition-shadow ${compact ? 'p-4' : ''}`}>
-            <CardHeader className={compact ? 'pb-2' : ''}>
+        <Card
+            className="hover:shadow-md transition-shadow duration-200 cursor-pointer"
+            onClick={handleCardClick}
+        >
+            <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-3">
-                        <Avatar className="w-10 h-10">
-                            <AvatarImage src={post.author.avatar} alt={post.author.username} />
-                            <AvatarFallback>{getFirstChar(post.author.username)}</AvatarFallback>
-                        </Avatar>
+                        <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+                            {post.author.avatar ? (
+                                <img
+                                    src={post.author.avatar}
+                                    alt={post.author.name}
+                                    className="w-10 h-10 rounded-full object-cover"
+                                />
+                            ) : (
+                                <span className="text-primary-600 font-semibold text-sm">
+                                    {post.author.name.charAt(0).toUpperCase()}
+                                </span>
+                            )}
+                        </div>
                         <div>
                             <div className="flex items-center space-x-2">
-                                <span className="font-medium text-sm">{post.author.username}</span>
+                                <h4 className="font-semibold text-gray-900">{post.author.name}</h4>
                                 {post.author.isVerified && (
-                                    <Badge variant="secondary" className="text-xs">인증</Badge>
-                                )}
-                                <Badge variant="outline" className="text-xs">
-                                    {post.author.role === 'admin' ? '관리자' :
-                                        post.author.role === 'artist' ? '아티스트' : '팬'}
-                                </Badge>
-                            </div>
-                            <div className="flex items-center space-x-2 text-xs text-gray-500">
-                                <Calendar className="w-3 h-3" />
-                                <span>{format(new Date(post.createdAt), 'yyyy.MM.dd HH:mm', { locale: ko })}</span>
-                                {post.updatedAt !== post.createdAt && (
-                                    <span className="text-blue-500">(수정됨)</span>
+                                    <span className="text-primary-600 text-xs">✓</span>
                                 )}
                             </div>
+                            <p className="text-sm text-gray-500">
+                                {formatDistanceToNow(new Date(post.createdAt), {
+                                    addSuffix: true,
+                                    locale: ko
+                                })}
+                            </p>
                         </div>
                     </div>
-
-                    {showActions && (
-                        <div className="flex items-center space-x-1">
-                            {onEdit && (
-                                <Button variant="ghost" size="sm" onClick={handleEdit} title="수정">
-                                    <Edit className="w-4 h-4" />
-                                </Button>
-                            )}
-                            {onDelete && (
-                                <Button variant="ghost" size="sm" onClick={handleDelete} title="삭제">
-                                    <Trash2 className="w-4 h-4" />
-                                </Button>
-                            )}
-                            <Button variant="ghost" size="sm" onClick={handleReport} title="신고">
-                                <Flag className="w-4 h-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" title="더보기">
-                                <MoreHorizontal className="w-4 h-4" />
-                            </Button>
-                        </div>
-                    )}
+                    <div className="flex items-center space-x-2">
+                        {post.isPinned && (
+                            <span className="text-xs bg-primary-100 text-primary-600 px-2 py-1 rounded-full">
+                                고정
+                            </span>
+                        )}
+                        {post.isHot && (
+                            <span className="text-xs bg-danger-100 text-danger-600 px-2 py-1 rounded-full">
+                                인기
+                            </span>
+                        )}
+                        <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => { }}
+                            aria-label="더보기"
+                        >
+                            <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                    </div>
                 </div>
             </CardHeader>
 
-            <CardContent className={compact ? 'pt-0' : ''}>
+            <CardContent className="pt-0">
                 <div className="space-y-3">
-                    {/* 제목 */}
-                    <h3 className={`font-semibold text-gray-900 hover:text-blue-600 cursor-pointer ${compact ? 'text-base' : 'text-lg'}`}>
-                        {post.title}
-                    </h3>
-
-                    {/* 내용 미리보기 */}
-                    {!compact && (
-                        <p className="text-gray-600 line-clamp-3">
-                            {post.content.replace(/<[^>]*>/g, '')} {/* HTML 태그 제거 */}
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                            {post.title}
+                        </h3>
+                        <p className="text-gray-700 line-clamp-3">
+                            {post.content}
                         </p>
-                    )}
-
-                    {/* 카테고리 및 태그 */}
-                    <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="secondary">{post.category}</Badge>
-                        {post.tags.map((tag) => (
-                            <Badge key={tag} variant="outline" className="text-xs">
-                                #{tag}
-                            </Badge>
-                        ))}
                     </div>
 
-                    {/* 통계 및 액션 */}
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
-                            <div className="flex items-center space-x-1">
-                                <ThumbsUp className={`w-4 h-4 ${post.isLiked ? 'text-blue-500' : ''}`} />
-                                <span className={post.isLiked ? 'text-blue-500 font-medium' : ''}>
-                                    {post.likes}
+                    {post.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                            {post.tags.map((tag, index) => (
+                                <span
+                                    key={index}
+                                    className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
+                                >
+                                    #{tag}
                                 </span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                                <ThumbsDown className={`w-4 h-4 ${post.isDisliked ? 'text-red-500' : ''}`} />
-                                <span className={post.isDisliked ? 'text-red-500 font-medium' : ''}>
-                                    {post.dislikes}
-                                </span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                                <MessageCircle className="w-4 h-4" />
-                                <span>{post.comments}</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                                <Eye className="w-4 h-4" />
-                                <span>{post.views}</span>
-                            </div>
+                            ))}
                         </div>
+                    )}
 
-                        {showActions && (
-                            <div className="flex items-center space-x-1">
+                    {showActions && (
+                        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                            <div className="flex items-center space-x-4">
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={handleLike}
-                                    className={post.isLiked ? 'text-blue-500' : ''}
+                                    className={`flex items-center space-x-1 ${post.isLiked ? 'text-primary-600' : 'text-gray-500'
+                                        }`}
                                 >
                                     <ThumbsUp className="w-4 h-4" />
+                                    <span>{post.likes}</span>
                                 </Button>
+
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={handleDislike}
-                                    className={post.isDisliked ? 'text-red-500' : ''}
+                                    className={`flex items-center space-x-1 ${post.isDisliked ? 'text-danger-600' : 'text-gray-500'
+                                        }`}
                                 >
                                     <ThumbsDown className="w-4 h-4" />
+                                    <span>{post.dislikes}</span>
                                 </Button>
+
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleComment}
+                                    className="flex items-center space-x-1 text-gray-500"
+                                >
+                                    <MessageCircle className="w-4 h-4" />
+                                    <span>{post.comments}</span>
+                                </Button>
+
+                                <div className="flex items-center space-x-1 text-gray-500">
+                                    <Eye className="w-4 h-4" />
+                                    <span>{post.views}</span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center space-x-2">
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={handleBookmark}
-                                    className={post.isBookmarked ? 'text-yellow-500' : ''}
+                                    className={`${post.isBookmarked ? 'text-primary-600' : 'text-gray-500'
+                                        }`}
                                 >
                                     <Bookmark className="w-4 h-4" />
                                 </Button>
+
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleShare}
+                                    className="text-gray-500"
+                                >
+                                    <Share2 className="w-4 h-4" />
+                                </Button>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </CardContent>
         </Card>
     );
-}
+};
+
+export default PostCard;

@@ -3,6 +3,7 @@
 ## 📊 현재 테스트 현황 분석
 
 ### 1. 기존 테스트 구조
+
 ```
 src/__tests__/
 ├── a11y.test.ts                    # 접근성 테스트
@@ -18,12 +19,14 @@ src/__tests__/
 ```
 
 ### 2. 테스트 커버리지 분석
+
 - **단위 테스트**: 컴포넌트별 기본 테스트 존재
 - **통합 테스트**: API 연동 테스트 부분적 구현
 - **E2E 테스트**: Cypress 설정되어 있으나 제한적
 - **접근성 테스트**: 기본적인 a11y 테스트 존재
 
 ### 3. 개선이 필요한 부분
+
 - **테스트 커버리지**: 전체 코드의 60% 미만
 - **테스트 품질**: 단순 렌더링 테스트 위주
 - **모킹 전략**: API 모킹이 일관되지 않음
@@ -34,6 +37,7 @@ src/__tests__/
 ### Phase 1: 테스트 인프라 구축
 
 #### 1.1 테스트 설정 표준화
+
 ```typescript
 // jest.config.js 개선
 module.exports = {
@@ -65,6 +69,7 @@ module.exports = {
 ```
 
 #### 1.2 테스트 유틸리티 구축
+
 ```typescript
 // src/test-utils/testUtils.tsx
 import React from 'react';
@@ -104,6 +109,7 @@ export { customRender as render };
 ### Phase 2: 단위 테스트 강화
 
 #### 2.1 컴포넌트 테스트 표준화
+
 ```typescript
 // src/shared/ui/Button/Button.test.tsx
 import React from 'react';
@@ -119,7 +125,7 @@ describe('Button Component', () => {
   it('handles click events', () => {
     const handleClick = jest.fn();
     render(<Button onClick={handleClick}>Click me</Button>);
-    
+
     fireEvent.click(screen.getByRole('button'));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
@@ -137,6 +143,7 @@ describe('Button Component', () => {
 ```
 
 #### 2.2 훅 테스트 강화
+
 ```typescript
 // src/shared/hooks/usePerformance.test.ts
 import { renderHook, act } from '@testing-library/react';
@@ -176,6 +183,7 @@ describe('useDebounce', () => {
 ### Phase 3: 통합 테스트 강화
 
 #### 3.1 API 통합 테스트
+
 ```typescript
 // src/lib/api/useFunding.test.tsx
 import { renderHook, waitFor } from '@testing-library/react';
@@ -239,6 +247,7 @@ describe('useFundingProjects', () => {
 ```
 
 #### 3.2 사용자 플로우 테스트
+
 ```typescript
 // src/__tests__/UserFlow.test.tsx
 import React from 'react';
@@ -282,6 +291,7 @@ describe('Funding Project User Flow', () => {
 ### Phase 4: E2E 테스트 강화
 
 #### 4.1 Cypress 테스트 시나리오
+
 ```typescript
 // cypress/e2e/funding-flow.cy.ts
 describe('Funding Flow E2E', () => {
@@ -293,42 +303,46 @@ describe('Funding Flow E2E', () => {
   it('should complete full funding flow', () => {
     // 홈페이지에서 프로젝트 클릭
     cy.get('[data-testid="project-card"]').first().click();
-    
+
     // 프로젝트 상세 페이지 로딩 확인
     cy.url().should('include', '/project/');
     cy.get('[data-testid="project-title"]').should('be.visible');
-    
+
     // 후원하기 버튼 클릭
     cy.get('[data-testid="support-button"]').click();
-    
+
     // 결제 모달 열림 확인
     cy.get('[data-testid="payment-modal"]').should('be.visible');
-    
+
     // 후원 금액 입력
     cy.get('[data-testid="amount-input"]').type('100000');
-    
+
     // 결제 정보 입력
     cy.get('[data-testid="card-number"]').type('4111111111111111');
     cy.get('[data-testid="card-expiry"]').type('12/25');
     cy.get('[data-testid="card-cvv"]').type('123');
-    
+
     // 결제 진행
     cy.get('[data-testid="proceed-payment"]').click();
-    
+
     // 결제 완료 확인
     cy.get('[data-testid="payment-success"]').should('be.visible');
-    cy.get('[data-testid="success-message"]').should('contain', '후원이 완료되었습니다');
+    cy.get('[data-testid="success-message"]').should(
+      'contain',
+      '후원이 완료되었습니다',
+    );
   });
 });
 ```
 
 #### 4.2 성능 테스트
+
 ```typescript
 // cypress/e2e/performance.cy.ts
 describe('Performance Tests', () => {
   it('should load homepage within performance budget', () => {
     cy.visit('/');
-    
+
     // Lighthouse 성능 점수 확인
     cy.lighthouse({
       performance: 90,
@@ -340,15 +354,17 @@ describe('Performance Tests', () => {
 
   it('should handle large datasets efficiently', () => {
     cy.visit('/projects');
-    
+
     // 대용량 프로젝트 리스트 로딩 시간 측정
     cy.get('[data-testid="project-list"]').should('be.visible');
-    
+
     // 가상화 확인
     cy.get('[data-testid="virtualized-list"]').should('exist');
-    
+
     // 스크롤 성능 테스트
-    cy.get('[data-testid="project-list"]').scrollTo('bottom', { duration: 1000 });
+    cy.get('[data-testid="project-list"]').scrollTo('bottom', {
+      duration: 1000,
+    });
     cy.get('[data-testid="project-list"]').should('be.visible');
   });
 });
@@ -357,6 +373,7 @@ describe('Performance Tests', () => {
 ### Phase 5: 접근성 테스트 강화
 
 #### 5.1 자동화된 접근성 테스트
+
 ```typescript
 // src/__tests__/accessibility.test.tsx
 import React from 'react';
@@ -392,46 +409,55 @@ describe('Accessibility Tests', () => {
 ## 📈 테스트 커버리지 목표
 
 ### 단위 테스트
+
 - **컴포넌트**: 90% 이상
 - **훅**: 95% 이상
 - **유틸리티**: 100%
 
 ### 통합 테스트
+
 - **API 연동**: 80% 이상
 - **사용자 플로우**: 70% 이상
 
 ### E2E 테스트
+
 - **핵심 기능**: 100%
 - **결제 플로우**: 100%
 - **관리자 기능**: 90%
 
 ### 접근성 테스트
+
 - **WCAG AA 준수**: 100%
 - **키보드 네비게이션**: 100%
 
 ## 🛠️ 구현 계획
 
 ### 1단계: 테스트 인프라 구축 (1주)
+
 - [ ] Jest 설정 최적화
 - [ ] 테스트 유틸리티 구축
 - [ ] 모킹 전략 수립
 
 ### 2단계: 단위 테스트 강화 (2주)
+
 - [ ] 컴포넌트 테스트 표준화
 - [ ] 훅 테스트 강화
 - [ ] 유틸리티 함수 테스트
 
 ### 3단계: 통합 테스트 강화 (2주)
+
 - [ ] API 통합 테스트
 - [ ] 사용자 플로우 테스트
 - [ ] 상태 관리 테스트
 
 ### 4단계: E2E 테스트 강화 (1주)
+
 - [ ] Cypress 시나리오 작성
 - [ ] 성능 테스트 추가
 - [ ] CI/CD 통합
 
 ### 5단계: 접근성 테스트 강화 (1주)
+
 - [ ] 자동화된 a11y 테스트
 - [ ] 키보드 네비게이션 테스트
 - [ ] 스크린 리더 테스트
@@ -439,16 +465,19 @@ describe('Accessibility Tests', () => {
 ## 🔧 도구 및 라이브러리
 
 ### 테스트 프레임워크
+
 - **Jest**: 단위 테스트
 - **React Testing Library**: 컴포넌트 테스트
 - **Cypress**: E2E 테스트
 - **MSW**: API 모킹
 
 ### 접근성 테스트
+
 - **jest-axe**: 자동화된 접근성 테스트
 - **@testing-library/jest-dom**: DOM 테스트 유틸리티
 
 ### 성능 테스트
+
 - **cypress-lighthouse**: Lighthouse 통합
 - **@testing-library/user-event**: 사용자 상호작용 시뮬레이션
 

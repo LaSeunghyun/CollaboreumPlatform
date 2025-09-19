@@ -26,10 +26,13 @@ export interface ProjectResult {
 export interface FundingProject {
     id: string; // number에서 string으로 변경
     title: string;
+    description: string;
+    artist: string;
     status: FanFundingProjectStatus;
     targetAmount: number;
     currentAmount: number;
     backers: number;
+    daysLeft: number;
     startDate: string;
     endDate: string;
     result?: ProjectResult;
@@ -105,3 +108,17 @@ export const SORT_OPTIONS = [
     { value: 'amount', label: '금액순' },
     { value: 'status', label: '상태순' }
 ] as const;
+
+// 결제 데이터
+export interface PaymentData {
+    id: string;
+    projectId: string;
+    userId: string;
+    amount: number;
+    paymentMethod: string;
+    message?: string;
+    rewardId?: string;
+    status: 'pending' | 'completed' | 'failed' | 'refunded';
+    createdAt: Date;
+    updatedAt: Date;
+}

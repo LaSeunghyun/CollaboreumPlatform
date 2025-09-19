@@ -3,6 +3,7 @@
 ## 📊 현재 폴더 구조 분석
 
 ### 현재 구조의 문제점
+
 ```
 src/
 ├── components/           # 모든 컴포넌트가 한 곳에 집중
@@ -17,6 +18,7 @@ src/
 ```
 
 ### 개선이 필요한 부분
+
 1. **거대한 컴포넌트들**: 700줄 이상의 단일 파일들
 2. **기능별 분리 부족**: 관련 기능이 흩어져 있음
 3. **의존성 관리**: 순환 의존성 위험
@@ -25,6 +27,7 @@ src/
 ## 🎯 개선된 폴더 구조
 
 ### 새로운 구조 설계
+
 ```
 src/
 ├── shared/                    # 공통 모듈
@@ -181,6 +184,7 @@ src/
 ### Phase 1: 공통 모듈 분리 (1주)
 
 #### 1.1 UI 컴포넌트 시스템 구축
+
 ```typescript
 // src/shared/ui/Button/Button.tsx
 import React from 'react';
@@ -236,13 +240,14 @@ Button.displayName = "Button";
 ```
 
 #### 1.2 공통 훅 분리
+
 ```typescript
 // src/shared/hooks/useDebounce.ts
 import { useCallback, useRef, useEffect } from 'react';
 
 export function useDebounce<T extends (...args: any[]) => any>(
   callback: T,
-  delay: number
+  delay: number,
 ): T {
   const timeoutRef = useRef<NodeJS.Timeout>();
 
@@ -253,7 +258,7 @@ export function useDebounce<T extends (...args: any[]) => any>(
       }
       timeoutRef.current = setTimeout(() => callback(...args), delay);
     },
-    [callback, delay]
+    [callback, delay],
   ) as T;
 
   useEffect(() => {
@@ -271,6 +276,7 @@ export function useDebounce<T extends (...args: any[]) => any>(
 ### Phase 2: 기능별 모듈 분리 (2주)
 
 #### 2.1 펀딩 모듈 분리
+
 ```typescript
 // src/features/funding/components/FundingProjectList/FundingProjectList.tsx
 import React from 'react';
@@ -317,6 +323,7 @@ export const FundingProjectList: React.FC<FundingProjectListProps> = ({
 ```
 
 #### 2.2 커스텀 훅 분리
+
 ```typescript
 // src/features/funding/hooks/useFundingProjects.ts
 import { useQuery } from '@tanstack/react-query';
@@ -342,6 +349,7 @@ export function useFundingProject(id: number) {
 ### Phase 3: 거대한 컴포넌트 분해 (2주)
 
 #### 3.1 AdminDashboard 분해
+
 ```typescript
 // src/features/admin/components/AdminDashboard/AdminDashboard.tsx
 import React from 'react';
@@ -365,6 +373,7 @@ export const AdminDashboard: React.FC = () => {
 ```
 
 #### 3.2 FundingProjects 분해
+
 ```typescript
 // src/features/funding/components/FundingProjectList/FundingProjectList.tsx
 import React from 'react';
@@ -389,6 +398,7 @@ export const FundingProjectList: React.FC = () => {
 ### Phase 4: 의존성 정리 (1주)
 
 #### 4.1 순환 의존성 제거
+
 ```typescript
 // src/shared/types/index.ts
 export * from './api';
@@ -397,6 +407,7 @@ export * from './ui';
 ```
 
 #### 4.2 절대 경로 설정
+
 ```typescript
 // tsconfig.json
 {
@@ -416,16 +427,19 @@ export * from './ui';
 ## 📈 기대 효과
 
 ### 개발 생산성 향상
+
 - **모듈화**: 기능별 독립적 개발 가능
 - **재사용성**: 컴포넌트 재사용 용이
 - **유지보수성**: 관련 코드가 한 곳에 집중
 
 ### 코드 품질 개선
+
 - **가독성**: 작은 단위의 컴포넌트
 - **테스트 용이성**: 독립적인 모듈 테스트
 - **타입 안정성**: 명확한 타입 정의
 
 ### 팀 협업 개선
+
 - **역할 분담**: 기능별 담당자 배정
 - **충돌 최소화**: 독립적인 모듈 개발
 - **코드 리뷰**: 작은 단위의 리뷰
@@ -433,22 +447,26 @@ export * from './ui';
 ## 🛠️ 구현 계획
 
 ### 1단계: 공통 모듈 구축 (1주)
+
 - [ ] UI 컴포넌트 시스템 구축
 - [ ] 공통 훅 분리
 - [ ] 유틸리티 함수 정리
 
 ### 2단계: 기능별 모듈 분리 (2주)
+
 - [ ] 펀딩 모듈 분리
 - [ ] 커뮤니티 모듈 분리
 - [ ] 관리자 모듈 분리
 - [ ] 아티스트 모듈 분리
 
 ### 3단계: 거대한 컴포넌트 분해 (2주)
+
 - [ ] AdminDashboard 분해
 - [ ] FundingProjects 분해
 - [ ] ArtistDashboard 분해
 
 ### 4단계: 의존성 정리 (1주)
+
 - [ ] 순환 의존성 제거
 - [ ] 절대 경로 설정
 - [ ] Import 정리

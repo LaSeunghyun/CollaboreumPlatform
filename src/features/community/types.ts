@@ -1,28 +1,43 @@
 // 커뮤니티 도메인 타입 정의
+export interface CommunityUser {
+    id: string;
+    name: string;
+    username: string;
+    avatar?: string;
+    role: 'admin' | 'artist' | 'fan';
+    isVerified?: boolean;
+}
 
 export interface CommunityPost {
-    id: string
-    title: string
-    content: string
-    author: {
-        id: string
-        name: string
-        avatar?: string
-        role: string
-    }
-    category: string
-    tags: string[]
-    likes: number
-    dislikes: number
-    replies: number
-    views: number
-    viewCount: number
-    isHot: boolean
-    isPinned: boolean
-    status: 'published' | 'draft' | 'archived'
-    createdAt: string
-    updatedAt: string
-    publishedAt?: string
+    id: string;
+    title: string;
+    content: string;
+    author: CommunityUser;
+    category: string;
+    tags: string[];
+    likes: number;
+    dislikes: number;
+    views: number;
+    comments: number;
+    replies: number;
+    viewCount: number;
+    isHot: boolean;
+    isPinned: boolean;
+    isLiked?: boolean;
+    isDisliked?: boolean;
+    isBookmarked?: boolean;
+    createdAt: string;
+    updatedAt: string;
+    status: 'published' | 'draft' | 'archived';
+}
+
+export interface CreateCommunityPostData {
+    title: string;
+    content: string;
+    category: string;
+    tags: string[];
+    images?: string[];
+    status?: 'published' | 'draft';
 }
 
 export interface CommunityPostListQuery {
@@ -46,13 +61,6 @@ export interface CommunityPostListResponse {
     }
 }
 
-export interface CreateCommunityPostData {
-    title: string
-    content: string
-    category: string
-    tags: string[]
-    status?: 'published' | 'draft'
-}
 
 export interface UpdateCommunityPostData {
     title?: string

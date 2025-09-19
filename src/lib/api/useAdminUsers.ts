@@ -39,8 +39,7 @@ export const useAdminUsers = (filters: UserFilters = {}) => {
     return useQuery<AdminUsersResponse>({
         queryKey: ['admin', 'users', filters],
         queryFn: async () => {
-            const response = await adminUserAPI.getUsers(filters);
-            return response;
+            return await adminUserAPI.getUsers(filters);
         },
         staleTime: 2 * 60 * 1000, // 2분
         gcTime: 5 * 60 * 1000, // 5분
@@ -53,8 +52,7 @@ export const useAdminUser = (userId: string) => {
     return useQuery<{ success: boolean; data: AdminUser }>({
         queryKey: ['admin', 'users', userId],
         queryFn: async () => {
-            const response = await adminUserAPI.getUser(userId);
-            return response;
+            return await adminUserAPI.getUser(userId);
         },
         enabled: !!userId,
         staleTime: 5 * 60 * 1000,
@@ -67,8 +65,7 @@ export const useUpdateUserStatus = () => {
 
     return useMutation({
         mutationFn: async ({ userId, status }: { userId: string; status: string }) => {
-            const response = await adminUserAPI.updateUserStatus(userId, status);
-            return response;
+            return await adminUserAPI.updateUserStatus(userId, status);
         },
         onSuccess: () => {
             // 관련 쿼리 무효화
@@ -83,8 +80,7 @@ export const useUpdateUserRole = () => {
 
     return useMutation({
         mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
-            const response = await adminUserAPI.updateUserRole(userId, role);
-            return response;
+            return await adminUserAPI.updateUserRole(userId, role);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
@@ -98,8 +94,7 @@ export const useDeleteUser = () => {
 
     return useMutation({
         mutationFn: async (userId: string) => {
-            const response = await adminUserAPI.deleteUser(userId);
-            return response;
+            return await adminUserAPI.deleteUser(userId);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });

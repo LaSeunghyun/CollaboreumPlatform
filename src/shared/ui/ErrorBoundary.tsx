@@ -37,7 +37,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({
       error,
       errorInfo,
@@ -53,7 +53,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
   }
 
-  componentDidUpdate(prevProps: ErrorBoundaryProps) {
+  override componentDidUpdate(prevProps: ErrorBoundaryProps) {
     const { resetKeys, resetOnPropsChange } = this.props;
     const { hasError } = this.state;
 
@@ -64,7 +64,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
   }
 
-  componentWillUnmount() {
+  override componentWillUnmount() {
     if (this.resetTimeoutId) {
       clearTimeout(this.resetTimeoutId);
     }
@@ -90,7 +90,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     window.location.href = '/';
   };
 
-  render() {
+  override render() {
     if (this.state.hasError) {
       // 커스텀 fallback이 제공된 경우
       if (this.props.fallback) {
@@ -141,16 +141,16 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                 <Button
                   onClick={this.handleRetry}
                   className="w-full"
-                  leftIcon={<RefreshCw className="h-4 w-4" />}
                 >
+                  <RefreshCw className="h-4 w-4 mr-2" />
                   다시 시도
                 </Button>
                 <Button
                   variant="outline"
                   onClick={this.handleGoHome}
                   className="w-full"
-                  leftIcon={<Home className="h-4 w-4" />}
                 >
+                  <Home className="h-4 w-4 mr-2" />
                   홈으로 이동
                 </Button>
               </div>

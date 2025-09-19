@@ -1,248 +1,230 @@
-import { useState, useCallback, useMemo } from 'react';
+﻿import { useCallback, useMemo, useState } from 'react';
 
-export interface ValidationRule<T = any> {
-    required?: boolean;
-    minLength?: number;
-    maxLength?: number;
-    pattern?: RegExp;
-    custom?: (value: T) => string | null;
-    message?: string;
+export type ValidationRule<T> = {
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: RegExp;
+  custom?: (value: T) => string | null;
+  message?: string;
+};
+
+export type FormValidationConfig<T extends Record<string, unknown>> = {
+  [K in keyof T]?: ValidationRule<T[K]>;
+};
+
+export interface FormValidationState<T extends Record<string, unknown>> {
+  values: T;
+  errors: Partial<Record<keyof T, string>>;
+  touched: Partial<Record<keyof T, boolean>>;
+  isValid: boolean;
+  isSubmitting: boolean;
 }
 
-export interface FormValidationConfig<T extends Record<string, any>> {
-    [K in keyof T]: ValidationRule<T[K]>;
+export interface FormValidationActions<T extends Record<string, unknown>> {
+  setValue: <K extends keyof T>(field: K, value: T[K]) => void;
+  setError: <K extends keyof T>(field: K, error: string) => void;
+  clearError: <K extends keyof T>(field: K) => void;
+  setTouched: <K extends keyof T>(field: K, touched: boolean) => void;
+  validateField: <K extends keyof T>(field: K) => boolean;
+  validateForm: () => boolean;
+  reset: () => void;
+  setSubmitting: (value: boolean) => void;
+  handleSubmit: (
+    onSubmit: (values: T) => void | Promise<void>,
+  ) => (event?: React.FormEvent) => Promise<void>;
 }
 
-export interface FormValidationState<T extends Record<string, any>> {
-    values: T;
-    errors: Partial<Record<keyof T, string>>;
-    touched: Partial<Record<keyof T, boolean>>;
-    isValid: boolean;
-    isSubmitting: boolean;
-}
+const isEmpty = (value: unknown) =>
+  value === undefined || value === null || value === '';
 
-export interface FormValidationActions<T extends Record<string, any>> {
-    setValue: <K extends keyof T>(field: K, value: T[K]) => void;
-    setError: <K extends keyof T>(field: K, error: string) => void;
-    clearError: <K extends keyof T>(field: K) => void;
-    setTouched: <K extends keyof T>(field: K, touched: boolean) => void;
-    validateField: <K extends keyof T>(field: K) => boolean;
-    validateForm: () => boolean;
-    reset: () => void;
-    setSubmitting: (submitting: boolean) => void;
-    handleSubmit: (onSubmit: (values: T) => void | Promise<void>) => (e?: React.FormEvent) => void;
-}
-
-export function useFormValidation<T extends Record<string, any>>(
-    initialValues: T,
-    validationConfig: FormValidationConfig<T>
+export function useFormValidation<T extends Record<string, unknown>>(
+  initialValues: T,
+  validationConfig: FormValidationConfig<T>,
 ): FormValidationState<T> & FormValidationActions<T> {
-    const [values, setValues] = useState<T>(initialValues);
-    const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
-    const [touched, setTouched] = useState<Partial<Record<keyof T, boolean>>>({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const [values, setValues] = useState<T>(initialValues);
+  const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
+  const [touched, setTouchedState] = useState<Partial<Record<keyof T, boolean>>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // 개별 필드 검증
-    const validateField = useCallback(<K extends keyof T>(field: K): boolean => {
-        const value = values[field];
-        const rule = validationConfig[field];
+  const applyRule = useCallback(
+    <K extends keyof T>(field: K, rule: ValidationRule<T[K]> | undefined): string | null => {
+      if (!rule) {
+        return null;
+      }
 
-        if (!rule) return true;
+      const value = values[field];
 
-        // Required 검증
-        if (rule.required && (value === undefined || value === null || value === '')) {
-            setErrors(prev => ({ ...prev, [field]: rule.message || `${String(field)}는 필수입니다.` }));
-            return false;
+      if (rule.required && isEmpty(value)) {
+        return rule.message ?? `${String(field)} 필드는 필수입니다.`;
+      }
+
+      if (isEmpty(value)) {
+        return null;
+      }
+
+      if (rule.minLength && typeof value === 'string' && value.length < rule.minLength) {
+        return rule.message ?? `${String(field)}은(는) 최소 ${rule.minLength}자 이상이어야 합니다.`;
+      }
+
+      if (rule.maxLength && typeof value === 'string' && value.length > rule.maxLength) {
+        return rule.message ?? `${String(field)}은(는) 최대 ${rule.maxLength}자까지 허용됩니다.`;
+      }
+
+      if (rule.pattern && typeof value === 'string' && !rule.pattern.test(value)) {
+        return rule.message ?? `${String(field)} 형식이 올바르지 않습니다.`;
+      }
+
+      if (rule.custom) {
+        return rule.custom(value);
+      }
+
+      return null;
+    },
+    [values],
+  );
+
+  const validateField = useCallback(
+    <K extends keyof T>(field: K): boolean => {
+      const message = applyRule(field, validationConfig[field]);
+
+      setErrors(prev => {
+        if (!message) {
+          if (!(field in prev)) {
+            return prev;
+          }
+          const { [field]: _omitted, ...rest } = prev as Partial<Record<keyof T, string>>;
+          return rest as Partial<Record<keyof T, string>>;
         }
 
-        // 값이 없으면 다른 검증 스킵
-        if (value === undefined || value === null || value === '') {
-            setErrors(prev => {
-                const newErrors = { ...prev };
-                delete newErrors[field];
-                return newErrors;
-            });
-            return true;
-        }
+        return { ...prev, [field]: message };
+      });
 
-        // 최소 길이 검증
-        if (rule.minLength && typeof value === 'string' && value.length < rule.minLength) {
-            setErrors(prev => ({
-                ...prev,
-                [field]: rule.message || `${String(field)}는 최소 ${rule.minLength}자 이상이어야 합니다.`
-            }));
-            return false;
-        }
+      return !message;
+    },
+    [applyRule, validationConfig],
+  );
 
-        // 최대 길이 검증
-        if (rule.maxLength && typeof value === 'string' && value.length > rule.maxLength) {
-            setErrors(prev => ({
-                ...prev,
-                [field]: rule.message || `${String(field)}는 최대 ${rule.maxLength}자까지 입력 가능합니다.`
-            }));
-            return false;
-        }
+  const validateForm = useCallback(() => {
+    const fields = Object.keys(validationConfig) as (keyof T)[];
+    return fields.every(field => validateField(field));
+  }, [validateField, validationConfig]);
 
-        // 패턴 검증
-        if (rule.pattern && typeof value === 'string' && !rule.pattern.test(value)) {
-            setErrors(prev => ({
-                ...prev,
-                [field]: rule.message || `${String(field)} 형식이 올바르지 않습니다.`
-            }));
-            return false;
-        }
+  const setValue = useCallback(
+    <K extends keyof T>(field: K, value: T[K]) => {
+      setValues(prev => ({ ...prev, [field]: value }));
 
-        // 커스텀 검증
-        if (rule.custom) {
-            const customError = rule.custom(value);
-            if (customError) {
-                setErrors(prev => ({ ...prev, [field]: customError }));
-                return false;
-            }
-        }
+      if (touched[field]) {
+        validateField(field);
+      }
+    },
+    [touched, validateField],
+  );
 
-        // 에러 제거
-        setErrors(prev => {
-            const newErrors = { ...prev };
-            delete newErrors[field];
-            return newErrors;
-        });
+  const setError = useCallback(<K extends keyof T>(field: K, error: string) => {
+    setErrors(prev => ({ ...prev, [field]: error }));
+  }, []);
 
-        return true;
-    }, [values, validationConfig]);
+  const clearError = useCallback(<K extends keyof T>(field: K) => {
+    setErrors(prev => {
+      if (!(field in prev)) {
+        return prev;
+      }
+      const { [field]: _omitted, ...rest } = prev as Partial<Record<keyof T, string>>;
+      return rest as Partial<Record<keyof T, string>>;
+    });
+  }, []);
 
-    // 전체 폼 검증
-    const validateForm = useCallback((): boolean => {
+  const setTouched = useCallback(<K extends keyof T>(field: K, next: boolean) => {
+    setTouchedState(prev => ({ ...prev, [field]: next }));
+  }, []);
+
+  const reset = useCallback(() => {
+    setValues(initialValues);
+    setErrors({});
+    setTouchedState({});
+    setIsSubmitting(false);
+  }, [initialValues]);
+
+  const handleSubmit = useCallback(
+    (onSubmit: (formValues: T) => void | Promise<void>) => {
+      return async (event?: React.FormEvent) => {
+        event?.preventDefault();
+
         const fields = Object.keys(validationConfig) as (keyof T)[];
-        let isValid = true;
+        fields.forEach(field => setTouched(field, true));
 
-        fields.forEach(field => {
-            const fieldValid = validateField(field);
-            if (!fieldValid) {
-                isValid = false;
-            }
-        });
-
-        return isValid;
-    }, [validateField, validationConfig]);
-
-    // 값 설정
-    const setValue = useCallback(<K extends keyof T>(field: K, value: T[K]) => {
-        setValues(prev => ({ ...prev, [field]: value }));
-
-        // 값이 변경되면 해당 필드 검증
-        if (touched[field]) {
-            validateField(field);
+        const valid = validateForm();
+        if (!valid) {
+          return;
         }
-    }, [touched, validateField]);
 
-    // 에러 설정
-    const setError = useCallback(<K extends keyof T>(field: K, error: string) => {
-        setErrors(prev => ({ ...prev, [field]: error }));
-    }, []);
+        setIsSubmitting(true);
+        try {
+          await onSubmit(values);
+        } finally {
+          setIsSubmitting(false);
+        }
+      };
+    },
+    [setTouched, validateForm, validationConfig, values],
+  );
 
-    // 에러 제거
-    const clearError = useCallback(<K extends keyof T>(field: K) => {
-        setErrors(prev => {
-            const newErrors = { ...prev };
-            delete newErrors[field];
-            return newErrors;
-        });
-    }, []);
+  const isValid = useMemo(() => {
+    const noErrors = Object.keys(errors).length === 0;
+    const allFilled = Object.keys(validationConfig).every(fieldKey => {
+      const key = fieldKey as keyof T;
+      if (!validationConfig[key]?.required) {
+        return true;
+      }
+      return !isEmpty(values[key]);
+    });
 
-    // 터치 상태 설정
-    const setTouched = useCallback(<K extends keyof T>(field: K, touched: boolean) => {
-        setTouched(prev => ({ ...prev, [field]: touched }));
-    }, []);
+    return noErrors && allFilled;
+  }, [errors, validationConfig, values]);
 
-    // 제출 상태 설정
-    const setSubmitting = useCallback((submitting: boolean) => {
-        setIsSubmitting(submitting);
-    }, []);
-
-    // 폼 리셋
-    const reset = useCallback(() => {
-        setValues(initialValues);
-        setErrors({});
-        setTouched({});
-        setIsSubmitting(false);
-    }, [initialValues]);
-
-    // 제출 핸들러
-    const handleSubmit = useCallback((onSubmit: (values: T) => void | Promise<void>) => {
-        return async (e?: React.FormEvent) => {
-            e?.preventDefault();
-
-            // 모든 필드를 터치 상태로 설정
-            const allFields = Object.keys(validationConfig) as (keyof T)[];
-            allFields.forEach(field => {
-                setTouched(field, true);
-            });
-
-            // 폼 검증
-            if (!validateForm()) {
-                return;
-            }
-
-            setIsSubmitting(true);
-            try {
-                await onSubmit(values);
-            } finally {
-                setIsSubmitting(false);
-            }
-        };
-    }, [values, validateForm, validationConfig]);
-
-    // 폼 유효성 상태
-    const isValid = useMemo(() => {
-        return Object.keys(errors).length === 0 && Object.values(values).every(value =>
-            value !== undefined && value !== null && value !== ''
-        );
-    }, [errors, values]);
-
-    return {
-        values,
-        errors,
-        touched,
-        isValid,
-        isSubmitting,
-        setValue,
-        setError,
-        clearError,
-        setTouched,
-        validateField,
-        validateForm,
-        reset,
-        setSubmitting,
-        handleSubmit,
-    };
+  return {
+    values,
+    errors,
+    touched,
+    isValid,
+    isSubmitting,
+    setValue,
+    setError,
+    clearError,
+    setTouched,
+    validateField,
+    validateForm,
+    reset,
+    setSubmitting: setIsSubmitting,
+    handleSubmit,
+  };
 }
 
-// 일반적인 검증 규칙들
 export const commonValidationRules = {
-    email: {
-        required: true,
-        pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        message: '올바른 이메일 주소를 입력해주세요.'
-    },
-    password: {
-        required: true,
-        minLength: 6,
-        message: '비밀번호는 최소 6자 이상이어야 합니다.'
-    },
-    username: {
-        required: true,
-        minLength: 2,
-        maxLength: 20,
-        pattern: /^[a-zA-Z0-9_]+$/,
-        message: '사용자명은 2-20자의 영문, 숫자, 언더스코어만 사용 가능합니다.'
-    },
-    phone: {
-        pattern: /^01[0-9]-\d{3,4}-\d{4}$/,
-        message: '올바른 전화번호 형식을 입력해주세요. (예: 010-1234-5678)'
-    },
-    url: {
-        pattern: /^https?:\/\/.+/,
-        message: '올바른 URL 형식을 입력해주세요. (http:// 또는 https://로 시작)'
-    }
+  email: {
+    required: true,
+    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    message: '올바른 이메일 주소를 입력해주세요.',
+  },
+  password: {
+    required: true,
+    minLength: 6,
+    message: '비밀번호는 최소 6자 이상이어야 합니다.',
+  },
+  username: {
+    required: true,
+    minLength: 2,
+    maxLength: 20,
+    pattern: /^[a-zA-Z0-9_]+$/,
+    message: '사용자명은 2~20자의 영문, 숫자, 밑줄만 허용됩니다.',
+  },
+  phone: {
+    pattern: /^01[0-9]-\d{3,4}-\d{4}$/,
+    message: '전화번호 형식을 확인해주세요. (예: 010-1234-5678)',
+  },
+  url: {
+    pattern: /^https?:\/\/.+/,
+    message: 'URL 형식을 확인해주세요. (http:// 또는 https://)',
+  },
 };

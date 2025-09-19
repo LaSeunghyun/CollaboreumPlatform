@@ -48,12 +48,22 @@ export interface CheckboxProps
     label?: string
     description?: string
     error?: string
+    onCheckedChange?: (checked: boolean) => void
 }
 
 const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-    ({ className, size, tone, label, description, error, id, ...props }, ref) => {
+    ({ className, size, tone, label, description, error, id, onCheckedChange, ...props }, ref) => {
         const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`
         const hasError = !!error
+
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (onCheckedChange) {
+                onCheckedChange(e.target.checked)
+            }
+            if (props.onChange) {
+                props.onChange(e)
+            }
+        }
 
         return (
             <div className="flex items-start space-x-2">
@@ -64,6 +74,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                         id={checkboxId}
                         className="sr-only"
                         {...props}
+                        onChange={handleChange}
                     />
                     <label
                         htmlFor={checkboxId}

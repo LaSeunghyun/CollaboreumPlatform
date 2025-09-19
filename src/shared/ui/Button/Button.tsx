@@ -1,6 +1,6 @@
 import React from "react";
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "../lib/cn"
+import { cn } from "../../lib/cn"
 import { forwardRef } from "react"
 
 const buttonStyles = cva(
@@ -16,6 +16,9 @@ const buttonStyles = cva(
                 indigo: "bg-indigo text-white hover:bg-indigo/90 shadow-sm hover:shadow-md active:scale-95 focus:ring-indigo-300",
                 gradient: "bg-gradient-to-r from-primary-600 to-indigo-600 text-white hover:from-primary-700 hover:to-indigo-700 shadow-lg hover:shadow-xl active:scale-95 focus:ring-primary-300",
                 glass: "bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 focus:ring-white/30",
+                // 추가 variant들
+                secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm hover:shadow-md active:scale-95 focus:ring-secondary-300",
+                default: "bg-primary-600 text-white hover:bg-primary-700 shadow-apple hover:shadow-apple-lg active:scale-95 focus:ring-primary-300",
             },
             size: {
                 xs: "h-6 rounded-lg gap-1 px-2 text-xs [&_svg]:size-3",

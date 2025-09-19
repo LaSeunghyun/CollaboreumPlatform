@@ -21,6 +21,7 @@ export interface FundingProject extends BaseEntity {
     status: FundingProjectStatus;
     startDate: Date;
     endDate: Date;
+    daysLeft: number; // 남은 일수
     ownerId: string;
     owner: User;
     categoryId: string;
@@ -323,10 +324,24 @@ export interface FundingProjectFilter {
     endDate?: Date;
     isActive?: boolean;
     isFeatured?: boolean;
+    page?: number;
+    limit?: number;
 }
 
 // 펀딩 프로젝트 정렬
 export interface FundingProjectSort {
     field: 'createdAt' | 'updatedAt' | 'targetAmount' | 'currentAmount' | 'progress' | 'backerCount' | 'endDate';
     order: 'asc' | 'desc';
+}
+
+// 결제 데이터
+export interface PaymentData {
+    id: string;
+    projectId: string;
+    userId: string;
+    amount: number;
+    paymentMethod: string;
+    status: 'pending' | 'completed' | 'failed' | 'refunded';
+    createdAt: Date;
+    updatedAt: Date;
 }

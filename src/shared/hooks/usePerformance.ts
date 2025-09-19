@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useEffect } from 'react';
+import { useCallback, useMemo, useRef, useEffect, useState } from 'react';
 import { useDebounce, useThrottle, usePerformanceMeasure } from '../lib/performance';
 
 /**
@@ -22,7 +22,7 @@ export function useDebouncedSearch<T>(
         setResults(items);
         return;
       }
-      
+
       const filtered = searchFn(items, searchQuery);
       setResults(filtered);
     }, [items, searchFn]),
@@ -57,7 +57,7 @@ export function useVirtualizedList<T>(
       items.length - 1,
       Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
     );
-    
+
     return { startIndex: start, endIndex: end };
   }, [scrollTop, itemHeight, containerHeight, items.length, overscan]);
 
@@ -97,14 +97,14 @@ export function useInfiniteScroll<T>(
   const lastItemRef = useCallback(
     (node: HTMLElement | null) => {
       if (isLoading) return;
-      
+
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
 
       observerRef.current = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting && hasMore) {
+          if (entries[0]?.isIntersecting && hasMore) {
             setIsLoading(true);
             loadMore();
           }
@@ -143,23 +143,21 @@ export function useMemoizedData<T>(
 ) {
   const sortedItems = useMemo(() => {
     if (!sortKey) return items;
-    
+
     return [...items].sort((a, b) => {
       const aVal = a[sortKey];
       const bVal = b[sortKey];
-      
+
       if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
       if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
       return 0;
     });
   }, [items, sortKey, sortOrder]);
 
-  const filteredItems = useMemo(() => {
+  return useMemo(() => {
     if (!filterFn) return sortedItems;
     return sortedItems.filter(filterFn);
   }, [sortedItems, filterFn]);
-
-  return filteredItems;
 }
 
 /**
@@ -171,7 +169,7 @@ export function usePerformanceTracker(componentName: string) {
 
   useEffect(() => {
     renderCount.current += 1;
-    
+
     if (process.env.NODE_ENV === 'development') {
       console.log(`${componentName} 렌더링 횟수: ${renderCount.current}`);
     }

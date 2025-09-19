@@ -1,13 +1,13 @@
 import { useCallback, useState } from 'react';
-import { 
-  classifyError, 
-  logError, 
-  getUserFriendlyMessage, 
+import {
+  classifyError,
+  logError,
+  getUserFriendlyMessage,
   getErrorRecoveryStrategy,
   collectErrorMetrics,
   sendErrorNotification,
   ErrorType,
-  ErrorLevel 
+  ErrorLevel
 } from '../lib/errorHandler';
 import { ApiError, AppError } from '../types';
 
@@ -44,16 +44,16 @@ export function useErrorHandler(): UseErrorHandlerReturn {
 
   const handleError = useCallback((error: unknown, context?: Record<string, any>) => {
     const classification = classifyError(error);
-    
+
     // 에러 로깅
     logError(error, context);
-    
+
     // 에러 메트릭 수집
     collectErrorMetrics(error, context);
-    
+
     // 에러 알림 전송
     sendErrorNotification(error, context);
-    
+
     // 에러 상태 업데이트
     setErrorState({
       error: error as AppError,
@@ -80,12 +80,12 @@ export function useErrorHandler(): UseErrorHandlerReturn {
     if (!errorState.retryable || isRetrying) return;
 
     setIsRetrying(true);
-    
+
     try {
       // 재시도 로직 구현
       // 예: API 재호출, 컴포넌트 리렌더링 등
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // 재시도 성공 시 에러 상태 클리어
       clearError();
     } catch (error) {
@@ -143,9 +143,9 @@ export function useErrorRecovery() {
     error: unknown,
     recoveryFn: () => Promise<void>,
     context?: Record<string, any>
-  ) => {
+  ): Promise<boolean> => {
     const strategy = getErrorRecoveryStrategy(error);
-    
+
     if (!strategy.shouldRetry || retryCount >= strategy.maxRetries) {
       return false;
     }
@@ -156,10 +156,10 @@ export function useErrorRecovery() {
     try {
       // 재시도 지연
       await new Promise(resolve => setTimeout(resolve, strategy.retryDelay));
-      
+
       // 복구 함수 실행
       await recoveryFn();
-      
+
       // 복구 성공
       setRetryCount(0);
       return true;
@@ -195,7 +195,7 @@ export function useErrorBoundary() {
   const handleError = useCallback((error: Error, errorInfo: any) => {
     setError(error);
     setErrorInfo(errorInfo);
-    
+
     // 에러 로깅
     logError(error, { componentStack: errorInfo.componentStack });
   }, []);

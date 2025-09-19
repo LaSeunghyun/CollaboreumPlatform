@@ -1,12 +1,12 @@
 import React from 'react';
 import { useFundingProjects } from '../../hooks/useFundingProjects';
-import { ProjectFilters } from './ProjectFilters';
-import { ProjectGrid } from './ProjectGrid';
-import { ProjectPagination } from './ProjectPagination';
+import ProjectFilters from './ProjectFilters';
+import ProjectGrid from './ProjectGrid';
+import ProjectPagination from './ProjectPagination';
 import { FundingFilters } from '../../types/funding.types';
 
 interface FundingProjectListProps {
-  onProjectClick?: (projectId: number) => void;
+  onProjectClick?: (projectId: string) => void;
   initialFilters?: FundingFilters;
 }
 
@@ -16,7 +16,7 @@ export const FundingProjectList: React.FC<FundingProjectListProps> = ({
 }) => {
   const [filters, setFilters] = React.useState<FundingFilters>(initialFilters || {});
   const [currentPage, setCurrentPage] = React.useState(1);
-  
+
   const { data: projects, isLoading, error } = useFundingProjects({
     ...filters,
     page: currentPage,
@@ -39,7 +39,7 @@ export const FundingProjectList: React.FC<FundingProjectListProps> = ({
         <div className="text-red-600 mb-4">
           프로젝트를 불러오는 중 오류가 발생했습니다.
         </div>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
         >
@@ -51,17 +51,17 @@ export const FundingProjectList: React.FC<FundingProjectListProps> = ({
 
   return (
     <div className="space-y-6">
-      <ProjectFilters 
+      <ProjectFilters
         filters={filters}
         onFiltersChange={handleFilterChange}
       />
-      
-      <ProjectGrid 
+
+      <ProjectGrid
         projects={projects || []}
         isLoading={isLoading}
         onProjectClick={onProjectClick}
       />
-      
+
       {projects && projects.length > 0 && (
         <ProjectPagination
           currentPage={currentPage}

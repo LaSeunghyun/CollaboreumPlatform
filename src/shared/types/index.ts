@@ -51,8 +51,31 @@ export interface ApiError {
     message: string;
     code?: string;
     statusCode?: number;
+    status?: number;
+    success?: boolean;
+    error?: string;
     details?: Record<string, unknown>;
+    stack?: string;
+    timestamp?: string;
 }
+
+export interface AppError extends ApiError {
+    success: false;
+    status: number;
+    stack?: string;
+    timestamp?: string;
+}
+
+// API 요청 설정
+export interface ApiRequestConfig {
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+    headers?: Record<string, string>;
+    body?: unknown;
+    timeout?: number;
+}
+
+// API 엔드포인트
+export type ApiEndpoint = string;
 
 // 폼 상태 타입
 export interface FormState<T = unknown> {

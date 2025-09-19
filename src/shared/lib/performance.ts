@@ -43,7 +43,7 @@ export function useThrottle<T extends (...args: any[]) => any>(
 ): T {
   const lastRun = useRef<number>(0);
 
-  const throttledCallback = useCallback(
+  return useCallback(
     (...args: Parameters<T>) => {
       const now = Date.now();
       if (now - lastRun.current >= delay) {
@@ -53,8 +53,6 @@ export function useThrottle<T extends (...args: any[]) => any>(
     },
     [callback, delay]
   ) as T;
-
-  return throttledCallback;
 }
 
 /**
@@ -220,24 +218,24 @@ export function calculateVisibleRange(
 export function measureWebVitals() {
   if (typeof window === 'undefined') return;
 
-  import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-    getCLS((metric) => {
+  import('web-vitals').then((vitals) => {
+    vitals.onCLS((metric: any) => {
       console.log('CLS:', metric);
     });
     
-    getFID((metric) => {
-      console.log('FID:', metric);
+    vitals.onINP((metric: any) => {
+      console.log('INP:', metric);
     });
     
-    getFCP((metric) => {
+    vitals.onFCP((metric: any) => {
       console.log('FCP:', metric);
     });
     
-    getLCP((metric) => {
+    vitals.onLCP((metric: any) => {
       console.log('LCP:', metric);
     });
     
-    getTTFB((metric) => {
+    vitals.onTTFB((metric: any) => {
       console.log('TTFB:', metric);
     });
   });

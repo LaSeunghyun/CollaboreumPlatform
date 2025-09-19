@@ -25,8 +25,7 @@ export const useAdminStats = () => {
     return useQuery<AdminStatsResponse>({
         queryKey: ['admin', 'stats'],
         queryFn: async () => {
-            const response = await adminAPI.getStats();
-            return response;
+            return await adminAPI.getStats();
         },
         staleTime: 5 * 60 * 1000, // 5분
         gcTime: 10 * 60 * 1000, // 10분
@@ -40,8 +39,7 @@ export const useRealtimeStats = (enabled: boolean = true) => {
     return useQuery<AdminStatsResponse>({
         queryKey: ['admin', 'stats', 'realtime'],
         queryFn: async () => {
-            const response = await adminAPI.getStats();
-            return response;
+            return await adminAPI.getStats();
         },
         enabled,
         refetchInterval: 30000, // 30초마다 업데이트

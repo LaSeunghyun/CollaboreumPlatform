@@ -1,21 +1,5 @@
-export interface FundingProject {
-  id: number;
-  title: string;
-  description: string;
-  artist: string;
-  category: string;
-  thumbnail: string;
-  currentAmount: number;
-  targetAmount: number;
-  backers: number;
-  daysLeft: number;
-  endDate: string;
-  status: 'active' | 'completed' | 'cancelled' | 'pending';
-  rewards: Reward[];
-  budgetBreakdown: BudgetItem[];
-  createdAt: string;
-  updatedAt: string;
-}
+// FundingProject는 index.ts에서 import
+export type { FundingProject } from './index';
 
 export interface Reward {
   id: number;
@@ -59,11 +43,15 @@ export interface FundingStats {
 
 export interface FundingFilters {
   category?: string;
-  status?: string;
-  minAmount?: number;
-  maxAmount?: number;
-  sortBy?: 'newest' | 'popular' | 'ending' | 'amount';
+  status?: string[];
+  search?: string;
+  tags?: string[];
+  minAmount?: number | null;
+  maxAmount?: number | null;
+  sortBy?: 'newest' | 'popular' | 'ending' | 'amount' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
 }
 
 export interface CreateFundingProjectRequest {
@@ -97,4 +85,15 @@ export interface BackProjectRequest {
     bankAccount?: string;
     bankName?: string;
   };
+}
+
+export interface PaymentData {
+  id: string;
+  projectId: string;
+  userId: string;
+  amount: number;
+  paymentMethod: string;
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  createdAt: Date;
+  updatedAt: Date;
 }

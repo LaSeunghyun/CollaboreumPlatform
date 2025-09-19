@@ -20,6 +20,10 @@ export interface CommunityPost {
     dislikes: number;
     views: number;
     comments: number;
+    replies: number;
+    viewCount: number;
+    isHot: boolean;
+    isPinned: boolean;
     isLiked?: boolean;
     isDisliked?: boolean;
     isBookmarked?: boolean;
@@ -85,6 +89,7 @@ export interface CreatePostData {
     content: string;
     category: string;
     tags: string[];
+    images?: string[];
     status?: 'published' | 'draft';
 }
 
@@ -176,6 +181,7 @@ export interface CommunityUIState {
 // 컴포넌트 Props 타입
 export interface PostCardProps {
     post: CommunityPost;
+    onPostClick?: (post: CommunityPost) => void;
     onLike?: (postId: string) => void;
     onDislike?: (postId: string) => void;
     onBookmark?: (postId: string) => void;

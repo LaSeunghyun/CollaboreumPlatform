@@ -3,7 +3,9 @@
 ## 📊 현재 성능 분석
 
 ### 1. 번들 크기 분석
+
 현재 프로젝트의 주요 의존성들:
+
 - **React 18**: 42KB (gzipped)
 - **Radix UI**: ~200KB (모든 컴포넌트)
 - **Lucide React**: ~50KB (아이콘 라이브러리)
@@ -14,16 +16,19 @@
 ### 2. 성능 이슈 식별
 
 #### 2.1 렌더링 성능 문제
+
 - **거대한 컴포넌트**: FundingProjects.tsx (716줄), AdminDashboard.tsx (1215줄)
 - **불필요한 리렌더링**: 상태 변경 시 전체 컴포넌트 리렌더링
 - **대용량 데이터 처리**: 1000개 이상의 사용자/프로젝트 리스트
 
 #### 2.2 번들 크기 문제
+
 - **Radix UI 전체 import**: 필요한 컴포넌트만 선택적 import 필요
 - **Lucide React 전체 import**: 사용하는 아이콘만 import
 - **미사용 코드**: 트리 셰이킹 미적용
 
 #### 2.3 네트워크 성능 문제
+
 - **이미지 최적화 부족**: WebP, 지연 로딩 미적용
 - **API 호출 최적화**: 중복 요청, 캐싱 전략 부족
 
@@ -32,6 +37,7 @@
 ### Phase 1: 번들 크기 최적화
 
 #### 1.1 코드 스플리팅
+
 ```typescript
 // 현재: 모든 페이지를 한 번에 로드
 import { HomePage } from './pages/home/HomePage';
@@ -43,6 +49,7 @@ const ArtistsPage = lazy(() => import('./pages/artists/ArtistsPage'));
 ```
 
 #### 1.2 트리 셰이킹 최적화
+
 ```typescript
 // 현재: 전체 라이브러리 import
 import { Heart, Star, Calendar } from 'lucide-react';
@@ -53,6 +60,7 @@ import { Star } from 'lucide-react/dist/esm/icons/star';
 ```
 
 #### 1.3 Radix UI 최적화
+
 ```typescript
 // 현재: 전체 컴포넌트 import
 import { Button } from '@radix-ui/react-button';
@@ -64,6 +72,7 @@ import { Button } from '@radix-ui/react-button/dist/Button';
 ### Phase 2: 렌더링 성능 개선
 
 #### 2.1 메모이제이션 적용
+
 ```typescript
 // 현재: 매번 리렌더링
 const ProjectList = ({ projects }) => {
@@ -89,6 +98,7 @@ const ProjectList = React.memo(({ projects }) => {
 ```
 
 #### 2.2 가상화 적용
+
 ```typescript
 // 대용량 리스트 가상화
 import { FixedSizeList as List } from 'react-window';
@@ -110,6 +120,7 @@ const VirtualizedProjectList = ({ projects }) => (
 ```
 
 #### 2.3 상태 최적화
+
 ```typescript
 // 현재: 불필요한 상태 업데이트
 const [projects, setProjects] = useState([]);
@@ -119,35 +130,37 @@ const [filteredProjects, setFilteredProjects] = useState([]);
 const [projects, setProjects] = useState([]);
 const [filter, setFilter] = useState('');
 
-const filteredProjects = useMemo(() => 
-  projects.filter(project => project.category === filter),
-  [projects, filter]
+const filteredProjects = useMemo(
+  () => projects.filter(project => project.category === filter),
+  [projects, filter],
 );
 ```
 
 ### Phase 3: 네트워크 성능 최적화
 
 #### 3.1 이미지 최적화
+
 ```typescript
 // WebP 이미지 지원
 const OptimizedImage = ({ src, alt, ...props }) => {
   const [imageSrc, setImageSrc] = useState(src);
-  
+
   useEffect(() => {
     // WebP 지원 확인
     const canvas = document.createElement('canvas');
     const supportsWebP = canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
-    
+
     if (supportsWebP) {
       setImageSrc(src.replace(/\.(jpg|jpeg|png)$/, '.webp'));
     }
   }, [src]);
-  
+
   return <img src={imageSrc} alt={alt} {...props} />;
 };
 ```
 
 #### 3.2 API 캐싱 최적화
+
 ```typescript
 // React Query 캐싱 전략
 const queryClient = new QueryClient({
@@ -164,6 +177,7 @@ const queryClient = new QueryClient({
 ### Phase 4: 성능 모니터링
 
 #### 4.1 성능 측정 도구
+
 ```typescript
 // Web Vitals 측정
 import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
@@ -176,6 +190,7 @@ getTTFB(console.log);
 ```
 
 #### 4.2 번들 분석
+
 ```bash
 # 번들 분석기 설치
 npm install --save-dev webpack-bundle-analyzer
@@ -188,16 +203,19 @@ npx webpack-bundle-analyzer build/static/js/*.js
 ## 🛠️ 구현 계획
 
 ### 1단계: 즉시 적용 가능한 최적화 (1주)
+
 - [ ] 코드 스플리팅 적용
 - [ ] 불필요한 import 제거
 - [ ] 메모이제이션 적용
 
 ### 2단계: 중급 최적화 (2주)
+
 - [ ] 가상화 적용
 - [ ] 이미지 최적화
 - [ ] API 캐싱 전략 개선
 
 ### 3단계: 고급 최적화 (1주)
+
 - [ ] 번들 분석 및 최적화
 - [ ] 성능 모니터링 구축
 - [ ] A/B 테스트 도구 도입
@@ -205,17 +223,20 @@ npx webpack-bundle-analyzer build/static/js/*.js
 ## 📈 기대 효과
 
 ### 성능 지표 개선
+
 - **First Contentful Paint (FCP)**: 2.5초 → 1.5초
 - **Largest Contentful Paint (LCP)**: 4초 → 2.5초
 - **Cumulative Layout Shift (CLS)**: 0.25 → 0.1
 - **First Input Delay (FID)**: 300ms → 100ms
 
 ### 번들 크기 감소
+
 - **초기 번들**: 500KB → 300KB
 - **총 번들**: 2MB → 1.2MB
 - **로딩 시간**: 3초 → 1.8초
 
 ### 사용자 경험 개선
+
 - **페이지 로딩 속도**: 50% 향상
 - **인터랙션 응답성**: 70% 향상
 - **모바일 성능**: 60% 향상
@@ -223,16 +244,19 @@ npx webpack-bundle-analyzer build/static/js/*.js
 ## 🔧 도구 및 라이브러리
 
 ### 성능 측정
+
 - **Web Vitals**: Core Web Vitals 측정
 - **Lighthouse**: 성능 감사
 - **Bundle Analyzer**: 번들 크기 분석
 
 ### 최적화 라이브러리
+
 - **react-window**: 가상화
 - **react-intersection-observer**: 지연 로딩
 - **web-vitals**: 성능 측정
 
 ### 모니터링
+
 - **Sentry**: 에러 추적
 - **LogRocket**: 사용자 세션 기록
 - **Google Analytics**: 사용자 행동 분석
