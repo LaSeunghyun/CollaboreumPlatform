@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { resolveApiBaseUrl } from '@/lib/config/env';
 import { ApiResponse, ApiError, ApiRequestConfig, ApiEndpoint } from '@/shared/types';
 
 class ApiClient {
@@ -6,7 +7,7 @@ class ApiClient {
 
   constructor() {
     this.client = axios.create({
-      baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+      baseURL: resolveApiBaseUrl(),
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',

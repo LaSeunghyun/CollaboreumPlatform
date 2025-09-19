@@ -1,9 +1,9 @@
+import { resolveApiBaseUrl } from '@/lib/config/env';
 import { ApiResponse, ApiRequestOptions } from '../types/api';
 
 // API 클라이언트 설정
 const API_CONFIG = {
-    baseURL: (import.meta as any).env?.VITE_API_BASE_URL ||
-        (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api'),
+    baseURL: resolveApiBaseUrl(),
     timeout: 10000,
     retries: 3,
     retryDelay: 1000,

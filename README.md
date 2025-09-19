@@ -43,6 +43,7 @@
 ## 🏗️ 기술 스택
 
 ### Frontend
+- **Vite 5** 번들러 & 개발 서버
 - **React 18** + **TypeScript**
 - **Tailwind CSS** + **shadcn/ui** 컴포넌트
 - **React Router** 네비게이션
@@ -146,7 +147,7 @@ cd server
 npm run dev
 
 # Frontend 개발 서버 실행 (새 터미널)
-npm start
+npm run dev
 ```
 
 ## 📊 펀딩 시스템 상세 설명

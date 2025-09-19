@@ -1,3 +1,5 @@
+import { getEnvVar, isLocalEnvironment } from '@/lib/config/env';
+
 // Feature Flags 시스템
 // 환경 변수 기반으로 기능 활성화/비활성화 관리
 
@@ -47,7 +49,8 @@ interface FeatureFlags {
 
 // 환경 변수에서 Feature Flag 값 읽기
 const getEnvFlag = (key: string, defaultValue: boolean = false): boolean => {
-    const value = process.env[`REACT_APP_FEATURE_${key.toUpperCase()}`]
+    const normalizedKey = key.toUpperCase()
+    const value = getEnvVar(`VITE_FEATURE_${normalizedKey}`) ?? getEnvVar(`REACT_APP_FEATURE_${normalizedKey}`)
     if (value === undefined) return defaultValue
     return value === 'true' || value === '1'
 }
@@ -116,7 +119,7 @@ export const isAdminContentModerationEnabled = () => isFeatureEnabled('admin.con
 export const isExperimentalAIEnabled = () => isFeatureEnabled('experimental.aiRecommendations')
 
 // 개발 환경에서 모든 기능 활성화
-if (process.env.NODE_ENV === 'development') {
+if (isLocalEnvironment()) {
     // 개발 환경에서는 모든 기능을 활성화 (필요시 개별 비활성화 가능)
     Object.keys(featureFlags).forEach(category => {
         Object.keys(featureFlags[category as keyof FeatureFlags]).forEach(feature => {

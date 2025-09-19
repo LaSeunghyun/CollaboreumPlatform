@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { resolveApiBaseUrl } from '@/lib/config/env';
 import { Button } from '../shared/ui/Button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
@@ -127,8 +128,7 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
 
         // 이미지 업로드는 FormData를 직접 fetch로 처리
         const token = localStorage.getItem('authToken');
-        const API_BASE_URL = process.env.REACT_APP_API_URL ||
-          (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
+        const API_BASE_URL = resolveApiBaseUrl();
         const imageResponse = await fetch(`${API_BASE_URL}/upload/images`, {
           method: 'POST',
           headers: {

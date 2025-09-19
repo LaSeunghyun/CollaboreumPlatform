@@ -1,3 +1,4 @@
+import { resolveApiBaseUrl } from '@/lib/config/env';
 import {
     Enums,
     CsvHeaders,
@@ -6,8 +7,7 @@ import {
     ConstantsResponse
 } from '../types/constants';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL ||
-    (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://collaboreumplatform-production.up.railway.app/api');
+const API_BASE_URL = resolveApiBaseUrl();
 
 
 class ConstantsService {

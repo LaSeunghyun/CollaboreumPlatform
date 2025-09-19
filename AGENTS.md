@@ -7,8 +7,8 @@
 - Automation lives in `scripts/` and `server/scripts/` (env verification, orphan page audits, seeding).
 
 ## Build, Test, and Development Commands
-- Client dev server: `npm start` (`react-scripts start`).
-- Production build: `npm run build`; backend health check: `cd server && npm run start:check`.
+- Client dev server: `npm run dev` (Vite) or `npm start`.
+- Production build: `npm run build` (Vite); backend health check: `cd server && npm run start:check`.
 - Full quality gate: `npm run check:all` (lint, types, format, unit, a11y, dead code, deps, colors, build).
 - API development: `cd server && npm run dev`; seed data with `cd server && npm run seed-data`.
 - Storybook and contract validation: `npm run storybook`, `npm run pact:test`, and `cd server && npm run pact:test`.
