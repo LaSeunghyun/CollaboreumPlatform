@@ -4,6 +4,8 @@
 
 이 가이드는 기존 `src/components` 폴더의 컴포넌트들을 새로운 `src/shared/ui` 시스템으로 마이그레이션하는 방법을 설명합니다.
 
+> 업데이트: 프로젝트는 Create React App 툴링에서 완전히 벗어나 `react-scripts` 없이 Vite 빌드 파이프라인과 Flat ESLint 설정(`eslint.config.js`)을 사용합니다. 타입 정의 패키지와 `typescript`는 모두 devDependencies로 이동했습니다.
+
 ## 마이그레이션 원칙
 
 1. **점진적 마이그레이션**: 기존 코드를 한 번에 바꾸지 않고 점진적으로 마이그레이션
