@@ -58,11 +58,11 @@ export interface CommunityCategory {
 
 export interface CommunityStats {
     totalPosts: number;
+    activeUsers: number;
     totalComments: number;
-    totalUsers: number;
-    totalLikes: number;
-    avgLikesPerPost: number;
-    avgCommentsPerPost: number;
+    avgLikes: number;
+    postsGrowthRate: number;
+    usersGrowthRate: number;
 }
 
 export interface PostListParams {
@@ -118,6 +118,7 @@ export interface PostListResponse {
         limit: number;
         total: number;
         pages: number;
+        totalPages?: number;
     };
     stats?: CommunityStats;
 }
