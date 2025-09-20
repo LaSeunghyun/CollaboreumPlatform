@@ -329,7 +329,8 @@ export async function apiCall<T>(endpoint: string, options: ApiCallOptions = {},
                 timeout,
             };
 
-            return await api.request<T>(endpoint, config);
+            const response = await api.request<T>(endpoint, config);
+            return extractApiData(response) as T;
         } catch (error) {
             console.error('API call failed:', error);
 
