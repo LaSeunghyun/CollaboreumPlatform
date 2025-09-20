@@ -227,14 +227,59 @@ router.get('/projects/:id', async (req, res) => {
     // 달성률 계산
     const progressPercentage = Math.min((project.currentAmount / project.goalAmount) * 100, 100);
     
-    // 응답 데이터 가공
+    const formatDate = (value) => {
+      if (!value) return '';
+      const date = value instanceof Date ? value : new Date(value);
+      return Number.isNaN(date.getTime()) ? '' : date.toISOString();
+    };
+
+    const backersList = Array.isArray(project.backers)
+      ? project.backers.map(backer => ({
+          id: backer._id ? backer._id.toString() : undefined,
+          userId: backer.user ? backer.user.toString() : undefined,
+          userName: backer.isAnonymous ? '익명 후원자' : (backer.userName || '익명 후원자'),
+          amount: backer.amount || 0,
+          date: formatDate(backer.backedAt),
+          status: backer.status || '완료'
+        }))
+      : [];
+
+    const revenueInfo = project.revenueDistribution || {};
+    const totalRevenue = revenueInfo.totalRevenue ?? project.currentAmount ?? 0;
+
+    const createShare = (shareValue) => {
+      if (shareValue && typeof shareValue === 'object') {
+        const percentage = typeof shareValue.percentage === 'number'
+          ? shareValue.percentage
+          : totalRevenue > 0 && typeof shareValue.amount === 'number'
+            ? Number(((shareValue.amount / totalRevenue) * 100).toFixed(2))
+            : 0;
+
+        const amount = typeof shareValue.amount === 'number'
+          ? shareValue.amount
+          : typeof shareValue.percentage === 'number'
+            ? Number(((shareValue.percentage / 100) * totalRevenue).toFixed(0))
+            : 0;
+
+        return { amount, percentage };
+      }
+
+      const ratio = typeof shareValue === 'number' ? shareValue : 0;
+      return {
+        amount: Number((ratio * totalRevenue).toFixed(0)),
+        percentage: Number((ratio * 100).toFixed(2))
+      };
+    };
+
     const formattedProject = {
-      id: project._id,
+      id: project._id ? project._id.toString() : projectId,
       title: project.title,
       description: project.description,
       artist: project.artist?.name || project.artistName,
+      artistId: project.artist?._id ? project.artist._id.toString() : undefined,
       category: project.category,
       goalAmount: project.goalAmount,
+      targetAmount: project.goalAmount,
       currentAmount: project.currentAmount,
       backers: project.backers?.length || 0,
       daysLeft: Math.max(0, daysLeft),
@@ -243,17 +288,36 @@ router.get('/projects/:id', async (req, res) => {
       progressPercentage: Math.round(progressPercentage),
       startDate: project.startDate,
       endDate: project.endDate,
+      story: project.story || project.description,
+      artistAvatar: project.artist?.avatar || '',
+      artistRating: project.artist?.rating || 0,
+      featured: Boolean(project.featured),
       rewards: project.rewards || [],
       updates: project.updates || [],
       tags: project.tags || [],
-      executionPlan: project.executionPlan || { stages: [], totalBudget: project.goalAmount },
+      executionPlan: {
+        stages: project.executionPlan?.stages || [],
+        totalBudget: project.executionPlan?.totalBudget ?? project.goalAmount
+      },
       expenseRecords: project.expenseRecords || [],
-      revenueDistribution: project.revenueDistribution || {
-        totalRevenue: 0,
-        platformFee: 0.05,
-        artistShare: 0.70,
-        backerShare: 0.25,
-        distributions: []
+      backersList,
+      revenueDistribution: {
+        totalRevenue,
+        platformFee: createShare(revenueInfo.platformFee),
+        artistShare: createShare(revenueInfo.artistShare),
+        backerShare: createShare(revenueInfo.backerShare),
+        distributions: Array.isArray(revenueInfo.distributions)
+          ? revenueInfo.distributions.map(distribution => ({
+              id: distribution._id ? distribution._id.toString() : undefined,
+              backer: distribution.backer ? distribution.backer.toString() : undefined,
+              userName: distribution.userName || '익명 후원자',
+              originalAmount: distribution.originalAmount || 0,
+              profitShare: distribution.profitShare || 0,
+              amount: distribution.totalReturn || distribution.amount || 0,
+              date: formatDate(distribution.distributedAt || distribution.date),
+              status: distribution.status || '대기'
+            }))
+          : []
       }
     };
 

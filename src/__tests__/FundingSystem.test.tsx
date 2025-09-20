@@ -332,7 +332,7 @@ describe('펀딩 시스템 기본 테스트', () => {
             });
 
             // description이 누락된 경우 기본값 표시 (프로젝트 헤더에서 확인)
-            expect(screen.getByText('프로젝트 설명이 없습니다.', { selector: '.text-gray-600.text-lg.mb-4' })).toBeInTheDocument();
+            expect(screen.getByText('프로젝트 설명이 등록되지 않았습니다.', { selector: '.text-gray-600.text-lg.mb-4' })).toBeInTheDocument();
         });
     });
 });

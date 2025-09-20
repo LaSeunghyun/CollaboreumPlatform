@@ -7,6 +7,7 @@ export interface FundingProject {
     artist: string;
     category: string;
     goalAmount: number;
+    targetAmount?: number;
     currentAmount: number;
     backers: number;
     daysLeft: number;
@@ -15,6 +16,11 @@ export interface FundingProject {
     progressPercentage: number;
     startDate: string;
     endDate: string;
+    story?: string;
+    artistAvatar?: string;
+    artistRating?: number;
+    artistId?: string;
+    featured?: boolean;
     rewards: Reward[];
     updates: ProjectUpdate[];
     backersList: Backer[];
@@ -44,7 +50,7 @@ export interface ProjectUpdate {
 
 export interface Backer {
     id: string;
-    userId: string;
+    userId?: string;
     userName: string;
     amount: number;
     date: string;
@@ -81,7 +87,7 @@ export interface ExpenseRecord {
 
 export interface Distribution {
     id: string;
-    backer: string;
+    backer?: string;
     userName: string;
     originalAmount: number;
     profitShare: number;
@@ -90,10 +96,15 @@ export interface Distribution {
     status: string;
 }
 
+export interface RevenueShare {
+    amount: number;
+    percentage: number;
+}
+
 export interface RevenueDistribution {
     totalRevenue: number;
-    platformFee: number;
-    artistShare: number;
-    backerShare: number;
+    platformFee: RevenueShare;
+    artistShare: RevenueShare;
+    backerShare: RevenueShare;
     distributions: Distribution[];
 }

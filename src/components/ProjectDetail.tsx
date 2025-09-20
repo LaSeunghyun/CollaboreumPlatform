@@ -34,10 +34,10 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
     const fetchProject = async () => {
       try {
         setLoading(true);
-        const response = await fundingAPI.getProject(projectId.toString()) as ApiResponse<any>;
+        const projectData = await fundingAPI.getProject(projectId.toString());
 
-        if (response.success && response.data) {
-          setProject(response.data);
+        if (projectData) {
+          setProject(projectData);
         } else {
           setError('프로젝트를 찾을 수 없습니다.');
         }
@@ -66,9 +66,9 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
 
       if (response.success) {
         // 프로젝트 정보 새로고침
-        const updatedResponse = await fundingAPI.getProject(projectId.toString()) as ApiResponse<any>;
-        if (updatedResponse.success && updatedResponse.data) {
-          setProject(updatedResponse.data);
+        const updatedProject = await fundingAPI.getProject(projectId.toString());
+        if (updatedProject) {
+          setProject(updatedProject);
         }
         setShowPaymentModal(false);
       }
@@ -84,11 +84,11 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
         // 좋아요 상태를 즉시 업데이트
         setIsLiked(!isLiked);
         // 프로젝트 정보 새로고침
-        const updatedResponse = await fundingAPI.getProject(projectId.toString()) as ApiResponse<any>;
-        if (updatedResponse.success && updatedResponse.data) {
+        const updatedProject = await fundingAPI.getProject(projectId.toString());
+        if (updatedProject) {
           setProject((prev: any) => ({
             ...prev,
-            ...updatedResponse.data,
+            ...updatedProject,
             isLiked: !isLiked
           }));
         }
@@ -105,9 +105,9 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
       if (response.success) {
         setIsBookmarked(!isBookmarked);
         // 프로젝트 정보 새로고침
-        const updatedResponse = await fundingAPI.getProject(projectId.toString()) as ApiResponse<any>;
-        if (updatedResponse.success && updatedResponse.data) {
-          setProject(updatedResponse.data);
+        const updatedProject = await fundingAPI.getProject(projectId.toString());
+        if (updatedProject) {
+          setProject(updatedProject);
         }
       }
     } catch (error) {

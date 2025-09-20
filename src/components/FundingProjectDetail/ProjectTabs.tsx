@@ -11,6 +11,18 @@ interface ProjectTabsProps {
 }
 
 export const ProjectTabs: React.FC<ProjectTabsProps> = ({ project }) => {
+    const rewards = project.rewards ?? [];
+    const updates = project.updates ?? [];
+    const backers = project.backersList ?? [];
+    const stages = project.executionPlan?.stages ?? [];
+    const expenses = project.expenseRecords ?? [];
+    const revenueDistribution = project.revenueDistribution;
+
+    const totalRevenue = revenueDistribution?.totalRevenue ?? 0;
+    const artistShareAmount = revenueDistribution?.artistShare?.amount ?? 0;
+    const artistSharePercentage = revenueDistribution?.artistShare?.percentage ?? 0;
+    const distributions = revenueDistribution?.distributions ?? [];
+
     return (
         <Tabs defaultValue="overview" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
@@ -21,19 +33,19 @@ export const ProjectTabs: React.FC<ProjectTabsProps> = ({ project }) => {
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <FileText className="h-5 w-5" />
-                            프로젝트 소개
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-gray-700 leading-relaxed">
-                            {project.description}
-                        </p>
-                    </CardContent>
-                </Card>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <FileText className="h-5 w-5" />
+                                프로젝트 소개
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-gray-700 leading-relaxed">
+                                {project.description || '프로젝트 소개가 아직 등록되지 않았습니다.'}
+                            </p>
+                        </CardContent>
+                    </Card>
 
                 {/* 리워드 목록 */}
                 <Card>
@@ -41,7 +53,9 @@ export const ProjectTabs: React.FC<ProjectTabsProps> = ({ project }) => {
                         <CardTitle>리워드</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {project.rewards.map((reward) => (
+                        {rewards.length === 0 ? (
+                            <p className="text-sm text-gray-500">등록된 리워드가 없습니다.</p>
+                        ) : rewards.map((reward) => (
                             <div
                                 key={reward.id}
                                 className="border rounded-lg p-4 space-y-2"
@@ -53,33 +67,39 @@ export const ProjectTabs: React.FC<ProjectTabsProps> = ({ project }) => {
                                             {reward.description}
                                         </p>
                                     </div>
-                                    <div className="text-right">
-                                        <div className="font-bold text-lg">
-                                            {reward.amount.toLocaleString()}원
-                                        </div>
-                                        <div className="text-sm text-gray-500">
-                                            예상 전달일: {reward.estimatedDelivery}
+                                        <div className="text-right">
+                                            <div className="font-bold text-lg">
+                                                {(reward.amount ?? 0).toLocaleString()}원
+                                            </div>
+                                            <div className="text-sm text-gray-500">
+                                                예상 전달일: {reward.estimatedDelivery ? new Date(reward.estimatedDelivery).toLocaleDateString() : '미정'}
+                                            </div>
                                         </div>
                                     </div>
+                                    {reward.maxClaim && (
+                                        <div className="flex justify-between text-sm text-gray-500">
+                                            <span>
+                                                {(reward.claimed ?? 0)} / {reward.maxClaim}명 선택
+                                            </span>
+                                            <span>
+                                                {reward.maxClaim ? Math.round(((reward.claimed ?? 0) / reward.maxClaim) * 100) : 0}% 완료
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
-                                {reward.maxClaim && (
-                                    <div className="flex justify-between text-sm text-gray-500">
-                                        <span>
-                                            {reward.claimed || 0} / {reward.maxClaim}명 선택
-                                        </span>
-                                        <span>
-                                            {Math.round(((reward.claimed || 0) / reward.maxClaim) * 100)}% 완료
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
                         ))}
                     </CardContent>
                 </Card>
             </TabsContent>
 
             <TabsContent value="updates" className="space-y-4">
-                {project.updates.map((update) => (
+                {updates.length === 0 ? (
+                    <Card>
+                        <CardContent className="p-6 text-sm text-gray-500">
+                            아직 등록된 업데이트가 없습니다.
+                        </CardContent>
+                    </Card>
+                ) : updates.map((update) => (
                     <Card key={update.id}>
                         <CardHeader>
                             <div className="flex justify-between items-start">
@@ -89,7 +109,7 @@ export const ProjectTabs: React.FC<ProjectTabsProps> = ({ project }) => {
                                 </Badge>
                             </div>
                             <p className="text-sm text-gray-500">
-                                {update.date}
+                                {update.date ? new Date(update.date).toLocaleString() : ''}
                             </p>
                         </CardHeader>
                         <CardContent>
@@ -103,26 +123,32 @@ export const ProjectTabs: React.FC<ProjectTabsProps> = ({ project }) => {
 
             <TabsContent value="backers" className="space-y-4">
                 <div className="grid gap-4">
-                    {project.backersList.map((backer) => (
+                    {backers.length === 0 ? (
+                        <Card>
+                            <CardContent className="p-6 text-sm text-gray-500 text-center">
+                                아직 후원자가 없습니다.
+                            </CardContent>
+                        </Card>
+                    ) : backers.map((backer) => (
                         <Card key={backer.id}>
                             <CardContent className="p-4">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <Avatar className="h-8 w-8">
                                             <AvatarFallback>
-                                                {backer.userName.charAt(0)}
+                                                {backer.userName?.charAt?.(0) ?? '익'}
                                             </AvatarFallback>
                                         </Avatar>
                                         <div>
                                             <p className="font-medium">{backer.userName}</p>
                                             <p className="text-sm text-gray-500">
-                                                {backer.date}
+                                                {backer.date ? new Date(backer.date).toLocaleString() : ''}
                                             </p>
                                         </div>
                                     </div>
                                     <div className="text-right">
                                         <div className="font-semibold">
-                                            {backer.amount.toLocaleString()}원
+                                            {(backer.amount ?? 0).toLocaleString()}원
                                         </div>
                                         <Badge
                                             variant={backer.status === '완료' ? 'default' : 'secondary'}
@@ -148,7 +174,9 @@ export const ProjectTabs: React.FC<ProjectTabsProps> = ({ project }) => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {project.executionPlan.stages.map((stage) => (
+                        {stages.length === 0 ? (
+                            <p className="text-sm text-gray-500">등록된 집행 계획이 없습니다.</p>
+                        ) : stages.map((stage) => (
                             <div
                                 key={stage.id}
                                 className="border rounded-lg p-4 space-y-2"
@@ -162,7 +190,7 @@ export const ProjectTabs: React.FC<ProjectTabsProps> = ({ project }) => {
                                     </div>
                                     <div className="text-right">
                                         <div className="font-semibold">
-                                            {stage.budget.toLocaleString()}원
+                                            {(stage.budget ?? 0).toLocaleString()}원
                                         </div>
                                         <Badge
                                             variant={
@@ -175,8 +203,8 @@ export const ProjectTabs: React.FC<ProjectTabsProps> = ({ project }) => {
                                     </div>
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-500">
-                                    <span>{stage.startDate} ~ {stage.endDate}</span>
-                                    <span>진행률: {stage.progress}%</span>
+                                    <span>{stage.startDate ? new Date(stage.startDate).toLocaleDateString() : ''} ~ {stage.endDate ? new Date(stage.endDate).toLocaleDateString() : ''}</span>
+                                    <span>진행률: {(stage.progress ?? 0)}%</span>
                                 </div>
                             </div>
                         ))}
@@ -192,7 +220,9 @@ export const ProjectTabs: React.FC<ProjectTabsProps> = ({ project }) => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {project.expenseRecords.map((expense) => (
+                        {expenses.length === 0 ? (
+                            <p className="text-sm text-gray-500">등록된 지출 내역이 없습니다.</p>
+                        ) : expenses.map((expense) => (
                             <div
                                 key={expense.id}
                                 className="border rounded-lg p-4 space-y-2"
@@ -209,7 +239,7 @@ export const ProjectTabs: React.FC<ProjectTabsProps> = ({ project }) => {
                                     </div>
                                     <div className="text-right">
                                         <div className="font-semibold">
-                                            {expense.amount.toLocaleString()}원
+                                            {(expense.amount ?? 0).toLocaleString()}원
                                         </div>
                                         <Badge
                                             variant={expense.verified ? 'default' : 'secondary'}
@@ -220,7 +250,7 @@ export const ProjectTabs: React.FC<ProjectTabsProps> = ({ project }) => {
                                     </div>
                                 </div>
                                 <div className="text-sm text-gray-500">
-                                    {expense.date}
+                                    {expense.date ? new Date(expense.date).toLocaleDateString() : ''}
                                 </div>
                             </div>
                         ))}
@@ -239,21 +269,23 @@ export const ProjectTabs: React.FC<ProjectTabsProps> = ({ project }) => {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="text-center p-4 bg-gray-50 rounded-lg">
                                 <div className="text-2xl font-bold text-green-600">
-                                    {project.revenueDistribution.totalRevenue.toLocaleString()}원
+                                    {totalRevenue.toLocaleString()}원
                                 </div>
                                 <div className="text-sm text-gray-500">총 수익</div>
                             </div>
                             <div className="text-center p-4 bg-gray-50 rounded-lg">
                                 <div className="text-2xl font-bold text-blue-600">
-                                    {project.revenueDistribution.artistShare.toLocaleString()}원
+                                    {artistShareAmount.toLocaleString()}원
                                 </div>
-                                <div className="text-sm text-gray-500">아티스트 수익</div>
+                                <div className="text-sm text-gray-500">아티스트 수익 ({artistSharePercentage}%)</div>
                             </div>
                         </div>
 
                         <div className="space-y-2">
                             <h4 className="font-semibold">분배 내역</h4>
-                            {project.revenueDistribution.distributions.map((distribution) => (
+                            {distributions.length === 0 ? (
+                                <p className="text-sm text-gray-500">분배 내역이 없습니다.</p>
+                            ) : distributions.map((distribution) => (
                                 <div
                                     key={distribution.id}
                                     className="flex justify-between items-center p-3 border rounded-lg"
@@ -261,12 +293,12 @@ export const ProjectTabs: React.FC<ProjectTabsProps> = ({ project }) => {
                                     <div>
                                         <p className="font-medium">{distribution.userName}</p>
                                         <p className="text-sm text-gray-500">
-                                            원래 후원: {distribution.originalAmount.toLocaleString()}원
+                                            원래 후원: {(distribution.originalAmount ?? 0).toLocaleString()}원
                                         </p>
                                     </div>
                                     <div className="text-right">
                                         <div className="font-semibold">
-                                            {distribution.amount.toLocaleString()}원
+                                            {(distribution.amount ?? 0).toLocaleString()}원
                                         </div>
                                         <div className="text-sm text-gray-500">
                                             {distribution.profitShare}% 수익
