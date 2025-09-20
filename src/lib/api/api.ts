@@ -32,7 +32,12 @@ class ApiClient {
       config => {
         const authToken = localStorage.getItem('authToken');
         const accessToken = localStorage.getItem('accessToken');
-        const token = authToken ?? accessToken;
+        
+        // "undefined" 문자열이나 null 값 필터링
+        const validAuthToken = authToken && authToken !== 'null' && authToken !== 'undefined' ? authToken : null;
+        const validAccessToken = accessToken && accessToken !== 'null' && accessToken !== 'undefined' ? accessToken : null;
+        
+        const token = validAuthToken ?? validAccessToken;
 
         // 디버깅을 위한 로그
         console.log('🔍 API Request Debug:', {
@@ -43,6 +48,14 @@ class ApiClient {
             : 'null',
           selectedToken: token ? `${token.substring(0, 20)}...` : 'null',
           headers: config.headers,
+        });
+
+        // localStorage 전체 상태 확인
+        console.log('🔍 localStorage 전체 상태:', {
+          allKeys: Object.keys(localStorage),
+          authToken: localStorage.getItem('authToken'),
+          accessToken: localStorage.getItem('accessToken'),
+          refreshToken: localStorage.getItem('refreshToken')
         });
 
         if (token) {

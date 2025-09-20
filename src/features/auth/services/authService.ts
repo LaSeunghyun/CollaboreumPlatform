@@ -9,9 +9,22 @@ const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 
 const storeTokens = (accessToken: string, refreshToken: string) => {
+    // 유효한 토큰인지 확인
+    if (!accessToken || accessToken === 'undefined' || accessToken === 'null') {
+        console.error('❌ Invalid accessToken:', accessToken);
+        return;
+    }
+    
+    if (!refreshToken || refreshToken === 'undefined' || refreshToken === 'null') {
+        console.error('❌ Invalid refreshToken:', refreshToken);
+        return;
+    }
+    
     localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
     localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
     localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    
+    console.log('✅ Tokens stored successfully');
 };
 
 const clearTokens = () => {
@@ -20,12 +33,38 @@ const clearTokens = () => {
     localStorage.removeItem(REFRESH_TOKEN_KEY);
 };
 
+const cleanInvalidTokens = () => {
+    const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
+    const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    
+    if (authToken === 'undefined' || authToken === 'null') {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        console.log('🧹 Cleaned invalid authToken');
+    }
+    
+    if (accessToken === 'undefined' || accessToken === 'null') {
+        localStorage.removeItem(ACCESS_TOKEN_KEY);
+        console.log('🧹 Cleaned invalid accessToken');
+    }
+    
+    if (refreshToken === 'undefined' || refreshToken === 'null') {
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
+        console.log('🧹 Cleaned invalid refreshToken');
+    }
+};
+
 const getStoredAccessToken = () => {
     return localStorage.getItem(AUTH_TOKEN_KEY) ?? localStorage.getItem(ACCESS_TOKEN_KEY);
 };
 
 class AuthService {
     private baseUrl = `${API_BASE_URL}/auth`;
+    
+    constructor() {
+        // 앱 시작 시 잘못된 토큰들 정리
+        cleanInvalidTokens();
+    }
 
     /**
      * 로그인
@@ -48,9 +87,9 @@ class AuthService {
             accessToken: response.data.accessToken ? `${response.data.accessToken.substring(0, 20)}...` : 'null',
             refreshToken: response.data.refreshToken ? `${response.data.refreshToken.substring(0, 20)}...` : 'null'
         });
-        
+
         storeTokens(response.data.accessToken, response.data.refreshToken);
-        
+
         // 저장 후 확인
         console.log('🔐 Tokens stored - Verification:', {
             authToken: localStorage.getItem(AUTH_TOKEN_KEY) ? `${localStorage.getItem(AUTH_TOKEN_KEY)!.substring(0, 20)}...` : 'null',

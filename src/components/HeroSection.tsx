@@ -57,8 +57,8 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
     selectedCategory === '전체'
       ? weeklyNewcomers
       : weeklyNewcomers.filter(
-          (artist: any) => artist.category === selectedCategory,
-        );
+        (artist: any) => artist.category === selectedCategory,
+      );
 
   const nextSlide = () => {
     setCurrentIndex(prev => (prev + 1) % filteredNewcomers.length);
@@ -195,11 +195,10 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
                     setSelectedCategory(category);
                     setCurrentIndex(0);
                   }}
-                  className={`cursor-pointer rounded-xl px-6 py-3 font-medium transition-all ${
-                    selectedCategory === category
+                  className={`cursor-pointer rounded-xl px-6 py-3 font-medium transition-all ${selectedCategory === category
                     ? 'shadow-apple bg-primary text-primary-foreground'
                     : 'hover:bg-secondary/50 text-muted-foreground hover:text-foreground'
-                  }`}
+                    }`}
                 >
                   {category}
                 </button>
@@ -230,15 +229,14 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
                         />
                         <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent' />
                         <Badge
-                          className={`absolute left-4 top-4 rounded-xl font-medium ${
-                            artist.category === '음악'
+                          className={`absolute left-4 top-4 rounded-xl font-medium ${artist.category === '음악'
                             ? 'bg-primary text-primary-foreground'
                             : artist.category === '미술'
                               ? 'bg-chart-5 text-white'
                               : artist.category === '문학'
                                 ? 'bg-chart-2 text-white'
                                 : 'bg-destructive text-white'
-                          }`}
+                            }`}
                         >
                           {artist.category}
                         </Badge>
