@@ -180,6 +180,12 @@ describe('useDebounce', () => {
 });
 ```
 
+#### 2.3 펀딩 신규 기능 테스트
+
+- `src/features/funding/components/FundingModeSelector/__tests__/FundingModeSelector.test.tsx`에서 라디오 기반 모금 방식 선택 UI를 검증하여 `variant`/`tone` 업데이트 이후 상호작용과 접근성을 보장합니다.
+- `src/features/funding/components/SecretPerksEditor/__tests__/SecretPerksEditor.test.tsx`는 비밀 혜택 폼이 입력을 트리밍하고 비동기 저장을 처리하는지 확인합니다.
+- `src/__tests__/CreateProjectPage.integration.test.tsx`는 `msw` 서버로 `/funding/projects` POST 요청을 모킹하여 Flexible Funding 옵션과 Secret Perks 데이터가 올바르게 전송되는 통합 시나리오를 담습니다.
+
 ### Phase 3: 통합 테스트 강화
 
 #### 3.1 API 통합 테스트

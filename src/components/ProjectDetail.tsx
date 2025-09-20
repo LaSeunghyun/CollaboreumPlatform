@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Progress } from './ui/progress';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  Progress,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from '@/shared/ui';
 import { Heart, Star, MessageCircle, Share2, Bookmark } from 'lucide-react';
 import { ImageWithFallback } from './atoms/ImageWithFallback';
-import { PaymentModal } from '@/features/funding/components/PaymentModal';
-import { fundingAPI, interactionAPI } from '../services/api';
-import { useCategories } from '../lib/api/useCategories';
-import { getCategoryColor } from '../constants/categories';
-import { getFirstChar } from '../utils/typeGuards';
-import { ApiResponse } from '../types';
+import { PaymentModal, SecretPerksEditor } from '@/features/funding/components';
+import { fundingAPI, interactionAPI } from '@/services/api';
+import { useCategories } from '@/lib/api/useCategories';
+import { getCategoryColor } from '@/constants/categories';
+import { getFirstChar } from '@/utils/typeGuards';
+import { ApiResponse } from '@/types';
+import { cn } from '@/shared/lib/cn';
 
 interface ProjectDetailProps {
   projectId: number;
@@ -26,6 +35,10 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [secretPerks, setSecretPerks] = useState('');
+  const [isSavingSecretPerks, setIsSavingSecretPerks] = useState(false);
+  const [secretPerksMessage, setSecretPerksMessage] = useState<string | null>(null);
+  const [secretPerksStatus, setSecretPerksStatus] = useState<'success' | 'error' | null>(null);
 
   // 카테고리 API 훅 사용
   const { data: categoriesData } = useCategories();
@@ -38,6 +51,10 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
 
         if (projectData) {
           setProject(projectData);
+          const perks = Array.isArray((projectData as any).secretPerks)
+            ? ((projectData as any).secretPerks as string[]).join('\n')
+            : ((projectData as any).secretPerks ?? '');
+          setSecretPerks(perks);
         } else {
           setError('프로젝트를 찾을 수 없습니다.');
         }
@@ -116,6 +133,46 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
     }
   };
 
+  const handleSecretPerksSave = async (value: string) => {
+    const entries = value
+      .split('\n')
+      .map(perk => perk.trim())
+      .filter(Boolean);
+
+    setIsSavingSecretPerks(true);
+    setSecretPerksMessage(null);
+    setSecretPerksStatus(null);
+
+    try {
+      const response = await fundingAPI.updateProject(projectId.toString(), {
+        secretPerks: entries
+      }) as ApiResponse<any>;
+
+      if (response?.success) {
+        setSecretPerks(value);
+        setProject((prev: any) => (
+          prev
+            ? {
+                ...prev,
+                secretPerks: entries
+              }
+            : prev
+        ));
+        setSecretPerksStatus('success');
+        setSecretPerksMessage('비밀 혜택이 저장되었습니다.');
+      } else {
+        setSecretPerksStatus('error');
+        setSecretPerksMessage('비밀 혜택 저장에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('비밀 혜택 저장 실패:', error);
+      setSecretPerksStatus('error');
+      setSecretPerksMessage('비밀 혜택 저장에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSavingSecretPerks(false);
+    }
+  };
+
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -132,10 +189,10 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-surface">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">프로젝트를 불러오는 중...</p>
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-muted-foreground/30 border-t-primary-500" />
+          <p className="mt-4 text-sm text-muted-foreground">프로젝트를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -143,10 +200,12 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
 
   if (error || !project) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-500 mb-4">{error}</p>
-          <Button onClick={onBack}>돌아가기</Button>
+      <div className="flex min-h-screen items-center justify-center bg-surface">
+        <div className="space-y-4 text-center">
+          <p className="text-sm font-semibold text-danger-600">{error || '프로젝트를 찾을 수 없습니다.'}</p>
+          <Button variant="outline" tone="danger" onClick={onBack}>
+            돌아가기
+          </Button>
         </div>
       </div>
     );
@@ -173,123 +232,130 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
-        <Button variant="ghost" onClick={onBack} className="mb-6">
+    <div className="min-h-screen bg-surface">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <Button variant="ghost" tone="default" onClick={onBack} className="mb-6 w-fit">
           ← 프로젝트 목록으로
         </Button>
 
-        {/* Project Header */}
-        <Card className="mb-8">
+        <Card className="mb-8 overflow-hidden">
           <div className="relative aspect-video">
             <ImageWithFallback
               src={project.image}
               alt={project.title || '프로젝트 이미지'}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
             />
             {project.featured && (
-              <Badge className="absolute top-4 left-4 bg-yellow-500 text-white">
+              <Badge tone="warning" className="absolute left-4 top-4">
                 주목 프로젝트
               </Badge>
             )}
-            <Badge className={`absolute top-4 right-4 ${getCategoryColorClass(project.category)}`}>
+            <Badge className={cn('absolute right-4 top-4', getCategoryColorClass(project.category))}>
               {project.category || '기타'}
             </Badge>
           </div>
 
-          <CardContent className="p-8">
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">{project.title || '제목 없음'}</h1>
-                <div className="flex items-center gap-4 mb-4">
-                  <Avatar className="w-12 h-12">
-                    <AvatarImage src={project.artistAvatar} alt={project.artist} />
-                    <AvatarFallback>{getFirstChar(project.artist)}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium text-gray-900">by {project.artist}</p>
-                    <div className="flex items-center gap-2">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-sm text-gray-600">{project.artistRating}</span>
+          <CardContent className="space-y-6 p-8">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+              <div className="flex-1 space-y-4">
+                <div className="space-y-3">
+                  <h1 className="text-3xl font-bold text-foreground">{project.title || '제목 없음'}</h1>
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={project.artistAvatar} alt={project.artist} />
+                      <AvatarFallback>{getFirstChar(project.artist)}</AvatarFallback>
+                    </Avatar>
+                    <div className="space-y-1">
+                      <p className="font-medium text-foreground">by {project.artist}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Star className="h-4 w-4 text-warning-500" />
+                        <span>{project.artistRating}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                <p className="text-base leading-relaxed text-muted-foreground">
+                  {project.description || '설명 없음'}
+                </p>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 self-start">
                 <Button
-                  variant={isLiked ? "default" : "outline"}
+                  variant={isLiked ? 'solid' : 'outline'}
+                  tone={isLiked ? 'success' : 'default'}
                   size="sm"
                   onClick={handleLike}
+                  aria-pressed={isLiked}
                 >
-                  <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
+                  <Heart className={cn('h-4 w-4', isLiked && 'fill-current')} />
                 </Button>
                 <Button
-                  variant={isBookmarked ? "default" : "outline"}
+                  variant={isBookmarked ? 'solid' : 'outline'}
+                  tone={isBookmarked ? 'info' : 'default'}
                   size="sm"
                   onClick={handleBookmark}
+                  aria-pressed={isBookmarked}
                 >
-                  <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
+                  <Bookmark className={cn('h-4 w-4', isBookmarked && 'fill-current')} />
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleShare}>
-                  <Share2 className="w-4 h-4" />
+                  <Share2 className="h-4 w-4" />
                 </Button>
               </div>
             </div>
 
-            <p className="text-lg text-gray-700 mb-6">{project.description || '설명 없음'}</p>
-
-            {/* Progress Section */}
-            <div className="bg-gray-50 rounded-lg p-6 mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="rounded-3xl bg-card/60 p-6">
+              <div className="grid gap-6 md:grid-cols-4">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">₩{project.currentAmount?.toLocaleString()}</p>
-                  <p className="text-sm text-gray-600">현재 모금액</p>
+                  <p className="text-2xl font-bold text-foreground">
+                    ₩{project.currentAmount?.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-muted-foreground">현재 모금액</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">₩{project.targetAmount?.toLocaleString()}</p>
-                  <p className="text-sm text-gray-600">목표 금액</p>
+                  <p className="text-2xl font-bold text-foreground">
+                    ₩{project.targetAmount?.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-muted-foreground">목표 금액</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">{typeof project.backers === 'number' ? project.backers : 0}</p>
-                  <p className="text-sm text-gray-600">후원자 수</p>
+                  <p className="text-2xl font-bold text-foreground">
+                    {typeof project.backers === 'number' ? project.backers : 0}
+                  </p>
+                  <p className="text-sm text-muted-foreground">후원자 수</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">{project.daysLeft}</p>
-                  <p className="text-sm text-gray-600">일 남음</p>
+                  <p className="text-2xl font-bold text-foreground">{project.daysLeft}</p>
+                  <p className="text-sm text-muted-foreground">일 남음</p>
                 </div>
               </div>
 
-              <div className="mt-4">
-                <div className="flex justify-between text-sm mb-2">
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <span>진행률</span>
                   <span>{getProgressPercentage(project.currentAmount || 0, project.targetAmount).toFixed(1)}%</span>
                 </div>
-                <Progress
-                  value={getProgressPercentage(project.currentAmount || 0, project.targetAmount)}
-                  className="h-3"
-                />
+                <Progress value={getProgressPercentage(project.currentAmount || 0, project.targetAmount)} className="h-3" />
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-3 md:flex-row">
               <Button size="lg" className="flex-1" onClick={handleBackProject}>
                 프로젝트 후원하기
               </Button>
               <Button
                 variant="outline"
+                tone="default"
                 size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600 hover:border-blue-700"
                 onClick={async () => {
                   try {
                     const response = await interactionAPI.followArtist(project.artistId || project.artist.id) as ApiResponse<any>;
                     if (response.success) {
                       alert('아티스트를 팔로우했습니다!');
                     }
-                  } catch (error) {
-                    console.error('팔로우 실패:', error);
+                  } catch (followError) {
+                    console.error('팔로우 실패:', followError);
                     alert('팔로우에 실패했습니다. 다시 시도해주세요.');
                   }
                 }}
@@ -300,7 +366,25 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
           </CardContent>
         </Card>
 
-        {/* Project Details Tabs */}
+        <SecretPerksEditor
+          value={secretPerks}
+          onChange={setSecretPerks}
+          onSubmit={handleSecretPerksSave}
+          isSaving={isSavingSecretPerks}
+          className="mb-6"
+        />
+        {secretPerksMessage && (
+          <p
+            className={cn(
+              'mb-8 text-sm font-medium',
+              secretPerksStatus === 'success' ? 'text-success-600' : 'text-danger-600'
+            )}
+            role="status"
+          >
+            {secretPerksMessage}
+          </p>
+        )}
+
         <Tabs defaultValue="story" className="mb-8">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="story">스토리</TabsTrigger>
@@ -311,9 +395,9 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
 
           <TabsContent value="story" className="mt-6">
             <Card>
-              <CardContent className="p-6">
-                <div className="prose max-w-none">
-                  <h3 className="text-xl font-semibold mb-4">프로젝트 스토리</h3>
+              <CardContent className="space-y-4 p-6">
+                <h3 className="text-xl font-semibold text-foreground">프로젝트 스토리</h3>
+                <div className="prose max-w-none text-muted-foreground">
                   <div dangerouslySetInnerHTML={{ __html: project.story || project.description }} />
                 </div>
               </CardContent>
@@ -322,18 +406,24 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
 
           <TabsContent value="rewards" className="mt-6">
             <Card>
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4">후원 옵션</h3>
+              <CardContent className="space-y-4 p-6">
+                <h3 className="text-xl font-semibold text-foreground">후원 옵션</h3>
                 <div className="grid gap-4">
                   {Array.isArray(project.rewards) && project.rewards.map((reward: any, index: number) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-medium text-lg">₩{typeof reward.amount === 'number' ? reward.amount.toLocaleString() : '0'}</h4>
-                        <Badge variant="secondary">{typeof reward.backers === 'number' ? reward.backers : 0}명 후원</Badge>
+                    <div key={index} className="rounded-2xl border border-border/60 p-4">
+                      <div className="mb-2 flex items-start justify-between">
+                        <h4 className="text-lg font-semibold text-foreground">
+                          ₩{typeof reward.amount === 'number' ? reward.amount.toLocaleString() : '0'}
+                        </h4>
+                        <Badge variant="secondary">
+                          {typeof reward.backers === 'number' ? reward.backers : 0}명 후원
+                        </Badge>
                       </div>
-                      <h5 className="font-medium text-gray-900 mb-2">{reward.title}</h5>
-                      <p className="text-gray-600 mb-3">{reward.description}</p>
-                      <Button onClick={handleBackProject}>이 옵션으로 후원하기</Button>
+                      <h5 className="mb-2 text-base font-medium text-foreground">{reward.title}</h5>
+                      <p className="mb-3 text-sm text-muted-foreground">{reward.description}</p>
+                      <Button size="sm" onClick={handleBackProject}>
+                        이 옵션으로 후원하기
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -343,23 +433,23 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
 
           <TabsContent value="updates" className="mt-6">
             <Card>
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4">프로젝트 업데이트</h3>
+              <CardContent className="space-y-4 p-6">
+                <h3 className="text-xl font-semibold text-foreground">프로젝트 업데이트</h3>
                 <div className="space-y-4">
                   {project.updates?.map((update: any, index: number) => (
-                    <div key={index} className="border-b pb-4 last:border-b-0">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-medium">{update.title}</h4>
-                        <span className="text-sm text-gray-500">{update.date}</span>
+                    <div key={index} className="border-b border-border/60 pb-4 last:border-b-0">
+                      <div className="mb-2 flex items-start justify-between">
+                        <h4 className="font-medium text-foreground">{update.title}</h4>
+                        <span className="text-sm text-muted-foreground">{update.date}</span>
                       </div>
-                      <p className="text-gray-600 mb-2">{update.content}</p>
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <p className="mb-2 text-sm text-muted-foreground">{update.content}</p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <div className="flex items-center gap-1">
-                          <Heart className="w-4 h-4" />
+                          <Heart className="h-4 w-4" />
                           <span>{typeof update.likes === 'number' ? update.likes : 0}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <MessageCircle className="w-4 h-4" />
+                          <MessageCircle className="h-4 w-4" />
                           <span>{update.comments}</span>
                         </div>
                       </div>
@@ -372,21 +462,21 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
 
           <TabsContent value="comments" className="mt-6">
             <Card>
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4">댓글</h3>
+              <CardContent className="space-y-4 p-6">
+                <h3 className="text-xl font-semibold text-foreground">댓글</h3>
                 <div className="space-y-4">
                   {(Array.isArray(project.comments) ? project.comments : []).map((comment: any, index: number) => (
                     <div key={index} className="flex gap-3">
-                      <Avatar className="w-8 h-8">
+                      <Avatar className="h-8 w-8">
                         <AvatarImage src={comment.author.avatar} alt={comment.author.username} />
                         <AvatarFallback>{getFirstChar(comment.author)}</AvatarFallback>
                       </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-sm">{comment.author.username}</span>
-                          <span className="text-xs text-gray-500">{comment.createdAt}</span>
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-foreground">{comment.author.username}</span>
+                          <span className="text-xs text-muted-foreground">{comment.createdAt}</span>
                         </div>
-                        <p className="text-gray-700">{comment.content}</p>
+                        <p className="text-sm text-muted-foreground">{comment.content}</p>
                       </div>
                     </div>
                   ))}
@@ -397,7 +487,6 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
         </Tabs>
       </div>
 
-      {/* Payment Modal */}
       {showPaymentModal && (
         <PaymentModal
           project={project}
