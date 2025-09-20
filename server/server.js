@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
+const fs = require('fs');
 const path = require('path');
 
 // Routes
@@ -61,6 +62,9 @@ if (missingEnvVars.length > 0) {
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const clientBuildPath = path.join(__dirname, '../build');
+const clientAssetsPath = path.join(clientBuildPath, 'assets');
+const clientIndexPath = path.join(clientBuildPath, 'index.html');
 
 // Database connection
 const connectDB = require('./config/database');
@@ -135,8 +139,28 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Static files
 app.use('/uploads', express.static('uploads'));
 
-// Serve static files from React build
-app.use(express.static(path.join(__dirname, '../build')));
+if (!fs.existsSync(clientBuildPath)) {
+  logger.warn({ clientBuildPath }, 'Client build directory is missing.');
+}
+
+if (fs.existsSync(clientAssetsPath)) {
+  app.use(
+    '/assets',
+    express.static(clientAssetsPath, {
+      immutable: true,
+      maxAge: '1y'
+    })
+  );
+}
+
+if (fs.existsSync(clientBuildPath)) {
+  app.use(
+    express.static(clientBuildPath, {
+      index: false,
+      maxAge: '1h'
+    })
+  );
+}
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -172,8 +196,26 @@ app.get('/api/health', (req, res) => {
 });
 
 // Catch all handler: send back React's index.html file for client-side routing
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../build', 'index.html'));
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+
+  if (!fs.existsSync(clientIndexPath)) {
+    logger.warn({ clientIndexPath }, 'Client index.html is missing.');
+    return res.status(404).send('Client build not found');
+  }
+
+  if (req.path.includes('.') && !req.path.endsWith('.html')) {
+    return res.status(404).end();
+  }
+
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  return res.sendFile(clientIndexPath, (error) => {
+    if (error) {
+      next(error);
+    }
+  });
 });
 
 // Graceful shutdown handling
