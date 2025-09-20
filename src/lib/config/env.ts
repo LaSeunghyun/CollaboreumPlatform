@@ -59,9 +59,9 @@ const ensureApiPath = (baseUrl: string): string => {
       url.pathname = '/api';
     }
 
-    return url.toString().replace(/\/+$/, '');
+    return url.toString().replace(/\/+$, '');
   } catch {
-    const withoutTrailingSlash = trimmed.replace(/\/+$/, '');
+    const withoutTrailingSlash = trimmed.replace(/\/+$, '');
 
     if (!withoutTrailingSlash || withoutTrailingSlash === '/' || withoutTrailingSlash === '.') {
       return '/api';
