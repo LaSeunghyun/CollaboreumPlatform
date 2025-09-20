@@ -1,0 +1,7 @@
+{
+  "name": "@types/http-errors",
+  "version": "2.0.5-local",
+  "description": "Local stub of @types/http-errors for offline installations",
+  "types": "index.d.ts",
+  "license": "MIT"
+}

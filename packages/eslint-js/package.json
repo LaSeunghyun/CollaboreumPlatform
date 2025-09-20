@@ -1,0 +1,13 @@
+{
+  "name": "@eslint/js",
+  "version": "9.6.0-local",
+  "description": "Local stub of @eslint/js for offline linting",
+  "main": "index.js",
+  "exports": {
+    ".": {
+      "require": "./index.js",
+      "import": "./index.js"
+    }
+  },
+  "license": "MIT"
+}
