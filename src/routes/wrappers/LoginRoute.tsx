@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import LoginPage from '@/components/LoginPage';
 import { useAuth } from '@/contexts/AuthContext';
 import { authAPI } from '@/services/api';
+import { ApiResponse } from '@/shared/types';
+import { AuthResponse } from '@/features/auth/types';
 
 export const LoginRoute: React.FC = () => {
   const navigate = useNavigate();
@@ -20,7 +22,10 @@ export const LoginRoute: React.FC = () => {
           setIsLoading(true);
           setError(undefined);
 
-          const response = await authAPI.login({ email, password });
+          const response = (await authAPI.login({
+            email,
+            password,
+          })) as ApiResponse<AuthResponse>;
 
           if (response.success && response.data) {
             // 토큰을 localStorage에 저장

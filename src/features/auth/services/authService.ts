@@ -7,7 +7,7 @@ import {
   PasswordReset,
 } from '../types';
 import { authAPI } from '../../../services/api';
-import { ApiResponse } from '../../../shared/types';
+import { ApiResponse, User } from '../../../shared/types';
 
 class AuthService {
   /**
@@ -84,18 +84,8 @@ class AuthService {
   /**
    * 현재 사용자 정보 조회
    */
-  async getCurrentUser(): Promise<{
-    id: string;
-    email: string;
-    name: string;
-    role: string;
-  }> {
-    const response = (await authAPI.verify()) as ApiResponse<{
-      id: string;
-      email: string;
-      name: string;
-      role: string;
-    }>;
+  async getCurrentUser(): Promise<User> {
+    const response = (await authAPI.verify()) as ApiResponse<User>;
 
     if (!response.success || !response.data) {
       throw new Error(response.error || '사용자 정보 조회에 실패했습니다');
@@ -139,13 +129,11 @@ class AuthService {
     name?: string;
     email?: string;
     avatar?: string;
-  }): Promise<{ id: string; email: string; name: string; role: string }> {
-    const response = (await authAPI.put('/auth/profile', data)) as ApiResponse<{
-      id: string;
-      email: string;
-      name: string;
-      role: string;
-    }>;
+  }): Promise<User> {
+    const response = (await authAPI.put(
+      '/auth/profile',
+      data,
+    )) as ApiResponse<User>;
 
     if (!response.success || !response.data) {
       throw new Error(response.error || '프로필 업데이트에 실패했습니다');
