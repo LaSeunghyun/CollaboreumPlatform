@@ -172,7 +172,7 @@
   * {
     @apply border-border;
   }
-  
+
   *:focus {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
@@ -216,6 +216,66 @@
   /* Radial gradient utility */
   .bg-gradient-radial {
     background-image: radial-gradient(ellipse at center, var(--tw-gradient-stops));
+  }
+
+  /* Top to bottom gradient utilities */
+  .bg-gradient-top {
+    background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
+  }
+
+  .bg-gradient-top-radial {
+    background-image: radial-gradient(ellipse at top, var(--tw-gradient-stops));
+  }
+
+  .bg-gradient-top-soft {
+    background-image: linear-gradient(180deg,
+        rgba(79, 70, 229, 0.15) 0%,
+        rgba(14, 165, 233, 0.1) 30%,
+        rgba(79, 70, 229, 0.05) 60%,
+        transparent 100%);
+  }
+
+  .bg-gradient-top-warm {
+    background-image: linear-gradient(180deg,
+        rgba(255, 193, 7, 0.2) 0%,
+        rgba(255, 152, 0, 0.15) 25%,
+        rgba(233, 30, 99, 0.1) 50%,
+        rgba(79, 70, 229, 0.05) 75%,
+        transparent 100%);
+  }
+
+  .bg-gradient-top-cool {
+    background-image: linear-gradient(180deg,
+        rgba(14, 165, 233, 0.2) 0%,
+        rgba(59, 130, 246, 0.15) 25%,
+        rgba(79, 70, 229, 0.1) 50%,
+        rgba(139, 92, 246, 0.05) 75%,
+        transparent 100%);
+  }
+
+  /* Animated gradient backgrounds */
+  .bg-gradient-animated {
+    background: linear-gradient(-45deg,
+        rgba(79, 70, 229, 0.1),
+        rgba(14, 165, 233, 0.1),
+        rgba(139, 92, 246, 0.1),
+        rgba(79, 70, 229, 0.1));
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+
+    100% {
+      background-position: 0% 50%;
+    }
   }
 }
 
