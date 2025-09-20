@@ -31,6 +31,21 @@
         "paths": {
             "@/*": [
                 "./*"
+            ],
+            "@/shared/*": [
+                "shared/*"
+            ],
+            "@/features/*": [
+                "features/*"
+            ],
+            "@/components/*": [
+                "components/*"
+            ],
+            "@/pages/*": [
+                "pages/*"
+            ],
+            "@/services/*": [
+                "services/*"
             ]
         },
         "types": [
