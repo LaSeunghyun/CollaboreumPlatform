@@ -1,4 +1,5 @@
 import { api } from '@/lib/api/api';
+import { ApiResponse } from '@/shared/types';
 import {
   FundingProject,
   FundingStats,
@@ -7,6 +8,145 @@ import {
   UpdateFundingProjectRequest,
   BackProjectRequest
 } from '../types/funding.types';
+import { FundingProjectStatus } from '../types';
+
+type FundingProjectsResponse = {
+  projects: FundingProjectApi[];
+};
+
+type FundingProjectApi = {
+  id?: string | number;
+  _id?: string | number;
+  title: string;
+  description?: string;
+  shortDescription?: string;
+  goalAmount: number;
+  currentAmount?: number;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+  daysLeft?: number;
+  ownerId?: string;
+  categoryId?: string;
+  category?: string;
+  image?: string;
+  images?: string[];
+  tags?: string[];
+  progress?: number;
+  backerCount?: number;
+  backers?: number;
+  isActive?: boolean;
+  isFeatured?: boolean;
+  featured?: boolean;
+  metadata?: Record<string, any>;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+const STATUS_MAP: Record<string, FundingProjectStatus> = {
+  collecting: FundingProjectStatus.COLLECTING,
+  진행중: FundingProjectStatus.COLLECTING,
+  succeeded: FundingProjectStatus.SUCCEEDED,
+  success: FundingProjectStatus.SUCCEEDED,
+  성공: FundingProjectStatus.SUCCEEDED,
+  failed: FundingProjectStatus.FAILED,
+  failure: FundingProjectStatus.FAILED,
+  실패: FundingProjectStatus.FAILED,
+  취소: FundingProjectStatus.FAILED,
+  executing: FundingProjectStatus.EXECUTING,
+  집행중: FundingProjectStatus.EXECUTING,
+  distributing: FundingProjectStatus.DISTRIBUTING,
+  분배중: FundingProjectStatus.DISTRIBUTING,
+  closed: FundingProjectStatus.CLOSED,
+  완료: FundingProjectStatus.CLOSED,
+  draft: FundingProjectStatus.DRAFT,
+  준비중: FundingProjectStatus.DRAFT,
+};
+
+const SHORT_DESCRIPTION_LENGTH = 120;
+
+const mapFundingProjectStatus = (status?: string): FundingProjectStatus => {
+  if (!status) {
+    return FundingProjectStatus.DRAFT;
+  }
+
+  const normalized = status.trim().toLowerCase();
+  if (normalized in STATUS_MAP) {
+    return STATUS_MAP[normalized];
+  }
+
+  if (status in STATUS_MAP) {
+    return STATUS_MAP[status];
+  }
+
+  return FundingProjectStatus.DRAFT;
+};
+
+const createShortDescription = (description?: string): string => {
+  if (!description) {
+    return '';
+  }
+
+  const trimmed = description.trim();
+  if (trimmed.length <= SHORT_DESCRIPTION_LENGTH) {
+    return trimmed;
+  }
+
+  return `${trimmed.slice(0, SHORT_DESCRIPTION_LENGTH - 1)}…`;
+};
+
+const mapFundingProjectFromApi = (
+  project: FundingProjectApi
+): FundingProject | null => {
+  const identifier = project.id ?? project._id;
+  if (!identifier) {
+    return null;
+  }
+
+  const targetAmount = project.goalAmount ?? 0;
+  const currentAmount = project.currentAmount ?? 0;
+
+  const imageList = Array.isArray(project.images)
+    ? project.images.filter((image): image is string => Boolean(image))
+    : [];
+
+  if (project.image) {
+    imageList.unshift(project.image);
+  }
+
+  const uniqueImages = Array.from(new Set(imageList));
+
+  const progress = typeof project.progress === 'number'
+    ? Math.min(Math.max(Math.round(project.progress), 0), 100)
+    : targetAmount > 0
+      ? Math.min(Math.max(Math.round((currentAmount / targetAmount) * 100), 0), 100)
+      : 0;
+
+  return {
+    id: String(identifier),
+    title: project.title,
+    description: project.description ?? '',
+    shortDescription: project.shortDescription ?? createShortDescription(project.description),
+    targetAmount,
+    currentAmount,
+    status: mapFundingProjectStatus(project.status),
+    startDate: project.startDate,
+    endDate: project.endDate,
+    daysLeft: project.daysLeft,
+    ownerId: project.ownerId,
+    categoryId: project.categoryId,
+    category: project.category,
+    images: uniqueImages,
+    tags: Array.isArray(project.tags) ? project.tags : [],
+    progress,
+    backerCount: project.backerCount ?? project.backers ?? 0,
+    isActive: project.isActive ?? true,
+    isFeatured: project.isFeatured ?? project.featured ?? false,
+    metadata: project.metadata ?? {},
+    createdAt: project.createdAt,
+    updatedAt: project.updatedAt,
+  };
+};
 
 class FundingService {
   // 펀딩 프로젝트 목록 조회
@@ -22,8 +162,20 @@ class FundingService {
     if (filters?.sortBy) params.append('sortBy', filters.sortBy);
     if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder);
 
-    const response = await api.get(`/funding/projects?${params.toString()}`);
-    return (response.data as any).data;
+    const queryString = params.toString();
+    const endpoint = queryString ? `/funding/projects?${queryString}` : '/funding/projects';
+
+    const response = await api.get<ApiResponse<FundingProjectsResponse>>(endpoint);
+
+    if (!response.success) {
+      throw new Error(response.message || '펀딩 프로젝트를 불러오지 못했습니다.');
+    }
+
+    const projects = response.data?.projects ?? [];
+
+    return projects
+      .map(mapFundingProjectFromApi)
+      .filter((project): project is FundingProject => project !== null);
   }
 
   // 펀딩 프로젝트 상세 조회

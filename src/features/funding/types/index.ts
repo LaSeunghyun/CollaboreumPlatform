@@ -12,31 +12,34 @@ export enum FundingProjectStatus {
 }
 
 // 펀딩 프로젝트
-export interface FundingProject extends BaseEntity {
+export interface FundingProject {
+    id: string;
     title: string;
     description: string;
     shortDescription: string;
     targetAmount: number; // 목표 금액 (원 단위)
     currentAmount: number; // 현재 모금액 (원 단위)
     status: FundingProjectStatus;
-    startDate: Date;
-    endDate: Date;
-    daysLeft: number; // 남은 일수
-    ownerId: string;
-    owner: User;
-    categoryId: string;
-    category: Category;
+    startDate?: Date | string;
+    endDate?: Date | string;
+    daysLeft?: number; // 남은 일수
+    ownerId?: string;
+    owner?: User;
+    categoryId?: string;
+    category?: Category | string;
     images: string[];
     tags: string[];
-    rewards: Reward[];
-    pledges: Pledge[];
-    executions: Execution[];
-    distributions: Distribution[];
+    rewards?: Reward[];
+    pledges?: Pledge[];
+    executions?: Execution[];
+    distributions?: Distribution[];
     progress: number; // 진행률 (0-100)
     backerCount: number; // 후원자 수
-    isActive: boolean;
+    isActive?: boolean;
     isFeatured: boolean;
-    metadata: Record<string, any>;
+    metadata?: Record<string, any>;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
 }
 
 // 리워드
