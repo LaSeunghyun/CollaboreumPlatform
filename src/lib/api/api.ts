@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { resolveApiBaseUrl } from '@/lib/config/env';
 import { ApiResponse, ApiError, ApiRequestConfig, ApiEndpoint } from '@/shared/types';
 
@@ -18,83 +18,89 @@ class ApiClient {
   }
 
   private setupInterceptors() {
-    // 요청 인터셉터
     this.client.interceptors.request.use(
       (config) => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken');
         if (token) {
+          config.headers = config.headers ?? {};
           config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
       },
-      (error) => {
-        return Promise.reject(this.handleError(error));
-      }
+      (error) => Promise.reject(this.handleError(error))
     );
 
-    // 응답 인터셉터
     this.client.interceptors.response.use(
-      (response: AxiosResponse<ApiResponse>) => {
-        return response;
-      },
-      (error) => {
-        return Promise.reject(this.handleError(error));
-      }
+      (response: AxiosResponse) => response,
+      (error) => Promise.reject(this.handleError(error))
     );
   }
 
-  private handleError(error: any): ApiError {
-    if (error.response) {
-      // 서버 응답이 있는 경우
+  private clearStoredAuth() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('authUser');
+  }
+
+  private handleError(error: AxiosError | Error): ApiError {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      if (status === 401) {
+        this.clearStoredAuth();
+      }
+
       return {
         success: false,
-        error: error.response.data?.error || '서버 오류가 발생했습니다.',
-        message: error.response.data?.message || '알 수 없는 오류가 발생했습니다.',
-        status: error.response.status,
-        details: error.response.data?.details,
-      };
-    } else if (error.request) {
-      // 요청은 보냈지만 응답을 받지 못한 경우
-      return {
-        success: false,
-        error: '네트워크 오류',
-        message: '서버에 연결할 수 없습니다.',
-        status: 0,
-      };
-    } else {
-      // 요청 설정 중 오류가 발생한 경우
-      return {
-        success: false,
-        error: '요청 오류',
-        message: error.message || '알 수 없는 오류가 발생했습니다.',
-        status: 0,
+        error: (error.response?.data as ApiError)?.error || error.message,
+        message:
+          (error.response?.data as ApiError)?.message ||
+          error.message ||
+          '알 수 없는 오류가 발생했습니다.',
+        status,
+        details: (error.response?.data as ApiError)?.details,
       };
     }
+
+    return {
+      success: false,
+      error: '요청 오류',
+      message: error.message || '알 수 없는 오류가 발생했습니다.',
+    };
   }
 
-  async get<T>(endpoint: ApiEndpoint, params?: Record<string, any>): Promise<ApiResponse<T>> {
-    const response = await this.client.get(endpoint, { params });
+  async request<T = unknown>(endpoint: ApiEndpoint, config: ApiRequestConfig = {}): Promise<T> {
+    const { method = 'GET', params, headers, data, body, timeout } = config;
+
+    const requestConfig: AxiosRequestConfig = {
+      url: endpoint,
+      method,
+      params,
+      headers,
+      data: data ?? body,
+      timeout,
+    };
+
+    const response = await this.client.request<T>(requestConfig);
     return response.data;
   }
 
-  async post<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>> {
-    const response = await this.client.post(endpoint, data);
-    return response.data;
+  async get<T>(endpoint: ApiEndpoint, params?: Record<string, any>): Promise<T> {
+    return this.request<T>(endpoint, { method: 'GET', params });
   }
 
-  async put<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>> {
-    const response = await this.client.put(endpoint, data);
-    return response.data;
+  async post<T>(endpoint: ApiEndpoint, data?: any): Promise<T> {
+    return this.request<T>(endpoint, { method: 'POST', data });
   }
 
-  async patch<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>> {
-    const response = await this.client.patch(endpoint, data);
-    return response.data;
+  async put<T>(endpoint: ApiEndpoint, data?: any): Promise<T> {
+    return this.request<T>(endpoint, { method: 'PUT', data });
   }
 
-  async delete<T>(endpoint: ApiEndpoint): Promise<ApiResponse<T>> {
-    const response = await this.client.delete(endpoint);
-    return response.data;
+  async patch<T>(endpoint: ApiEndpoint, data?: any): Promise<T> {
+    return this.request<T>(endpoint, { method: 'PATCH', data });
+  }
+
+  async delete<T>(endpoint: ApiEndpoint): Promise<T> {
+    return this.request<T>(endpoint, { method: 'DELETE' });
   }
 
   // 파일 업로드
@@ -119,7 +125,7 @@ class ApiClient {
   }
 
   // 배치 요청
-  async batch<T>(requests: Array<{ method: string; endpoint: ApiEndpoint; data?: any }>): Promise<ApiResponse<T>[]> {
+  async batch<T>(requests: Array<{ method: string; endpoint: ApiEndpoint; data?: any }>): Promise<T[]> {
     const promises = requests.map(({ method, endpoint, data }) => {
       switch (method.toUpperCase()) {
         case 'GET':

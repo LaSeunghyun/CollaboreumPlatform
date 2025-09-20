@@ -1,6 +1,14 @@
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery as useInfiniteQueryHook, UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
-import { api } from '../../services/apiClient';
-import { ApiResponse, SearchParams } from '../../types/api';
+import {
+    useQuery,
+    useMutation,
+    useQueryClient,
+    useInfiniteQuery as useInfiniteQueryHook,
+    UseQueryOptions,
+    UseMutationOptions,
+} from '@tanstack/react-query';
+import { api } from '@/lib/api/api';
+import type { ApiResponse } from '@/shared/types';
+import { SearchParams } from '../../types/api';
 
 // 기본 쿼리 옵션
 const defaultQueryOptions = {
@@ -25,7 +33,7 @@ export function useApiQuery<T = any>(
 ) {
     return useQuery({
         queryKey,
-        queryFn: () => api.get<T>(endpoint, params),
+        queryFn: () => api.get<ApiResponse<T>>(endpoint, params),
         ...defaultQueryOptions,
         ...options,
     });
@@ -43,15 +51,15 @@ export function useApiMutation<T = any, V = any>(
         mutationFn: (data?: V) => {
             switch (method) {
                 case 'POST':
-                    return api.post<T>(endpoint, data);
+                    return api.post<ApiResponse<T>>(endpoint, data);
                 case 'PUT':
-                    return api.put<T>(endpoint, data);
+                    return api.put<ApiResponse<T>>(endpoint, data);
                 case 'DELETE':
-                    return api.delete<T>(endpoint);
+                    return api.delete<ApiResponse<T>>(endpoint);
                 case 'PATCH':
-                    return api.patch<T>(endpoint, data);
+                    return api.patch<ApiResponse<T>>(endpoint, data);
                 default:
-                    return api.post<T>(endpoint, data);
+                    return api.post<ApiResponse<T>>(endpoint, data);
             }
         },
         ...defaultMutationOptions,
@@ -87,11 +95,13 @@ export function useInfiniteQuery<T = any>(
     return useInfiniteQueryHook({
         queryKey,
         queryFn: ({ pageParam = 1 }: { pageParam?: number }) =>
-            api.get<T>(endpoint, { ...params, page: pageParam }),
-        getNextPageParam: (lastPage: any) => {
-            if (!lastPage.pagination) return undefined;
-            const { page, pages } = lastPage.pagination;
-            return page < pages ? page + 1 : undefined;
+            api.get<ApiResponse<T>>(endpoint, { ...params, page: pageParam }),
+        getNextPageParam: (lastPage: ApiResponse<any>) => {
+            if (!lastPage?.pagination) return undefined;
+            const { page } = lastPage.pagination as { page: number; totalPages?: number; pages?: number };
+            const totalPages = lastPage.pagination.totalPages ?? (lastPage.pagination as any).pages;
+            if (typeof totalPages !== 'number') return undefined;
+            return page < totalPages ? page + 1 : undefined;
         },
         ...defaultQueryOptions,
         ...options,
@@ -132,15 +142,15 @@ export function useOptimisticMutation<T = any, V = any>(
         mutationFn: (data?: V) => {
             switch (method) {
                 case 'POST':
-                    return api.post<T>(endpoint, data);
+                    return api.post<ApiResponse<T>>(endpoint, data);
                 case 'PUT':
-                    return api.put<T>(endpoint, data);
+                    return api.put<ApiResponse<T>>(endpoint, data);
                 case 'DELETE':
-                    return api.delete<T>(endpoint);
+                    return api.delete<ApiResponse<T>>(endpoint);
                 case 'PATCH':
-                    return api.patch<T>(endpoint, data);
+                    return api.patch<ApiResponse<T>>(endpoint, data);
                 default:
-                    return api.post<T>(endpoint, data);
+                    return api.post<ApiResponse<T>>(endpoint, data);
             }
         },
         onMutate: async (newData) => {
