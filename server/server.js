@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
+const fs = require('fs');
 const path = require('path');
 
 // Routes
@@ -61,6 +62,182 @@ if (missingEnvVars.length > 0) {
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const clientBuildPath = path.join(__dirname, '../build');
+const clientAssetsPath = path.join(clientBuildPath, 'assets');
+const clientIndexPath = path.join(clientBuildPath, 'index.html');
+const clientManifestPath = path.join(clientBuildPath, 'manifest.json');
+
+let cachedManifest = null;
+let cachedManifestMtime = 0;
+let manifestMissingLogged = false;
+let manifestReadErrorLogged = false;
+let cachedIndexHtml = null;
+let cachedIndexHtmlMtime = 0;
+let cachedHydratedIndexHtml = null;
+let cachedHydratedIndexSignature = null;
+let entrypointResolutionWarned = false;
+
+const normalizeEntrypoint = (filePath) => {
+  if (!filePath) {
+    return null;
+  }
+
+  return filePath.startsWith('/') ? filePath.slice(1) : filePath;
+};
+
+const loadAssetManifest = () => {
+  if (!fs.existsSync(clientManifestPath)) {
+    if (!manifestMissingLogged) {
+      logger.warn({ manifestPath: clientManifestPath }, 'Client manifest is missing.');
+      manifestMissingLogged = true;
+    }
+    cachedManifest = null;
+    cachedManifestMtime = 0;
+    return null;
+  }
+
+  try {
+    const manifestStats = fs.statSync(clientManifestPath);
+
+    if (!cachedManifest || manifestStats.mtimeMs !== cachedManifestMtime) {
+      const manifestRaw = fs.readFileSync(clientManifestPath, 'utf-8');
+      cachedManifest = JSON.parse(manifestRaw);
+      cachedManifestMtime = manifestStats.mtimeMs;
+      manifestMissingLogged = false;
+      manifestReadErrorLogged = false;
+      logger.info({ manifestPath: clientManifestPath }, 'Client manifest loaded.');
+    }
+  } catch (error) {
+    if (!manifestReadErrorLogged) {
+      logger.error({ error, manifestPath: clientManifestPath }, 'Failed to read client manifest.');
+      manifestReadErrorLogged = true;
+    }
+    cachedManifest = null;
+    cachedManifestMtime = 0;
+    return null;
+  }
+
+  return cachedManifest;
+};
+
+const resolveEntrypointFromManifest = () => {
+  const manifest = loadAssetManifest();
+
+  if (manifest && manifest['src/main.tsx'] && manifest['src/main.tsx'].file) {
+    entrypointResolutionWarned = false;
+    return normalizeEntrypoint(manifest['src/main.tsx'].file);
+  }
+
+  return null;
+};
+
+const resolveEntrypointFromAssets = () => {
+  if (!fs.existsSync(clientAssetsPath)) {
+    return null;
+  }
+
+  try {
+    const assetFiles = fs.readdirSync(clientAssetsPath);
+    const jsCandidates = assetFiles.filter((fileName) => fileName.endsWith('.js'));
+
+    if (!jsCandidates.length) {
+      return null;
+    }
+
+    const preferredCandidate =
+      jsCandidates.find((fileName) => /^index(?:-[\w-]+)?\.js$/.test(fileName)) ||
+      jsCandidates.find((fileName) => /^main(?:-[\w-]+)?\.js$/.test(fileName));
+
+    const resolvedFile = preferredCandidate || jsCandidates[0];
+
+    entrypointResolutionWarned = false;
+    return path.posix.join('assets', resolvedFile);
+  } catch (error) {
+    logger.error({ error, clientAssetsPath }, 'Failed to inspect client assets directory.');
+    return null;
+  }
+};
+
+const resolveClientEntrypoint = () => {
+  const manifestEntrypoint = resolveEntrypointFromManifest();
+  if (manifestEntrypoint) {
+    return manifestEntrypoint;
+  }
+
+  const assetEntrypoint = resolveEntrypointFromAssets();
+  if (assetEntrypoint) {
+    return assetEntrypoint;
+  }
+
+  if (!entrypointResolutionWarned) {
+    logger.error(
+      {
+        manifestPathExists: fs.existsSync(clientManifestPath),
+        assetsPathExists: fs.existsSync(clientAssetsPath),
+      },
+      'Unable to resolve client entrypoint. Falling back to development script path.'
+    );
+    entrypointResolutionWarned = true;
+  }
+
+  return null;
+};
+
+const readClientIndexHtml = () => {
+  if (!fs.existsSync(clientIndexPath)) {
+    logger.warn({ clientIndexPath }, 'Client index.html is missing.');
+    cachedIndexHtml = null;
+    cachedIndexHtmlMtime = 0;
+    cachedHydratedIndexHtml = null;
+    cachedHydratedIndexSignature = null;
+    return null;
+  }
+
+  try {
+    const indexStats = fs.statSync(clientIndexPath);
+
+    if (!cachedIndexHtml || indexStats.mtimeMs !== cachedIndexHtmlMtime) {
+      cachedIndexHtml = fs.readFileSync(clientIndexPath, 'utf-8');
+      cachedIndexHtmlMtime = indexStats.mtimeMs;
+      cachedHydratedIndexHtml = null;
+      cachedHydratedIndexSignature = null;
+      logger.info({ clientIndexPath }, 'Client index.html loaded.');
+    }
+  } catch (error) {
+    logger.error({ error, clientIndexPath }, 'Failed to read client index.html.');
+    return null;
+  }
+
+  return cachedIndexHtml;
+};
+
+const getClientIndexHtml = () => {
+  const baseHtml = readClientIndexHtml();
+
+  if (!baseHtml) {
+    return null;
+  }
+
+  const entrypoint = resolveClientEntrypoint();
+  const signature = `${cachedIndexHtmlMtime}:${entrypoint || 'missing'}`;
+
+  if (cachedHydratedIndexHtml && cachedHydratedIndexSignature === signature) {
+    return cachedHydratedIndexHtml;
+  }
+
+  let hydratedHtml = baseHtml;
+
+  if (entrypoint && baseHtml.includes('/src/main.tsx')) {
+    const normalized = entrypoint.startsWith('/') ? entrypoint : `/${entrypoint}`;
+    hydratedHtml = baseHtml.replace(/src="\/src\/main\.tsx"/g, `src="${normalized}"`);
+    logger.info({ entrypoint: normalized }, 'Replaced client entrypoint for production build.');
+  }
+
+  cachedHydratedIndexHtml = hydratedHtml;
+  cachedHydratedIndexSignature = signature;
+
+  return hydratedHtml;
+};
 
 // Database connection
 const connectDB = require('./config/database');
@@ -135,8 +312,28 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Static files
 app.use('/uploads', express.static('uploads'));
 
-// Serve static files from React build
-app.use(express.static(path.join(__dirname, '../build')));
+if (!fs.existsSync(clientBuildPath)) {
+  logger.warn({ clientBuildPath }, 'Client build directory is missing.');
+}
+
+if (fs.existsSync(clientAssetsPath)) {
+  app.use(
+    '/assets',
+    express.static(clientAssetsPath, {
+      immutable: true,
+      maxAge: '1y'
+    })
+  );
+}
+
+if (fs.existsSync(clientBuildPath)) {
+  app.use(
+    express.static(clientBuildPath, {
+      index: false,
+      maxAge: '1h'
+    })
+  );
+}
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -172,8 +369,34 @@ app.get('/api/health', (req, res) => {
 });
 
 // Catch all handler: send back React's index.html file for client-side routing
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../build', 'index.html'));
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+
+  if (!fs.existsSync(clientIndexPath)) {
+    logger.warn({ clientIndexPath }, 'Client index.html is missing.');
+    return res.status(404).send('Client build not found');
+  }
+
+  if (req.path.includes('.') && !req.path.endsWith('.html')) {
+    return res.status(404).type('text/plain').send('Not found');
+  }
+
+  const acceptsHtml = !req.headers.accept || req.headers.accept.includes('text/html');
+
+  if (!acceptsHtml) {
+    return res.status(404).type('text/plain').send('Not found');
+  }
+
+  const indexHtml = getClientIndexHtml();
+
+  if (!indexHtml) {
+    return res.status(500).type('text/plain').send('Client build is unavailable');
+  }
+
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.type('html').send(indexHtml);
 });
 
 // Graceful shutdown handling
