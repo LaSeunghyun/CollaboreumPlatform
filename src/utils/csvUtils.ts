@@ -11,6 +11,53 @@ export interface CsvConfig {
     delimiter?: string;
 }
 
+export interface RevenueDistributionCsvRecord {
+    userName?: string;
+    originalAmount?: number;
+    profitShare?: number;
+    totalReturn?: number;
+    status?: string;
+    distributedAt?: string | Date | null;
+}
+
+export interface ExpenseRecordCsvEntry {
+    category?: string;
+    title?: string;
+    description?: string;
+    amount?: number;
+    date?: string | Date | null;
+    stage?: {
+        title?: string;
+    };
+    verified?: boolean;
+}
+
+export interface ProjectStageCsvEntry {
+    order?: number;
+    title?: string;
+    description?: string;
+    progress?: number;
+    status?: string;
+    completedAt?: string | Date | null;
+}
+
+export interface UserActivityCsvEntry {
+    type?: string;
+    title?: string;
+    description?: string;
+    date?: string | Date | null;
+    status?: string;
+    amount?: number;
+}
+
+export interface EventAttendeeCsvEntry {
+    userName?: string;
+    email?: string;
+    ticketType?: string;
+    registeredAt?: string | Date | null;
+    status?: string;
+}
+
 // 기본 CSV 설정
 const DEFAULT_CSV_CONFIG: Partial<CsvConfig> = {
     encoding: 'utf-8',
@@ -104,7 +151,7 @@ export const downloadCsv = (
 
 // 수익 분배 CSV 생성
 export const generateRevenueDistributionCsv = (
-    distributions: any[],
+    distributions: RevenueDistributionCsvRecord[],
     projectId: string
 ): string => {
     const headers = ['후원자', '원금', '수익 배분', '총 반환금', '상태', '분배일'];
@@ -123,7 +170,7 @@ export const generateRevenueDistributionCsv = (
 
 // 비용 기록 CSV 생성
 export const generateExpenseRecordsCsv = (
-    expenses: any[],
+    expenses: ExpenseRecordCsvEntry[],
     projectId: string
 ): string => {
     const headers = ['카테고리', '제목', '설명', '금액', '날짜', '단계', '검증상태'];
@@ -143,7 +190,7 @@ export const generateExpenseRecordsCsv = (
 
 // 프로젝트 진행 CSV 생성
 export const generateProjectProgressCsv = (
-    stages: any[],
+    stages: ProjectStageCsvEntry[],
     projectId: string
 ): string => {
     const headers = ['단계', '제목', '설명', '진행률', '상태', '완료일'];
@@ -162,7 +209,7 @@ export const generateProjectProgressCsv = (
 
 // 사용자 활동 CSV 생성
 export const generateUserActivityCsv = (
-    activities: any[],
+    activities: UserActivityCsvEntry[],
     userId: string
 ): string => {
     const headers = ['활동유형', '제목', '설명', '날짜', '상태', '금액'];
@@ -181,7 +228,7 @@ export const generateUserActivityCsv = (
 
 // 이벤트 참가자 CSV 생성
 export const generateEventAttendeesCsv = (
-    attendees: any[],
+    attendees: EventAttendeeCsvEntry[],
     eventId: string
 ): string => {
     const headers = ['이름', '이메일', '티켓타입', '등록일', '참석상태'];

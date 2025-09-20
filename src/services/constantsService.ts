@@ -1,6 +1,33 @@
+import type { ApiResponse } from '@/shared/types';
 import { constantsService } from './constants';
 import { Enums, StatusColors, StatusIcons } from '../types/constants';
 import { constantsAPI } from './api';
+
+type StatusVariant =
+    | 'default'
+    | 'destructive'
+    | 'outline'
+    | 'secondary'
+    | 'ghost'
+    | 'link'
+    | 'success'
+    | 'warning';
+
+interface StatusConfigEntry {
+    label: string;
+    variant: StatusVariant;
+    color?: string;
+}
+
+type StatusConfigRecord = Record<string, StatusConfigEntry>;
+
+interface CategorisedOption {
+    id: string;
+    label: string;
+    icon?: string;
+}
+
+type StatusConfigType = 'project' | 'funding' | 'event';
 
 // 하드코딩된 상수값들을 API에서 가져오는 서비스
 export class DynamicConstantsService {
@@ -22,10 +49,11 @@ export class DynamicConstantsService {
         }
 
         try {
-            const response = await constantsAPI.getEnums() as any;
-            this.enumsCache = response.data || this.getDefaultEnums();
+            const response = await constantsAPI.getEnums();
+            const enums = (response as ApiResponse<Enums> | undefined)?.data ?? this.getDefaultEnums();
+            this.enumsCache = enums;
             this.lastFetch = Date.now();
-            return this.enumsCache!;
+            return enums;
         } catch (error) {
             console.error('Enum 값들을 가져오는 중 오류 발생:', error);
             // API 실패 시 기본값 반환
@@ -56,10 +84,11 @@ export class DynamicConstantsService {
         }
 
         try {
-            const response = await constantsAPI.getStatusIcons() as any;
-            this.statusIconsCache = response.data || this.getDefaultStatusIcons();
+            const response = await constantsAPI.getStatusIcons();
+            const icons = (response as ApiResponse<StatusIcons> | undefined)?.data ?? this.getDefaultStatusIcons();
+            this.statusIconsCache = icons;
             this.lastFetch = Date.now();
-            return this.statusIconsCache!;
+            return icons;
         } catch (error) {
             console.error('상태 아이콘을 가져오는 중 오류 발생:', error);
             return this.getDefaultStatusIcons();
@@ -67,59 +96,50 @@ export class DynamicConstantsService {
     }
 
     // 아트워크 카테고리 가져오기
-    async getArtworkCategories() {
+    async getArtworkCategories(): Promise<CategorisedOption[]> {
         try {
-            const response = await constantsAPI.getArtworkCategories() as any;
-            return response.data;
+            const response = await constantsAPI.getArtworkCategories();
+            const categories = (response as ApiResponse<CategorisedOption[]> | undefined)?.data;
+            return categories ?? this.getDefaultArtworkCategories();
         } catch (error) {
             console.error('아트워크 카테고리를 가져오는 중 오류 발생:', error);
-            return [
-                { id: 'painting', label: '회화', icon: '🎨' },
-                { id: 'sculpture', label: '조각', icon: '🗿' },
-                { id: 'photography', label: '사진', icon: '📸' },
-                { id: 'digital', label: '디지털아트', icon: '💻' },
-                { id: 'craft', label: '공예', icon: '🛠️' }
-            ];
+            return this.getDefaultArtworkCategories();
         }
     }
 
     // 비용 카테고리 가져오기
-    async getExpenseCategories() {
+    async getExpenseCategories(): Promise<CategorisedOption[]> {
         try {
-            const response = await constantsAPI.getExpenseCategories() as any;
-            return response.data;
+            const response = await constantsAPI.getExpenseCategories();
+            const categories = (response as ApiResponse<CategorisedOption[]> | undefined)?.data;
+            return categories ?? this.getDefaultExpenseCategories();
         } catch (error) {
             console.error('비용 카테고리를 가져오는 중 오류 발생:', error);
-            return [
-                { id: 'labor', label: '인건비', icon: '👥' },
-                { id: 'material', label: '재료비', icon: '🧱' },
-                { id: 'equipment', label: '장비비', icon: '⚙️' },
-                { id: 'marketing', label: '마케팅비', icon: '📢' },
-                { id: 'other', label: '기타', icon: '📋' }
-            ];
+            return this.getDefaultExpenseCategories();
         }
     }
 
     // 결제 방법 가져오기
-    async getPaymentMethods() {
+    async getPaymentMethods(): Promise<CategorisedOption[]> {
         try {
-            const response = await constantsAPI.getPaymentMethods() as any;
-            return response.data;
+            const response = await constantsAPI.getPaymentMethods();
+            const methods = (response as ApiResponse<CategorisedOption[]> | undefined)?.data;
+            return methods ?? this.getDefaultPaymentMethods();
         } catch (error) {
             console.error('결제 방법을 가져오는 중 오류 발생:', error);
-            return [
-                { id: 'card', label: '신용카드', icon: '💳' },
-                { id: 'phone', label: '휴대폰 결제', icon: '📱' },
-                { id: 'bank', label: '계좌이체', icon: '🏦' }
-            ];
+            return this.getDefaultPaymentMethods();
         }
     }
 
     // 상태 설정 가져오기
-    async getStatusConfig(type: 'project' | 'funding' | 'event') {
+    async getStatusConfig(type: StatusConfigType): Promise<StatusConfigRecord> {
         try {
-            const response = await constantsAPI.getStatusConfig(type) as any;
-            return response.data;
+            const response = await constantsAPI.getStatusConfig(type);
+            const statusConfig = (response as ApiResponse<StatusConfigRecord> | undefined)?.data;
+            if (statusConfig) {
+                return statusConfig;
+            }
+            return this.getDefaultStatusConfig(type);
         } catch (error) {
             console.error(`${type} 상태 설정을 가져오는 중 오류 발생:`, error);
             return this.getDefaultStatusConfig(type);
@@ -132,7 +152,7 @@ export class DynamicConstantsService {
             const enums = await this.getEnums();
             const statusColors = await this.getStatusColors();
 
-            const statusConfig: Record<string, { label: string; variant: any; color?: string }> = {};
+            const statusConfig: StatusConfigRecord = {};
 
             // 프로젝트 상태별 설정
             Object.values(enums.PROJECT_STATUSES || {}).forEach(status => {
@@ -157,7 +177,7 @@ export class DynamicConstantsService {
             const enums = await this.getEnums();
             const statusColors = await this.getStatusColors();
 
-            const statusConfig: Record<string, { label: string; variant: any; color?: string }> = {};
+            const statusConfig: StatusConfigRecord = {};
 
             // 펀딩 프로젝트 상태별 설정
             Object.values(enums.FUNDING_PROJECT_STATUSES || {}).forEach(status => {
@@ -182,7 +202,7 @@ export class DynamicConstantsService {
             const enums = await this.getEnums();
             const statusColors = await this.getStatusColors();
 
-            const statusConfig: Record<string, { label: string; variant: any; color?: string }> = {};
+            const statusConfig: StatusConfigRecord = {};
 
             // 이벤트 상태별 설정
             Object.values(enums.EVENT_STATUSES || {}).forEach(status => {
@@ -202,10 +222,8 @@ export class DynamicConstantsService {
     }
 
     // 정렬 옵션 가져오기
-    async getSortOptions() {
+    async getSortOptions(): Promise<Array<{ value: string; label: string }>> {
         try {
-            const enums = await this.getEnums();
-
             // API에서 정렬 옵션을 가져오거나 기본값 사용
             return [
                 { value: 'popular', label: '인기순' },
@@ -225,7 +243,7 @@ export class DynamicConstantsService {
     }
 
     // 카테고리 목록 가져오기
-    async getCategories(type: 'artist' | 'project' | 'event' | 'community' = 'project') {
+    async getCategories(type: 'artist' | 'project' | 'event' | 'community' = 'project'): Promise<string[]> {
         try {
             const enums = await this.getEnums();
 
@@ -370,7 +388,7 @@ export class DynamicConstantsService {
         }
     }
 
-    private getDefaultStatusConfig(type: 'project' | 'funding' | 'event') {
+    private getDefaultStatusConfig(type: StatusConfigType): StatusConfigRecord {
         switch (type) {
             case 'project':
                 return {
@@ -445,8 +463,8 @@ export class DynamicConstantsService {
     }
 
     // 상태 variant 변환
-    private getStatusVariant(status: string): any {
-        const variants: Record<string, any> = {
+    private getStatusVariant(status: string): StatusVariant {
+        const variants: Record<string, StatusVariant> = {
             'PENDING': 'secondary',
             'IN_PROGRESS': 'default',
             'COMPLETED': 'outline',
@@ -463,8 +481,8 @@ export class DynamicConstantsService {
         return variants[status] || 'secondary';
     }
 
-    private getFundingStatusVariant(status: string): any {
-        const variants: Record<string, any> = {
+    private getFundingStatusVariant(status: string): StatusVariant {
+        const variants: Record<string, StatusVariant> = {
             'PREPARING': 'secondary',
             'IN_PROGRESS': 'default',
             'SUCCESS': 'outline',
@@ -476,14 +494,42 @@ export class DynamicConstantsService {
         return variants[status] || 'secondary';
     }
 
-    private getEventStatusVariant(status: string): any {
-        const variants: Record<string, any> = {
+    private getEventStatusVariant(status: string): StatusVariant {
+        const variants: Record<string, StatusVariant> = {
             'SCHEDULED': 'default',
             'IN_PROGRESS': 'secondary',
             'COMPLETED': 'outline',
             'CANCELLED': 'destructive'
         };
         return variants[status] || 'secondary';
+    }
+
+    private getDefaultArtworkCategories(): CategorisedOption[] {
+        return [
+            { id: 'painting', label: '회화', icon: '🎨' },
+            { id: 'sculpture', label: '조각', icon: '🗿' },
+            { id: 'photography', label: '사진', icon: '📸' },
+            { id: 'digital', label: '디지털아트', icon: '💻' },
+            { id: 'craft', label: '공예', icon: '🛠️' }
+        ];
+    }
+
+    private getDefaultExpenseCategories(): CategorisedOption[] {
+        return [
+            { id: 'labor', label: '인건비', icon: '👥' },
+            { id: 'material', label: '재료비', icon: '🧱' },
+            { id: 'equipment', label: '장비비', icon: '⚙️' },
+            { id: 'marketing', label: '마케팅비', icon: '📢' },
+            { id: 'other', label: '기타', icon: '📋' }
+        ];
+    }
+
+    private getDefaultPaymentMethods(): CategorisedOption[] {
+        return [
+            { id: 'card', label: '신용카드', icon: '💳' },
+            { id: 'phone', label: '휴대폰 결제', icon: '📱' },
+            { id: 'bank', label: '계좌이체', icon: '🏦' }
+        ];
     }
 
     // 기본 상태 색상

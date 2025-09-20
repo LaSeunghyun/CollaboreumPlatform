@@ -233,7 +233,7 @@ export function getUserFriendlyMessage(error: unknown): string {
 }
 
 // 에러 경계용 에러 생성
-export function createErrorBoundaryError(error: Error, errorInfo: any): AppError {
+export function createErrorBoundaryError(error: Error, errorInfo: unknown): AppError {
   return {
     success: false,
     status: 500,

@@ -1,6 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-export interface ApiCallState<T = any> {
+type AsyncFn<TArgs extends unknown[], TResult> = (...args: TArgs) => Promise<TResult>;
+
+export interface ApiCallState<T = unknown> {
     data: T | null;
     loading: boolean;
     error: string | null;
@@ -8,26 +10,27 @@ export interface ApiCallState<T = any> {
     isError: boolean;
 }
 
-export interface ApiCallOptions {
+export interface ApiCallOptions<TData = unknown, TArgs extends unknown[] = []> {
     immediate?: boolean;
     retryCount?: number;
     retryDelay?: number;
     timeout?: number;
-    onSuccess?: (data: any) => void;
+    onSuccess?: (data: TData) => void;
     onError?: (error: string) => void;
     onFinally?: () => void;
+    onRetry?: (attempt: number, args: TArgs) => void;
 }
 
-export interface ApiCallActions<T = any> {
-    execute: (...args: any[]) => Promise<T | null>;
+export interface ApiCallActions<TData = unknown, TArgs extends unknown[] = []> {
+    execute: (...args: TArgs) => Promise<TData | null>;
     reset: () => void;
-    retry: () => Promise<T | null>;
+    retry: (...args: TArgs) => Promise<TData | null>;
 }
 
-export function useApiCall<T = any>(
-    apiFunction: (...args: any[]) => Promise<T>,
-    options: ApiCallOptions = {}
-): ApiCallState<T> & ApiCallActions<T> {
+export function useApiCall<TData = unknown, TArgs extends unknown[] = []>(
+    apiFunction: AsyncFn<TArgs, TData>,
+    options: ApiCallOptions<TData, TArgs> = {}
+): ApiCallState<TData> & ApiCallActions<TData, TArgs> {
     const {
         immediate = false,
         retryCount = 0,
@@ -36,17 +39,19 @@ export function useApiCall<T = any>(
         onSuccess,
         onError,
         onFinally,
+        onRetry,
     } = options;
 
-    const [data, setData] = useState<T | null>(null);
+    const [data, setData] = useState<TData | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isSuccess, setIsSuccess] = useState(false);
     const [isError, setIsError] = useState(false);
 
     const retryCountRef = useRef(0);
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const isMountedRef = useRef(true);
+    const lastArgsRef = useRef<TArgs | null>(null);
 
     // 컴포넌트 언마운트 시 정리
     useEffect(() => {
@@ -58,21 +63,15 @@ export function useApiCall<T = any>(
         };
     }, []);
 
-    // 즉시 실행 옵션이 활성화된 경우
-    useEffect(() => {
-        if (immediate) {
-            execute();
-        }
-    }, [immediate]);
-
     // API 호출 실행
-    const execute = useCallback(async (...args: any[]): Promise<T | null> => {
+    const execute = useCallback(async (...args: TArgs): Promise<TData | null> => {
         if (!isMountedRef.current) return null;
 
         setLoading(true);
         setError(null);
         setIsError(false);
         setIsSuccess(false);
+        lastArgsRef.current = args;
 
         // 타임아웃 설정
         if (timeout > 0) {
@@ -105,7 +104,7 @@ export function useApiCall<T = any>(
             }
 
             return result;
-        } catch (err) {
+        } catch (err: unknown) {
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
                 timeoutRef.current = null;
@@ -123,9 +122,10 @@ export function useApiCall<T = any>(
             // 재시도 로직
             if (retryCountRef.current < retryCount) {
                 retryCountRef.current++;
+                onRetry?.(retryCountRef.current, args);
                 setTimeout(() => {
                     if (isMountedRef.current) {
-                        execute(...args);
+                        void execute(...args);
                     }
                 }, retryDelay * retryCountRef.current);
             }
@@ -134,10 +134,33 @@ export function useApiCall<T = any>(
         }
     }, [apiFunction, timeout, retryCount, retryDelay, onSuccess, onError, onFinally]);
 
+    // 즉시 실행 옵션이 활성화된 경우
+    useEffect(() => {
+        if (!immediate) {
+            return;
+        }
+
+        if (lastArgsRef.current) {
+            void execute(...lastArgsRef.current);
+            return;
+        }
+
+        void execute(...([] as unknown as TArgs));
+    }, [immediate, execute]);
+
     // 재시도
-    const retry = useCallback(async (): Promise<T | null> => {
+    const retry = useCallback(async (...args: TArgs): Promise<TData | null> => {
         retryCountRef.current = 0;
-        return execute();
+        if (args.length > 0) {
+            lastArgsRef.current = args;
+            return execute(...args);
+        }
+
+        if (lastArgsRef.current) {
+            return execute(...lastArgsRef.current);
+        }
+
+        return null;
     }, [execute]);
 
     // 상태 리셋
@@ -167,48 +190,48 @@ export function useApiCall<T = any>(
 }
 
 // 특정 API 호출을 위한 간편 훅들
-export function useApiQuery<T = any>(
-    queryFunction: (...args: any[]) => Promise<T>,
-    options: ApiCallOptions = {}
+export function useApiQuery<TData = unknown, TArgs extends unknown[] = []>(
+    queryFunction: AsyncFn<TArgs, TData>,
+    options: ApiCallOptions<TData, TArgs> = {}
 ) {
     return useApiCall(queryFunction, { ...options, immediate: true });
 }
 
-export function useApiMutation<T = any>(
-    mutationFunction: (...args: any[]) => Promise<T>,
-    options: ApiCallOptions = {}
+export function useApiMutation<TData = unknown, TArgs extends unknown[] = []>(
+    mutationFunction: AsyncFn<TArgs, TData>,
+    options: ApiCallOptions<TData, TArgs> = {}
 ) {
     return useApiCall(mutationFunction, { ...options, immediate: false });
 }
 
 // 여러 API 호출을 동시에 관리하는 훅
-export function useApiBatch<T = any>(
-    apiFunctions: Array<(...args: any[]) => Promise<T>>,
-    options: ApiCallOptions = {}
+export function useApiBatch<TData = unknown, TArgs extends unknown[] = []>(
+    apiFunctions: ReadonlyArray<AsyncFn<TArgs, TData>>,
+    options: ApiCallOptions<TData, TArgs> = {}
 ) {
-    const [results, setResults] = useState<Array<T | null>>([]);
+    const [results, setResults] = useState<Array<TData | null>>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const executeAll = useCallback(async (...args: any[]) => {
+    const executeAll = useCallback(async (...args: TArgs) => {
         setLoading(true);
         setError(null);
 
         try {
             const promises = apiFunctions.map(fn => fn(...args));
-            const results = await Promise.allSettled(promises);
+            const settledResults = await Promise.allSettled(promises);
 
-            const successResults = results.map(result =>
+            const successResults = settledResults.map(result =>
                 result.status === 'fulfilled' ? result.value : null
             );
 
             setResults(successResults);
 
-            const hasError = results.some(result => result.status === 'rejected');
+            const hasError = settledResults.some(result => result.status === 'rejected');
             if (hasError) {
                 setError('일부 요청이 실패했습니다.');
             }
-        } catch (err) {
+        } catch (err: unknown) {
             setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
         } finally {
             setLoading(false);

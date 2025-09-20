@@ -1,7 +1,9 @@
 import type { ApiResponse as SharedApiResponse, ApiError as SharedApiError } from '@/shared/types';
 
+export type UnknownRecord = Record<string, unknown>;
+
 // API 응답 표준 타입 정의
-export type ApiResponse<T = any> = SharedApiResponse<T>;
+export type ApiResponse<T = unknown> = SharedApiResponse<T>;
 
 // 페이징 파라미터
 export interface PaginationParams {
@@ -22,7 +24,7 @@ export interface SearchParams extends PaginationParams {
 export type ApiError = SharedApiError;
 
 // 성공 응답
-export interface ApiSuccess<T = any> {
+export interface ApiSuccess<T = unknown> {
   success: true;
   data: T;
   message?: string;
@@ -56,11 +58,13 @@ export type ApiEndpoint =
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 // API 요청 옵션
-export interface ApiRequestOptions {
+export type ApiQueryParams = Record<string, string | number | boolean | null | undefined>;
+
+export interface ApiRequestOptions<TBody = unknown, TParams extends ApiQueryParams | undefined = ApiQueryParams> {
   method?: HttpMethod;
-  body?: any;
+  body?: TBody;
   headers?: Record<string, string>;
-  params?: Record<string, any>;
+  params?: TParams;
   timeout?: number;
   retries?: number;
 }

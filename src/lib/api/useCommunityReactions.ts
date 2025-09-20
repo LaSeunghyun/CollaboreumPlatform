@@ -1,32 +1,50 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { communityPostAPI, communityCommentAPI } from '../../services/api';
+import type { CommunityPost } from '@/features/community';
+
+interface PostReactionResponse {
+    likes: number;
+    dislikes: number;
+    isLiked: boolean;
+    isDisliked: boolean;
+}
+
+interface PostViewsResponse {
+    views: number;
+}
 
 // 게시글 반응 훅
 export const usePostReaction = () => {
     const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: ({ postId, reaction }: { postId: string; reaction: 'like' | 'dislike' | 'unlike' | 'undislike' }) =>
-            communityPostAPI.togglePostReaction(postId, reaction),
-        onSuccess: (data: any, { postId }) => {
-            // 게시글 상세 캐시 업데이트
-            queryClient.setQueryData(['community', 'post', postId], (old: any) => {
-                if (old) {
-                    return {
-                        ...old,
-                        likes: data.likes || old.likes,
-                        dislikes: data.dislikes || old.dislikes,
-                        isLiked: data.isLiked ?? old.isLiked,
-                        isDisliked: data.isDisliked ?? old.isDisliked,
-                    };
-                }
-                return old;
-            });
+    return useMutation<PostReactionResponse, unknown, { postId: string; reaction: 'like' | 'dislike' | 'unlike' | 'undislike' }>(
+        {
+            mutationFn: ({ postId, reaction }) =>
+                communityPostAPI.togglePostReaction(postId, reaction) as Promise<PostReactionResponse>,
+            onSuccess: ({ likes, dislikes, isLiked, isDisliked }, { postId }) => {
+                // 게시글 상세 캐시 업데이트
+                queryClient.setQueryData<CommunityPost | undefined>(
+                    ['community', 'post', postId],
+                    (old) => {
+                        if (!old) {
+                            return old;
+                        }
 
-            // 게시글 목록 캐시 무효화
-            queryClient.invalidateQueries({ queryKey: ['community', 'posts'] });
-        },
-    });
+                        return {
+                            ...old,
+                            likes,
+                            dislikes,
+                            isLiked,
+                            isDisliked,
+                        };
+                    }
+                );
+
+                // 게시글 목록 캐시 무효화
+                queryClient.invalidateQueries({ queryKey: ['community', 'posts'] });
+            },
+        }
+    );
 };
 
 // 댓글 반응 훅
@@ -55,20 +73,25 @@ export const useCommentReaction = () => {
 export const useIncrementPostViews = () => {
     const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: (postId: string) => communityPostAPI.incrementPostViews(postId),
-        onSuccess: (data: any, postId) => {
+    return useMutation<PostViewsResponse, unknown, string>({
+        mutationFn: (postId: string) =>
+            communityPostAPI.incrementPostViews(postId) as Promise<PostViewsResponse>,
+        onSuccess: ({ views }, postId) => {
             // 게시글 상세 캐시 업데이트
-            queryClient.setQueryData(['community', 'post', postId], (old: any) => {
-                if (old) {
+            queryClient.setQueryData<CommunityPost | undefined>(
+                ['community', 'post', postId],
+                (old) => {
+                    if (!old) {
+                        return old;
+                    }
+
                     return {
                         ...old,
-                        views: data.views || old.views,
-                        viewCount: data.views || old.viewCount,
+                        views,
+                        viewCount: views,
                     };
                 }
-                return old;
-            });
+            );
         },
     });
 };

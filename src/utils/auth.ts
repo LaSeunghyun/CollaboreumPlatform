@@ -79,11 +79,12 @@ export const getCurrentUserId = (): string | null => {
 };
 
 // 현재 로그인한 사용자 정보 가져오기
-export const getCurrentUser = (): any | null => {
+export const getCurrentUser = (): Record<string, unknown> | null => {
   try {
     const userStr = localStorage.getItem('authUser');
     if (userStr) {
-      return JSON.parse(userStr);
+      const parsed = JSON.parse(userStr);
+      return typeof parsed === 'object' && parsed !== null ? parsed as Record<string, unknown> : null;
     }
     return null;
   } catch (error) {
@@ -96,12 +97,12 @@ export const getCurrentUser = (): any | null => {
 export const isAuthenticated = (): boolean => {
   const token = localStorage.getItem('authToken');
   const user = getCurrentUser();
-  return !!(token && user);
+  return Boolean(token && user);
 };
 
 // 사용자 역할 확인
 export const getUserRole = (): string | null => {
   const user = getCurrentUser();
-  return user?.role || null;
+  return typeof user?.role === 'string' ? (user.role as string) : null;
 };
 

@@ -65,7 +65,7 @@ export type FilterOperator =
 export interface FilterCondition {
   field: string;
   operator: FilterOperator;
-  value: any;
+  value: unknown;
 }
 
 // 정렬 조건 타입
@@ -88,7 +88,7 @@ export interface PaginationInfo {
 export interface SearchResult<T> {
   items: T[];
   pagination: PaginationInfo;
-  filters: Record<string, any>;
+  filters: Record<string, string | number | boolean | null | undefined>;
   sort: SortCondition[];
   query?: string;
 }
@@ -105,7 +105,7 @@ export interface FormState<T> {
 // 모달 상태 타입
 export interface ModalState {
   isOpen: boolean;
-  data?: any;
+  data?: unknown;
 }
 
 // 토스트 메시지 타입

@@ -5,7 +5,8 @@ import type {
     CommunityPostListQuery,
     CreateCommunityPostData,
     UpdateCommunityPostData,
-    CommunityPost
+    CommunityPost,
+    CommunityPostListResponse
 } from '../types'
 
 // 게시글 목록 조회
@@ -93,19 +94,17 @@ export const useLikeCommunityPost = () => {
                 return old
             })
             // 게시글 목록의 좋아요 수 업데이트
-            queryClient.setQueriesData(
+            queryClient.setQueriesData<CommunityPostListResponse | undefined>(
                 { queryKey: ['community', 'posts'] },
-                (old: any) => {
-                    if (old?.posts) {
-                        return {
-                            ...old,
-                            posts: old.posts.map((post: CommunityPost) =>
-                                post.id === postId ? { ...post, likes: data.likes } : post
-                            ),
-                        }
-                    }
-                    return old
-                }
+                (old) =>
+                    old?.posts
+                        ? {
+                              ...old,
+                              posts: old.posts.map((post) =>
+                                  post.id === postId ? { ...post, likes: data.likes } : post
+                              ),
+                          }
+                        : old
             )
         },
     })

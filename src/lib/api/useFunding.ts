@@ -4,7 +4,58 @@ import {
   usePaginatedQuery,
   useOptimisticMutation,
 } from './useApi';
+import type { ApiResponse } from '@/shared/types';
 import { SearchParams } from '../../types/api';
+
+type ProjectRecord = Record<string, unknown> & { id?: string | number };
+
+type FundingProjectsCache = ApiResponse<{ projects: ProjectRecord[] }> | undefined;
+
+interface BackProjectPayload {
+  projectId: string;
+  amount: number;
+  message: string;
+  rewardId?: string;
+}
+
+interface ToggleProjectPayload {
+  projectId: string;
+}
+
+const toNumeric = (value: unknown): number => {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  return 0;
+};
+
+const mapProjects = (
+  cache: FundingProjectsCache,
+  mapper: (project: ProjectRecord) => ProjectRecord,
+): FundingProjectsCache => {
+  const projects = cache?.data?.projects;
+  if (!Array.isArray(projects)) {
+    return cache;
+  }
+
+  const updatedProjects = projects.map((project) => mapper(project));
+
+  return cache
+    ? {
+        ...cache,
+        data: {
+          ...cache.data,
+          projects: updatedProjects,
+        },
+      }
+    : cache;
+};
 
 // 펀딩 프로젝트 목록 조회
 export const useFundingProjects = (params?: SearchParams) => {
@@ -36,93 +87,81 @@ export const useCreateFundingProject = () => {
 
 // 펀딩 프로젝트 후원
 export const useBackFundingProject = () => {
-  return useOptimisticMutation('/funding/projects/:id/back', 'POST', {
-    queryKey: ['funding', 'projects'],
-    updateFn: (oldData, newData) => {
-      // 옵티미스틱 업데이트 로직
-      if (oldData?.data?.projects) {
-        const updatedProjects = oldData.data.projects.map((project: any) => {
-          if (project.id === newData.projectId) {
-            return {
-              ...project,
-              currentAmount: project.currentAmount + newData.amount,
-              backers: project.backers + 1,
-            };
+  return useOptimisticMutation<FundingProjectsCache, BackProjectPayload>(
+    '/funding/projects/:id/back',
+    'POST',
+    {
+      queryKey: ['funding', 'projects'],
+      updateFn: (oldData, newData) =>
+        mapProjects(oldData, (project) => {
+          const projectId = project.id != null ? String(project.id) : '';
+          if (projectId !== newData.projectId) {
+            return project;
           }
-          return project;
-        });
-        return {
-          ...oldData,
-          data: {
-            ...oldData.data,
-            projects: updatedProjects,
-          },
-        };
-      }
-      return oldData;
+
+          const currentAmount = toNumeric(project.currentAmount) + newData.amount;
+          const backers = toNumeric(project.backers) + 1;
+          const backerCount = toNumeric(project.backerCount) + 1;
+
+          return {
+            ...project,
+            currentAmount,
+            backers,
+            backerCount,
+          };
+        }),
     },
-  });
+  );
 };
 
 // 펀딩 프로젝트 좋아요
 export const useLikeFundingProject = () => {
-  return useOptimisticMutation('/funding/projects/:id/like', 'POST', {
-    queryKey: ['funding', 'projects'],
-    updateFn: (oldData, newData) => {
-      // 옵티미스틱 업데이트 로직
-      if (oldData?.data?.projects) {
-        const updatedProjects = oldData.data.projects.map((project: any) => {
-          if (project.id === newData.projectId) {
-            return {
-              ...project,
-              isLiked: !project.isLiked,
-              likesCount: project.isLiked
-                ? project.likesCount - 1
-                : project.likesCount + 1,
-            };
+  return useOptimisticMutation<FundingProjectsCache, ToggleProjectPayload>(
+    '/funding/projects/:id/like',
+    'POST',
+    {
+      queryKey: ['funding', 'projects'],
+      updateFn: (oldData, newData) =>
+        mapProjects(oldData, (project) => {
+          const projectId = project.id != null ? String(project.id) : '';
+          if (projectId !== newData.projectId) {
+            return project;
           }
-          return project;
-        });
-        return {
-          ...oldData,
-          data: {
-            ...oldData.data,
-            projects: updatedProjects,
-          },
-        };
-      }
-      return oldData;
+
+          const isLiked = Boolean(project.isLiked);
+          const likesCount = toNumeric(project.likesCount) + (isLiked ? -1 : 1);
+
+          return {
+            ...project,
+            isLiked: !isLiked,
+            likesCount,
+          };
+        }),
     },
-  });
+  );
 };
 
 // 펀딩 프로젝트 북마크
 export const useBookmarkFundingProject = () => {
-  return useOptimisticMutation('/funding/projects/:id/bookmark', 'POST', {
-    queryKey: ['funding', 'projects'],
-    updateFn: (oldData, newData) => {
-      // 옵티미스틱 업데이트 로직
-      if (oldData?.data?.projects) {
-        const updatedProjects = oldData.data.projects.map((project: any) => {
-          if (project.id === newData.projectId) {
-            return {
-              ...project,
-              isBookmarked: !project.isBookmarked,
-            };
+  return useOptimisticMutation<FundingProjectsCache, ToggleProjectPayload>(
+    '/funding/projects/:id/bookmark',
+    'POST',
+    {
+      queryKey: ['funding', 'projects'],
+      updateFn: (oldData, newData) =>
+        mapProjects(oldData, (project) => {
+          const projectId = project.id != null ? String(project.id) : '';
+          if (projectId !== newData.projectId) {
+            return project;
           }
-          return project;
-        });
-        return {
-          ...oldData,
-          data: {
-            ...oldData.data,
-            projects: updatedProjects,
-          },
-        };
-      }
-      return oldData;
+
+          return {
+            ...project,
+            isBookmarked: !project.isBookmarked,
+          };
+        }),
     },
-  });
+  );
 };
 
 // 펀딩 프로젝트 환불

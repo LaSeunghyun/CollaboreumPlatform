@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { artistAPI } from '../../services/api';
+import type { UnknownRecord } from '@/types/api';
 
 // 아티스트 목록 조회
 export const useArtists = (params?: {
@@ -68,7 +69,7 @@ export const useUpdateArtistProfile = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ artistId, data }: { artistId: string; data: any }) =>
+        mutationFn: ({ artistId, data }: { artistId: string; data: UnknownRecord }) =>
             artistAPI.updateArtistProfile(artistId, data),
         onSuccess: (_, { artistId }) => {
             queryClient.invalidateQueries({ queryKey: ['artist', artistId] });

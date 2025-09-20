@@ -5,6 +5,7 @@ import {
     useInfiniteQuery as useInfiniteQueryHook,
     UseQueryOptions,
     UseMutationOptions,
+    UseInfiniteQueryOptions,
 } from '@tanstack/react-query';
 import { api } from '@/lib/api/api';
 import type { ApiResponse } from '@/shared/types';
@@ -25,10 +26,10 @@ const defaultMutationOptions = {
 };
 
 // 제네릭 API 쿼리 훅
-export function useApiQuery<T = any>(
+export function useApiQuery<T = unknown>(
     queryKey: (string | number | object)[],
     endpoint: string,
-    params?: Record<string, any>,
+    params?: Record<string, unknown>,
     options?: Partial<UseQueryOptions<ApiResponse<T>>>
 ) {
     return useQuery({
@@ -40,7 +41,7 @@ export function useApiQuery<T = any>(
 }
 
 // 제네릭 API 뮤테이션 훅
-export function useApiMutation<T = any, V = any>(
+export function useApiMutation<T = unknown, V = unknown>(
     endpoint: string,
     method: 'POST' | 'PUT' | 'DELETE' | 'PATCH' = 'POST',
     options?: Partial<UseMutationOptions<ApiResponse<T>, Error, V>>
@@ -68,7 +69,7 @@ export function useApiMutation<T = any, V = any>(
 }
 
 // 페이지네이션 쿼리 훅
-export function usePaginatedQuery<T = any>(
+export function usePaginatedQuery<T = unknown>(
     queryKey: (string | number | object)[],
     endpoint: string,
     params: SearchParams = {},
@@ -80,26 +81,26 @@ export function usePaginatedQuery<T = any>(
         params,
         {
             ...options,
-            placeholderData: (previousData) => previousData as any, // 페이지네이션 시 이전 데이터 유지
+            placeholderData: (previousData) => previousData, // 페이지네이션 시 이전 데이터 유지
         }
     );
 }
 
 // 무한 스크롤 쿼리 훅
-export function useInfiniteQuery<T = any>(
+export function useInfiniteQuery<T = unknown>(
     queryKey: (string | number | object)[],
     endpoint: string,
     params: Omit<SearchParams, 'page'> = {},
-    options?: any
+    options?: Partial<UseInfiniteQueryOptions<ApiResponse<T>, Error, ApiResponse<T>, ApiResponse<T>, (string | number | object)[]>>
 ) {
     return useInfiniteQueryHook({
         queryKey,
         queryFn: ({ pageParam = 1 }: { pageParam?: number }) =>
             api.get<T>(endpoint, { ...params, page: pageParam }),
-        getNextPageParam: (lastPage: ApiResponse<any>) => {
+        getNextPageParam: (lastPage: ApiResponse<T>) => {
             if (!lastPage?.pagination) return undefined;
             const { page } = lastPage.pagination as { page: number; totalPages?: number; pages?: number };
-            const totalPages = lastPage.pagination.totalPages ?? (lastPage.pagination as any).pages;
+            const totalPages = lastPage.pagination.totalPages ?? (lastPage.pagination as { pages?: number }).pages;
             if (typeof totalPages !== 'number') return undefined;
             return page < totalPages ? page + 1 : undefined;
         },
@@ -127,7 +128,7 @@ export function useInvalidateQueries() {
 }
 
 // 옵티미스틱 업데이트 헬퍼
-export function useOptimisticMutation<T = any, V = any>(
+export function useOptimisticMutation<T = unknown, V = unknown>(
     endpoint: string,
     method: 'POST' | 'PUT' | 'DELETE' | 'PATCH' = 'POST',
     options?: {

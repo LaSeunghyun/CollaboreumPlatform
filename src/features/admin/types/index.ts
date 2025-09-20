@@ -30,7 +30,7 @@ export interface AdminNotification {
     timestamp: string;
     actionRequired: boolean;
     read: boolean;
-    data?: any;
+    data?: Record<string, unknown>;
     relatedUser?: {
         id: number;
         name: string;

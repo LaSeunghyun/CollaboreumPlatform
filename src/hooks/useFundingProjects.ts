@@ -1,9 +1,37 @@
 import { useState, useMemo } from 'react';
 import { useFundingProjects, useBackFundingProject, useLikeFundingProject } from '@/lib/api/useFunding';
 import { useCategories } from '@/lib/api/useCategories';
-import { normalizeProjectData } from '@/utils/fundingUtils';
+import { normalizeProjectData, type NormalizedFundingProject } from '@/utils/fundingUtils';
 import { KOREAN_CATEGORIES } from '@/constants/categories';
 import { FundingProject, PaymentData } from '@/types/funding';
+
+interface FundingProjectsResponse {
+    data?: {
+        projects?: unknown[];
+    };
+}
+
+interface CategoriesResponse {
+    data?: Array<{ label?: string; name?: string }>;
+}
+
+const isFundingProjectsResponse = (value: unknown): value is FundingProjectsResponse => {
+    if (!value || typeof value !== 'object') {
+        return false;
+    }
+
+    const data = (value as FundingProjectsResponse).data;
+    return !data || Array.isArray(data.projects);
+};
+
+const isCategoriesResponse = (value: unknown): value is CategoriesResponse => {
+    if (!value || typeof value !== 'object') {
+        return false;
+    }
+
+    const data = (value as CategoriesResponse).data;
+    return !data || (Array.isArray(data) && data.every(item => typeof item === 'object' && item !== null));
+};
 
 export const useFundingProjectsData = () => {
     const [selectedCategory, setSelectedCategory] = useState('전체');
@@ -24,19 +52,23 @@ export const useFundingProjectsData = () => {
     const backProjectMutation = useBackFundingProject();
     const likeProjectMutation = useLikeFundingProject();
 
-    const projects = useMemo(() => {
-        if (!projectsData) return [];
-        const data = projectsData as any;
-        if (!data?.data?.projects) return [];
-        return data.data.projects.map((project: any) => normalizeProjectData(project));
+    const projects = useMemo<NormalizedFundingProject[]>(() => {
+        if (!projectsData || !isFundingProjectsResponse(projectsData)) {
+            return [];
+        }
+
+        const projectList = projectsData.data?.projects ?? [];
+        return projectList.map(project => normalizeProjectData(project));
     }, [projectsData]);
 
     const categories = useMemo(() => {
         if (categoriesLoading) return ['전체'];
         if (Array.isArray(categoriesData)) return ['전체', ...categoriesData];
-        if ((categoriesData as any)?.data && Array.isArray((categoriesData as any).data)) {
-            const categoryLabels = (categoriesData as any).data.map((cat: { label?: string; name?: string }) => cat.label || cat.name || '');
-            return ['전체', ...categoryLabels.filter((label: string) => label !== '')];
+        if (isCategoriesResponse(categoriesData) && Array.isArray(categoriesData.data)) {
+            const categoryLabels = categoriesData.data
+                .map(cat => cat.label || cat.name || '')
+                .filter((label): label is string => label !== '');
+            return ['전체', ...categoryLabels];
         }
         return KOREAN_CATEGORIES;
     }, [categoriesData, categoriesLoading]);

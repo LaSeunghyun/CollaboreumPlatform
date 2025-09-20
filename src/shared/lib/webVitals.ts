@@ -3,14 +3,9 @@
  */
 
 import { onCLS, onINP, onFCP, onLCP, onTTFB } from 'web-vitals';
+import type { Metric } from 'web-vitals';
 
-interface WebVitalsMetric {
-    name: string;
-    value: number;
-    delta: number;
-    id: string;
-    navigationType: string;
-}
+type WebVitalsMetric = Metric;
 
 interface PerformanceConfig {
     enableLogging: boolean;
@@ -73,13 +68,13 @@ class PerformanceMonitor {
 
     public startMonitoring() {
         // Core Web Vitals
-        onCLS((metric: any) => this.handleMetric(metric));
-        onINP((metric: any) => this.handleMetric(metric));
-        onLCP((metric: any) => this.handleMetric(metric));
+        onCLS((metric) => this.handleMetric(metric));
+        onINP((metric) => this.handleMetric(metric));
+        onLCP((metric) => this.handleMetric(metric));
 
         // Additional metrics
-        onFCP((metric: any) => this.handleMetric(metric));
-        onTTFB((metric: any) => this.handleMetric(metric));
+        onFCP((metric) => this.handleMetric(metric));
+        onTTFB((metric) => this.handleMetric(metric));
     }
 
     public getMetrics(): Map<string, WebVitalsMetric> {

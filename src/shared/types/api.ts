@@ -3,7 +3,7 @@
  */
 
 // 기본 API 응답 구조
-export interface ApiResponse<T = unknown> {
+export interface ApiResponse<T = unknown, TDetails extends Record<string, unknown> | undefined = Record<string, unknown>> {
     success: boolean;
     data?: T;
     message?: string;
@@ -18,20 +18,21 @@ export interface ApiResponse<T = unknown> {
         hasPrev?: boolean;
     };
     errors?: Record<string, string[]>;
-    details?: Record<string, any>;
+    details?: TDetails;
 }
 
 // 에러 응답 구조
-export interface ApiError {
+export interface ApiError<TDetails extends Record<string, unknown> | undefined = Record<string, unknown>> {
     success?: false;
     error?: string;
     message: string;
     status?: number;
-    details?: Record<string, any>;
+    details?: TDetails;
 }
 
 // 페이지네이션 응답 구조
-export interface PaginatedResponse<T> extends ApiResponse<T[]> {
+export interface PaginatedResponse<T, TDetails extends Record<string, unknown> | undefined = Record<string, unknown>>
+    extends ApiResponse<T[], TDetails> {
     pagination: {
         page: number;
         limit: number;
@@ -51,9 +52,11 @@ export interface PaginationParams {
 }
 
 // 검색 요청 파라미터
+export type SearchFilter = Record<string, string | number | boolean | null | undefined>;
+
 export interface SearchParams extends PaginationParams {
     query?: string;
-    filters?: Record<string, any>;
+    filters?: SearchFilter;
 }
 
 // 파일 업로드 응답
@@ -72,50 +75,52 @@ export type ApiEndpoint = string;
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 // API 요청 설정
-export interface ApiRequestConfig {
+export interface ApiRequestConfig<TData = unknown, TParams extends Record<string, unknown> | undefined = Record<string, unknown>> {
     method?: HttpMethod;
-    params?: Record<string, any>;
-    data?: any;
-    body?: any;
+    params?: TParams;
+    data?: TData;
+    body?: TData;
     headers?: Record<string, string>;
     timeout?: number;
 }
 
 // API 클라이언트 인터페이스
 export interface ApiClient {
-    get<T>(endpoint: ApiEndpoint, params?: Record<string, any>): Promise<ApiResponse<T>>;
-    post<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>>;
-    put<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>>;
-    patch<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>>;
-    delete<T>(endpoint: ApiEndpoint): Promise<ApiResponse<T>>;
+    get<TResponse>(endpoint: ApiEndpoint, params?: SearchFilter): Promise<ApiResponse<TResponse>>;
+    post<TResponse, TBody = unknown>(endpoint: ApiEndpoint, data?: TBody): Promise<ApiResponse<TResponse>>;
+    put<TResponse, TBody = unknown>(endpoint: ApiEndpoint, data?: TBody): Promise<ApiResponse<TResponse>>;
+    patch<TResponse, TBody = unknown>(endpoint: ApiEndpoint, data?: TBody): Promise<ApiResponse<TResponse>>;
+    delete<TResponse>(endpoint: ApiEndpoint): Promise<ApiResponse<TResponse>>;
 }
 
 // API 상태 타입
-export interface ApiState {
+export interface ApiState<TData = unknown> {
     loading: boolean;
     error: ApiError | null;
-    data: any;
+    data: TData;
 }
 
 // API 훅 반환 타입
-export interface UseApiReturn<T> {
-    data: T | null;
+export interface UseApiReturn<TData> {
+    data: TData | null;
     loading: boolean;
     error: ApiError | null;
     refetch: () => Promise<void>;
-    mutate: (data: Partial<T>) => Promise<void>;
+    mutate: (data: Partial<TData>) => Promise<void>;
 }
 
 // API 미들웨어 타입
-export type ApiMiddleware = (
-    config: ApiRequestConfig,
-    next: (config: ApiRequestConfig) => Promise<ApiResponse>
-) => Promise<ApiResponse>;
+export type ApiMiddleware<TData = unknown, TParams extends Record<string, unknown> | undefined = Record<string, unknown>> = (
+    config: ApiRequestConfig<TData, TParams>,
+    next: (config: ApiRequestConfig<TData, TParams>) => Promise<ApiResponse<TData>>
+) => Promise<ApiResponse<TData>>;
 
 // API 인터셉터 타입
-export interface ApiInterceptor {
-    request?: (config: ApiRequestConfig) => ApiRequestConfig | Promise<ApiRequestConfig>;
-    response?: (response: ApiResponse) => ApiResponse | Promise<ApiResponse>;
+export interface ApiInterceptor<TData = unknown, TParams extends Record<string, unknown> | undefined = Record<string, unknown>> {
+    request?: (config: ApiRequestConfig<TData, TParams>) =>
+        | ApiRequestConfig<TData, TParams>
+        | Promise<ApiRequestConfig<TData, TParams>>;
+    response?: (response: ApiResponse<TData>) => ApiResponse<TData> | Promise<ApiResponse<TData>>;
     error?: (error: ApiError) => ApiError | Promise<ApiError>;
 }
 
