@@ -1,16 +1,7 @@
+import type { ApiResponse as SharedApiResponse, ApiError as SharedApiError } from '@/shared/types';
+
 // API 응답 표준 타입 정의
-export interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  message?: string;
-  error?: string;
-  pagination?: {
-    page: number;
-    limit: number;
-    total: number;
-    pages: number;
-  };
-}
+export type ApiResponse<T = any> = SharedApiResponse<T>;
 
 // 페이징 파라미터
 export interface PaginationParams {
@@ -28,13 +19,7 @@ export interface SearchParams extends PaginationParams {
 }
 
 // 에러 응답
-export interface ApiError {
-  success: false;
-  message: string;
-  error?: string;
-  code?: string;
-  details?: Record<string, any>;
-}
+export type ApiError = SharedApiError;
 
 // 성공 응답
 export interface ApiSuccess<T = any> {

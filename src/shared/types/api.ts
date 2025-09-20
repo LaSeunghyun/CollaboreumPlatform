@@ -3,33 +3,42 @@
  */
 
 // 기본 API 응답 구조
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
     success: boolean;
-    data: T;
+    data?: T;
     message?: string;
     error?: string;
-    status: number;
+    status?: number;
+    pagination?: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+        hasNext?: boolean;
+        hasPrev?: boolean;
+    };
+    errors?: Record<string, string[]>;
+    details?: Record<string, any>;
 }
 
 // 에러 응답 구조
 export interface ApiError {
-    success: false;
-    error: string;
+    success?: false;
+    error?: string;
     message: string;
-    status: number;
+    status?: number;
     details?: Record<string, any>;
 }
 
 // 페이지네이션 응답 구조
-export interface PaginatedResponse<T> {
-    data: T[];
+export interface PaginatedResponse<T> extends ApiResponse<T[]> {
     pagination: {
         page: number;
         limit: number;
         total: number;
         totalPages: number;
-        hasNext: boolean;
-        hasPrev: boolean;
+        hasNext?: boolean;
+        hasPrev?: boolean;
     };
 }
 
@@ -57,39 +66,17 @@ export interface UploadResponse {
 }
 
 // API 엔드포인트 타입
-export type ApiEndpoint =
-    | 'auth/login'
-    | 'auth/register'
-    | 'auth/refresh'
-    | 'auth/logout'
-    | 'users/profile'
-    | 'users/update'
-    | 'funding/projects'
-    | 'funding/projects/:id'
-    | 'funding/projects/:id/back'
-    | 'funding/projects/:id/like'
-    | 'funding/projects/:id/bookmark'
-    | 'funding/stats'
-    | 'community/posts'
-    | 'community/posts/:id'
-    | 'community/posts/:id/like'
-    | 'community/posts/:id/comment'
-    | 'artists'
-    | 'artists/:id'
-    | 'artists/:id/projects'
-    | 'admin/users'
-    | 'admin/projects'
-    | 'admin/stats';
+export type ApiEndpoint = string;
 
 // HTTP 메서드 타입
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 // API 요청 설정
 export interface ApiRequestConfig {
-    method: HttpMethod;
-    endpoint: ApiEndpoint;
+    method?: HttpMethod;
     params?: Record<string, any>;
     data?: any;
+    body?: any;
     headers?: Record<string, string>;
     timeout?: number;
 }

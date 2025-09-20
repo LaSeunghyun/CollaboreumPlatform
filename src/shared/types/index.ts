@@ -1,3 +1,5 @@
+export * from './api';
+
 // 공통 타입 정의
 export interface BaseEntity {
     id: string;
@@ -21,23 +23,6 @@ export enum UserRole {
     FAN = 'fan'
 }
 
-export interface ApiResponse<T = unknown> {
-    success: boolean;
-    data?: T;
-    message?: string;
-    error?: string;
-    errors?: Record<string, string[]>;
-}
-
-export interface PaginatedResponse<T> extends ApiResponse<T[]> {
-    pagination: {
-        page: number;
-        limit: number;
-        total: number;
-        totalPages: number;
-    };
-}
-
 export interface QueryParams {
     page?: number;
     limit?: number;
@@ -47,35 +32,12 @@ export interface QueryParams {
 }
 
 // 에러 타입
-export interface ApiError {
-    message: string;
-    code?: string;
-    statusCode?: number;
-    status?: number;
-    success?: boolean;
-    error?: string;
-    details?: Record<string, unknown>;
-    stack?: string;
-    timestamp?: string;
-}
-
 export interface AppError extends ApiError {
     success: false;
     status: number;
     stack?: string;
     timestamp?: string;
 }
-
-// API 요청 설정
-export interface ApiRequestConfig {
-    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-    headers?: Record<string, string>;
-    body?: unknown;
-    timeout?: number;
-}
-
-// API 엔드포인트
-export type ApiEndpoint = string;
 
 // 폼 상태 타입
 export interface FormState<T = unknown> {

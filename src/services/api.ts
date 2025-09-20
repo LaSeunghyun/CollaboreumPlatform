@@ -1,12 +1,19 @@
-import { resolveApiBaseUrl } from '@/lib/config/env';
+import { api } from '@/lib/api/api';
+import type { ApiError, ApiRequestConfig } from '@/shared/types';
 
-// API Base URL
-const API_BASE_URL = resolveApiBaseUrl();
-
-// 토큰 가져오기 함수
-const getAuthToken = (): string | null => {
-    return localStorage.getItem('authToken');
+type ApiCallOptions = RequestInit & {
+    params?: Record<string, unknown>;
+    timeout?: number;
 };
+
+const PUBLIC_ENDPOINTS = [
+    '/artists',
+    '/funding/projects',
+    '/community/posts',
+    '/stats/platform',
+    '/categories',
+    '/events',
+];
 
 // 재시도 로직을 위한 헬퍼 함수
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -45,88 +52,106 @@ class RequestQueue {
 
 const requestQueue = new RequestQueue();
 
+// Header Normalizer
+const normalizeHeaders = (headers?: HeadersInit): Record<string, string> | undefined => {
+    if (!headers) {
+        return undefined;
+    }
+
+    if (headers instanceof Headers) {
+        const result: Record<string, string> = {};
+        headers.forEach((value, key) => {
+            result[key] = value;
+        });
+        return result;
+    }
+
+    if (Array.isArray(headers)) {
+        return headers.reduce<Record<string, string>>((acc, [key, value]) => {
+            acc[key] = value;
+            return acc;
+        }, {});
+    }
+
+    return headers;
+};
+
+const isApiError = (error: unknown): error is ApiError => {
+    return Boolean(error) && typeof error === 'object' && 'message' in (error as Record<string, unknown>);
+};
+
+const isRetryableError = (error: unknown): boolean => {
+    if (isApiError(error)) {
+        return Boolean(error.status && error.status >= 500);
+    }
+
+    if (error instanceof Error) {
+        return (
+            error.message.includes('Network') ||
+            error.message.includes('timeout') ||
+            error.message.includes('Failed to fetch')
+        );
+    }
+
+    return false;
+};
+
+const isPublicEndpoint = (endpoint: string): boolean => {
+    return PUBLIC_ENDPOINTS.some((publicEndpoint) => endpoint.startsWith(publicEndpoint));
+};
+
 // Generic API function with better error handling and automatic token inclusion
-export async function apiCall<T>(endpoint: string, options: RequestInit = {}, retryCount = 0): Promise<T> {
+export async function apiCall<T>(endpoint: string, options: ApiCallOptions = {}, retryCount = 0): Promise<T> {
     const maxRetries = 3;
     const retryDelay = 1000; // 1초
-    const timeout = 10000; // 10초 타임아웃
+    const timeout = options.timeout ?? 10000; // 10초 타임아웃
 
     // 동시 요청 제한을 위해 큐에 추가
     return requestQueue.add(async () => {
         try {
-            const token = getAuthToken();
-
-            const headers: HeadersInit = {
-                'Content-Type': 'application/json',
-                ...options.headers,
-            };
-
-            // 토큰이 있으면 Authorization 헤더에 추가
-            if (token) {
-                (headers as any)['Authorization'] = `Bearer ${token}`;
+            const defaultHeaders: Record<string, string> = {};
+            if (!(options.body instanceof FormData)) {
+                defaultHeaders['Content-Type'] = 'application/json';
             }
 
-            // AbortController를 사용한 타임아웃 설정
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), timeout);
+            const config: ApiRequestConfig = {
+                method: (options.method ?? 'GET').toUpperCase() as ApiRequestConfig['method'],
+                headers: {
+                    ...defaultHeaders,
+                    ...normalizeHeaders(options.headers),
+                },
+                data: options.body,
+                params: options.params,
+                timeout,
+            };
 
-            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-                ...options,
-                headers,
-                signal: controller.signal,
-            });
+            return await api.request<T>(endpoint, config);
+        } catch (error) {
+            console.error('API call failed:', error);
 
-            clearTimeout(timeoutId);
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-
-                // 401 Unauthorized 오류 시 토큰 제거
-                if (response.status === 401) {
-                    localStorage.removeItem('authToken');
-                    localStorage.removeItem('authUser');
-                    // 인증 토큰이 만료되어 자동 로그아웃
-                }
-
-                // 공개 데이터 조회 시 401 에러는 무시하고 빈 데이터 반환
-                if (response.status === 401 && (
-                    endpoint.includes('/artists') ||
-                    endpoint.includes('/funding/projects') ||
-                    endpoint.includes('/community/posts') ||
-                    endpoint.includes('/stats/platform')
-                )) {
+            if (isApiError(error)) {
+                if (error.status === 401 && isPublicEndpoint(endpoint)) {
                     console.warn(`공개 데이터 조회 실패 (401): ${endpoint}`);
                     return { success: false, data: [], message: '인증이 필요합니다' } as T;
                 }
 
-                throw new Error(errorData.message || `API Error: ${response.status} ${response.statusText}`);
+                if (retryCount < maxRetries && isRetryableError(error)) {
+                    await delay(retryDelay * (retryCount + 1));
+                    return apiCall<T>(endpoint, options, retryCount + 1);
+                }
+
+                throw new Error(error.message || 'API 요청에 실패했습니다.');
             }
 
-            return await response.json();
-        } catch (error) {
-            console.error('API call failed:', error);
-
-            // 타임아웃 에러 처리
-            if (error instanceof Error && error.name === 'AbortError') {
-                throw new Error('요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
-            }
-
-            // ERR_INSUFFICIENT_RESOURCES는 재시도하면 안 되는 에러
-            if (error instanceof TypeError && error.message.includes('ERR_INSUFFICIENT_RESOURCES')) {
-                throw new Error('서버 리소스가 부족합니다. 잠시 후 다시 시도해주세요.');
-            }
-
-            // 네트워크 에러이고 재시도 횟수가 남아있으면 재시도
-            if (retryCount < maxRetries && (
-                (error instanceof TypeError && error.message.includes('Failed to fetch')) ||
-                (error instanceof TypeError && error.message.includes('NetworkError'))
-            )) {
+            if (retryCount < maxRetries && isRetryableError(error)) {
                 console.log(`API 호출 재시도 중... (${retryCount + 1}/${maxRetries})`);
-                await delay(retryDelay * (retryCount + 1)); // 지수 백오프
+                await delay(retryDelay * (retryCount + 1));
                 return apiCall<T>(endpoint, options, retryCount + 1);
             }
 
-            throw error;
+            throw error instanceof Error
+                ? error
+                : new Error('요청 처리 중 알 수 없는 오류가 발생했습니다.');
         }
     });
 }
@@ -614,8 +639,11 @@ export const categoryAPI = {
 // Utility function to check if API is available
 export const isAPIAvailable = async (): Promise<boolean> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/health`);
-        return response.ok;
+        const response = await api.get<{ success: boolean }>('/health');
+        if (typeof response === 'object' && response !== null && 'success' in response) {
+            return Boolean((response as any).success);
+        }
+        return true;
     } catch {
         return false;
     }

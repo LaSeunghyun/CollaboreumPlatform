@@ -4,13 +4,7 @@ import {
     FundingHistoryFilter,
     FundingProject
 } from '../types/funding';
-
-// API 응답 타입 정의
-interface ApiResponse<T> {
-    success: boolean;
-    data?: T;
-    message?: string;
-}
+import type { ApiResponse } from '@/shared/types';
 
 // 프로젝트 업데이트 타입 정의
 interface ProjectUpdate {
