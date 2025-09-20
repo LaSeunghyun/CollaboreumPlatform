@@ -44,7 +44,19 @@ class AuthService {
         }
 
         // 토큰을 localStorage에 저장
+        console.log('🔐 Login Success - Storing tokens:', {
+            accessToken: response.data.accessToken ? `${response.data.accessToken.substring(0, 20)}...` : 'null',
+            refreshToken: response.data.refreshToken ? `${response.data.refreshToken.substring(0, 20)}...` : 'null'
+        });
+        
         storeTokens(response.data.accessToken, response.data.refreshToken);
+        
+        // 저장 후 확인
+        console.log('🔐 Tokens stored - Verification:', {
+            authToken: localStorage.getItem(AUTH_TOKEN_KEY) ? `${localStorage.getItem(AUTH_TOKEN_KEY)!.substring(0, 20)}...` : 'null',
+            accessToken: localStorage.getItem(ACCESS_TOKEN_KEY) ? `${localStorage.getItem(ACCESS_TOKEN_KEY)!.substring(0, 20)}...` : 'null',
+            refreshToken: localStorage.getItem(REFRESH_TOKEN_KEY) ? `${localStorage.getItem(REFRESH_TOKEN_KEY)!.substring(0, 20)}...` : 'null'
+        });
 
         return response.data;
     }
