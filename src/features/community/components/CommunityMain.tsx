@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/shared/ui/Card";
 import { Button } from "@/shared/ui/Button";
 import { Input } from "@/shared/ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/Select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/ui/Tabs";
-import { CommunityPost } from "../types";
+import { ErrorMessage, ProjectListSkeleton } from "@/shared/ui";
+import { useCommunityPosts } from "@/lib/api/useCommunityPosts";
+import type { CommunityPost, CommunityPostListQuery } from "../types";
 import PostCard from "./PostCard";
 import PostForm from "./PostForm";
 import { Search, Plus, Filter, TrendingUp, Clock, Star } from "lucide-react";
@@ -20,76 +23,195 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
     onCreatePost,
     showStats = true
 }) => {
-    const [activeTab, setActiveTab] = useState("all");
-    const [searchQuery, setSearchQuery] = useState("");
-    const [sortBy, setSortBy] = useState("latest");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchInput, setSearchInput] = useState("");
     const [showCreateForm, setShowCreateForm] = useState(false);
 
-    // 임시 데이터 - 실제로는 API에서 가져와야 함
-    const mockPosts: CommunityPost[] = [
-        {
-            id: "1",
-            title: "새로운 음악 프로젝트를 시작합니다!",
-            content: "안녕하세요! 새로운 앨범 작업을 시작하게 되었습니다. 많은 관심 부탁드려요.",
-            author: {
-                id: "user1",
-                name: "김아티스트",
-                username: "kimartist",
-                avatar: undefined,
-                role: "artist" as const,
-                isVerified: true
-            },
-            category: "announcement",
-            tags: ["음악", "앨범", "프로젝트"],
-            likes: 15,
-            dislikes: 2,
-            views: 120,
-            comments: 8,
-            replies: 3,
-            viewCount: 120,
-            isHot: true,
-            isPinned: false,
-            isLiked: false,
-            isDisliked: false,
-            isBookmarked: false,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            status: "published"
-        },
-        {
-            id: "2",
-            title: "협업하고 싶은 뮤지션을 찾습니다",
-            content: "재즈 장르로 작업하고 계신 분들과 협업하고 싶습니다. 연락주세요!",
-            author: {
-                id: "user2",
-                name: "박뮤지션",
-                username: "parkmusician",
-                avatar: undefined,
-                role: "artist" as const,
-                isVerified: false
-            },
-            category: "collaboration",
-            tags: ["재즈", "협업", "뮤지션"],
-            likes: 8,
-            dislikes: 1,
-            views: 45,
-            comments: 3,
-            replies: 1,
-            viewCount: 45,
-            isHot: false,
-            isPinned: false,
-            isLiked: true,
-            isDisliked: false,
-            isBookmarked: false,
-            createdAt: new Date(Date.now() - 3600000).toISOString(),
-            updatedAt: new Date(Date.now() - 3600000).toISOString(),
-            status: "published"
+    const categoryParam = searchParams.get("category") || "all";
+    const sortParam = searchParams.get("sort") || "latest";
+    const orderParam = searchParams.get("order");
+    const searchParam = searchParams.get("search") || "";
+    const pageParam = searchParams.get("page");
+    const limitParam = searchParams.get("limit");
+    const statusParam = searchParams.get("status");
+    const authorParam = searchParams.get("authorId");
+
+    useEffect(() => {
+        setSearchInput(searchParam);
+    }, [searchParam]);
+
+    const mapSortOption = useCallback((option: string): Pick<CommunityPostListQuery, "sortBy" | "order"> => {
+        switch (option) {
+            case "popular":
+                return { sortBy: "likes", order: "desc" };
+            case "trending":
+                return { sortBy: "views", order: "desc" };
+            case "latest":
+            default:
+                return { sortBy: "createdAt", order: "desc" };
         }
-    ];
+    }, []);
+
+    const updateSearchParams = useCallback(
+        (updates: Record<string, string | null | undefined>) => {
+            setSearchParams((prev) => {
+                const next = new URLSearchParams(prev);
+
+                Object.entries(updates).forEach(([key, value]) => {
+                    if (value === null || value === undefined || value === "") {
+                        next.delete(key);
+                        return;
+                    }
+
+                    if (key === "page" && value === "1") {
+                        next.delete(key);
+                        return;
+                    }
+
+                    next.set(key, value);
+                });
+
+                return next;
+            });
+        },
+        [setSearchParams]
+    );
+
+    const handleTabChange = useCallback(
+        (value: string) => {
+            updateSearchParams({
+                category: value === "all" ? null : value,
+                page: "1",
+            });
+        },
+        [updateSearchParams]
+    );
+
+    const handleSortChange = useCallback(
+        (value: string) => {
+            const { order } = mapSortOption(value);
+            updateSearchParams({
+                sort: value,
+                order,
+                page: "1",
+            });
+        },
+        [mapSortOption, updateSearchParams]
+    );
+
+    const handleSearchChange = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            const value = event.target.value;
+            setSearchInput(value);
+
+            const normalized = value.trim();
+            updateSearchParams({
+                search: normalized ? normalized : null,
+                page: "1",
+            });
+        },
+        [updateSearchParams]
+    );
+
+    const query = useMemo<CommunityPostListQuery>(() => {
+        const params: CommunityPostListQuery = {};
+
+        if (categoryParam && categoryParam !== "all") {
+            params.category = categoryParam;
+        }
+
+        if (searchParam) {
+            params.search = searchParam;
+        }
+
+        if (pageParam) {
+            const parsedPage = Number(pageParam);
+            if (!Number.isNaN(parsedPage) && parsedPage > 0) {
+                params.page = parsedPage;
+            }
+        }
+
+        if (limitParam) {
+            const parsedLimit = Number(limitParam);
+            if (!Number.isNaN(parsedLimit) && parsedLimit > 0) {
+                params.limit = parsedLimit;
+            }
+        }
+
+        if (statusParam) {
+            params.status = statusParam as CommunityPostListQuery["status"];
+        }
+
+        if (authorParam) {
+            params.authorId = authorParam;
+        }
+
+        const { sortBy, order } = mapSortOption(sortParam);
+        if (sortBy) {
+            params.sortBy = sortBy;
+        }
+
+        const normalizedOrder = (orderParam as CommunityPostListQuery["order"]) || order;
+        if (normalizedOrder) {
+            params.order = normalizedOrder;
+        }
+
+        return params;
+    }, [authorParam, categoryParam, limitParam, mapSortOption, orderParam, pageParam, searchParam, sortParam, statusParam]);
+
+    const {
+        data,
+        isLoading,
+        isFetching,
+        error,
+        refetch,
+    } = useCommunityPosts(query);
+
+    const posts = useMemo<CommunityPost[]>(() => {
+        if (!data) {
+            return [];
+        }
+
+        if (Array.isArray((data as any).posts)) {
+            return (data as any).posts as CommunityPost[];
+        }
+
+        if (Array.isArray((data as any).data?.posts)) {
+            return (data as any).data.posts as CommunityPost[];
+        }
+
+        if (Array.isArray((data as any).data)) {
+            return (data as any).data as CommunityPost[];
+        }
+
+        return [];
+    }, [data]);
+
+    const pagination = useMemo(() => {
+        if (!data) return undefined;
+
+        if ((data as any).pagination) {
+            return (data as any).pagination;
+        }
+
+        if ((data as any).data?.pagination) {
+            return (data as any).data.pagination;
+        }
+
+        return undefined;
+    }, [data]);
+
+    const allowedTabs = ["all", "general", "question", "discussion", "collaboration"] as const;
+    const activeTab = allowedTabs.includes(categoryParam as typeof allowedTabs[number]) ? categoryParam : "all";
+    const allowedSorts = ["latest", "popular", "trending"] as const;
+    const normalizedSort = allowedSorts.includes(sortParam as typeof allowedSorts[number]) ? sortParam : "latest";
+    const totalPosts = pagination?.total ?? posts.length;
 
     const handleCreatePost = (data: any) => {
         console.log("Creating post:", data);
         setShowCreateForm(false);
+        onCreatePost?.();
+        refetch();
         // 실제로는 API 호출
     };
 
@@ -98,26 +220,6 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
             onPostClick(post);
         }
     };
-
-    const filteredPosts = mockPosts.filter(post => {
-        if (activeTab !== "all" && post.category !== activeTab) return false;
-        if (searchQuery && !post.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-            !post.content.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-        return true;
-    });
-
-    const sortedPosts = [...filteredPosts].sort((a, b) => {
-        switch (sortBy) {
-            case "latest":
-                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-            case "popular":
-                return b.likes - a.likes;
-            case "trending":
-                return (b.likes + b.comments) - (a.likes + a.comments);
-            default:
-                return 0;
-        }
-    });
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -145,13 +247,13 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                                 <Input
                                     placeholder="게시글 검색..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    value={searchInput}
+                                    onChange={handleSearchChange}
                                     className="pl-10"
                                 />
                             </div>
                         </div>
-                        <Select value={sortBy} onValueChange={setSortBy}>
+                        <Select value={normalizedSort} onValueChange={handleSortChange}>
                             <SelectTrigger className="w-full sm:w-48">
                                 <SelectValue placeholder="정렬 방식" />
                             </SelectTrigger>
@@ -206,7 +308,7 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
                                     <Filter className="w-5 h-5 text-green-600" />
                                     <div>
                                         <p className="text-sm text-gray-600">총 게시글</p>
-                                        <p className="text-2xl font-bold text-gray-900">1,234</p>
+                                        <p className="text-2xl font-bold text-gray-900">{totalPosts.toLocaleString()}</p>
                                     </div>
                                 </div>
                             </CardContent>
@@ -216,7 +318,7 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
 
                 {/* 탭 및 게시글 목록 */}
                 <div className="space-y-6">
-                    <Tabs value={activeTab} onValueChange={setActiveTab}>
+                    <Tabs value={activeTab} onValueChange={handleTabChange}>
                         <TabsList className="grid w-full grid-cols-5">
                             <TabsTrigger value="all">전체</TabsTrigger>
                             <TabsTrigger value="general">일반</TabsTrigger>
@@ -233,8 +335,15 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
                                 />
                             ) : (
                                 <div className="space-y-4">
-                                    {sortedPosts.length > 0 ? (
-                                        sortedPosts.map((post) => (
+                                    {isLoading ? (
+                                        <ProjectListSkeleton />
+                                    ) : error ? (
+                                        <ErrorMessage
+                                            error={error as Error}
+                                            onRetry={() => refetch()}
+                                        />
+                                    ) : posts.length > 0 ? (
+                                        posts.map((post) => (
                                             <PostCard
                                                 key={post.id}
                                                 post={post}
@@ -245,6 +354,14 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
                                         <Card>
                                             <CardContent className="p-8 text-center">
                                                 <p className="text-gray-500">게시글이 없습니다.</p>
+                                            </CardContent>
+                                        </Card>
+                                    )}
+
+                                    {!isLoading && !error && isFetching && (
+                                        <Card>
+                                            <CardContent className="p-4 text-center text-sm text-gray-500">
+                                                최신 게시글을 불러오는 중입니다...
                                             </CardContent>
                                         </Card>
                                     )}
