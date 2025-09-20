@@ -4,6 +4,25 @@ import { ApiResponse } from '../../../shared/types';
 // import { fetch } from '../../../utils/fetch';
 
 const API_BASE_URL = resolveApiBaseUrl();
+const AUTH_TOKEN_KEY = 'authToken';
+const ACCESS_TOKEN_KEY = 'accessToken';
+const REFRESH_TOKEN_KEY = 'refreshToken';
+
+const storeTokens = (accessToken: string, refreshToken: string) => {
+    localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+};
+
+const clearTokens = () => {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+};
+
+const getStoredAccessToken = () => {
+    return localStorage.getItem(AUTH_TOKEN_KEY) ?? localStorage.getItem(ACCESS_TOKEN_KEY);
+};
 
 class AuthService {
     private baseUrl = `${API_BASE_URL}/auth`;
@@ -25,8 +44,7 @@ class AuthService {
         }
 
         // 토큰을 localStorage에 저장
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
+        storeTokens(response.data.accessToken, response.data.refreshToken);
 
         return response.data;
     }
@@ -48,8 +66,7 @@ class AuthService {
         }
 
         // 토큰을 localStorage에 저장
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
+        storeTokens(response.data.accessToken, response.data.refreshToken);
 
         return response.data;
     }
@@ -58,7 +75,7 @@ class AuthService {
      * 로그아웃
      */
     async logout(): Promise<void> {
-        const refreshToken = localStorage.getItem('refreshToken');
+        const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
 
         if (refreshToken) {
             try {
@@ -66,7 +83,7 @@ class AuthService {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                        'Authorization': `Bearer ${getStoredAccessToken()}`,
                     },
                     body: JSON.stringify({ refreshToken }),
                 });
@@ -76,15 +93,14 @@ class AuthService {
         }
 
         // 로컬 스토리지에서 토큰 제거
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        clearTokens();
     }
 
     /**
      * 토큰 갱신
      */
     async refreshToken(): Promise<RefreshTokenResponse> {
-        const refreshToken = localStorage.getItem('refreshToken');
+        const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
 
         if (!refreshToken) {
             throw new Error('리프레시 토큰이 없습니다');
@@ -103,8 +119,7 @@ class AuthService {
         }
 
         // 새로운 토큰을 localStorage에 저장
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
+        storeTokens(response.data.accessToken, response.data.refreshToken);
 
         return response.data;
     }
@@ -113,7 +128,7 @@ class AuthService {
      * 현재 사용자 정보 조회
      */
     async getCurrentUser(): Promise<any> {
-        const token = localStorage.getItem('accessToken');
+        const token = getStoredAccessToken();
 
         if (!token) {
             throw new Error('인증 토큰이 없습니다');
@@ -171,7 +186,7 @@ class AuthService {
      * 프로필 업데이트
      */
     async updateProfile(data: any): Promise<any> {
-        const token = localStorage.getItem('accessToken');
+        const token = getStoredAccessToken();
 
         if (!token) {
             throw new Error('인증 토큰이 없습니다');
@@ -197,7 +212,7 @@ class AuthService {
      * 비밀번호 변경
      */
     async changePassword(data: any): Promise<void> {
-        const token = localStorage.getItem('accessToken');
+        const token = getStoredAccessToken();
 
         if (!token) {
             throw new Error('인증 토큰이 없습니다');
@@ -221,7 +236,7 @@ class AuthService {
      * 토큰 유효성 검사
      */
     isTokenValid(): boolean {
-        const token = localStorage.getItem('accessToken');
+        const token = getStoredAccessToken();
         if (!token) return false;
 
         try {
@@ -241,14 +256,14 @@ class AuthService {
      * 현재 토큰 가져오기
      */
     getAccessToken(): string | null {
-        return localStorage.getItem('accessToken');
+        return getStoredAccessToken();
     }
 
     /**
      * 현재 리프레시 토큰 가져오기
      */
     getRefreshToken(): string | null {
-        return localStorage.getItem('refreshToken');
+        return localStorage.getItem(REFRESH_TOKEN_KEY);
     }
 }
 

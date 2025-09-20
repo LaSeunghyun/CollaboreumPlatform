@@ -119,8 +119,11 @@
       "last 1 safari version"
     ]
   },
+  "overrides": {
+    "@types/http-errors": "file:packages/types-http-errors"
+  },
   "devDependencies": {
-    "@eslint/js": "^9.0.0",
+    "@eslint/js": "file:packages/eslint-js",
     "@pact-foundation/pact": "^13.0.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",
