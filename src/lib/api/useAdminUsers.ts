@@ -52,7 +52,8 @@ export const useAdminUser = (userId: string) => {
   return useQuery<{ success: boolean; data: AdminUser }>({
     queryKey: ['admin', 'users', userId],
     queryFn: async (): Promise<{ success: boolean; data: AdminUser }> => {
-      return await adminUserAPI.getAllUsers({ search: userId, limit: 1 });
+      const result = await adminUserAPI.getAllUsers({ search: userId, limit: 1 });
+      return result as { success: boolean; data: AdminUser };
     },
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,

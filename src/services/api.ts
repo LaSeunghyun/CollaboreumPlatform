@@ -311,7 +311,7 @@ export async function apiCall<T>(endpoint: string, options: ApiCallOptions = {},
     const timeout = options.timeout ?? 10000; // 10초 타임아웃
 
     // 동시 요청 제한을 위해 큐에 추가
-    return requestQueue.add(async () => {
+    return requestQueue.add(async (): Promise<T> => {
         try {
             const defaultHeaders: Record<string, string> = {};
             if (!(options.body instanceof FormData)) {
