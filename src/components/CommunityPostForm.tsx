@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { resolveApiBaseUrl } from '@/lib/config/env';
+import { getStoredAccessToken } from '@/features/auth/services/tokenStorage';
 import { Button } from '../shared/ui/Button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Label } from './ui/label';
 import { useAuth } from '../contexts/AuthContext';
@@ -17,7 +24,7 @@ interface CommunityPostFormProps {
 // 카테고리는 API에서 동적으로 가져옴
 
 export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
-  onBack
+  onBack,
 }) => {
   const { user } = useAuth();
   const typedUser = user as User | null;
@@ -25,11 +32,13 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
     title: '',
     content: '',
     category: '',
-    images: [] as File[]
+    images: [] as File[],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [categories, setCategories] = useState<Array<{ id: string, label: string }>>([]);
+  const [categories, setCategories] = useState<
+    Array<{ id: string; label: string }>
+  >([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
 
   // 카테고리 목록 가져오기
@@ -40,7 +49,10 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
         setCategories(categoriesData);
         // 첫 번째 카테고리를 기본값으로 설정
         if (categoriesData && categoriesData.length > 0) {
-          setFormData(prev => ({ ...prev, category: categoriesData[0]?.id || 'music' }));
+          setFormData(prev => ({
+            ...prev,
+            category: categoriesData[0]?.id || 'music',
+          }));
         }
       } catch (error) {
         console.error('카테고리 로드 실패:', error);
@@ -54,7 +66,7 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
           { id: 'video', label: '영상' },
           { id: 'design', label: '디자인' },
           { id: 'craft', label: '공예' },
-          { id: 'other', label: '기타' }
+          { id: 'other', label: '기타' },
         ];
         setCategories(defaultCategories);
         setFormData(prev => ({ ...prev, category: 'music' }));
@@ -78,7 +90,8 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
     }
 
     const validFiles = files.filter(file => {
-      if (file.size > 5 * 1024 * 1024) { // 5MB 제한
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB 제한
         setError('이미지 크기는 5MB 이하여야 합니다.');
         return false;
       }
@@ -96,7 +109,7 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
   const removeImage = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
@@ -113,6 +126,13 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
       return;
     }
 
+    const token = getStoredAccessToken();
+
+    if (!token) {
+      setError('로그인 세션이 만료되었습니다. 다시 로그인해주세요.');
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
 
@@ -122,19 +142,18 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
 
       if (formData.images.length > 0) {
         const formDataForImages = new (window as any).FormData();
-        formData.images.forEach((image) => {
+        formData.images.forEach(image => {
           formDataForImages.append('images', image);
         });
 
         // 이미지 업로드는 FormData를 직접 fetch로 처리
-        const token = localStorage.getItem('authToken');
         const API_BASE_URL = resolveApiBaseUrl();
         const imageResponse = await fetch(`${API_BASE_URL}/upload/images`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
-          body: formDataForImages
+          body: formDataForImages,
         });
 
         if (imageResponse.ok) {
@@ -151,7 +170,7 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
         content: formData.content.trim(),
         category: formData.category,
         tags: [],
-        status: 'published' as const
+        status: 'published' as const,
       };
 
       await communityApi.createPost(postData);
@@ -160,12 +179,15 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
         title: '',
         content: '',
         category: '음악',
-        images: []
+        images: [],
       });
       onBack(); // 포스트 생성 성공 시 뒤로가기
     } catch (error: unknown) {
       console.error('포스트 생성 오류:', error);
-      const errorMessage = error instanceof Error ? error.message : '포스트 생성 중 오류가 발생했습니다.';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : '포스트 생성 중 오류가 발생했습니다.';
       setError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -173,28 +195,36 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
+    <Card className='mx-auto w-full max-w-4xl'>
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center">새 글 작성</CardTitle>
+        <CardTitle className='text-center text-2xl font-bold'>
+          새 글 작성
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className='space-y-6'>
           {/* 카테고리 선택 */}
-          <div className="space-y-2">
-            <Label htmlFor="category">카테고리</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='category'>카테고리</Label>
             <Select
               value={formData.category}
-              onValueChange={(value) => handleInputChange('category', value)}
+              onValueChange={value => handleInputChange('category', value)}
             >
-              <SelectTrigger className="h-10">
-                <SelectValue placeholder="카테고리를 선택하세요" />
+              <SelectTrigger className='h-10'>
+                <SelectValue placeholder='카테고리를 선택하세요' />
               </SelectTrigger>
-              <SelectContent className="bg-white">
+              <SelectContent className='bg-white'>
                 {isLoadingCategories ? (
-                  <SelectItem value="loading" disabled className="bg-white">카테고리 로딩 중...</SelectItem>
+                  <SelectItem value='loading' disabled className='bg-white'>
+                    카테고리 로딩 중...
+                  </SelectItem>
                 ) : (
-                  categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id} className="bg-white hover:bg-gray-50">
+                  categories.map(category => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id}
+                      className='bg-white hover:bg-gray-50'
+                    >
                       {category.label}
                     </SelectItem>
                   ))
@@ -204,67 +234,67 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
           </div>
 
           {/* 제목 입력 */}
-          <div className="space-y-2">
-            <Label htmlFor="title">제목</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='title'>제목</Label>
             <Input
-              id="title"
+              id='title'
               value={formData.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
-              placeholder="제목을 입력하세요"
+              onChange={e => handleInputChange('title', e.target.value)}
+              placeholder='제목을 입력하세요'
               maxLength={200}
               required
             />
-            <div className="text-sm text-gray-500 text-right">
+            <div className='text-right text-sm text-gray-500'>
               {formData.title.length}/200
             </div>
           </div>
 
           {/* 내용 입력 */}
-          <div className="space-y-2">
-            <Label htmlFor="content">내용</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='content'>내용</Label>
             <Textarea
-              id="content"
+              id='content'
               value={formData.content}
-              onChange={(e) => handleInputChange('content', e.target.value)}
-              placeholder="내용을 입력하세요"
+              onChange={e => handleInputChange('content', e.target.value)}
+              placeholder='내용을 입력하세요'
               rows={8}
               maxLength={5000}
               required
             />
-            <div className="text-sm text-gray-500 text-right">
+            <div className='text-right text-sm text-gray-500'>
               {formData.content.length}/5000
             </div>
           </div>
 
           {/* 이미지 업로드 */}
-          <div className="space-y-2">
-            <Label htmlFor="images">이미지 첨부 (선택사항)</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='images'>이미지 첨부 (선택사항)</Label>
             <Input
-              id="images"
-              type="file"
+              id='images'
+              type='file'
               multiple
-              accept="image/*"
+              accept='image/*'
               onChange={handleImageChange}
-              className="cursor-pointer"
+              className='cursor-pointer'
             />
-            <div className="text-sm text-gray-500">
+            <div className='text-sm text-gray-500'>
               최대 5개, 각 파일 5MB 이하, 이미지 파일만 가능
             </div>
 
             {/* 이미지 미리보기 */}
             {formData.images.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 mt-2">
+              <div className='mt-2 grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-5'>
                 {formData.images.map((image, index) => (
-                  <div key={index} className="relative">
+                  <div key={index} className='relative'>
                     <img
                       src={URL.createObjectURL(image)}
                       alt={`미리보기 ${index + 1}`}
-                      className="w-full h-24 object-cover rounded"
+                      className='h-24 w-full rounded object-cover'
                     />
                     <button
-                      type="button"
+                      type='button'
                       onClick={() => removeImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                      className='absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-sm text-white hover:bg-red-600'
                     >
                       ×
                     </button>
@@ -276,25 +306,25 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
 
           {/* 에러 메시지 */}
           {error && (
-            <div className="text-red-500 text-sm bg-red-50 p-3 rounded">
+            <div className='rounded bg-red-50 p-3 text-sm text-red-500'>
               {error}
             </div>
           )}
 
           {/* 버튼 그룹 */}
-          <div className="flex justify-end space-x-3 pt-4">
+          <div className='flex justify-end space-x-3 pt-4'>
             <Button
-              type="button"
-              variant="outline"
+              type='button'
+              variant='outline'
               onClick={onBack}
               disabled={isSubmitting}
             >
               취소
             </Button>
             <Button
-              type="submit"
+              type='submit'
               disabled={isSubmitting}
-              className="bg-blue-600 hover:bg-blue-700"
+              className='bg-blue-600 hover:bg-blue-700'
             >
               {isSubmitting ? '작성 중...' : '글 작성'}
             </Button>

@@ -1,3 +1,5 @@
+import { getStoredAccessToken } from '@/features/auth/services/tokenStorage';
+
 export type UserRole = 'fan' | 'artist' | 'admin';
 
 export interface SignupData {
@@ -21,7 +23,10 @@ export interface LoginResponse {
   token: string;
 }
 
-export const login = async (email: string, password: string): Promise<LoginResponse> => {
+export const login = async (
+  email: string,
+  password: string,
+): Promise<LoginResponse> => {
   const response = await fetch('/api/auth/login', {
     method: 'POST',
     headers: {
@@ -94,7 +99,7 @@ export const getCurrentUser = (): any | null => {
 
 // 사용자 인증 상태 확인
 export const isAuthenticated = (): boolean => {
-  const token = localStorage.getItem('authToken');
+  const token = getStoredAccessToken();
   const user = getCurrentUser();
   return !!(token && user);
 };
@@ -104,4 +109,3 @@ export const getUserRole = (): string | null => {
   const user = getCurrentUser();
   return user?.role || null;
 };
-

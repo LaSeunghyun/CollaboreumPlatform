@@ -1,6 +1,11 @@
-const getImportMetaEnv = (): Record<string, string | boolean | undefined> | undefined => {
+const getImportMetaEnv = ():
+  | Record<string, string | boolean | undefined>
+  | undefined => {
   try {
-    if (typeof import.meta !== 'undefined' && typeof import.meta.env !== 'undefined') {
+    if (
+      typeof import.meta !== 'undefined' &&
+      typeof import.meta.env !== 'undefined'
+    ) {
       return import.meta.env as Record<string, string | boolean | undefined>;
     }
   } catch {
@@ -33,7 +38,19 @@ export const isLocalEnvironment = (): boolean => {
     return getEnvVar('NODE_ENV') !== 'production';
   }
 
-  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  return (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1'
+  );
+};
+
+const sanitizeBaseUrl = (value: string | undefined): string | undefined => {
+  if (!value) {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
 };
 
 export const ensureApiPath = (path: string): string => {
@@ -53,10 +70,11 @@ export const resolveApiBaseUrl = (): string => {
     ? 'http://localhost:5000/api'
     : 'https://collaboreumplatform-production.up.railway.app/api';
 
-  const baseUrl =
-    getEnvVar('VITE_API_BASE_URL') ??
-    getEnvVar('REACT_APP_API_URL') ??
-    fallback;
+  const envBaseUrl =
+    sanitizeBaseUrl(getEnvVar('VITE_API_BASE_URL')) ??
+    sanitizeBaseUrl(getEnvVar('REACT_APP_API_URL'));
+
+  const baseUrl = envBaseUrl ?? fallback;
 
   return ensureApiPath(baseUrl);
 };
