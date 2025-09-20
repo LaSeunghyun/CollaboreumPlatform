@@ -39,6 +39,7 @@ router.get('/projects', async (req, res) => {
       id: project._id,
       title: project.title,
       description: project.description,
+      shortDescription: project.shortDescription || (project.description ? project.description.slice(0, 120) : ''),
       artist: project.artist?.name || project.artistName,
       category: project.category,
       goalAmount: project.goalAmount,
@@ -47,8 +48,14 @@ router.get('/projects', async (req, res) => {
       daysLeft: project.daysLeft,
       progress: project.progress,
       status: project.status,
+      startDate: project.startDate,
+      endDate: project.endDate,
       image: project.image,
-      tags: project.tags
+      tags: project.tags,
+      featured: project.featured || false,
+      isActive: project.isActive,
+      createdAt: project.createdAt,
+      updatedAt: project.updatedAt
     }));
 
     res.json({
