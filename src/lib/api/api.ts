@@ -11,6 +11,10 @@ import {
   ApiRequestConfig,
   ApiEndpoint,
 } from '@/shared/types';
+import {
+  sanitizeToken,
+  storeTokens,
+} from '@/features/auth/services/authService';
 
 class ApiClient {
   private client: AxiosInstance;
@@ -30,22 +34,16 @@ class ApiClient {
   private setupInterceptors() {
     this.client.interceptors.request.use(
       config => {
-        const authToken = localStorage.getItem('authToken');
-        const accessToken = localStorage.getItem('accessToken');
-        
-        // "undefined" 문자열이나 null 값 필터링
-        const validAuthToken = authToken && authToken !== 'null' && authToken !== 'undefined' ? authToken : null;
-        const validAccessToken = accessToken && accessToken !== 'null' && accessToken !== 'undefined' ? accessToken : null;
-        
-        const token = validAuthToken ?? validAccessToken;
+        const authToken = sanitizeToken(localStorage.getItem('authToken'));
+        const accessToken = sanitizeToken(localStorage.getItem('accessToken'));
+
+        const token = authToken ?? accessToken;
 
         // 디버깅을 위한 로그
         console.log('🔍 API Request Debug:', {
           url: config.url,
           authToken: authToken ? `${authToken.substring(0, 20)}...` : 'null',
-          accessToken: accessToken
-            ? `${accessToken.substring(0, 20)}...`
-            : 'null',
+          accessToken: accessToken ? `${accessToken.substring(0, 20)}...` : 'null',
           selectedToken: token ? `${token.substring(0, 20)}...` : 'null',
           headers: config.headers,
         });
@@ -92,16 +90,35 @@ class ApiClient {
               if (response.ok) {
                 const data = await response.json();
                 if (data.success && data.data) {
-                  // 새로운 토큰 저장
-                  localStorage.setItem('authToken', data.data.accessToken);
-                  localStorage.setItem('accessToken', data.data.accessToken);
-                  localStorage.setItem('refreshToken', data.data.refreshToken);
+                  const storedTokens = storeTokens(
+                    data.data.accessToken,
+                    data.data.refreshToken,
+                    data.data.token,
+                  );
+
+                  if (!storedTokens.accessToken) {
+                    console.error('❌ Token refresh response did not contain a valid access token');
+                    this.clearStoredAuth('unauthorized');
+                    return Promise.reject(
+                      new Error('토큰 갱신 실패: 유효한 액세스 토큰을 받지 못했습니다'),
+                    );
+                  }
 
                   console.log('✅ Token refreshed successfully');
 
                   // 원래 요청 재시도
                   const originalRequest = error.config;
-                  originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
+                  if (!originalRequest) {
+                    return Promise.reject(
+                      new Error('토큰 갱신 후 원본 요청 정보를 찾을 수 없습니다'),
+                    );
+                  }
+
+                  originalRequest.headers = {
+                    ...(originalRequest.headers ?? {}),
+                    Authorization: `Bearer ${storedTokens.accessToken}`,
+                  };
+
                   return this.client.request(originalRequest);
                 }
               }
@@ -109,6 +126,10 @@ class ApiClient {
               console.error('❌ Token refresh failed:', refreshError);
             }
           }
+          this.clearStoredAuth('unauthorized');
+          return Promise.reject(
+            new Error('토큰 갱신 실패: 유효한 토큰을 확보하지 못했습니다'),
+          );
         }
 
         return Promise.reject(this.handleError(error));

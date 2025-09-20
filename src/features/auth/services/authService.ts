@@ -13,7 +13,7 @@ type StoredTokens = {
     refreshToken: string | null;
 };
 
-const sanitizeToken = (token?: string | null): string | null => {
+export const sanitizeToken = (token?: string | null): string | null => {
     if (!token) return null;
 
     const trimmed = token.trim();
@@ -24,8 +24,19 @@ const sanitizeToken = (token?: string | null): string | null => {
     return trimmed;
 };
 
-const storeTokens = (accessToken?: string | null, refreshToken?: string | null): StoredTokens => {
-    const sanitizedAccessToken = sanitizeToken(accessToken);
+export const selectValidAccessToken = (
+    accessToken?: string | null,
+    fallbackToken?: string | null,
+): string | null => {
+    return sanitizeToken(accessToken) ?? sanitizeToken(fallbackToken);
+};
+
+export const storeTokens = (
+    accessToken?: string | null,
+    refreshToken?: string | null,
+    fallbackToken?: string | null,
+): StoredTokens => {
+    const sanitizedAccessToken = selectValidAccessToken(accessToken, fallbackToken);
     const sanitizedRefreshToken = sanitizeToken(refreshToken);
 
     if (!sanitizedAccessToken) {
@@ -108,16 +119,21 @@ class AuthService {
             throw new Error(response.error || '로그인에 실패했습니다');
         }
 
-        const rawAccessToken = response.data.accessToken ?? response.data.token ?? null;
-        const rawRefreshToken = response.data.refreshToken ?? null;
+        const storedTokens = storeTokens(
+            response.data.accessToken,
+            response.data.refreshToken,
+            response.data.token,
+        );
 
         // 토큰을 localStorage에 저장
         console.log('🔐 Login Success - Storing tokens:', {
-            accessToken: rawAccessToken ? `${rawAccessToken.substring(0, 20)}...` : 'null',
-            refreshToken: rawRefreshToken ? `${rawRefreshToken.substring(0, 20)}...` : 'null'
+            accessToken: storedTokens.accessToken
+                ? `${storedTokens.accessToken.substring(0, 20)}...`
+                : 'null',
+            refreshToken: storedTokens.refreshToken
+                ? `${storedTokens.refreshToken.substring(0, 20)}...`
+                : 'null',
         });
-
-        const storedTokens = storeTokens(rawAccessToken, rawRefreshToken);
 
         if (!storedTokens.accessToken) {
             throw new Error('유효한 로그인 토큰을 받지 못했습니다');
@@ -154,9 +170,11 @@ class AuthService {
             throw new Error(response.error || '회원가입에 실패했습니다');
         }
 
-        const rawAccessToken = response.data.accessToken ?? response.data.token ?? null;
-        const rawRefreshToken = response.data.refreshToken ?? null;
-        const storedTokens = storeTokens(rawAccessToken, rawRefreshToken);
+        const storedTokens = storeTokens(
+            response.data.accessToken,
+            response.data.refreshToken,
+            response.data.token,
+        );
 
         if (!storedTokens.accessToken) {
             throw new Error('유효한 인증 토큰을 받지 못했습니다');
@@ -217,9 +235,11 @@ class AuthService {
             throw new Error(response.error || '토큰 갱신에 실패했습니다');
         }
 
-        const rawAccessToken = response.data.accessToken ?? response.data.token ?? null;
-        const rawRefreshToken = response.data.refreshToken ?? null;
-        const storedTokens = storeTokens(rawAccessToken, rawRefreshToken);
+        const storedTokens = storeTokens(
+            response.data.accessToken,
+            response.data.refreshToken,
+            response.data.token,
+        );
 
         if (!storedTokens.accessToken) {
             throw new Error('토큰 갱신에 실패했습니다 (유효한 토큰 없음)');
