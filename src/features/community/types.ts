@@ -58,6 +58,7 @@ export interface CommunityPostListResponse {
         limit: number
         total: number
         totalPages: number
+        pages?: number
     }
 }
 

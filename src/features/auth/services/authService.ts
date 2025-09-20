@@ -1,62 +1,18 @@
 import { resolveApiBaseUrl } from '@/lib/config/env';
+import {
+    cleanInvalidTokens,
+    clearTokens,
+    getStoredAccessToken,
+    getStoredRefreshToken,
+    persistTokens,
+    previewToken,
+    resolveAuthTokenCandidates,
+} from '@/features/auth/services/tokenStorage';
 import { AuthResponse, RefreshTokenResponse, LoginCredentials, SignupData, PasswordResetRequest, PasswordReset } from '../types';
 import { ApiResponse } from '../../../shared/types';
 // import { fetch } from '../../../utils/fetch';
 
 const API_BASE_URL = resolveApiBaseUrl();
-const AUTH_TOKEN_KEY = 'authToken';
-const ACCESS_TOKEN_KEY = 'accessToken';
-const REFRESH_TOKEN_KEY = 'refreshToken';
-
-const storeTokens = (accessToken: string, refreshToken: string) => {
-    // 유효한 토큰인지 확인
-    if (!accessToken || accessToken === 'undefined' || accessToken === 'null') {
-        console.error('❌ Invalid accessToken:', accessToken);
-        return;
-    }
-    
-    if (!refreshToken || refreshToken === 'undefined' || refreshToken === 'null') {
-        console.error('❌ Invalid refreshToken:', refreshToken);
-        return;
-    }
-    
-    localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
-    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-    
-    console.log('✅ Tokens stored successfully');
-};
-
-const clearTokens = () => {
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-};
-
-const cleanInvalidTokens = () => {
-    const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
-    const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
-    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-    
-    if (authToken === 'undefined' || authToken === 'null') {
-        localStorage.removeItem(AUTH_TOKEN_KEY);
-        console.log('🧹 Cleaned invalid authToken');
-    }
-    
-    if (accessToken === 'undefined' || accessToken === 'null') {
-        localStorage.removeItem(ACCESS_TOKEN_KEY);
-        console.log('🧹 Cleaned invalid accessToken');
-    }
-    
-    if (refreshToken === 'undefined' || refreshToken === 'null') {
-        localStorage.removeItem(REFRESH_TOKEN_KEY);
-        console.log('🧹 Cleaned invalid refreshToken');
-    }
-};
-
-const getStoredAccessToken = () => {
-    return localStorage.getItem(AUTH_TOKEN_KEY) ?? localStorage.getItem(ACCESS_TOKEN_KEY);
-};
 
 class AuthService {
     private baseUrl = `${API_BASE_URL}/auth`;
@@ -82,22 +38,41 @@ class AuthService {
             throw new Error(response.error || '로그인에 실패했습니다');
         }
 
+        const tokenCandidates = resolveAuthTokenCandidates(response);
+        const candidateAccessToken = tokenCandidates.accessToken;
+        const fallbackToken = tokenCandidates.fallbackToken;
+        const rawRefreshToken = tokenCandidates.refreshToken;
+
         // 토큰을 localStorage에 저장
         console.log('🔐 Login Success - Storing tokens:', {
-            accessToken: response.data.accessToken ? `${response.data.accessToken.substring(0, 20)}...` : 'null',
-            refreshToken: response.data.refreshToken ? `${response.data.refreshToken.substring(0, 20)}...` : 'null'
+            accessToken: previewToken(candidateAccessToken),
+            fallbackToken: previewToken(fallbackToken),
+            refreshToken: previewToken(rawRefreshToken)
         });
 
-        storeTokens(response.data.accessToken, response.data.refreshToken);
+        const storedTokens = persistTokens({
+            accessToken: candidateAccessToken,
+            fallbackToken,
+            refreshToken: rawRefreshToken,
+        });
+
+        if (!storedTokens.accessToken) {
+            throw new Error('유효한 로그인 토큰을 받지 못했습니다');
+        }
 
         // 저장 후 확인
         console.log('🔐 Tokens stored - Verification:', {
-            authToken: localStorage.getItem(AUTH_TOKEN_KEY) ? `${localStorage.getItem(AUTH_TOKEN_KEY)!.substring(0, 20)}...` : 'null',
-            accessToken: localStorage.getItem(ACCESS_TOKEN_KEY) ? `${localStorage.getItem(ACCESS_TOKEN_KEY)!.substring(0, 20)}...` : 'null',
-            refreshToken: localStorage.getItem(REFRESH_TOKEN_KEY) ? `${localStorage.getItem(REFRESH_TOKEN_KEY)!.substring(0, 20)}...` : 'null'
+            authToken: previewToken(storedTokens.accessToken),
+            accessToken: previewToken(storedTokens.accessToken),
+            refreshToken: previewToken(storedTokens.refreshToken)
         });
 
-        return response.data;
+        return {
+            user: response.data.user,
+            accessToken: storedTokens.accessToken,
+            refreshToken: storedTokens.refreshToken,
+            token: fallbackToken ?? storedTokens.accessToken,
+        };
     }
 
     /**
@@ -116,25 +91,39 @@ class AuthService {
             throw new Error(response.error || '회원가입에 실패했습니다');
         }
 
-        // 토큰을 localStorage에 저장
-        storeTokens(response.data.accessToken, response.data.refreshToken);
+        const tokenCandidates = resolveAuthTokenCandidates(response);
+        const storedTokens = persistTokens({
+            accessToken: tokenCandidates.accessToken,
+            fallbackToken: tokenCandidates.fallbackToken,
+            refreshToken: tokenCandidates.refreshToken,
+        });
 
-        return response.data;
+        if (!storedTokens.accessToken) {
+            throw new Error('유효한 인증 토큰을 받지 못했습니다');
+        }
+
+        return {
+            user: response.data.user,
+            accessToken: storedTokens.accessToken,
+            refreshToken: storedTokens.refreshToken,
+            token: tokenCandidates.fallbackToken ?? storedTokens.accessToken,
+        };
     }
 
     /**
      * 로그아웃
      */
     async logout(): Promise<void> {
-        const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+        const refreshToken = getStoredRefreshToken();
+        const accessToken = getStoredAccessToken();
 
-        if (refreshToken) {
+        if (refreshToken && accessToken) {
             try {
                 await fetch(`${this.baseUrl}/logout`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${getStoredAccessToken()}`,
+                        'Authorization': `Bearer ${accessToken}`,
                     },
                     body: JSON.stringify({ refreshToken }),
                 });
@@ -151,7 +140,7 @@ class AuthService {
      * 토큰 갱신
      */
     async refreshToken(): Promise<RefreshTokenResponse> {
-        const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+        const refreshToken = getStoredRefreshToken();
 
         if (!refreshToken) {
             throw new Error('리프레시 토큰이 없습니다');
@@ -169,10 +158,22 @@ class AuthService {
             throw new Error(response.error || '토큰 갱신에 실패했습니다');
         }
 
-        // 새로운 토큰을 localStorage에 저장
-        storeTokens(response.data.accessToken, response.data.refreshToken);
+        const tokenCandidates = resolveAuthTokenCandidates(response);
+        const storedTokens = persistTokens({
+            accessToken: tokenCandidates.accessToken,
+            fallbackToken: tokenCandidates.fallbackToken,
+            refreshToken: tokenCandidates.refreshToken ?? refreshToken,
+        });
 
-        return response.data;
+        if (!storedTokens.accessToken) {
+            throw new Error('토큰 갱신에 실패했습니다 (유효한 토큰 없음)');
+        }
+
+        return {
+            accessToken: storedTokens.accessToken,
+            refreshToken: storedTokens.refreshToken,
+            token: tokenCandidates.fallbackToken ?? storedTokens.accessToken,
+        };
     }
 
     /**
@@ -314,7 +315,7 @@ class AuthService {
      * 현재 리프레시 토큰 가져오기
      */
     getRefreshToken(): string | null {
-        return localStorage.getItem(REFRESH_TOKEN_KEY);
+        return getStoredRefreshToken();
     }
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../shared/ui/Button';
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { ArrowLeft, MessageSquare, Upload } from 'lucide-react';
 import { communityPostAPI } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCategories } from '../../lib/api/useCategories';
 
 // 타입 정의
 declare global {
@@ -40,6 +41,46 @@ export const CreatePostPage: React.FC = () => {
     tags: '',
     images: [] as File[]
   });
+  const { data: categories = [], isLoading: categoriesLoading, error: categoriesError, refetch: refetchCategories } = useCategories();
+
+  const categoryOptions = useMemo(() => {
+    if (!categories || !Array.isArray(categories)) {
+      return [];
+    }
+
+    const unique = new Map<string, { value: string; label: string }>();
+
+    categories.forEach(category => {
+      const rawValue =
+        (category as any).value ||
+        (category as any).id ||
+        (category as any).name ||
+        (category as any).label;
+
+      if (!rawValue || typeof rawValue !== 'string') {
+        return;
+      }
+
+      const normalizedValue = rawValue.trim();
+      if (!normalizedValue) {
+        return;
+      }
+
+      const label =
+        (category as any).label ||
+        (category as any).name ||
+        normalizedValue;
+
+      if (!unique.has(normalizedValue)) {
+        unique.set(normalizedValue, {
+          value: normalizedValue,
+          label,
+        });
+      }
+    });
+
+    return Array.from(unique.values());
+  }, [categories]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -161,19 +202,42 @@ export const CreatePostPage: React.FC = () => {
                 <Label htmlFor="category" className="text-red-500 font-semibold">
                   카테고리 <span className="text-red-500">*</span>
                 </Label>
-                <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) => handleInputChange('category', value)}
+                  disabled={categoriesLoading || loading}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="카테고리를 선택하세요" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="general">일반</SelectItem>
-                    <SelectItem value="question">질문</SelectItem>
-                    <SelectItem value="share">공유</SelectItem>
-                    <SelectItem value="collaboration">협업</SelectItem>
-                    <SelectItem value="feedback">피드백</SelectItem>
-                    <SelectItem value="announcement">공지</SelectItem>
+                    {categoryOptions.length === 0 ? (
+                      <div className="px-3 py-2 text-sm text-gray-500">
+                        {categoriesLoading ? '카테고리를 불러오는 중입니다...' : '사용 가능한 카테고리가 없습니다.'}
+                      </div>
+                    ) : (
+                      categoryOptions.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
+                {categoriesError && (
+                  <div className="mt-2 flex items-center gap-2 text-sm text-red-500">
+                    <span>카테고리를 불러오지 못했습니다.</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => refetchCategories()}
+                    >
+                      다시 시도
+                    </Button>
+                  </div>
+                )}
               </div>
 
               <div>
