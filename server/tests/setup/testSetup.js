@@ -1,5 +1,16 @@
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+
+process.env.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/collaboreum-test';
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-secret';
+process.env.NODE_ENV = process.env.NODE_ENV || 'test';
+process.env.RAILWAY_ENVIRONMENT = process.env.RAILWAY_ENVIRONMENT || 'test';
+
+let MongoMemoryServer;
+try {
+  ({ MongoMemoryServer } = require('mongodb-memory-server'));
+} catch (error) {
+  console.warn('mongodb-memory-server 모듈을 찾을 수 없어 메모리 데이터베이스를 건너뜁니다.');
+}
 
 /**
  * 테스트 환경 설정
@@ -15,6 +26,11 @@ class TestSetup {
    */
   async setupDatabase() {
     try {
+      if (!MongoMemoryServer) {
+        console.warn('메모리 MongoDB 서버를 사용할 수 없어 데이터베이스 연결을 생략합니다.');
+        return null;
+      }
+
       // MongoDB Memory Server 시작
       this.mongoServer = await MongoMemoryServer.create({
         instance: {
@@ -26,7 +42,7 @@ class TestSetup {
       });
 
       const mongoUri = this.mongoServer.getUri();
-      
+
       // MongoDB 연결
       this.connection = await mongoose.connect(mongoUri, {
         useNewUrlParser: true,
@@ -203,6 +219,9 @@ class TestSetup {
       storeProjectCreated: jest.fn().mockResolvedValue({ _id: 'mock-event-id' }),
       storePledgeCreated: jest.fn().mockResolvedValue({ _id: 'mock-event-id' }),
     }));
+
+    // 데이터베이스 연결 모킹
+    jest.mock('../../config/database', () => jest.fn(() => Promise.resolve()));
   }
 
   /**

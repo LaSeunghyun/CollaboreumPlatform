@@ -1,9 +1,18 @@
+const createTransformConfig = () => {
+  try {
+    require.resolve('ts-jest');
+    return {
+      '^.+\\.(t|j)sx?$': ['ts-jest', { tsconfig: 'tsconfig.json' }]
+    };
+  } catch (_error) {
+    return {};
+  }
+};
+
 module.exports = {
   testEnvironment: 'node',
   reporters: ['default', ['jest-junit', { outputDirectory: 'reports/junit' }]],
-  transform: {
-    '^.+\\.(t|j)sx?$': ['ts-jest', { tsconfig: 'tsconfig.json' }]
-  },
+  transform: createTransformConfig(),
   testMatch: [
     '**/tests/**/*.(ts|js)',
     '**/*.(test|spec).(ts|js)',
