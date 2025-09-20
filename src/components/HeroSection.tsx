@@ -100,8 +100,8 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
         {/* Sophisticated Background */}
         <div className='absolute inset-0'>
           <div className='via-secondary/20 to-muted/30 absolute inset-0 bg-gradient-to-br from-background'></div>
-          {/* 상단에서 하단으로 퍼져나가는 그라데이션 */}
-          <div className='bg-gradient-top-soft absolute inset-0'></div>
+          {/* 상단 흐림 → 중앙 짙음 그라데이션 */}
+          <div className='bg-gradient-top-to-center-strong absolute inset-0'></div>
           {/* Animated Background Elements */}
           <div className='bg-primary/10 animate-float absolute left-1/4 top-1/4 h-72 w-72 rounded-full blur-3xl'></div>
           <div

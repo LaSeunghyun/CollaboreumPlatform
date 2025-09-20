@@ -93,8 +93,8 @@ export const HomePage: React.FC = () => {
         <section className='relative flex min-h-screen items-center justify-center space-y-8 overflow-hidden py-8 text-center md:space-y-12 md:py-12'>
           {/* Enhanced Background with top gradient */}
           <div className='via-secondary/20 to-muted/30 pointer-events-none absolute inset-0 bg-gradient-to-br from-background' />
-          {/* 상단에서 하단으로 퍼져나가는 그라데이션 */}
-          <div className='bg-gradient-top-soft pointer-events-none absolute inset-0' />
+          {/* 상단 흐림 → 중앙 짙음 그라데이션 */}
+          <div className='bg-gradient-top-to-center-strong pointer-events-none absolute inset-0' />
           <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(79,70,229,0.1),transparent_50%)]' />
 
           {/* Animated Background Elements */}

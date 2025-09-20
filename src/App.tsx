@@ -16,8 +16,8 @@ function App() {
         <AuthProvider>
           <Router>
             <div className='relative min-h-screen bg-background'>
-              {/* 상단에서 하단으로 퍼져나가는 전체 배경 그라데이션 */}
-              <div className='bg-gradient-top-soft pointer-events-none absolute inset-0'></div>
+              {/* 상단 흐림 → 중앙 짙음 그라데이션 */}
+              <div className='bg-gradient-top-to-center-strong pointer-events-none absolute inset-0'></div>
               <Toast />
               <AppRoutes />
             </div>

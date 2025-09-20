@@ -235,6 +235,39 @@
         transparent 100%);
   }
 
+  /* 상단 흐림 → 중앙 짙음 그라데이션 */
+  .bg-gradient-top-to-center {
+    background-image: linear-gradient(180deg,
+        rgba(79, 70, 229, 0.05) 0%,
+        rgba(79, 70, 229, 0.1) 20%,
+        rgba(79, 70, 229, 0.2) 40%,
+        rgba(79, 70, 229, 0.3) 60%,
+        rgba(79, 70, 229, 0.15) 80%,
+        rgba(79, 70, 229, 0.05) 100%);
+  }
+
+  .bg-gradient-top-to-center-strong {
+    background-image: linear-gradient(180deg,
+        rgba(79, 70, 229, 0.08) 0%,
+        rgba(79, 70, 229, 0.15) 15%,
+        rgba(79, 70, 229, 0.25) 30%,
+        rgba(79, 70, 229, 0.35) 45%,
+        rgba(79, 70, 229, 0.4) 60%,
+        rgba(79, 70, 229, 0.25) 75%,
+        rgba(79, 70, 229, 0.1) 90%,
+        rgba(79, 70, 229, 0.03) 100%);
+  }
+
+  .bg-gradient-top-to-center-warm {
+    background-image: linear-gradient(180deg,
+        rgba(255, 193, 7, 0.05) 0%,
+        rgba(255, 152, 0, 0.1) 20%,
+        rgba(255, 87, 34, 0.2) 40%,
+        rgba(255, 87, 34, 0.3) 60%,
+        rgba(255, 152, 0, 0.15) 80%,
+        rgba(255, 193, 7, 0.05) 100%);
+  }
+
   .bg-gradient-top-warm {
     background-image: linear-gradient(180deg,
         rgba(255, 193, 7, 0.2) 0%,
