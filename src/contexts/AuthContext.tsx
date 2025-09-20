@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { clearTokens, cleanInvalidTokens, getStoredAccessToken, persistTokens } from '@/features/auth/services/tokenStorage';
 import { authAPI } from '../services/api';
 
 interface User {
@@ -37,30 +38,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(null);
     setUser(null);
 
-    localStorage.removeItem('authToken');
+    clearTokens();
     localStorage.removeItem('authUser');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
   }, []);
 
   // 컴포넌트 마운트 시 로컬 스토리지에서 토큰과 사용자 정보 복원
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const storedToken = localStorage.getItem('authToken');
+        cleanInvalidTokens();
+
+        const storedToken = getStoredAccessToken();
         const storedUser = localStorage.getItem('authUser');
 
         if (storedToken && storedUser) {
-          // 토큰 유효성 검증
           const isValid = await validateToken(storedToken);
 
           if (isValid) {
             setToken(storedToken);
             setUser(JSON.parse(storedUser));
           } else {
-            // 유효하지 않은 토큰 제거
             logout();
           }
+        } else if (!storedToken) {
+          logout();
         }
       } catch (error) {
         console.error('토큰 복원 중 오류:', error);
@@ -90,12 +91,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // 로그인 함수
   const login = (newToken: string, newUser: User) => {
-    setToken(newToken);
-    setUser(newUser);
+    const storedTokens = persistTokens({ accessToken: newToken, fallbackToken: newToken });
 
-    // 로컬 스토리지에 저장
-    localStorage.setItem('authToken', newToken);
-    localStorage.setItem('authUser', JSON.stringify(newUser));
+    if (storedTokens.accessToken) {
+      setToken(storedTokens.accessToken);
+      setUser(newUser);
+      localStorage.setItem('authUser', JSON.stringify(newUser));
+    } else {
+      console.error('로그인 토큰 저장에 실패했습니다. 전달받은 토큰이 유효하지 않습니다.');
+      setToken(null);
+      setUser(null);
+      localStorage.removeItem('authUser');
+    }
 
     // 리다이렉트는 호출하는 쪽에서 처리하도록 변경
   };

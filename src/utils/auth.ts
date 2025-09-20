@@ -1,3 +1,5 @@
+import { getStoredAccessToken } from '@/features/auth/services/tokenStorage';
+
 export type UserRole = 'fan' | 'artist' | 'admin';
 
 export interface SignupData {
@@ -94,7 +96,7 @@ export const getCurrentUser = (): any | null => {
 
 // 사용자 인증 상태 확인
 export const isAuthenticated = (): boolean => {
-  const token = localStorage.getItem('authToken');
+  const token = getStoredAccessToken();
   const user = getCurrentUser();
   return !!(token && user);
 };

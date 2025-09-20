@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { resolveApiBaseUrl } from '@/lib/config/env';
+import { getStoredAccessToken } from '@/features/auth/services/tokenStorage';
 import { Button } from '../shared/ui/Button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
@@ -113,6 +114,13 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
       return;
     }
 
+    const token = getStoredAccessToken();
+
+    if (!token) {
+      setError('로그인 세션이 만료되었습니다. 다시 로그인해주세요.');
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
 
@@ -127,7 +135,6 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
         });
 
         // 이미지 업로드는 FormData를 직접 fetch로 처리
-        const token = localStorage.getItem('authToken');
         const API_BASE_URL = resolveApiBaseUrl();
         const imageResponse = await fetch(`${API_BASE_URL}/upload/images`, {
           method: 'POST',
