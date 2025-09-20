@@ -58,7 +58,7 @@
 - **Multer** 파일 업로드
 
 ### 개발 도구
-- **ESLint** + **Prettier** 코드 품질
+- **ESLint 9 (Flat config)** + **Prettier** 코드 품질
 - **TypeScript** 정적 타입 검사
 - **Git** 버전 관리
 
@@ -125,6 +125,8 @@ cd server
 npm install
 cd ..
 ```
+
+> ℹ️ CRA 기반의 `react-scripts`는 제거되었으며, 프런트엔드는 Vite 빌드 체인과 Flat ESLint 구성을 그대로 사용합니다.
 
 ### 3. 환경 변수 설정
 ```bash
