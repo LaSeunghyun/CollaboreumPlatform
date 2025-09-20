@@ -58,10 +58,13 @@ export const ensureApiPath = (path: string): string => {
     return path;
   }
 
+  // 루트 경로는 그대로 유지
   if (path === '/') {
     return path;
   }
 
+  // 절대 경로와 상대 경로 모두에 대해 후행 슬래시 제거
+  // /\/+$/ 정규식으로 하나 이상의 연속된 슬래시를 끝에서 제거
   return path.replace(/\/+$/, '');
 };
 
