@@ -100,8 +100,6 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
         {/* Sophisticated Background */}
         <div className='absolute inset-0'>
           <div className='via-secondary/20 to-muted/30 absolute inset-0 bg-gradient-to-br from-background'></div>
-          {/* 상단 흐림 → 중앙 짙음 그라데이션 */}
-          <div className='bg-gradient-top-to-center-strong absolute inset-0'></div>
           {/* Animated Background Elements */}
           <div className='bg-primary/10 animate-float absolute left-1/4 top-1/4 h-72 w-72 rounded-full blur-3xl'></div>
           <div
@@ -199,8 +197,8 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
                   }}
                   className={`cursor-pointer rounded-xl px-6 py-3 font-medium transition-all ${
                     selectedCategory === category
-                      ? 'shadow-apple bg-primary text-primary-foreground'
-                      : 'hover:bg-secondary/50 text-muted-foreground hover:text-foreground'
+                    ? 'shadow-apple bg-primary text-primary-foreground'
+                    : 'hover:bg-secondary/50 text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {category}
@@ -234,12 +232,12 @@ export function HeroSection({ onViewArtistCommunity }: HeroSectionProps) {
                         <Badge
                           className={`absolute left-4 top-4 rounded-xl font-medium ${
                             artist.category === '음악'
-                              ? 'bg-primary text-primary-foreground'
-                              : artist.category === '미술'
-                                ? 'bg-chart-5 text-white'
-                                : artist.category === '문학'
-                                  ? 'bg-chart-2 text-white'
-                                  : 'bg-destructive text-white'
+                            ? 'bg-primary text-primary-foreground'
+                            : artist.category === '미술'
+                              ? 'bg-chart-5 text-white'
+                              : artist.category === '문학'
+                                ? 'bg-chart-2 text-white'
+                                : 'bg-destructive text-white'
                           }`}
                         >
                           {artist.category}
