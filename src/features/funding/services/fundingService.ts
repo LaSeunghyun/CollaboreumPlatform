@@ -5,8 +5,7 @@ import {
   FundingStats,
   FundingFilters,
   CreateFundingProjectRequest,
-  UpdateFundingProjectRequest,
-  BackProjectRequest
+  BackProjectRequest,
 } from '../types/funding.types';
 import { FundingProjectStatus } from '../types';
 
@@ -72,11 +71,11 @@ const mapFundingProjectStatus = (status?: string): FundingProjectStatus => {
 
   const normalized = status.trim().toLowerCase();
   if (normalized in STATUS_MAP) {
-    return STATUS_MAP[normalized];
+    return STATUS_MAP[normalized]!;
   }
 
   if (status in STATUS_MAP) {
-    return STATUS_MAP[status];
+    return STATUS_MAP[status]!;
   }
 
   return FundingProjectStatus.DRAFT;
@@ -96,7 +95,7 @@ const createShortDescription = (description?: string): string => {
 };
 
 const mapFundingProjectFromApi = (
-  project: FundingProjectApi
+  project: FundingProjectApi,
 ): FundingProject | null => {
   const identifier = project.id ?? project._id;
   if (!identifier) {
@@ -116,17 +115,22 @@ const mapFundingProjectFromApi = (
 
   const uniqueImages = Array.from(new Set(imageList));
 
-  const progress = typeof project.progress === 'number'
-    ? Math.min(Math.max(Math.round(project.progress), 0), 100)
-    : targetAmount > 0
-      ? Math.min(Math.max(Math.round((currentAmount / targetAmount) * 100), 0), 100)
-      : 0;
+  const progress =
+    typeof project.progress === 'number'
+      ? Math.min(Math.max(Math.round(project.progress), 0), 100)
+      : targetAmount > 0
+        ? Math.min(
+            Math.max(Math.round((currentAmount / targetAmount) * 100), 0),
+            100,
+          )
+        : 0;
 
   return {
     id: String(identifier),
     title: project.title,
     description: project.description ?? '',
-    shortDescription: project.shortDescription ?? createShortDescription(project.description),
+    shortDescription:
+      project.shortDescription ?? createShortDescription(project.description),
     targetAmount,
     currentAmount,
     status: mapFundingProjectStatus(project.status),
@@ -148,7 +152,10 @@ const mapFundingProjectFromApi = (
   };
 };
 
-const ensureSuccess = <T>(response: ApiResponse<T>, fallbackMessage: string): ApiResponse<T> => {
+const ensureSuccess = <T>(
+  response: ApiResponse<T>,
+  fallbackMessage: string,
+): ApiResponse<T> => {
   if (!response.success) {
     throw new Error(response.message || fallbackMessage);
   }
@@ -156,7 +163,10 @@ const ensureSuccess = <T>(response: ApiResponse<T>, fallbackMessage: string): Ap
   return response;
 };
 
-const requireData = <T>(response: ApiResponse<T>, fallbackMessage: string): T => {
+const requireData = <T>(
+  response: ApiResponse<T>,
+  fallbackMessage: string,
+): T => {
   const safeResponse = ensureSuccess(response, fallbackMessage);
 
   if (safeResponse.data === undefined || safeResponse.data === null) {
@@ -166,7 +176,9 @@ const requireData = <T>(response: ApiResponse<T>, fallbackMessage: string): T =>
   return safeResponse.data;
 };
 
-const normalizeProjectList = (projects: FundingProjectApi[] | undefined | null): FundingProject[] => {
+const normalizeProjectList = (
+  projects: FundingProjectApi[] | undefined | null,
+): FundingProject[] => {
   if (!projects) {
     return [];
   }
@@ -185,24 +197,36 @@ class FundingService {
     if (filters?.status && filters.status.length > 0) {
       filters.status.forEach(status => params.append('status', status));
     }
-    if (filters?.minAmount) params.append('minAmount', filters.minAmount.toString());
-    if (filters?.maxAmount) params.append('maxAmount', filters.maxAmount.toString());
+    if (filters?.minAmount)
+      params.append('minAmount', filters.minAmount.toString());
+    if (filters?.maxAmount)
+      params.append('maxAmount', filters.maxAmount.toString());
     if (filters?.sortBy) params.append('sortBy', filters.sortBy);
     if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder);
 
     const queryString = params.toString();
-    const endpoint = queryString ? `/funding/projects?${queryString}` : '/funding/projects';
+    const endpoint = queryString
+      ? `/funding/projects?${queryString}`
+      : '/funding/projects';
 
     const response = await api.get<FundingProjectsResponse>(endpoint);
-    const payload = ensureSuccess(response, '펀딩 프로젝트를 불러오지 못했습니다.').data;
+    const payload = ensureSuccess(
+      response,
+      '펀딩 프로젝트를 불러오지 못했습니다.',
+    ).data;
 
     return normalizeProjectList(payload?.projects);
   }
 
   // 펀딩 프로젝트 상세 조회
   async getProject(id: number): Promise<FundingProject> {
-    const response = await api.get<FundingProjectApi>(`/funding/projects/${id}`);
-    const project = requireData(response, '펀딩 프로젝트를 불러오지 못했습니다.');
+    const response = await api.get<FundingProjectApi>(
+      `/funding/projects/${id}`,
+    );
+    const project = requireData(
+      response,
+      '펀딩 프로젝트를 불러오지 못했습니다.',
+    );
     const normalized = mapFundingProjectFromApi(project);
 
     if (!normalized) {
@@ -219,8 +243,13 @@ class FundingService {
   }
 
   // 펀딩 프로젝트 생성
-  async createProject(data: CreateFundingProjectRequest): Promise<FundingProject> {
-    const response = await api.post<FundingProjectApi>('/funding/projects', data);
+  async createProject(
+    data: CreateFundingProjectRequest,
+  ): Promise<FundingProject> {
+    const response = await api.post<FundingProjectApi>(
+      '/funding/projects',
+      data,
+    );
     const project = requireData(response, '펀딩 프로젝트 생성에 실패했습니다.');
     const normalized = mapFundingProjectFromApi(project);
 
@@ -232,9 +261,18 @@ class FundingService {
   }
 
   // 펀딩 프로젝트 수정
-  async updateProject(id: number, data: Partial<CreateFundingProjectRequest>): Promise<FundingProject> {
-    const response = await api.put<FundingProjectApi>(`/funding/projects/${id}`, data);
-    const project = requireData(response, '펀딩 프로젝트 업데이트에 실패했습니다.');
+  async updateProject(
+    id: number,
+    data: Partial<CreateFundingProjectRequest>,
+  ): Promise<FundingProject> {
+    const response = await api.put<FundingProjectApi>(
+      `/funding/projects/${id}`,
+      data,
+    );
+    const project = requireData(
+      response,
+      '펀딩 프로젝트 업데이트에 실패했습니다.',
+    );
     const normalized = mapFundingProjectFromApi(project);
 
     if (!normalized) {
@@ -246,23 +284,30 @@ class FundingService {
 
   // 펀딩 프로젝트 삭제
   async deleteProject(id: number): Promise<void> {
-    ensureSuccess(await api.delete(`/funding/projects/${id}`), '펀딩 프로젝트 삭제에 실패했습니다.');
+    ensureSuccess(
+      await api.delete(`/funding/projects/${id}`),
+      '펀딩 프로젝트 삭제에 실패했습니다.',
+    );
   }
 
   // 프로젝트 후원
-  async backProject(data: BackProjectRequest): Promise<{ paymentId: number; message: string }> {
+  async backProject(
+    data: BackProjectRequest,
+  ): Promise<{ paymentId: number; message: string }> {
     const response = await api.post<{ paymentId: number; message: string }>(
       `/funding/projects/${data.projectId}/back`,
-      data
+      data,
     );
 
     return requireData(response, '후원 처리에 실패했습니다.');
   }
 
   // 프로젝트 좋아요
-  async likeProject(projectId: number): Promise<{ liked: boolean; likesCount: number }> {
+  async likeProject(
+    projectId: number,
+  ): Promise<{ liked: boolean; likesCount: number }> {
     const response = await api.post<{ liked: boolean; likesCount: number }>(
-      `/funding/projects/${projectId}/like`
+      `/funding/projects/${projectId}/like`,
     );
 
     return requireData(response, '좋아요 처리에 실패했습니다.');
@@ -271,7 +316,7 @@ class FundingService {
   // 프로젝트 북마크
   async bookmarkProject(projectId: number): Promise<{ bookmarked: boolean }> {
     const response = await api.post<{ bookmarked: boolean }>(
-      `/funding/projects/${projectId}/bookmark`
+      `/funding/projects/${projectId}/bookmark`,
     );
 
     return requireData(response, '북마크 처리에 실패했습니다.');
@@ -279,30 +324,43 @@ class FundingService {
 
   // 사용자 후원 내역 조회
   async getUserBackings(userId: string): Promise<FundingProject[]> {
-    const response = await api.get<FundingProjectApi[]>(`/funding/users/${userId}/backings`);
-    const projects = ensureSuccess(response, '후원 내역을 불러오지 못했습니다.').data;
+    const response = await api.get<FundingProjectApi[]>(
+      `/funding/users/${userId}/backings`,
+    );
+    const projects = ensureSuccess(
+      response,
+      '후원 내역을 불러오지 못했습니다.',
+    ).data;
 
     return normalizeProjectList(projects);
   }
 
   // 아티스트 프로젝트 목록 조회
   async getArtistProjects(artistId: string): Promise<FundingProject[]> {
-    const response = await api.get<FundingProjectApi[]>(`/funding/artists/${artistId}/projects`);
-    const projects = ensureSuccess(response, '아티스트 프로젝트를 불러오지 못했습니다.').data;
+    const response = await api.get<FundingProjectApi[]>(
+      `/funding/artists/${artistId}/projects`,
+    );
+    const projects = ensureSuccess(
+      response,
+      '아티스트 프로젝트를 불러오지 못했습니다.',
+    ).data;
 
     return normalizeProjectList(projects);
   }
 
   // 프로젝트 승인 (관리자)
   async approveProject(projectId: number): Promise<void> {
-    ensureSuccess(await api.post(`/funding/projects/${projectId}/approve`), '프로젝트 승인에 실패했습니다.');
+    ensureSuccess(
+      await api.post(`/funding/projects/${projectId}/approve`),
+      '프로젝트 승인에 실패했습니다.',
+    );
   }
 
   // 프로젝트 거부 (관리자)
   async rejectProject(projectId: number, reason: string): Promise<void> {
     ensureSuccess(
       await api.post(`/funding/projects/${projectId}/reject`, { reason }),
-      '프로젝트 거부에 실패했습니다.'
+      '프로젝트 거부에 실패했습니다.',
     );
   }
 }
