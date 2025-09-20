@@ -13,6 +13,23 @@ import type {
 
 const API_BASE = '/community'
 
+const unwrapData = <T>(payload: any): T | null => {
+    if (payload === null || payload === undefined) {
+        return null
+    }
+
+    if (Array.isArray(payload)) {
+        return payload as T
+    }
+
+    if (typeof payload === 'object' && payload !== null && 'data' in payload) {
+        const value = (payload as { data?: T }).data
+        return (value ?? null) as T | null
+    }
+
+    return payload as T
+}
+
 export const communityApi = {
     // 게시글 목록 조회
     getPosts: async (query: CommunityPostListQuery = {}): Promise<CommunityPostListResponse> => {
@@ -30,10 +47,16 @@ export const communityApi = {
         const queryString = params.toString()
         const endpoint = queryString ? `${API_BASE}/posts?${queryString}` : `${API_BASE}/posts`
 
-        const response = await apiCall<{ success: boolean; posts: any[]; pagination: any }>(endpoint)
+        const response = await apiCall<{ posts?: any[]; pagination?: any }>(endpoint)
+
+        const rawPosts = Array.isArray(response?.posts)
+            ? response.posts
+            : Array.isArray((response as any)?.data)
+                ? (response as any).data
+                : []
 
         // 데이터 변환 및 정규화
-        const normalizedPosts = response.posts.map(post => ({
+        const normalizedPosts = rawPosts.map(post => ({
             ...post,
             id: post.id || post._id,
             views: post.viewCount || post.views || 0,
@@ -48,19 +71,32 @@ export const communityApi = {
             updatedAt: post.updatedAt || new Date().toISOString()
         }))
 
+        const pagination = (response && typeof response === 'object' && 'pagination' in response)
+            ? (response as any).pagination
+            : undefined
+
         return {
             posts: normalizedPosts,
-            pagination: response.pagination
+            pagination: pagination ?? {
+                page: 1,
+                limit: normalizedPosts.length,
+                total: normalizedPosts.length,
+                pages: 1
+            }
         }
     },
 
     // 게시글 상세 조회
     getPost: async (postId: string): Promise<CommunityPost> => {
         try {
-            const response = await apiCall<{ success: boolean; data: any }>(`${API_BASE}/posts/${postId}`)
+            const response = await apiCall<{ data?: any }>(`${API_BASE}/posts/${postId}`)
+            const post = unwrapData<any>(response)
+
+            if (!post) {
+                throw new Error('게시글 데이터를 찾을 수 없습니다.')
+            }
 
             // 데이터 변환 및 정규화
-            const post = response.data
             const normalizedPost: CommunityPost = {
                 ...post,
                 id: post.id || post._id,
@@ -85,26 +121,34 @@ export const communityApi = {
 
     // 게시글 생성
     createPost: async (data: CreateCommunityPostData): Promise<CommunityPost> => {
-        const response = await apiCall<{ success: boolean; data: CommunityPost; message: string }>(`${API_BASE}/posts`, {
+        const response = await apiCall<{ data?: CommunityPost }>(`${API_BASE}/posts`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(data),
         })
-        return response.data
+        const result = unwrapData<CommunityPost>(response)
+        if (!result) {
+            throw new Error('게시글 생성 응답이 비어 있습니다.')
+        }
+        return result
     },
 
     // 게시글 수정
     updatePost: async (postId: string, data: UpdateCommunityPostData): Promise<CommunityPost> => {
-        const response = await apiCall<{ success: boolean; data: CommunityPost; message: string }>(`${API_BASE}/posts/${postId}`, {
+        const response = await apiCall<{ data?: CommunityPost }>(`${API_BASE}/posts/${postId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(data),
         })
-        return response.data
+        const result = unwrapData<CommunityPost>(response)
+        if (!result) {
+            throw new Error('게시글 수정 응답이 비어 있습니다.')
+        }
+        return result
     },
 
     // 게시글 삭제
@@ -116,20 +160,22 @@ export const communityApi = {
 
     // 게시글 좋아요
     likePost: async (postId: string): Promise<{ likes: number }> => {
-        const response = await apiCall<{ success: boolean; data: { likes: number; dislikes: number }; message: string }>(`${API_BASE}/posts/${postId}/reactions`, {
+        const response = await apiCall<{ data?: { likes: number; dislikes: number } }>(`${API_BASE}/posts/${postId}/reactions`, {
             method: 'POST',
             body: JSON.stringify({ reaction: 'like' }),
         })
-        return { likes: response.data.likes }
+        const result = unwrapData<{ likes: number; dislikes: number }>(response)
+        return { likes: result?.likes ?? 0 }
     },
 
     // 게시글 조회수 증가
     viewPost: async (postId: string): Promise<{ views: number }> => {
         try {
-            const response = await apiCall<{ success: boolean; data: { views: number }; message: string }>(`${API_BASE}/posts/${postId}/views`, {
+            const response = await apiCall<{ data?: { views: number } }>(`${API_BASE}/posts/${postId}/views`, {
                 method: 'POST',
             })
-            return { views: response.data.views }
+            const result = unwrapData<{ views: number }>(response)
+            return { views: result?.views ?? 0 }
         } catch (error) {
             console.error('조회수 증가 실패:', error)
             throw error
@@ -138,32 +184,40 @@ export const communityApi = {
 
     // 댓글 목록 조회
     getComments: async (postId: string): Promise<CommunityComment[]> => {
-        const response = await apiCall<{ success: boolean; data: CommunityComment[]; pagination: any }>(`${API_BASE}/posts/${postId}/comments`)
-        return response.data
+        const response = await apiCall<{ data?: CommunityComment[] }>(`${API_BASE}/posts/${postId}/comments`)
+        return unwrapData<CommunityComment[]>(response) ?? []
     },
 
     // 댓글 생성
     createComment: async (data: CreateCommunityCommentData): Promise<CommunityComment> => {
-        const response = await apiCall<{ success: boolean; data: CommunityComment; message: string }>(`${API_BASE}/posts/${data.postId}/comments`, {
+        const response = await apiCall<{ data?: CommunityComment }>(`${API_BASE}/posts/${data.postId}/comments`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ content: data.content, parentId: data.parentId }),
         })
-        return response.data
+        const result = unwrapData<CommunityComment>(response)
+        if (!result) {
+            throw new Error('댓글 생성 응답이 비어 있습니다.')
+        }
+        return result
     },
 
     // 댓글 수정
     updateComment: async (postId: string, commentId: string, content: string): Promise<CommunityComment> => {
-        const response = await apiCall<{ success: boolean; data: CommunityComment; message: string }>(`${API_BASE}/posts/${postId}/comments/${commentId}`, {
+        const response = await apiCall<{ data?: CommunityComment }>(`${API_BASE}/posts/${postId}/comments/${commentId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ content }),
         })
-        return response.data
+        const result = unwrapData<CommunityComment>(response)
+        if (!result) {
+            throw new Error('댓글 수정 응답이 비어 있습니다.')
+        }
+        return result
     },
 
     // 댓글 삭제
@@ -175,28 +229,29 @@ export const communityApi = {
 
     // 댓글 좋아요
     likeComment: async (postId: string, commentId: string): Promise<{ likes: number }> => {
-        const response = await apiCall<{ success: boolean; data: { likes: number; dislikes: number }; message: string }>(`${API_BASE}/posts/${postId}/comments/${commentId}/reactions`, {
+        const response = await apiCall<{ data?: { likes: number; dislikes: number } }>(`${API_BASE}/posts/${postId}/comments/${commentId}/reactions`, {
             method: 'POST',
             body: JSON.stringify({ reaction: 'like' }),
         })
-        return { likes: response.data.likes }
+        const result = unwrapData<{ likes: number; dislikes: number }>(response)
+        return { likes: result?.likes ?? 0 }
     },
 
     // 카테고리 목록 조회
     getCategories: async (): Promise<CommunityCategory[]> => {
-        const response = await apiCall<{ success: boolean; data: CommunityCategory[] }>('/categories')
-        return response.data
+        const response = await apiCall<{ data?: CommunityCategory[] }>(`${API_BASE}/categories`)
+        return unwrapData<CommunityCategory[]>(response) ?? []
     },
 
     // 인기 게시글 조회
     getPopularPosts: async (limit: number = 10): Promise<CommunityPost[]> => {
-        const response = await apiCall<{ success: boolean; data: CommunityPost[] }>(`${API_BASE}/posts/popular?limit=${limit}`)
-        return response.data
+        const response = await apiCall<{ data?: CommunityPost[] }>(`${API_BASE}/posts/popular?limit=${limit}`)
+        return unwrapData<CommunityPost[]>(response) ?? []
     },
 
     // 최신 게시글 조회
     getRecentPosts: async (limit: number = 10): Promise<CommunityPost[]> => {
-        const response = await apiCall<{ success: boolean; data: CommunityPost[] }>(`${API_BASE}/posts/recent?limit=${limit}`)
-        return response.data
+        const response = await apiCall<{ data?: CommunityPost[] }>(`${API_BASE}/posts/recent?limit=${limit}`)
+        return unwrapData<CommunityPost[]>(response) ?? []
     },
 }

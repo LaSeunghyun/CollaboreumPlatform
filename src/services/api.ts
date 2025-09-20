@@ -128,8 +128,33 @@ const extractApiData = <T>(response: ApiResponse<T> | T | undefined): T | null =
         return null;
     }
 
-    if (typeof response === 'object' && 'success' in response) {
-        return (response as ApiResponse<T>).data ?? null;
+    if (typeof response === 'object' && response !== null && 'success' in response) {
+        const typed = response as ApiResponse<T> & Record<string, unknown>;
+        const hasData = Object.prototype.hasOwnProperty.call(typed, 'data');
+        const dataValue = (typed as ApiResponse<T>).data;
+
+        const metaEntries = Object.entries(typed).filter(([key, value]) => {
+            if (key === 'success' || key === 'data') {
+                return false;
+            }
+            return value !== undefined;
+        });
+
+        if (!hasData && metaEntries.length === 0) {
+            return null;
+        }
+
+        if (!hasData) {
+            return Object.fromEntries(metaEntries) as unknown as T;
+        }
+
+        if (metaEntries.length === 0) {
+            return (dataValue ?? null) as T;
+        }
+
+        return Object.assign(Object.fromEntries(metaEntries), {
+            data: dataValue ?? null,
+        }) as unknown as T;
     }
 
     return response as T;
@@ -1053,7 +1078,7 @@ export const communityPostAPI = {
     getCategories: () => apiCall('/community/categories'),
 
     // 통계 조회
-    getStats: () => apiCall('/community/stats'),
+    getStats: () => apiCall('/stats/community'),
 
     // 내 게시글 조회
     getMyPosts: (params?: any) => {

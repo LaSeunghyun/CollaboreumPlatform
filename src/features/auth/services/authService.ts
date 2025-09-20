@@ -8,23 +8,49 @@ const AUTH_TOKEN_KEY = 'authToken';
 const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 
-const storeTokens = (accessToken: string, refreshToken: string) => {
-    // 유효한 토큰인지 확인
-    if (!accessToken || accessToken === 'undefined' || accessToken === 'null') {
-        console.error('❌ Invalid accessToken:', accessToken);
-        return;
+type StoredTokens = {
+    accessToken: string | null;
+    refreshToken: string | null;
+};
+
+const sanitizeToken = (token?: string | null): string | null => {
+    if (!token) return null;
+
+    const trimmed = token.trim();
+    if (trimmed === '' || trimmed === 'undefined' || trimmed === 'null') {
+        return null;
     }
-    
-    if (!refreshToken || refreshToken === 'undefined' || refreshToken === 'null') {
-        console.error('❌ Invalid refreshToken:', refreshToken);
-        return;
+
+    return trimmed;
+};
+
+const storeTokens = (accessToken?: string | null, refreshToken?: string | null): StoredTokens => {
+    const sanitizedAccessToken = sanitizeToken(accessToken);
+    const sanitizedRefreshToken = sanitizeToken(refreshToken);
+
+    if (!sanitizedAccessToken) {
+        console.error('❌ Invalid accessToken provided:', accessToken);
+        clearTokens();
+        return { accessToken: null, refreshToken: null };
     }
-    
-    localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
-    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-    
-    console.log('✅ Tokens stored successfully');
+
+    localStorage.setItem(AUTH_TOKEN_KEY, sanitizedAccessToken);
+    localStorage.setItem(ACCESS_TOKEN_KEY, sanitizedAccessToken);
+
+    if (sanitizedRefreshToken) {
+        localStorage.setItem(REFRESH_TOKEN_KEY, sanitizedRefreshToken);
+    } else {
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
+    }
+
+    console.log('✅ Tokens stored successfully', {
+        hasRefreshToken: Boolean(sanitizedRefreshToken),
+    });
+
+    return {
+        accessToken: sanitizedAccessToken,
+        refreshToken: sanitizedRefreshToken,
+    };
 };
 
 const clearTokens = () => {
@@ -82,22 +108,34 @@ class AuthService {
             throw new Error(response.error || '로그인에 실패했습니다');
         }
 
+        const rawAccessToken = response.data.accessToken ?? response.data.token ?? null;
+        const rawRefreshToken = response.data.refreshToken ?? null;
+
         // 토큰을 localStorage에 저장
         console.log('🔐 Login Success - Storing tokens:', {
-            accessToken: response.data.accessToken ? `${response.data.accessToken.substring(0, 20)}...` : 'null',
-            refreshToken: response.data.refreshToken ? `${response.data.refreshToken.substring(0, 20)}...` : 'null'
+            accessToken: rawAccessToken ? `${rawAccessToken.substring(0, 20)}...` : 'null',
+            refreshToken: rawRefreshToken ? `${rawRefreshToken.substring(0, 20)}...` : 'null'
         });
 
-        storeTokens(response.data.accessToken, response.data.refreshToken);
+        const storedTokens = storeTokens(rawAccessToken, rawRefreshToken);
+
+        if (!storedTokens.accessToken) {
+            throw new Error('유효한 로그인 토큰을 받지 못했습니다');
+        }
 
         // 저장 후 확인
         console.log('🔐 Tokens stored - Verification:', {
-            authToken: localStorage.getItem(AUTH_TOKEN_KEY) ? `${localStorage.getItem(AUTH_TOKEN_KEY)!.substring(0, 20)}...` : 'null',
-            accessToken: localStorage.getItem(ACCESS_TOKEN_KEY) ? `${localStorage.getItem(ACCESS_TOKEN_KEY)!.substring(0, 20)}...` : 'null',
-            refreshToken: localStorage.getItem(REFRESH_TOKEN_KEY) ? `${localStorage.getItem(REFRESH_TOKEN_KEY)!.substring(0, 20)}...` : 'null'
+            authToken: `${storedTokens.accessToken.substring(0, 20)}...`,
+            accessToken: `${storedTokens.accessToken.substring(0, 20)}...`,
+            refreshToken: storedTokens.refreshToken ? `${storedTokens.refreshToken.substring(0, 20)}...` : 'null'
         });
 
-        return response.data;
+        return {
+            user: response.data.user,
+            accessToken: storedTokens.accessToken,
+            refreshToken: storedTokens.refreshToken,
+            token: response.data.token ?? storedTokens.accessToken,
+        };
     }
 
     /**
@@ -116,10 +154,20 @@ class AuthService {
             throw new Error(response.error || '회원가입에 실패했습니다');
         }
 
-        // 토큰을 localStorage에 저장
-        storeTokens(response.data.accessToken, response.data.refreshToken);
+        const rawAccessToken = response.data.accessToken ?? response.data.token ?? null;
+        const rawRefreshToken = response.data.refreshToken ?? null;
+        const storedTokens = storeTokens(rawAccessToken, rawRefreshToken);
 
-        return response.data;
+        if (!storedTokens.accessToken) {
+            throw new Error('유효한 인증 토큰을 받지 못했습니다');
+        }
+
+        return {
+            user: response.data.user,
+            accessToken: storedTokens.accessToken,
+            refreshToken: storedTokens.refreshToken,
+            token: response.data.token ?? storedTokens.accessToken,
+        };
     }
 
     /**
@@ -169,10 +217,19 @@ class AuthService {
             throw new Error(response.error || '토큰 갱신에 실패했습니다');
         }
 
-        // 새로운 토큰을 localStorage에 저장
-        storeTokens(response.data.accessToken, response.data.refreshToken);
+        const rawAccessToken = response.data.accessToken ?? response.data.token ?? null;
+        const rawRefreshToken = response.data.refreshToken ?? null;
+        const storedTokens = storeTokens(rawAccessToken, rawRefreshToken);
 
-        return response.data;
+        if (!storedTokens.accessToken) {
+            throw new Error('토큰 갱신에 실패했습니다 (유효한 토큰 없음)');
+        }
+
+        return {
+            accessToken: storedTokens.accessToken,
+            refreshToken: storedTokens.refreshToken,
+            token: response.data.token ?? storedTokens.accessToken,
+        };
     }
 
     /**
