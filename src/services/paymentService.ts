@@ -43,32 +43,32 @@ export interface RefundResponse {
 class PaymentService {
   // 결제 요청 생성
   async createPayment(data: PaymentRequest): Promise<ApiResponse<PaymentResponse>> {
-    return api.post<ApiResponse<PaymentResponse>>('/payments', data);
+    return api.post<PaymentResponse>('/payments', data);
   }
 
   // 결제 상태 확인
   async getPaymentStatus(paymentId: string): Promise<ApiResponse<PaymentResponse>> {
-    return api.get<ApiResponse<PaymentResponse>>(`/payments/${paymentId}`);
+    return api.get<PaymentResponse>(`/payments/${paymentId}`);
   }
 
   // 결제 승인 (웹훅에서 호출)
   async confirmPayment(paymentId: string, transactionId: string): Promise<ApiResponse<PaymentResponse>> {
-    return api.post<ApiResponse<PaymentResponse>>(`/payments/${paymentId}/confirm`, { transactionId });
+    return api.post<PaymentResponse>(`/payments/${paymentId}/confirm`, { transactionId });
   }
 
   // 결제 취소
   async cancelPayment(paymentId: string, reason: string): Promise<ApiResponse<PaymentResponse>> {
-    return api.post<ApiResponse<PaymentResponse>>(`/payments/${paymentId}/cancel`, { reason });
+    return api.post<PaymentResponse>(`/payments/${paymentId}/cancel`, { reason });
   }
 
   // 환불 요청
   async requestRefund(data: RefundRequest): Promise<ApiResponse<RefundResponse>> {
-    return api.post<ApiResponse<RefundResponse>>('/refunds', data);
+    return api.post<RefundResponse>('/refunds', data);
   }
 
   // 환불 상태 확인
   async getRefundStatus(refundId: string): Promise<ApiResponse<RefundResponse>> {
-    return api.get<ApiResponse<RefundResponse>>(`/refunds/${refundId}`);
+    return api.get<RefundResponse>(`/refunds/${refundId}`);
   }
 
   // 결제 내역 조회
@@ -78,7 +78,7 @@ class PaymentService {
     status?: string;
     projectId?: string;
   }): Promise<ApiResponse<PaymentResponse[]>> {
-    return api.get<ApiResponse<PaymentResponse[]>>('/payments', params);
+    return api.get<PaymentResponse[]>('/payments', params);
   }
 
   // 프로젝트별 결제 통계
@@ -88,12 +88,12 @@ class PaymentService {
     dailyAmount: number[];
     paymentMethodStats: Record<string, number>;
   }>> {
-    return api.get<ApiResponse<{
+    return api.get<{
       totalAmount: number;
       totalBackers: number;
       dailyAmount: number[];
       paymentMethodStats: Record<string, number>;
-    }>>(`/payments/stats/project/${projectId}`);
+    }>(`/payments/stats/project/${projectId}`);
   }
 }
 

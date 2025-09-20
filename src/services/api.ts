@@ -856,10 +856,12 @@ export const categoryAPI = {
 export const isAPIAvailable = async (): Promise<boolean> => {
     try {
         const response = await api.get<{ success: boolean }>('/health');
-        if (typeof response === 'object' && response !== null && 'success' in response) {
-            return Boolean((response as any).success);
+
+        if (response.data && typeof response.data.success === 'boolean') {
+            return response.data.success;
         }
-        return true;
+
+        return response.success;
     } catch {
         return false;
     }
