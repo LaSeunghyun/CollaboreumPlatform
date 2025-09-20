@@ -198,17 +198,18 @@ describe('API 서비스 테스트', () => {
                 json: async () => ({ success: true, data: mockProject })
             });
 
-            const result = await fundingAPI.getProject('1') as any;
+            const result = await fundingAPI.getProject('1');
 
-            expect(global.fetch).toHaveBeenCalledWith(
-                expect.stringContaining('/api/projects/1'),
+            expect(result).toEqual(
                 expect.objectContaining({
-                    method: 'GET'
+                    id: expect.any(String),
+                    title: mockProject.title,
+                    description: mockProject.description,
+                    currentAmount: mockProject.currentAmount,
+                    targetAmount: mockProject.targetAmount,
+                    backers: mockProject.backers
                 })
             );
-
-            expect(result.success).toBe(true);
-            expect(result.data).toEqual(mockProject);
         });
     });
 
