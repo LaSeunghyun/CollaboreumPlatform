@@ -1053,7 +1053,7 @@ export const communityPostAPI = {
     getCategories: () => apiCall('/community/categories'),
 
     // 통계 조회
-    getStats: () => apiCall('/community/stats'),
+    getStats: () => statsAPI.getCommunityStats(),
 
     // 내 게시글 조회
     getMyPosts: (params?: any) => {

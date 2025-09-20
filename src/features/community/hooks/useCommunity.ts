@@ -16,6 +16,53 @@ import {
     CommunityStats
 } from '../types/index';
 
+const defaultCommunityStats: CommunityStats = {
+    totalPosts: 0,
+    activeUsers: 0,
+    totalComments: 0,
+    avgLikes: 0,
+    postsGrowthRate: 0,
+    usersGrowthRate: 0,
+};
+
+const toNumber = (value: unknown): number => {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+        return value;
+    }
+
+    if (typeof value === 'string') {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    return 0;
+};
+
+export const normalizeCommunityStatsResponse = (response: unknown): CommunityStats => {
+    if (!response) {
+        return { ...defaultCommunityStats };
+    }
+
+    const payload = typeof response === 'object' && response !== null && 'data' in (response as Record<string, unknown>)
+        ? (response as Record<string, unknown>).data
+        : response;
+
+    if (!payload || typeof payload !== 'object') {
+        return { ...defaultCommunityStats };
+    }
+
+    const stats = payload as Record<string, unknown>;
+
+    return {
+        totalPosts: toNumber(stats.totalPosts),
+        activeUsers: toNumber(stats.activeUsers),
+        totalComments: toNumber(stats.totalComments),
+        avgLikes: toNumber(stats.avgLikes),
+        postsGrowthRate: toNumber(stats.postsGrowthRate),
+        usersGrowthRate: toNumber(stats.usersGrowthRate),
+    };
+};
+
 // 게시글 목록 조회
 export const useCommunityPosts = (params: PostListParams = {}) => {
     return useQuery<PostListResponse>({
@@ -194,7 +241,10 @@ export const useCommunityCategories = () => {
 export const useCommunityStats = () => {
     return useQuery<CommunityStats>({
         queryKey: ['community', 'stats'],
-        queryFn: () => communityPostAPI.getStats() as Promise<CommunityStats>,
+        queryFn: async () => {
+            const response = await communityPostAPI.getStats();
+            return normalizeCommunityStatsResponse(response);
+        },
         staleTime: 10 * 60 * 1000, // 10분
     });
 };
