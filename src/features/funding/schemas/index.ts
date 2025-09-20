@@ -4,16 +4,18 @@ import {
     FundingProjectStatus,
     PledgeStatus,
     ExecutionStatus,
-    DistributionStatus,
     DistributionRuleType,
     EventType,
     EventStatus
 } from '../types';
 
+const REQUIRED_TITLE_MESSAGE = '제목은 필수입니다';
+const REQUIRED_REWARD_TITLE_MESSAGE = '리워드 제목은 필수입니다';
+
 // 펀딩 프로젝트 생성 스키마
 export const createFundingProjectSchema = z.object({
     title: z.string()
-        .min(1, '제목은 필수입니다')
+        .min(1, REQUIRED_TITLE_MESSAGE)
         .max(100, '제목은 최대 100자까지 가능합니다'),
     description: z.string()
         .min(1, '설명은 필수입니다')
@@ -32,7 +34,7 @@ export const createFundingProjectSchema = z.object({
         .min(1, '최소 1개의 태그가 필요합니다')
         .max(10, '최대 10개의 태그만 가능합니다'),
     rewards: z.array(z.object({
-        title: z.string().min(1, '리워드 제목은 필수입니다').max(100),
+        title: z.string().min(1, REQUIRED_REWARD_TITLE_MESSAGE).max(100),
         description: z.string().min(1, '리워드 설명은 필수입니다').max(1000),
         amount: commonSchemas.amount,
         deliveryDate: z.date().min(new Date(), '배송일은 현재 날짜 이후여야 합니다'),
@@ -76,7 +78,7 @@ export const updateFundingProjectSchema = z.object({
 // 리워드 생성 스키마
 export const createRewardSchema = z.object({
     projectId: commonSchemas.id,
-    title: z.string().min(1, '리워드 제목은 필수입니다').max(100),
+    title: z.string().min(1, REQUIRED_REWARD_TITLE_MESSAGE).max(100),
     description: z.string().min(1, '리워드 설명은 필수입니다').max(1000),
     amount: commonSchemas.amount,
     deliveryDate: z.date().min(new Date(), '배송일은 현재 날짜 이후여야 합니다'),
@@ -120,7 +122,7 @@ export const updatePledgeStatusSchema = z.object({
 // 집행 생성 스키마
 export const createExecutionSchema = z.object({
     projectId: commonSchemas.id,
-    title: z.string().min(1, '제목은 필수입니다').max(100),
+    title: z.string().min(1, REQUIRED_TITLE_MESSAGE).max(100),
     description: z.string().min(1, '설명은 필수입니다').max(1000),
     budgetAmount: commonSchemas.amount,
     receipts: z.array(z.object({

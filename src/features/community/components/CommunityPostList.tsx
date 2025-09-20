@@ -79,10 +79,10 @@ export function CommunityPostList({
         )
     }
 
-    const handlePostClick = (postId: string) => {
+    const handlePostClick = (_postId: string) => {
         // 조회수 증가
-        viewPostMutation.mutate(postId)
-        onPostClick?.(postId)
+        viewPostMutation.mutate(_postId)
+        onPostClick?.(_postId)
     }
 
     const handleLikeClick = (postId: string, e: React.MouseEvent) => {

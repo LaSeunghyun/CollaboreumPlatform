@@ -5,7 +5,6 @@ import { CommunityPost } from "../types";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import {
-    Heart,
     MessageCircle,
     Share2,
     Bookmark,
@@ -14,6 +13,10 @@ import {
     ThumbsUp,
     ThumbsDown
 } from "lucide-react";
+
+const BUTTON_CLASSES = "flex items-center space-x-1";
+const PRIMARY_COLOR = "text-primary-600";
+const GRAY_COLOR = "text-gray-500";
 
 interface PostCardProps {
     post: CommunityPost;
@@ -42,7 +45,7 @@ const PostCard: React.FC<PostCardProps> = ({
     onDelete,
     onReport,
     showActions = true,
-    compact = false
+    compact: _compact = false
 }) => {
     const handleLike = () => {
         if (onLike) onLike(post.id);
@@ -64,15 +67,15 @@ const PostCard: React.FC<PostCardProps> = ({
         if (onShare) onShare(post.id);
     };
 
-    const handleEdit = () => {
+    const _handleEdit = () => {
         if (onEdit) onEdit(post.id);
     };
 
-    const handleDelete = () => {
+    const _handleDelete = () => {
         if (onDelete) onDelete(post.id);
     };
 
-    const handleReport = () => {
+    const _handleReport = () => {
         if (onReport) onReport(post.id);
     };
 
@@ -170,7 +173,7 @@ const PostCard: React.FC<PostCardProps> = ({
                                     variant="ghost"
                                     size="sm"
                                     onClick={handleLike}
-                                    className={`flex items-center space-x-1 ${post.isLiked ? 'text-primary-600' : 'text-gray-500'
+                                    className={`${BUTTON_CLASSES} ${post.isLiked ? PRIMARY_COLOR : GRAY_COLOR
                                         }`}
                                 >
                                     <ThumbsUp className="w-4 h-4" />
@@ -181,7 +184,7 @@ const PostCard: React.FC<PostCardProps> = ({
                                     variant="ghost"
                                     size="sm"
                                     onClick={handleDislike}
-                                    className={`flex items-center space-x-1 ${post.isDisliked ? 'text-danger-600' : 'text-gray-500'
+                                    className={`${BUTTON_CLASSES} ${post.isDisliked ? 'text-danger-600' : 'text-gray-500'
                                         }`}
                                 >
                                     <ThumbsDown className="w-4 h-4" />
@@ -192,13 +195,13 @@ const PostCard: React.FC<PostCardProps> = ({
                                     variant="ghost"
                                     size="sm"
                                     onClick={handleComment}
-                                    className="flex items-center space-x-1 text-gray-500"
+                                    className={`${BUTTON_CLASSES} text-gray-500`}
                                 >
                                     <MessageCircle className="w-4 h-4" />
                                     <span>{post.comments}</span>
                                 </Button>
 
-                                <div className="flex items-center space-x-1 text-gray-500">
+                                <div className={`${BUTTON_CLASSES} text-gray-500`}>
                                     <Eye className="w-4 h-4" />
                                     <span>{post.views}</span>
                                 </div>
@@ -209,7 +212,7 @@ const PostCard: React.FC<PostCardProps> = ({
                                     variant="ghost"
                                     size="sm"
                                     onClick={handleBookmark}
-                                    className={`${post.isBookmarked ? 'text-primary-600' : 'text-gray-500'
+                                    className={`${post.isBookmarked ? PRIMARY_COLOR : GRAY_COLOR
                                         }`}
                                 >
                                     <Bookmark className="w-4 h-4" />

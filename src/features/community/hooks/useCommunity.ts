@@ -147,9 +147,9 @@ export const useUpdateCommunityComment = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ postId, commentId, data }: { postId: string; commentId: string; data: UpdateCommentData }) =>
+        mutationFn: ({ postId, commentId: _commentId, data }: { postId: string; commentId: string; data: UpdateCommentData }) =>
             communityCommentAPI.updateComment(postId, commentId, data),
-        onSuccess: (_, { commentId }) => {
+        onSuccess: (_, { commentId: _commentId }) => {
             queryClient.invalidateQueries({ queryKey: ['community', 'comments'] });
         },
     });
@@ -175,7 +175,7 @@ export const useLikeCommunityComment = () => {
     return useMutation({
         mutationFn: ({ commentId, action }: { commentId: string; action: 'like' | 'dislike' | 'unlike' | 'undislike' }) =>
             communityCommentAPI.likeComment(commentId, action as 'like' | 'unlike'),
-        onSuccess: (_, { commentId }) => {
+        onSuccess: (_, { commentId: _commentId }) => {
             queryClient.invalidateQueries({ queryKey: ['community', 'comments'] });
         },
     });

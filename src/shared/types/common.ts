@@ -2,6 +2,8 @@
  * 공통 타입 정의
  */
 
+import React from 'react';
+
 // 기본 엔티티 인터페이스
 export interface BaseEntity {
   id: string | number;
@@ -197,6 +199,7 @@ export type Middleware<S, A extends Action> = (
 ) => (next: Dispatcher<A>) => (action: A) => void;
 
 // 이벤트 핸들러 타입
+
 export type EventHandler<T = Event> = (event: T) => void;
 
 // 마우스 이벤트 핸들러 타입

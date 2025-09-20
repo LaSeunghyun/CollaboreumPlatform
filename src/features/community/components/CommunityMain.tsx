@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Card, CardContent, CardHeader } from "@/shared/ui/Card";
+import { Card, CardContent } from "@/shared/ui/Card";
 import { Button } from "@/shared/ui/Button";
 import { Input } from "@/shared/ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/Select";
@@ -172,16 +172,16 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
             return [];
         }
 
-        if (Array.isArray((data as any).posts)) {
-            return (data as any).posts as CommunityPost[];
+        if (Array.isArray((data as { posts: unknown }).posts)) {
+            return (data as { posts: CommunityPost[] }).posts;
         }
 
-        if (Array.isArray((data as any).data?.posts)) {
-            return (data as any).data.posts as CommunityPost[];
+        if (Array.isArray((data as { data: { posts: unknown } }).data?.posts)) {
+            return (data as { data: { posts: CommunityPost[] } }).data.posts;
         }
 
-        if (Array.isArray((data as any).data)) {
-            return (data as any).data as CommunityPost[];
+        if (Array.isArray((data as { data: unknown }).data)) {
+            return (data as { data: CommunityPost[] }).data;
         }
 
         return [];
@@ -190,12 +190,12 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
     const pagination = useMemo(() => {
         if (!data) return undefined;
 
-        if ((data as any).pagination) {
-            return (data as any).pagination;
+        if ((data as { pagination: unknown }).pagination) {
+            return (data as { pagination: unknown }).pagination;
         }
 
-        if ((data as any).data?.pagination) {
-            return (data as any).data.pagination;
+        if ((data as { data: { pagination: unknown } }).data?.pagination) {
+            return (data as { data: { pagination: unknown } }).data.pagination;
         }
 
         return undefined;
@@ -207,8 +207,8 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
     const normalizedSort = allowedSorts.includes(sortParam as typeof allowedSorts[number]) ? sortParam : "latest";
     const totalPosts = pagination?.total ?? posts.length;
 
-    const handleCreatePost = (data: any) => {
-        console.log("Creating post:", data);
+    const handleCreatePost = (_data: CommunityPost) => {
+        // console.log("Creating post:", data);
         setShowCreateForm(false);
         onCreatePost?.();
         refetch();

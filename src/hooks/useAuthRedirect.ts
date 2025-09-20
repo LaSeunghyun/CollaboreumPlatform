@@ -72,15 +72,7 @@ export const useAuthRedirect = () => {
      * @param requireRole - 특정 역할이 필요한 경우
      */
     const checkAuth = (requireRole?: 'artist' | 'admin' | 'fan'): boolean => {
-        if (!isAuthenticated) {
-            return false;
-        }
-
-        if (requireRole && user?.role !== requireRole) {
-            return false;
-        }
-
-        return true;
+        return isAuthenticated && (!requireRole || user?.role === requireRole);
     };
 
     /**
