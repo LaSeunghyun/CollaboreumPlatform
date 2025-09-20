@@ -36,14 +36,27 @@ export const isLocalEnvironment = (): boolean => {
   return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 };
 
+export const ensureApiPath = (path: string): string => {
+  if (!path) {
+    return path;
+  }
+
+  if (path === '/') {
+    return path;
+  }
+
+  return path.replace(/\/+$/, '');
+};
+
 export const resolveApiBaseUrl = (): string => {
   const fallback = isLocalEnvironment()
     ? 'http://localhost:5000/api'
     : 'https://collaboreumplatform-production.up.railway.app/api';
 
-  return (
+  const baseUrl =
     getEnvVar('VITE_API_BASE_URL') ??
     getEnvVar('REACT_APP_API_URL') ??
-    fallback
-  );
+    fallback;
+
+  return ensureApiPath(baseUrl);
 };
