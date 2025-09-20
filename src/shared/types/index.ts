@@ -11,6 +11,7 @@ export interface User extends BaseEntity {
   email: string;
   username: string;
   displayName: string;
+  name: string;
   role: UserRole;
   avatar?: string;
   bio?: string;
@@ -35,6 +36,9 @@ export interface QueryParams {
 export interface AppError {
   success: false;
   status: number;
+  code?: string;
+  message: string;
+  details?: any;
   stack?: string;
   timestamp?: string;
 }

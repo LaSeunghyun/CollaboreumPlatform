@@ -51,7 +51,7 @@ export const useAdminUsers = (filters: UserFilters = {}) => {
 export const useAdminUser = (userId: string) => {
   return useQuery<{ success: boolean; data: AdminUser }>({
     queryKey: ['admin', 'users', userId],
-    queryFn: async () => {
+    queryFn: async (): Promise<{ success: boolean; data: AdminUser }> => {
       return await adminUserAPI.getAllUsers({ search: userId, limit: 1 });
     },
     enabled: !!userId,
