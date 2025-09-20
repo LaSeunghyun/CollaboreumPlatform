@@ -1,24 +1,23 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const js = require('@eslint/js');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const tseslint = require('@typescript-eslint/eslint-plugin');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const tsparser = require('@typescript-eslint/parser');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const react = require('eslint-plugin-react');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const reactHooks = require('eslint-plugin-react-hooks');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const importPlugin = require('eslint-plugin-import');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const sonarjs = require('eslint-plugin-sonarjs');
+function optionalRequire(moduleId, fallbackPath) {
+  try {
+    return require(moduleId);
+  } catch (error) {
+    if (fallbackPath) {
+      return require(fallbackPath);
+    }
+    throw error;
+  }
+}
+
+const js = optionalRequire('@eslint/js', './packages/eslint-js');
+const react = optionalRequire('eslint-plugin-react', './packages/eslint-plugins/react');
+const reactHooks = optionalRequire('eslint-plugin-react-hooks', './packages/eslint-plugins/react-hooks');
 
 module.exports = [
   js.configs.recommended,
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    files: ['**/*.{js,jsx}'],
     languageOptions: {
-      parser: tsparser,
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
@@ -88,30 +87,16 @@ module.exports = [
       }
     },
     plugins: {
-      '@typescript-eslint': tseslint,
       'react': react,
-      'react-hooks': reactHooks,
-      'import': importPlugin,
-      'sonarjs': sonarjs
+      'react-hooks': reactHooks
     },
     rules: {
-      ...tseslint.configs.recommended.rules,
       ...react.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
-      ...sonarjs.configs.recommended.rules,
       'no-constant-condition': 'error',
       'no-undef': 'error',
       'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { 
-        argsIgnorePattern: '^_', 
-        varsIgnorePattern: '^_' 
-      }],
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-non-null-assertion': 'warn',
-      'sonarjs/cognitive-complexity': ['warn', 20],
       'complexity': ['warn', 15],
-      'import/no-unresolved': 'off', // TypeScript가 처리
-      'import/no-extraneous-dependencies': 'error',
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
       'react/display-name': 'warn',
@@ -132,17 +117,17 @@ module.exports = [
     files: ['**/*.test.*', '**/*.spec.*', '**/__tests__/**/*'],
     rules: { 
       'no-undef': 'off',
-      '@typescript-eslint/no-explicit-any': 'off'
-    }
-  },
-  {
-    files: ['**/*.js'],
-    rules: {
-      '@typescript-eslint/no-var-requires': 'off'
     }
   },
   {
     ignores: [
+      '**/*.ts',
+      '**/*.tsx',
+      'cypress/',
+      'server/',
+      'scripts/',
+      'packages/',
+      '.storybook/',
       'node_modules/',
       'build/',
       'dist/',

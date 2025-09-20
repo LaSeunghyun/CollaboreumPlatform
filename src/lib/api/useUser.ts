@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { authService } from '@/features/auth/services/authService';
 import { userAPI, userProfileAPI, interactionAPI } from '../../services/api';
 
 // 사용자 프로필 조회
@@ -112,16 +113,39 @@ export const useArtistFundingHistory = (userId: string, artistId: string, params
 };
 
 // 알림 목록 조회
-export const useNotifications = (params?: {
+type NotificationQueryParams = {
     page?: number;
     limit?: number;
     type?: string;
     read?: boolean;
-}) => {
+};
+
+type UseNotificationsOptions = {
+    enabled?: boolean;
+};
+
+const isUnauthorizedError = (error: unknown): error is Error & { status?: number } => {
+    return error instanceof Error && (error as Error & { status?: number }).status === 401;
+};
+
+export const useNotifications = (
+    params?: NotificationQueryParams,
+    options?: UseNotificationsOptions,
+) => {
+    const shouldEnableQuery = options?.enabled ?? authService.isTokenValid();
+
     return useQuery({
         queryKey: ['notifications', params],
         queryFn: () => interactionAPI.getNotifications(params),
         staleTime: 1 * 60 * 1000, // 1분
+        enabled: shouldEnableQuery,
+        retry: (failureCount, error) => {
+            if (isUnauthorizedError(error)) {
+                return false;
+            }
+
+            return failureCount < 3;
+        },
     });
 };
 

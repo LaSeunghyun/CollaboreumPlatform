@@ -20,7 +20,7 @@ class ApiClient {
   private setupInterceptors() {
     this.client.interceptors.request.use(
       (config) => {
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('authToken') ?? localStorage.getItem('accessToken');
         if (token) {
           config.headers = config.headers ?? {};
           config.headers.Authorization = `Bearer ${token}`;
@@ -36,16 +36,29 @@ class ApiClient {
     );
   }
 
-  private clearStoredAuth() {
+  private clearStoredAuth(reason: 'unauthorized' | 'forbidden' | 'unknown' = 'unknown') {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('authUser');
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('auth:logout', {
+          detail: {
+            reason,
+            source: 'api-client',
+          },
+        }),
+      );
+    }
   }
 
   private handleError(error: AxiosError | Error): ApiError {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
       if (status === 401) {
-        this.clearStoredAuth();
+        this.clearStoredAuth('unauthorized');
       }
 
       return {

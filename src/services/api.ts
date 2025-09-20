@@ -345,7 +345,16 @@ export async function apiCall<T>(endpoint: string, options: ApiCallOptions = {},
                     return apiCall<T>(endpoint, options, retryCount + 1);
                 }
 
-                throw new Error(error.message || 'API 요청에 실패했습니다.');
+                const enrichedError = Object.assign(
+                    new Error(error.message || 'API 요청에 실패했습니다.'),
+                    {
+                        status: error.status,
+                        details: error.details,
+                        cause: error,
+                    },
+                );
+
+                throw enrichedError;
             }
 
             if (retryCount < maxRetries && isRetryableError(error)) {

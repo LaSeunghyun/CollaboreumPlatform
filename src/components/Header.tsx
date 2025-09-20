@@ -32,10 +32,15 @@ export const Header: React.FC = () => {
   const navigate = useNavigate();
 
   // 알림 데이터 로드
-  const { data: notifications } = useNotifications({
-    read: false,
-    limit: 10
-  });
+  const { data: notifications } = useNotifications(
+    {
+      read: false,
+      limit: 10,
+    },
+    {
+      enabled: isAuthenticated,
+    },
+  );
 
   const unreadCount = (notifications as any)?.unreadCount || 0;
 
