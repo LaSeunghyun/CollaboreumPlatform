@@ -11,6 +11,14 @@ import {
   ApiRequestConfig,
   ApiEndpoint,
 } from '@/shared/types';
+import {
+  cleanInvalidTokens,
+  clearTokens,
+  getStoredAccessToken,
+  getStoredRefreshToken,
+  storeTokens,
+  tokenStorageKeys,
+} from '@/features/auth/utils/tokenStorage';
 
 class ApiClient {
   private client: AxiosInstance;
@@ -30,22 +38,18 @@ class ApiClient {
   private setupInterceptors() {
     this.client.interceptors.request.use(
       config => {
-        const authToken = localStorage.getItem('authToken');
-        const accessToken = localStorage.getItem('accessToken');
-        
-        // "undefined" 문자열이나 null 값 필터링
-        const validAuthToken = authToken && authToken !== 'null' && authToken !== 'undefined' ? authToken : null;
-        const validAccessToken = accessToken && accessToken !== 'null' && accessToken !== 'undefined' ? accessToken : null;
-        
-        const token = validAuthToken ?? validAccessToken;
+        cleanInvalidTokens();
+
+        const token = getStoredAccessToken();
+        const authToken = localStorage.getItem(tokenStorageKeys.auth);
+        const accessToken = localStorage.getItem(tokenStorageKeys.access);
+        const refreshToken = localStorage.getItem(tokenStorageKeys.refresh);
 
         // 디버깅을 위한 로그
         console.log('🔍 API Request Debug:', {
           url: config.url,
           authToken: authToken ? `${authToken.substring(0, 20)}...` : 'null',
-          accessToken: accessToken
-            ? `${accessToken.substring(0, 20)}...`
-            : 'null',
+          accessToken: accessToken ? `${accessToken.substring(0, 20)}...` : 'null',
           selectedToken: token ? `${token.substring(0, 20)}...` : 'null',
           headers: config.headers,
         });
@@ -53,9 +57,9 @@ class ApiClient {
         // localStorage 전체 상태 확인
         console.log('🔍 localStorage 전체 상태:', {
           allKeys: Object.keys(localStorage),
-          authToken: localStorage.getItem('authToken'),
-          accessToken: localStorage.getItem('accessToken'),
-          refreshToken: localStorage.getItem('refreshToken')
+          authToken,
+          accessToken,
+          refreshToken,
         });
 
         if (token) {
@@ -74,7 +78,7 @@ class ApiClient {
       async error => {
         // 401 에러 시 토큰 갱신 시도
         if (error.response?.status === 401) {
-          const refreshToken = localStorage.getItem('refreshToken');
+          const refreshToken = getStoredRefreshToken();
           if (refreshToken) {
             try {
               console.log('🔄 Attempting token refresh...');
@@ -91,18 +95,21 @@ class ApiClient {
 
               if (response.ok) {
                 const data = await response.json();
-                if (data.success && data.data) {
-                  // 새로운 토큰 저장
-                  localStorage.setItem('authToken', data.data.accessToken);
-                  localStorage.setItem('accessToken', data.data.accessToken);
-                  localStorage.setItem('refreshToken', data.data.refreshToken);
+                if (data?.success) {
+                  const payload = data.data ?? data;
+                  const stored = storeTokens(
+                    payload?.accessToken ?? payload?.token ?? null,
+                    payload?.refreshToken ?? null,
+                  );
 
-                  console.log('✅ Token refreshed successfully');
+                  if (stored.accessToken) {
+                    console.log('✅ Token refreshed successfully');
 
-                  // 원래 요청 재시도
-                  const originalRequest = error.config;
-                  originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
-                  return this.client.request(originalRequest);
+                    const originalRequest = error.config;
+                    originalRequest.headers = originalRequest.headers ?? {};
+                    originalRequest.headers.Authorization = `Bearer ${stored.accessToken}`;
+                    return this.client.request(originalRequest);
+                  }
                 }
               }
             } catch (refreshError) {
@@ -119,9 +126,7 @@ class ApiClient {
   private clearStoredAuth(
     reason: 'unauthorized' | 'forbidden' | 'unknown' = 'unknown',
   ) {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    clearTokens();
     localStorage.removeItem('authUser');
 
     if (typeof window !== 'undefined') {
