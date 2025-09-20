@@ -190,14 +190,14 @@ export function useErrorRecovery() {
 // 에러 경계용 훅
 export function useErrorBoundary() {
   const [error, setError] = useState<Error | null>(null);
-  const [errorInfo, setErrorInfo] = useState<any>(null);
+  const [errorInfo, setErrorInfo] = useState<unknown>(null);
 
-  const handleError = useCallback((error: Error, errorInfo: any) => {
+  const handleError = useCallback((error: Error, errorInfo: unknown) => {
     setError(error);
     setErrorInfo(errorInfo);
 
     // 에러 로깅
-    logError(error, { componentStack: errorInfo.componentStack });
+    logError(error, { componentStack: (errorInfo as { componentStack?: string })?.componentStack });
   }, []);
 
   const resetError = useCallback(() => {

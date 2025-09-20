@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userAPI, userProfileAPI, interactionAPI } from '../../services/api';
+import type { UnknownRecord } from '@/types/api';
 
 // 사용자 프로필 조회
 export const useUserProfile = (userId: string) => {
@@ -16,7 +17,7 @@ export const useUpdateUserProfile = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ userId, data }: { userId: string; data: any }) =>
+        mutationFn: ({ userId, data }: { userId: string; data: UnknownRecord }) =>
             userProfileAPI.updateUserProfile(userId, data),
         onSuccess: (_, { userId }) => {
             queryClient.invalidateQueries({ queryKey: ['user', 'profile', userId] });

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { communityPostAPI, communityCommentAPI } from '../../services/api';
+import type { UnknownRecord } from '@/types/api';
 
 // 커뮤니티 게시글 목록 조회
 export const useCommunityPosts = (params?: {
@@ -35,7 +36,7 @@ export const useCreateCommunityPost = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data: any) => communityPostAPI.createPost(data),
+        mutationFn: (data: UnknownRecord) => communityPostAPI.createPost(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['community', 'posts'] });
         },
@@ -47,7 +48,7 @@ export const useUpdateCommunityPost = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ postId, data }: { postId: string; data: any }) =>
+        mutationFn: ({ postId, data }: { postId: string; data: UnknownRecord }) =>
             communityPostAPI.updatePost(postId, data),
         onSuccess: (_, { postId }) => {
             queryClient.invalidateQueries({ queryKey: ['community', 'post', postId] });

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { communityPostAPI, communityCommentAPI } from '../../../services/api';
+import type { CommunityPost } from '@/features/community';
 import {
     PostListParams,
     CommentListParams,
@@ -15,6 +16,13 @@ import {
     // CommunityComment,
     CommunityStats
 } from '../types/index';
+
+type TogglePostReactionResponse = {
+    likes?: number;
+    dislikes?: number;
+    isLiked?: boolean;
+    isDisliked?: boolean;
+};
 
 // 게시글 목록 조회
 export const useCommunityPosts = (params: PostListParams = {}) => {
@@ -80,22 +88,27 @@ export const useDeleteCommunityPost = () => {
 export const useLikeCommunityPost = () => {
     const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: ({ postId, action }: { postId: string; action: 'like' | 'dislike' | 'unlike' | 'undislike' }) =>
-            communityPostAPI.togglePostReaction(postId, action),
-        onSuccess: (data: any, { postId }) => {
+    return useMutation<
+        TogglePostReactionResponse,
+        unknown,
+        { postId: string; action: 'like' | 'dislike' | 'unlike' | 'undislike' }
+    >({
+        mutationFn: ({ postId, action }) =>
+            communityPostAPI.togglePostReaction(postId, action) as Promise<TogglePostReactionResponse>,
+        onSuccess: (data, { postId }) => {
             // 게시글 상세 캐시 업데이트
-            queryClient.setQueryData(['community', 'post', postId], (old: any) => {
-                if (old) {
-                    return {
-                        ...old,
-                        likes: data.likes || old.likes,
-                        dislikes: data.dislikes || old.dislikes,
-                        isLiked: data.isLiked ?? old.isLiked,
-                        isDisliked: data.isDisliked ?? old.isDisliked,
-                    };
+            queryClient.setQueryData<CommunityPost | undefined>(['community', 'post', postId], (old) => {
+                if (!old) {
+                    return old;
                 }
-                return old;
+
+                return {
+                    ...old,
+                    likes: data?.likes ?? old.likes,
+                    dislikes: data?.dislikes ?? old.dislikes,
+                    isLiked: data?.isLiked ?? old.isLiked,
+                    isDisliked: data?.isDisliked ?? old.isDisliked,
+                };
             });
 
             // 게시글 목록 캐시 무효화

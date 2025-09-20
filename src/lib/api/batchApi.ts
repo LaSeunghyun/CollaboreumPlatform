@@ -1,18 +1,23 @@
 // 배치 API 호출을 위한 유틸리티
 import { apiCall } from '../../services/api';
+import type { UnknownRecord } from '@/types/api';
 
-interface BatchRequest {
+interface BatchRequest<TData = UnknownRecord> {
     id: string;
     url: string;
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-    data?: any;
+    data?: TData;
 }
 
-interface BatchResponse {
+interface BatchResponse<TData = unknown> {
     id: string;
     success: boolean;
-    data?: any;
+    data?: TData;
     error?: string;
+}
+
+interface BatchApiPayload<TData = unknown> {
+    data?: Array<BatchResponse<TData>>;
 }
 
 class BatchApiManager {
@@ -48,12 +53,12 @@ class BatchApiManager {
 
         try {
             // 서버에 배치 요청 전송
-            const response = await apiCall('/api/batch', {
+            const response = await apiCall<BatchApiPayload>('/api/batch', {
                 method: 'POST',
                 body: JSON.stringify({ requests })
             });
 
-            return (response as any).data || [];
+            return response.data ?? [];
         } catch (error) {
             // 배치 처리 실패 시 개별 요청으로 폴백
             return this.fallbackToIndividualRequests(requests);
@@ -98,7 +103,7 @@ export const batchGet = (url: string, id?: string) =>
         method: 'GET'
     });
 
-export const batchPost = (url: string, data: any, id?: string) =>
+export const batchPost = (url: string, data: UnknownRecord, id?: string) =>
     batchApiManager.addRequest({
         id: id || Math.random().toString(36).substr(2, 9),
         url,

@@ -3,15 +3,16 @@
  */
 
 import { useCallback, useMemo, useRef, useEffect } from 'react';
+import type { Metric } from 'web-vitals';
 
 /**
  * 디바운스 훅 - 연속된 호출을 지연시켜 성능 최적화
  */
-export function useDebounce<T extends (...args: any[]) => any>(
+export function useDebounce<T extends (...args: unknown[]) => unknown>(
   callback: T,
   delay: number
 ): T {
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const debouncedCallback = useCallback(
     (...args: Parameters<T>) => {
@@ -37,7 +38,7 @@ export function useDebounce<T extends (...args: any[]) => any>(
 /**
  * 쓰로틀 훅 - 일정 시간 간격으로만 함수 실행
  */
-export function useThrottle<T extends (...args: any[]) => any>(
+export function useThrottle<T extends (...args: unknown[]) => unknown>(
   callback: T,
   delay: number
 ): T {
@@ -219,24 +220,14 @@ export function measureWebVitals() {
   if (typeof window === 'undefined') return;
 
   import('web-vitals').then((vitals) => {
-    vitals.onCLS((metric: any) => {
-      console.log('CLS:', metric);
-    });
-    
-    vitals.onINP((metric: any) => {
-      console.log('INP:', metric);
-    });
-    
-    vitals.onFCP((metric: any) => {
-      console.log('FCP:', metric);
-    });
-    
-    vitals.onLCP((metric: any) => {
-      console.log('LCP:', metric);
-    });
-    
-    vitals.onTTFB((metric: any) => {
-      console.log('TTFB:', metric);
-    });
+    const logMetric = (metric: Metric) => {
+      console.log(`${metric.name}:`, metric);
+    };
+
+    vitals.onCLS(logMetric);
+    vitals.onINP(logMetric);
+    vitals.onFCP(logMetric);
+    vitals.onLCP(logMetric);
+    vitals.onTTFB(logMetric);
   });
 }

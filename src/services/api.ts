@@ -1,5 +1,6 @@
 import { api } from '@/lib/api/api';
 import type { ApiError, ApiRequestConfig, ApiResponse } from '@/shared/types';
+import type { ApiQueryParams, UnknownRecord } from '@/types/api';
 import type { FundingProject, RevenueShare } from '@/types/fundingProject';
 
 type ApiCallOptions = RequestInit & {
@@ -21,7 +22,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // 동시 요청 제한을 위한 큐
 class RequestQueue {
-    private queue: Array<() => Promise<any>> = [];
+    private queue: Array<() => Promise<unknown>> = [];
     private running = 0;
     private maxConcurrent = 5; // 최대 동시 요청 수
 
@@ -97,6 +98,148 @@ const createId = (value: unknown, prefix: string): string => {
     return String(value);
 };
 
+const getString = (value: unknown, fallback = ''): string => {
+    if (typeof value === 'string') {
+        return value;
+    }
+
+    if (typeof value === 'number' || typeof value === 'boolean') {
+        return String(value);
+    }
+
+    return fallback;
+};
+
+const buildQueryString = (params: ApiQueryParams): string => {
+    const searchParams = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+        if (value === undefined || value === null) {
+            return;
+        }
+
+        if (Array.isArray(value)) {
+            value.forEach(item => {
+                if (item !== undefined && item !== null) {
+                    searchParams.append(key, String(item));
+                }
+            });
+            return;
+        }
+
+        searchParams.set(key, String(value));
+    });
+
+    return searchParams.toString();
+};
+
+interface RawReward extends UnknownRecord {
+    _id?: unknown;
+    title?: unknown;
+    description?: unknown;
+    amount?: unknown;
+    estimatedDelivery?: unknown;
+    claimed?: unknown;
+    maxClaim?: unknown;
+}
+
+interface RawProjectUpdate extends UnknownRecord {
+    _id?: unknown;
+    title?: unknown;
+    content?: unknown;
+    date?: unknown;
+    type?: unknown;
+    createdAt?: unknown;
+}
+
+interface RawBacker extends UnknownRecord {
+    _id?: unknown;
+    userId?: unknown;
+    userName?: unknown;
+    amount?: unknown;
+    date?: unknown;
+    status?: unknown;
+}
+
+interface RawExecutionStage extends UnknownRecord {
+    _id?: unknown;
+    name?: unknown;
+    description?: unknown;
+    budget?: unknown;
+    startDate?: unknown;
+    endDate?: unknown;
+    status?: unknown;
+    progress?: unknown;
+}
+
+interface RawExpenseRecord extends UnknownRecord {
+    _id?: unknown;
+    category?: unknown;
+    title?: unknown;
+    description?: unknown;
+    amount?: unknown;
+    date?: unknown;
+    receipt?: unknown;
+    stage?: unknown;
+    verified?: unknown;
+}
+
+interface RawDistribution extends UnknownRecord {
+    _id?: unknown;
+    backer?: unknown;
+    userName?: unknown;
+    originalAmount?: unknown;
+    profitShare?: unknown;
+    amount?: unknown;
+    date?: unknown;
+    status?: unknown;
+}
+
+interface RawRevenueDistribution extends UnknownRecord {
+    totalRevenue?: unknown;
+    platformFee?: unknown;
+    artistShare?: unknown;
+    backerShare?: unknown;
+    distributions?: unknown;
+}
+
+interface RawExecutionPlan extends UnknownRecord {
+    stages?: unknown;
+    totalBudget?: unknown;
+}
+
+interface RawFundingProject extends UnknownRecord {
+    id?: unknown;
+    _id?: unknown;
+    title?: unknown;
+    description?: unknown;
+    artist?: unknown;
+    artistName?: unknown;
+    artistId?: unknown;
+    artistAvatar?: unknown;
+    artistRating?: unknown;
+    category?: unknown;
+    goalAmount?: unknown;
+    targetAmount?: unknown;
+    currentAmount?: unknown;
+    backers?: unknown;
+    backersList?: unknown;
+    daysLeft?: unknown;
+    image?: unknown;
+    status?: unknown;
+    progressPercentage?: unknown;
+    progress?: unknown;
+    startDate?: unknown;
+    endDate?: unknown;
+    story?: unknown;
+    featured?: unknown;
+    rewards?: unknown;
+    updates?: unknown;
+    executionPlan?: unknown;
+    expenseRecords?: unknown;
+    revenueDistribution?: unknown;
+}
+
 const mapRevenueShare = (share: unknown, totalRevenue: number): RevenueShare => {
     if (share && typeof share === 'object' && !Array.isArray(share)) {
         const shareObject = share as { amount?: unknown; percentage?: unknown };
@@ -135,122 +278,134 @@ const extractApiData = <T>(response: ApiResponse<T> | T | undefined): T | null =
     return response as T;
 };
 
-export const mapFundingProjectDetail = (project: any): FundingProject | null => {
-    if (!project) {
+export const mapFundingProjectDetail = (project: unknown): FundingProject | null => {
+    if (!project || typeof project !== 'object') {
         return null;
     }
 
-    const totalRevenue = toNumber(project?.revenueDistribution?.totalRevenue, toNumber(project?.currentAmount));
-    const backersArray = project.backersList ?? project.backers;
+    const projectRecord = project as RawFundingProject;
+    const revenueDistributionRaw =
+        typeof projectRecord.revenueDistribution === 'object' && projectRecord.revenueDistribution !== null
+            ? (projectRecord.revenueDistribution as RawRevenueDistribution)
+            : undefined;
 
-    const goalAmount = toNumber(project.goalAmount, toNumber(project.targetAmount));
+    const totalRevenue = toNumber(revenueDistributionRaw?.totalRevenue, toNumber(projectRecord.currentAmount));
+    const backersSource =
+        Array.isArray(projectRecord.backersList)
+            ? projectRecord.backersList
+            : Array.isArray(projectRecord.backers)
+                ? projectRecord.backers
+                : undefined;
+
+    const goalAmount = toNumber(projectRecord.goalAmount, toNumber(projectRecord.targetAmount));
 
     return {
-        id: createId(project.id ?? project._id, 'project'),
-        title: typeof project.title === 'string' ? project.title : '',
-        description: typeof project.description === 'string' ? project.description : '',
-        artist: typeof project.artist === 'string'
-            ? project.artist
-            : typeof project.artistName === 'string'
-                ? project.artistName
-                : '',
-        category: typeof project.category === 'string' ? project.category : '',
+        id: createId(projectRecord.id ?? projectRecord._id, 'project'),
+        title: getString(projectRecord.title),
+        description: getString(projectRecord.description),
+        artist: typeof projectRecord.artist === 'string'
+            ? projectRecord.artist
+            : getString(projectRecord.artistName),
+        category: getString(projectRecord.category),
         goalAmount,
-        targetAmount: toNumber(project.targetAmount, goalAmount),
-        currentAmount: toNumber(project.currentAmount),
-        backers: typeof project.backers === 'number'
-            ? project.backers
-            : Array.isArray(project.backers)
-                ? project.backers.length
-                : Array.isArray(project.backersList)
-                    ? project.backersList.length
+        targetAmount: toNumber(projectRecord.targetAmount, goalAmount),
+        currentAmount: toNumber(projectRecord.currentAmount),
+        backers: typeof projectRecord.backers === 'number'
+            ? projectRecord.backers
+            : Array.isArray(projectRecord.backers)
+                ? projectRecord.backers.length
+                : Array.isArray(projectRecord.backersList)
+                    ? projectRecord.backersList.length
                     : 0,
-        daysLeft: toNumber(project.daysLeft),
-        image: typeof project.image === 'string' ? project.image : '',
-        status: typeof project.status === 'string' ? project.status : '',
-        progressPercentage: toNumber(project.progressPercentage, toNumber(project.progress)),
-        startDate: toIsoString(project.startDate),
-        endDate: toIsoString(project.endDate),
-        story: typeof project.story === 'string' ? project.story : typeof project.description === 'string' ? project.description : undefined,
-        artistAvatar: typeof project.artistAvatar === 'string' ? project.artistAvatar : undefined,
-        artistRating: typeof project.artistRating === 'number' ? project.artistRating : undefined,
-        artistId: project.artistId
-            ? String(project.artistId)
-            : project.artist && typeof project.artist === 'object' && '_id' in project.artist
-                ? String((project.artist as { _id: unknown })._id)
+        daysLeft: toNumber(projectRecord.daysLeft),
+        image: getString(projectRecord.image),
+        status: getString(projectRecord.status),
+        progressPercentage: toNumber(projectRecord.progressPercentage, toNumber(projectRecord.progress)),
+        startDate: toIsoString(projectRecord.startDate),
+        endDate: toIsoString(projectRecord.endDate),
+        story: typeof projectRecord.story === 'string'
+            ? projectRecord.story
+            : typeof projectRecord.description === 'string'
+                ? projectRecord.description
                 : undefined,
-        featured: typeof project.featured === 'boolean' ? project.featured : undefined,
-        rewards: toArray(project.rewards).map((reward: any) => ({
+        artistAvatar: typeof projectRecord.artistAvatar === 'string' ? projectRecord.artistAvatar : undefined,
+        artistRating: typeof projectRecord.artistRating === 'number' ? projectRecord.artistRating : undefined,
+        artistId: projectRecord.artistId
+            ? String(projectRecord.artistId)
+            : typeof projectRecord.artist === 'object' && projectRecord.artist !== null && '_id' in (projectRecord.artist as UnknownRecord)
+                ? String((projectRecord.artist as { _id: unknown })._id)
+                : undefined,
+        featured: typeof projectRecord.featured === 'boolean' ? projectRecord.featured : undefined,
+        rewards: toArray<RawReward>(projectRecord.rewards as RawReward[] | undefined).map((reward) => ({
             id: createId(reward.id ?? reward._id ?? reward.title, 'reward'),
-            title: typeof reward.title === 'string' ? reward.title : '',
-            description: typeof reward.description === 'string' ? reward.description : '',
+            title: getString(reward.title),
+            description: getString(reward.description),
             amount: toNumber(reward.amount),
             estimatedDelivery: toIsoString(reward.estimatedDelivery),
             claimed: typeof reward.claimed === 'number' ? reward.claimed : undefined,
             maxClaim: typeof reward.maxClaim === 'number' ? reward.maxClaim : undefined,
         })),
-        updates: toArray(project.updates).map((update: any) => ({
+        updates: toArray<RawProjectUpdate>(projectRecord.updates as RawProjectUpdate[] | undefined).map((update) => ({
             id: createId(update.id ?? update._id ?? update.title, 'update'),
-            title: typeof update.title === 'string' ? update.title : '',
-            content: typeof update.content === 'string' ? update.content : '',
+            title: getString(update.title),
+            content: getString(update.content),
             date: toIsoString(update.date ?? update.createdAt),
             type: typeof update.type === 'string' ? update.type : undefined,
             createdAt: update.createdAt ? toIsoString(update.createdAt) : undefined,
         })),
-        backersList: toArray(backersArray).map((backer: any) => ({
-            id: createId(backer.id ?? backer._id ?? backer.user, 'backer'),
-            userId: backer.userId
-                ? String(backer.userId)
-                : backer.user
-                    ? String(backer.user)
-                    : undefined,
-            userName: typeof backer.userName === 'string'
-                ? backer.userName
-                : backer.isAnonymous
-                    ? '익명 후원자'
-                    : '익명 후원자',
+        backersList: toArray<RawBacker>(backersSource as RawBacker[] | undefined).map((backer) => ({
+            id: createId(backer.id ?? backer._id ?? backer.userId ?? backer.userName, 'backer'),
+            userId: backer.userId ? String(backer.userId) : undefined,
+            userName: getString(backer.userName),
             amount: toNumber(backer.amount),
-            date: toIsoString(backer.date ?? backer.backedAt),
-            status: typeof backer.status === 'string' ? backer.status : '완료',
+            date: toIsoString(backer.date),
+            status: getString(backer.status),
         })),
-        executionPlan: {
-            stages: toArray(project.executionPlan?.stages).map((stage: any) => ({
-                id: createId(stage.id ?? stage._id ?? stage.name, 'stage'),
-                name: typeof stage.name === 'string' ? stage.name : '',
-                description: typeof stage.description === 'string' ? stage.description : '',
-                budget: toNumber(stage.budget),
-                startDate: toIsoString(stage.startDate),
-                endDate: toIsoString(stage.endDate),
-                status: typeof stage.status === 'string' ? stage.status : '계획',
-                progress: toNumber(stage.progress),
-            })),
-            totalBudget: toNumber(project.executionPlan?.totalBudget, toNumber(project.goalAmount)),
-        },
-        expenseRecords: toArray(project.expenseRecords).map((expense: any) => ({
+        executionPlan: (() => {
+            const executionPlanRaw =
+                typeof projectRecord.executionPlan === 'object' && projectRecord.executionPlan !== null
+                    ? (projectRecord.executionPlan as RawExecutionPlan)
+                    : undefined;
+
+            return {
+                stages: toArray<RawExecutionStage>(executionPlanRaw?.stages as RawExecutionStage[] | undefined).map((stage) => ({
+                    id: createId(stage.id ?? stage._id ?? stage.name, 'stage'),
+                    name: getString(stage.name),
+                    description: getString(stage.description),
+                    budget: toNumber(stage.budget),
+                    startDate: toIsoString(stage.startDate),
+                    endDate: toIsoString(stage.endDate),
+                    status: getString(stage.status),
+                    progress: toNumber(stage.progress),
+                })),
+                totalBudget: toNumber(executionPlanRaw?.totalBudget),
+            };
+        })(),
+        expenseRecords: toArray<RawExpenseRecord>(projectRecord.expenseRecords as RawExpenseRecord[] | undefined).map((expense) => ({
             id: createId(expense.id ?? expense._id ?? expense.title, 'expense'),
-            category: typeof expense.category === 'string' ? expense.category : '',
-            title: typeof expense.title === 'string' ? expense.title : '',
-            description: typeof expense.description === 'string' ? expense.description : '',
+            category: getString(expense.category),
+            title: getString(expense.title),
+            description: getString(expense.description),
             amount: toNumber(expense.amount),
             date: toIsoString(expense.date),
-            receipt: typeof expense.receipt === 'string' ? expense.receipt : '',
-            stage: expense.stage ? String(expense.stage) : '',
-            verified: Boolean(expense.verified),
+            receipt: getString(expense.receipt),
+            stage: getString(expense.stage),
+            verified: typeof expense.verified === 'boolean' ? expense.verified : false,
         })),
         revenueDistribution: {
             totalRevenue,
-            platformFee: mapRevenueShare(project.revenueDistribution?.platformFee, totalRevenue),
-            artistShare: mapRevenueShare(project.revenueDistribution?.artistShare, totalRevenue),
-            backerShare: mapRevenueShare(project.revenueDistribution?.backerShare, totalRevenue),
-            distributions: toArray(project.revenueDistribution?.distributions).map((distribution: any) => ({
-                id: createId(distribution.id ?? distribution._id ?? distribution.backer, 'distribution'),
-                backer: distribution.backer ? String(distribution.backer) : undefined,
-                userName: typeof distribution.userName === 'string' ? distribution.userName : '익명 후원자',
+            platformFee: mapRevenueShare(revenueDistributionRaw?.platformFee, totalRevenue),
+            artistShare: mapRevenueShare(revenueDistributionRaw?.artistShare, totalRevenue),
+            backerShare: mapRevenueShare(revenueDistributionRaw?.backerShare, totalRevenue),
+            distributions: toArray<RawDistribution>(revenueDistributionRaw?.distributions as RawDistribution[] | undefined).map((distribution) => ({
+                id: createId(distribution.id ?? distribution._id ?? distribution.backer ?? distribution.userName, 'distribution'),
+                backer: typeof distribution.backer === 'string' ? distribution.backer : undefined,
+                userName: getString(distribution.userName),
                 originalAmount: toNumber(distribution.originalAmount),
                 profitShare: toNumber(distribution.profitShare),
-                amount: toNumber(distribution.amount ?? distribution.totalReturn),
-                date: toIsoString(distribution.date ?? distribution.distributedAt),
-                status: typeof distribution.status === 'string' ? distribution.status : '대기',
+                amount: toNumber(distribution.amount),
+                date: toIsoString(distribution.date),
+                status: getString(distribution.status),
             })),
         },
     };
@@ -373,7 +528,7 @@ export const artistAPI = {
         sortBy?: string;
         order?: 'asc' | 'desc';
     }) => {
-        const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+        const queryParams = params ? `?${buildQueryString(params)}` : '';
         return apiCall(`/artists${queryParams}`);
     },
 
@@ -400,7 +555,7 @@ export const artistAPI = {
         }),
 
     // 아티스트 프로필 업데이트
-    updateArtistProfile: (artistId: string, data: any) =>
+    updateArtistProfile: (artistId: string, data: UnknownRecord) =>
         apiCall(`/artists/${artistId}`, {
             method: 'PUT',
             body: JSON.stringify(data)
@@ -410,12 +565,12 @@ export const artistAPI = {
     getArtistData: (artistId: number) => apiCall(`/artists/${artistId}/dashboard`),
     getProjects: (artistId: number) => apiCall(`/artists/${artistId}/projects`),
     getWbsItems: (projectId: number) => apiCall(`/projects/${projectId}/wbs`),
-    updateProject: (projectId: number, data: any) =>
+    updateProject: (projectId: number, data: UnknownRecord) =>
         apiCall(`/projects/${projectId}`, {
             method: 'PUT',
             body: JSON.stringify(data)
         }),
-    createProject: (data: any) =>
+    createProject: (data: UnknownRecord) =>
         apiCall('/projects', {
             method: 'POST',
             body: JSON.stringify(data)
@@ -455,7 +610,7 @@ export const galleryAPI = {
         page?: number;
         limit?: number;
     }) => {
-        const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+        const queryParams = params ? `?${buildQueryString(params)}` : '';
         return apiCall(`/gallery/artworks${queryParams}`);
     },
 
@@ -468,7 +623,7 @@ export const galleryAPI = {
         limit?: number;
         sortBy?: string;
     }) => {
-        const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+        const queryParams = params ? `?${buildQueryString(params)}` : '';
         return apiCall(`/gallery/artworks?category=${category}${queryParams}`);
     },
 
@@ -477,19 +632,19 @@ export const galleryAPI = {
         page?: number;
         limit?: number;
     }) => {
-        const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+        const queryParams = params ? `?${buildQueryString(params)}` : '';
         return apiCall(`/gallery/artists/${artistId}/artworks${queryParams}`);
     },
 
     // 작품 업로드
-    uploadArtwork: (data: any) =>
+    uploadArtwork: (data: FormData | UnknownRecord) =>
         apiCall('/gallery/artworks', {
             method: 'POST',
             body: JSON.stringify(data)
         }),
 
     // 작품 수정
-    updateArtwork: (artworkId: string, data: any) =>
+    updateArtwork: (artworkId: string, data: UnknownRecord) =>
         apiCall(`/gallery/artworks/${artworkId}`, {
             method: 'PUT',
             body: JSON.stringify(data)
@@ -511,19 +666,19 @@ export const galleryAPI = {
     getGalleryCategories: () => apiCall('/gallery/categories'),
 
     // 하위 호환성을 위한 기존 함수들
-    getArtworks: async (filters?: any) => {
-        const queryParams = filters ? `?${new URLSearchParams(filters).toString()}` : '';
-        const response = await apiCall<any>(`/gallery/artworks${queryParams}`);
+    getArtworks: async (filters?: ApiQueryParams) => {
+        const queryParams = filters ? `?${buildQueryString(filters)}` : '';
+        const response = await apiCall<ApiResponse<UnknownRecord>>(`/gallery/artworks${queryParams}`);
         return response.data;
     },
 
     getCategories: async () => {
-        const response = await apiCall<any>('/gallery/categories');
+        const response = await apiCall<ApiResponse<UnknownRecord>>('/gallery/categories');
         return response.data;
     },
 
     getArtistArtworks: async (artistId: string, page: number = 1, limit: number = 20) => {
-        const response = await apiCall<any>(`/gallery/artists/${artistId}/artworks?page=${page}&limit=${limit}`);
+        const response = await apiCall<ApiResponse<UnknownRecord>>(`/gallery/artists/${artistId}/artworks?page=${page}&limit=${limit}`);
         return response.data;
     }
 };
@@ -531,7 +686,7 @@ export const galleryAPI = {
 // Artist Profile APIs
 export const profileAPI = {
     getArtistProfile: (artistId: number) => apiCall(`/artists/${artistId}/profile`),
-    updateProfile: (artistId: number, data: any) =>
+    updateProfile: (artistId: number, data: UnknownRecord) =>
         apiCall(`/artists/${artistId}/profile`, {
             method: 'PUT',
             body: JSON.stringify(data)
@@ -562,7 +717,7 @@ export const communityAPI = {
     },
     getEvents: () => apiCall('/events'), // 올바른 경로로 수정
     getCategories: () => apiCall('/categories'), // 카테고리 API 추가
-    createPost: (data: any) =>
+    createPost: (data: UnknownRecord) =>
         apiCall('/community/posts', {
             method: 'POST',
             body: JSON.stringify(data)
@@ -592,8 +747,8 @@ export const communityAPI = {
 // Funding Projects APIs
 export const fundingAPI = {
     // 프로젝트 목록 조회
-    getProjects: (filters?: any) => {
-        const queryParams = filters ? `?${new URLSearchParams(filters).toString()}` : '';
+    getProjects: (filters?: ApiQueryParams) => {
+        const queryParams = filters ? `?${buildQueryString(filters)}` : '';
         return apiCall(`/funding/projects${queryParams}`);
     },
 
@@ -608,19 +763,19 @@ export const fundingAPI = {
     },
 
     // 프로젝트 생성
-    createProject: (projectData: any) => apiCall('/funding/projects', {
+    createProject: (projectData: UnknownRecord) => apiCall('/funding/projects', {
         method: 'POST',
         body: JSON.stringify(projectData)
     }),
 
     // 프로젝트 업데이트
-    updateProject: (projectId: string, projectData: any) => apiCall(`/funding/projects/${projectId}`, {
+    updateProject: (projectId: string, projectData: UnknownRecord) => apiCall(`/funding/projects/${projectId}`, {
         method: 'PUT',
         body: JSON.stringify(projectData)
     }),
 
     // 후원 참여
-    backProject: (projectId: string, backData: any) => apiCall(`/funding/projects/${projectId}/back`, {
+    backProject: (projectId: string, backData: UnknownRecord) => apiCall(`/funding/projects/${projectId}/back`, {
         method: 'POST',
         body: JSON.stringify(backData)
     }),
@@ -631,13 +786,13 @@ export const fundingAPI = {
     }),
 
     // 집행 계획 업데이트
-    updateExecutionPlan: (projectId: string, executionData: any) => apiCall(`/funding/projects/${projectId}/execution`, {
+    updateExecutionPlan: (projectId: string, executionData: UnknownRecord) => apiCall(`/funding/projects/${projectId}/execution`, {
         method: 'PUT',
         body: JSON.stringify(executionData)
     }),
 
     // 비용 내역 추가
-    addExpense: (projectId: string, expenseData: any) => apiCall(`/funding/projects/${projectId}/expenses`, {
+    addExpense: (projectId: string, expenseData: UnknownRecord) => apiCall(`/funding/projects/${projectId}/expenses`, {
         method: 'POST',
         body: JSON.stringify(expenseData)
     }),
@@ -676,7 +831,7 @@ export const userAPI = {
         limit?: number;
         type?: string;
     }) => {
-        const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+        const queryParams = params ? `?${buildQueryString(params)}` : '';
         return apiCall(`/users/${userId}/points/history${queryParams}`);
     },
     investWithPoints: (userId: string, data: { projectId: string; amount: number }) =>
@@ -694,7 +849,7 @@ export const userAPI = {
         sortBy?: 'date' | 'amount' | 'status';
         order?: 'asc' | 'desc';
     }) => {
-        const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+        const queryParams = params ? `?${buildQueryString(params)}` : '';
         return apiCall(`/users/${userId}/following/funding-history${queryParams}`);
     },
     // 특정 아티스트의 펀딩 프로젝트 히스토리 조회
@@ -703,10 +858,10 @@ export const userAPI = {
         limit?: number;
         status?: 'success' | 'failed' | 'ongoing';
     }) => {
-        const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+        const queryParams = params ? `?${buildQueryString(params)}` : '';
         return apiCall(`/users/${userId}/following/${artistId}/funding-history${queryParams}`);
     },
-    updateProfile: (userId: string, data: any) =>
+    updateProfile: (userId: string, data: UnknownRecord) =>
         apiCall(`/users/${userId}/profile`, {
             method: 'PUT',
             body: JSON.stringify(data)
@@ -722,7 +877,7 @@ export const interactionAPI = {
         type?: string;
         read?: boolean;
     }) => {
-        const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+        const queryParams = params ? `?${buildQueryString(params)}` : '';
         return apiCall(`/notifications${queryParams}`);
     },
 
@@ -767,7 +922,7 @@ export const authAPI = {
         body: JSON.stringify({ email })
     }),
     // 회원가입
-    signup: (userData: any) => apiCall('/auth/signup', {
+    signup: (userData: UnknownRecord) => apiCall('/auth/signup', {
         method: 'POST',
         body: JSON.stringify(userData)
     }),
@@ -791,12 +946,12 @@ export const authAPI = {
     // GET 요청
     get: (endpoint: string) => apiCall(endpoint, { method: 'GET' }),
     // POST 요청
-    post: (endpoint: string, data?: any) => apiCall(endpoint, {
+    post: (endpoint: string, data?: UnknownRecord) => apiCall(endpoint, {
         method: 'POST',
         body: data ? JSON.stringify(data) : undefined
     }),
     // PUT 요청
-    put: (endpoint: string, data?: any) => apiCall(endpoint, {
+    put: (endpoint: string, data?: UnknownRecord) => apiCall(endpoint, {
         method: 'PUT',
         body: data ? JSON.stringify(data) : undefined
     }),
@@ -806,10 +961,10 @@ export const authAPI = {
 
 // Live Stream APIs
 export const liveStreamAPI = {
-    getLiveStreams: () => apiCall('/live-streams') as Promise<any>,
-    getLiveStream: (streamId: string) => apiCall(`/live-streams/${streamId}`) as Promise<any>,
+    getLiveStreams: () => apiCall('/live-streams'),
+    getLiveStream: (streamId: string) => apiCall(`/live-streams/${streamId}`),
     getScheduledStreams: () => apiCall('/live-streams/scheduled'),
-    startStream: (data: any) =>
+    startStream: (data: UnknownRecord) =>
         apiCall('/live-streams', {
             method: 'POST',
             body: JSON.stringify(data)
@@ -829,14 +984,14 @@ export const categoryAPI = {
     getCategoryById: (categoryId: string) => apiCall(`/categories/${categoryId}`),
 
     // 카테고리 생성 (관리자용)
-    createCategory: (data: any) =>
+    createCategory: (data: UnknownRecord) =>
         apiCall('/categories', {
             method: 'POST',
             body: JSON.stringify(data)
         }),
 
     // 카테고리 수정 (관리자용)
-    updateCategory: (categoryId: string, data: any) =>
+    updateCategory: (categoryId: string, data: UnknownRecord) =>
         apiCall(`/categories/${categoryId}`, {
             method: 'PUT',
             body: JSON.stringify(data)
@@ -873,9 +1028,9 @@ export const isAPIAvailable = async (): Promise<boolean> => {
 // Enhanced artist data fetcher - API만 사용
 export const getArtistData = async () => {
     try {
-        const response = await artistAPI.getPopularArtists(20);
-        if ((response as any).success && (response as any).data?.artists) {
-            return (response as any).data.artists;
+        const response = await artistAPI.getPopularArtists(20) as ApiResponse<{ artists?: UnknownRecord[] }>;
+        if (Array.isArray(response?.data?.artists)) {
+            return response.data.artists;
         }
         return [];
     } catch (error) {
@@ -910,7 +1065,7 @@ export const userProfileAPI = {
     getUserProfile: (userId: string) => apiCall(`/users/${userId}/profile`),
 
     // 사용자 프로필 업데이트
-    updateUserProfile: (userId: string, data: any) =>
+    updateUserProfile: (userId: string, data: UnknownRecord) =>
         apiCall(`/users/${userId}/profile`, {
             method: 'PUT',
             body: JSON.stringify(data)
@@ -930,7 +1085,7 @@ export const userProfileAPI = {
         page?: number;
         limit?: number;
     }) => {
-        const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+        const queryParams = params ? `?${buildQueryString(params)}` : '';
         return apiCall(`/users/${userId}/projects${queryParams}`);
     },
 
@@ -942,7 +1097,7 @@ export const userProfileAPI = {
         page?: number;
         limit?: number;
     }) => {
-        const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+        const queryParams = params ? `?${buildQueryString(params)}` : '';
         return apiCall(`/users/${userId}/revenues${queryParams}`);
     },
 
@@ -953,7 +1108,7 @@ export const userProfileAPI = {
         page?: number;
         limit?: number;
     }) => {
-        const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+        const queryParams = params ? `?${buildQueryString(params)}` : '';
         return apiCall(`/users/${userId}/backings${queryParams}`);
     }
 };
@@ -990,14 +1145,14 @@ export const communityPostAPI = {
     getPostById: (postId: string) => apiCall(`/community/posts/${postId}`),
 
     // 게시글 생성
-    createPost: (data: any) =>
+    createPost: (data: UnknownRecord) =>
         apiCall('/community/posts', {
             method: 'POST',
             body: JSON.stringify(data)
         }),
 
     // 게시글 수정
-    updatePost: (postId: string, data: any) =>
+    updatePost: (postId: string, data: UnknownRecord) =>
         apiCall(`/community/posts/${postId}`, {
             method: 'PUT',
             body: JSON.stringify(data)
@@ -1047,7 +1202,7 @@ export const communityPostAPI = {
     getStats: () => apiCall('/community/stats'),
 
     // 내 게시글 조회
-    getMyPosts: (params?: any) => {
+    getMyPosts: (params?: ApiQueryParams) => {
         const queryParams = new URLSearchParams();
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.limit) queryParams.append('limit', params.limit.toString());
@@ -1056,7 +1211,7 @@ export const communityPostAPI = {
     },
 
     // 북마크한 게시글 조회
-    getBookmarkedPosts: (params?: any) => {
+    getBookmarkedPosts: (params?: ApiQueryParams) => {
         const queryParams = new URLSearchParams();
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.limit) queryParams.append('limit', params.limit.toString());
@@ -1074,7 +1229,7 @@ export const communityCommentAPI = {
         sortBy?: string;
         order?: 'asc' | 'desc';
     }) => {
-        const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+        const queryParams = params ? `?${buildQueryString(params)}` : '';
         return apiCall(`/community/posts/${postId}/comments${queryParams}`);
     },
 
@@ -1113,7 +1268,7 @@ export const communityCommentAPI = {
         }),
 
     // 내 댓글 조회
-    getMyComments: (params?: any) => {
+    getMyComments: (params?: ApiQueryParams) => {
         const queryParams = new URLSearchParams();
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.limit) queryParams.append('limit', params.limit.toString());
@@ -1157,14 +1312,14 @@ export const eventManagementAPI = {
     getEventById: (eventId: string) => apiCall(`/events/${eventId}`),
 
     // 이벤트 생성
-    createEvent: (data: any) =>
+    createEvent: (data: UnknownRecord) =>
         apiCall('/events', {
             method: 'POST',
             body: JSON.stringify(data)
         }),
 
     // 이벤트 수정
-    updateEvent: (eventId: string, data: any) =>
+    updateEvent: (eventId: string, data: UnknownRecord) =>
         apiCall(`/events/${eventId}`, {
             method: 'PUT',
             body: JSON.stringify(data)
@@ -1194,7 +1349,7 @@ export const eventManagementAPI = {
         page?: number;
         limit?: number;
     }) => {
-        const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+        const queryParams = params ? `?${buildQueryString(params)}` : '';
         return apiCall(`/events/${eventId}/participants${queryParams}`);
     },
 
@@ -1305,7 +1460,7 @@ export const adminProjectAPI = {
         }),
 
     // 프로젝트 조치 실행
-    executeProjectAction: (projectId: string, action: string, data?: any) =>
+    executeProjectAction: (projectId: string, action: string, data?: UnknownRecord) =>
         apiCall(`/admin/projects/${projectId}/actions`, {
             method: 'POST',
             body: JSON.stringify({ action, ...data })

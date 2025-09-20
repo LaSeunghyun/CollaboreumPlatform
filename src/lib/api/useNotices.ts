@@ -1,5 +1,47 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { communityAPI } from '../../services/api';
+import type { CommunityPost } from '@/features/community';
+import type { UnknownRecord } from '@/types/api';
+
+interface ForumPostsResponse {
+    success?: boolean;
+    posts?: CommunityPost[];
+    data?: {
+        posts?: CommunityPost[];
+    };
+}
+
+const isCommunityPost = (value: unknown): value is CommunityPost => {
+    if (!value || typeof value !== 'object') {
+        return false;
+    }
+
+    const record = value as Partial<CommunityPost>;
+    return typeof record.id === 'string' && typeof record.title === 'string' && typeof record.content === 'string';
+};
+
+const extractForumPosts = (response: unknown): CommunityPost[] => {
+    if (!response || typeof response !== 'object') {
+        return [];
+    }
+
+    const { posts, data } = response as ForumPostsResponse;
+
+    if (Array.isArray(posts)) {
+        return posts.filter(isCommunityPost);
+    }
+
+    if (data && Array.isArray(data.posts)) {
+        return data.posts.filter(isCommunityPost);
+    }
+
+    return [];
+};
+
+type NoticePayload = UnknownRecord & {
+    isPinned?: boolean;
+    isImportant?: boolean;
+};
 
 // 공지사항 목록 조회 (커뮤니티 API의 notice 카테고리 사용)
 export const useNotices = (params?: {
@@ -28,14 +70,14 @@ export const useNotices = (params?: {
 export const useNotice = (noticeId: string) => {
     return useQuery({
         queryKey: ['notice', noticeId],
-        queryFn: () => communityAPI.getForumPosts('notice', {
-            search: noticeId,
-            limit: 1
-        }).then((response: any) => {
-            // API 응답에서 해당 공지사항 찾기
-            const notices = response.data?.posts || response.posts || [];
-            return notices.find((notice: any) => notice.id === noticeId) || notices[0];
-        }),
+        queryFn: async () => {
+            const response = await communityAPI.getForumPosts('notice', {
+                search: noticeId,
+                limit: 1
+            });
+            const notices = extractForumPosts(response);
+            return notices.find((notice) => notice.id === noticeId) ?? notices[0];
+        },
         enabled: !!noticeId,
         staleTime: 10 * 60 * 1000,
     });
@@ -46,12 +88,15 @@ export const useCreateNotice = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data: any) => communityAPI.createPost({
-            ...data,
-            category: 'notice',
-            isPinned: data.isPinned || false,
-            isImportant: data.isImportant || false,
-        }),
+        mutationFn: (data: NoticePayload) => {
+            const { isPinned = false, isImportant = false, ...rest } = data;
+            return communityAPI.createPost({
+                ...rest,
+                category: 'notice',
+                isPinned,
+                isImportant,
+            });
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notices'] });
         },
@@ -63,12 +108,16 @@ export const useUpdateNotice = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ noticeId, data }: { noticeId: string; data: any }) =>
-            communityAPI.createPost({
-                ...data,
+        mutationFn: ({ noticeId, data }: { noticeId: string; data: NoticePayload }) => {
+            const { isPinned = false, isImportant = false, ...rest } = data;
+            return communityAPI.createPost({
+                ...rest,
                 id: noticeId,
                 category: 'notice',
-            }),
+                isPinned,
+                isImportant,
+            });
+        },
         onSuccess: (_, { noticeId }) => {
             queryClient.invalidateQueries({ queryKey: ['notice', noticeId] });
             queryClient.invalidateQueries({ queryKey: ['notices'] });

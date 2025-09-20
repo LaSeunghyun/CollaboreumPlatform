@@ -1,7 +1,7 @@
 // API 응답 처리 유틸리티
 
 export const safeApiCall = async <T>(
-  apiCall: () => Promise<any>,
+  apiCall: () => Promise<unknown>,
   fallback: T,
   errorMessage: string = 'API 호출에 실패했습니다.'
 ): Promise<T> => {
@@ -36,7 +36,7 @@ export const safeApiCall = async <T>(
 
 // 배열 응답을 안전하게 처리
 export const safeArrayResponse = <T>(
-  response: any,
+  response: unknown,
   fallback: T[] = []
 ): T[] => {
   if (Array.isArray(response)) {
@@ -52,7 +52,7 @@ export const safeArrayResponse = <T>(
 
 // 객체 응답을 안전하게 처리
 export const safeObjectResponse = <T>(
-  response: any,
+  response: unknown,
   fallback: T | null = null
 ): T | null => {
   if (response && typeof response === 'object') {
@@ -66,7 +66,7 @@ export const safeObjectResponse = <T>(
 };
 
 // 에러 메시지를 안전하게 추출
-export const getErrorMessage = (error: any, fallback: string = '알 수 없는 오류가 발생했습니다.'): string => {
+export const getErrorMessage = (error: unknown, fallback: string = '알 수 없는 오류가 발생했습니다.'): string => {
   if (error instanceof Error) {
     return error.message;
   }
@@ -103,7 +103,7 @@ export const retryApiCall = async <T>(
   maxRetries: number = 3,
   delay: number = 1000
 ): Promise<T> => {
-  let lastError: any;
+  let lastError: unknown;
   
   for (let i = 0; i < maxRetries; i++) {
     try {

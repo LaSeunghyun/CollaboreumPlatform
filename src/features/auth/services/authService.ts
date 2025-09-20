@@ -1,5 +1,7 @@
 import { resolveApiBaseUrl } from '@/lib/config/env';
+import type { User } from '../../../shared/types';
 import { AuthResponse, RefreshTokenResponse, LoginCredentials, SignupData, PasswordResetRequest, PasswordReset } from '../types';
+import type { ProfileUpdateInput, ChangePasswordInput } from '../schemas';
 import { ApiResponse } from '../../../shared/types';
 // import { fetch } from '../../../utils/fetch';
 
@@ -112,7 +114,7 @@ class AuthService {
     /**
      * 현재 사용자 정보 조회
      */
-    async getCurrentUser(): Promise<any> {
+    async getCurrentUser(): Promise<User> {
         const token = localStorage.getItem('accessToken');
 
         if (!token) {
@@ -124,7 +126,7 @@ class AuthService {
             headers: {
                 'Authorization': `Bearer ${token}`,
             },
-        }).then(res => res.json()) as ApiResponse<any>;
+        }).then(res => res.json()) as ApiResponse<User>;
 
         if (!response.success || !response.data) {
             throw new Error(response.error || '사용자 정보 조회에 실패했습니다');
@@ -170,7 +172,7 @@ class AuthService {
     /**
      * 프로필 업데이트
      */
-    async updateProfile(data: any): Promise<any> {
+    async updateProfile(data: ProfileUpdateInput): Promise<User> {
         const token = localStorage.getItem('accessToken');
 
         if (!token) {
@@ -184,7 +186,7 @@ class AuthService {
                 'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify(data),
-        }).then(res => res.json()) as ApiResponse<any>;
+        }).then(res => res.json()) as ApiResponse<User>;
 
         if (!response.success || !response.data) {
             throw new Error(response.error || '프로필 업데이트에 실패했습니다');
@@ -196,7 +198,7 @@ class AuthService {
     /**
      * 비밀번호 변경
      */
-    async changePassword(data: any): Promise<void> {
+    async changePassword(data: ChangePasswordInput): Promise<void> {
         const token = localStorage.getItem('accessToken');
 
         if (!token) {

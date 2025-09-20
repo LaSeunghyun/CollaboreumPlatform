@@ -67,7 +67,7 @@ class ApiClient {
     };
   }
 
-  async request<T = unknown>(endpoint: ApiEndpoint, config: ApiRequestConfig = {}): Promise<ApiResponse<T>> {
+  async request<T = unknown>(endpoint: ApiEndpoint, config: ApiRequestConfig<unknown> = {}): Promise<ApiResponse<T>> {
     const { method = 'GET', params, headers, data, body, timeout } = config;
 
     const requestConfig: AxiosRequestConfig = {
@@ -83,19 +83,19 @@ class ApiClient {
     return response.data;
   }
 
-  async get<T>(endpoint: ApiEndpoint, params?: Record<string, any>): Promise<ApiResponse<T>> {
+  async get<T>(endpoint: ApiEndpoint, params?: Record<string, unknown>): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { method: 'GET', params });
   }
 
-  async post<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>> {
+  async post<T>(endpoint: ApiEndpoint, data?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { method: 'POST', data });
   }
 
-  async put<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>> {
+  async put<T>(endpoint: ApiEndpoint, data?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { method: 'PUT', data });
   }
 
-  async patch<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>> {
+  async patch<T>(endpoint: ApiEndpoint, data?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { method: 'PATCH', data });
   }
 
@@ -125,7 +125,7 @@ class ApiClient {
   }
 
   // 배치 요청
-  async batch<T>(requests: Array<{ method: string; endpoint: ApiEndpoint; data?: any }>): Promise<Array<ApiResponse<T>>> {
+  async batch<T>(requests: Array<{ method: string; endpoint: ApiEndpoint; data?: unknown }>): Promise<Array<ApiResponse<T>>> {
     const promises = requests.map(({ method, endpoint, data }) => {
       switch (method.toUpperCase()) {
         case 'GET':

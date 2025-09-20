@@ -1,6 +1,6 @@
-import { 
-  ArtistFundingHistory, 
-  FundingHistoryFilter, 
+import {
+  ArtistFundingHistory,
+  FundingHistoryFilter,
   FanFundingProjectStatus,
   FanFundingProjectCategory,
   FanFundingSortOption
@@ -102,19 +102,69 @@ export const getCategoryOrder = (category: FanFundingProjectCategory): number =>
     return order[category];
 };
 
+export type NormalizedFundingProject = Record<string, unknown> & {
+    id: string;
+    targetAmount: number;
+    currentAmount: number;
+    backerCount: number;
+    progress: number;
+    daysLeft: number;
+    createdAt: Date;
+    updatedAt: Date;
+    startDate: Date;
+    endDate: Date;
+};
+
+const toNumber = (value: unknown, defaultValue = 0): number => {
+    if (typeof value === 'number') {
+        return Number.isFinite(value) ? value : defaultValue;
+    }
+
+    if (typeof value === 'string') {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : defaultValue;
+    }
+
+    return defaultValue;
+};
+
+const toDate = (value: unknown): Date => {
+    if (value instanceof Date) {
+        return value;
+    }
+
+    if (typeof value === 'string' || typeof value === 'number') {
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? new Date() : date;
+    }
+
+    return new Date();
+};
+
 // 프로젝트 데이터 정규화
-export const normalizeProjectData = (project: any) => {
+export const normalizeProjectData = (project: unknown): NormalizedFundingProject => {
+    const projectRecord = (typeof project === 'object' && project !== null)
+        ? (project as Record<string, unknown>)
+        : {};
+
+    const rawId = projectRecord.id;
+    const id = typeof rawId === 'string'
+        ? rawId
+        : rawId != null
+            ? String(rawId)
+            : '';
+
     return {
-        ...project,
-        id: project.id?.toString() || '',
-        targetAmount: Number(project.targetAmount) || 0,
-        currentAmount: Number(project.currentAmount) || 0,
-        backerCount: Number(project.backerCount) || 0,
-        progress: Number(project.progress) || 0,
-        daysLeft: Number(project.daysLeft) || 0,
-        createdAt: project.createdAt ? new Date(project.createdAt) : new Date(),
-        updatedAt: project.updatedAt ? new Date(project.updatedAt) : new Date(),
-        startDate: project.startDate ? new Date(project.startDate) : new Date(),
-        endDate: project.endDate ? new Date(project.endDate) : new Date(),
+        ...projectRecord,
+        id,
+        targetAmount: toNumber(projectRecord.targetAmount),
+        currentAmount: toNumber(projectRecord.currentAmount),
+        backerCount: toNumber(projectRecord.backerCount),
+        progress: toNumber(projectRecord.progress),
+        daysLeft: toNumber(projectRecord.daysLeft),
+        createdAt: toDate(projectRecord.createdAt),
+        updatedAt: toDate(projectRecord.updatedAt),
+        startDate: toDate(projectRecord.startDate),
+        endDate: toDate(projectRecord.endDate),
     };
 };

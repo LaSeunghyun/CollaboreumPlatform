@@ -5,11 +5,14 @@ export const queryClient = new QueryClient({
         queries: {
             staleTime: 10 * 60 * 1000, // 10분으로 증가 (더 오래 캐시 유지)
             gcTime: 30 * 60 * 1000, // 30분으로 증가 (메모리에서 더 오래 유지)
-            retry: (failureCount, error: any) => {
-                // 401, 403, 404 에러는 재시도하지 않음
-                if (error?.status === 401 || error?.status === 403 || error?.status === 404) {
-                    return false;
+            retry: (failureCount, error: unknown) => {
+                if (typeof error === 'object' && error !== null && 'status' in error) {
+                    const { status } = error as { status?: number };
+                    if (status === 401 || status === 403 || status === 404) {
+                        return false;
+                    }
                 }
+
                 // 최대 2번 재시도로 감소 (빠른 실패)
                 return failureCount < 2;
             },

@@ -7,23 +7,23 @@ interface UseRetryOptions {
     onMaxRetriesReached?: () => void;
 }
 
-interface UseRetryReturn<T> {
-    data: T | null;
+interface UseRetryReturn<TData, TArgs extends unknown[]> {
+    data: TData | null;
     error: string | null;
     isLoading: boolean;
     retryCount: number;
     isMaxRetriesReached: boolean;
-    execute: (...args: any[]) => Promise<T | null>;
-    retry: () => Promise<T | null>;
+    execute: (...args: TArgs) => Promise<TData | null>;
+    retry: (...args: TArgs) => Promise<TData | null>;
     reset: () => void;
-    setData: (data: T | null) => void;
+    setData: (data: TData | null) => void;
     setError: (error: string | null) => void;
 }
 
-export function useRetry<T = any>(
-    asyncFunction: (...args: any[]) => Promise<T>,
+export function useRetry<TData = unknown, TArgs extends unknown[] = []>(
+    asyncFunction: (...args: TArgs) => Promise<TData>,
     options: UseRetryOptions = {}
-): UseRetryReturn<T> {
+): UseRetryReturn<TData, TArgs> {
     const {
         maxRetries = 3,
         retryDelay = 1000,
@@ -31,17 +31,17 @@ export function useRetry<T = any>(
         onMaxRetriesReached,
     } = options;
 
-    const [data, setData] = useState<T | null>(null);
+    const [data, setData] = useState<TData | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
 
-    const lastArgsRef = useRef<any[]>([]);
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const lastArgsRef = useRef<TArgs | null>(null);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const isMaxRetriesReached = retryCount >= maxRetries;
 
-    const executeWithRetry = useCallback(async (attempt: number, ...args: any[]): Promise<T | null> => {
+    const executeWithRetry = useCallback(async (attempt: number, ...args: TArgs): Promise<TData | null> => {
         try {
             setIsLoading(true);
             setError(null);
@@ -50,8 +50,8 @@ export function useRetry<T = any>(
             setData(result);
             setRetryCount(0); // 성공 시 재시도 카운트 리셋
             return result;
-        } catch (err: any) {
-            const errorMessage = err.message || '알 수 없는 오류가 발생했습니다.';
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
             setError(errorMessage);
 
             if (attempt < maxRetries) {
@@ -60,7 +60,7 @@ export function useRetry<T = any>(
                 onRetry?.(attempt);
 
                 // 지연 후 재시도
-                return new Promise((resolve) => {
+                return new Promise<TData | null>((resolve) => {
                     timeoutRef.current = setTimeout(async () => {
                         const result = await executeWithRetry(attempt + 1, ...args);
                         resolve(result);
@@ -77,15 +77,24 @@ export function useRetry<T = any>(
         }
     }, [asyncFunction, maxRetries, retryDelay, onRetry, onMaxRetriesReached]);
 
-    const execute = useCallback(async (...args: any[]): Promise<T | null> => {
+    const execute = useCallback(async (...args: TArgs): Promise<TData | null> => {
         lastArgsRef.current = args;
         setRetryCount(0);
         return executeWithRetry(0, ...args);
     }, [executeWithRetry]);
 
-    const retry = useCallback(async (): Promise<T | null> => {
+    const retry = useCallback(async (...args: TArgs): Promise<TData | null> => {
         if (isMaxRetriesReached) {
             console.warn('최대 재시도 횟수에 도달했습니다.');
+            return null;
+        }
+
+        if (args.length > 0) {
+            lastArgsRef.current = args;
+            return executeWithRetry(retryCount + 1, ...args);
+        }
+
+        if (!lastArgsRef.current) {
             return null;
         }
 
@@ -150,18 +159,18 @@ export function useNetworkStatus() {
 }
 
 // 자동 재시도 훅 (네트워크 복구 시)
-export function useAutoRetry<T = any>(
-    asyncFunction: (...args: any[]) => Promise<T>,
+export function useAutoRetry<TData = unknown, TArgs extends unknown[] = []>(
+    asyncFunction: (...args: TArgs) => Promise<TData>,
     options: UseRetryOptions & { autoRetryOnNetworkRecovery?: boolean } = {}
 ) {
     const { autoRetryOnNetworkRecovery = true, ...retryOptions } = options;
     const { isOnline, wasOffline } = useNetworkStatus();
-    const retryHook = useRetry(asyncFunction, retryOptions);
+    const retryHook = useRetry<TData, TArgs>(asyncFunction, retryOptions);
 
     useEffect(() => {
         if (autoRetryOnNetworkRecovery && isOnline && wasOffline && retryHook.error) {
             // 네트워크가 복구되고 에러가 있으면 자동 재시도
-            retryHook.retry();
+            void retryHook.retry();
         }
     }, [isOnline, wasOffline, retryHook.error, autoRetryOnNetworkRecovery, retryHook]);
 

@@ -4,7 +4,7 @@ import { useCallback, useRef, DependencyList } from 'react';
  * 메모이제이션된 콜백 훅
  * 의존성 배열이 변경되지 않는 한 동일한 함수 참조를 반환
  */
-export function useMemoizedCallback<T extends (...args: any[]) => any>(
+export function useMemoizedCallback<T extends (...args: unknown[]) => unknown>(
     callback: T,
     deps: DependencyList
 ): T {

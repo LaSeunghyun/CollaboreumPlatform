@@ -240,7 +240,7 @@ export function useLazyImage(src: string, fallback?: string) {
 /**
  * 쓰로틀된 이벤트 핸들러 훅
  */
-export function useThrottledHandler<T extends (...args: any[]) => any>(
+export function useThrottledHandler<T extends (...args: unknown[]) => unknown>(
   handler: T,
   delay: number
 ): T {
@@ -250,7 +250,7 @@ export function useThrottledHandler<T extends (...args: any[]) => any>(
 /**
  * 디바운스된 이벤트 핸들러 훅
  */
-export function useDebouncedHandler<T extends (...args: any[]) => any>(
+export function useDebouncedHandler<T extends (...args: unknown[]) => unknown>(
   handler: T,
   delay: number
 ): T {

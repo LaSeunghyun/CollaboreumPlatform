@@ -1,7 +1,12 @@
 // 커뮤니티 댓글 React Query 훅들
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { communityApi } from '../api/communityApi'
-import type { CommunityComment, CreateCommunityCommentData } from '../types'
+import type {
+    CommunityComment,
+    CommunityPost,
+    CommunityPostListResponse,
+    CreateCommunityCommentData
+} from '../types'
 
 // 댓글 목록 조회
 export const useCommunityComments = (postId: string) => {
@@ -25,21 +30,19 @@ export const useCreateCommunityComment = () => {
                 queryKey: ['community', 'comments', newComment.postId]
             })
             // 게시글의 댓글 수 업데이트
-            queryClient.setQueriesData(
+            queryClient.setQueriesData<CommunityPostListResponse | undefined>(
                 { queryKey: ['community', 'posts'] },
-                (old: any) => {
-                    if (old?.posts) {
-                        return {
-                            ...old,
-                            posts: old.posts.map((post: any) =>
-                                post.id === newComment.postId
-                                    ? { ...post, replies: post.replies + 1 }
-                                    : post
-                            ),
-                        }
-                    }
-                    return old
-                }
+                (old) =>
+                    old?.posts
+                        ? {
+                              ...old,
+                              posts: old.posts.map((post: CommunityPost) =>
+                                  post.id === newComment.postId
+                                      ? { ...post, replies: post.replies + 1 }
+                                      : post
+                              ),
+                          }
+                        : old
             )
         },
     })
