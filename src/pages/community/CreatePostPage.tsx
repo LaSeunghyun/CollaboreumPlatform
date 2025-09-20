@@ -99,15 +99,19 @@ export const CreatePostPage: React.FC = () => {
 
       console.warn('게시글 작성 요청 데이터:', postData);
 
-      const response = await communityPostAPI.createPost(postData) as any;
+      const createdPost = await communityPostAPI.createPost(postData) as any;
 
-      console.warn('게시글 작성 응답:', response);
+      console.warn('게시글 작성 응답:', createdPost);
 
-      if (response.success) {
-        window.alert(ERROR_MESSAGES.POST_SUCCESS);
+      if (createdPost && typeof createdPost === 'object') {
+        const successMessage =
+          typeof createdPost.title === 'string' && createdPost.title.trim()
+            ? `"${createdPost.title.trim()}" 게시글이 성공적으로 작성되었습니다.`
+            : ERROR_MESSAGES.POST_SUCCESS;
+        window.alert(successMessage);
         navigate('/community');
       } else {
-        window.alert(`${ERROR_MESSAGES.POST_FAILED} ${response.message || ERROR_MESSAGES.UNKNOWN_ERROR}`);
+        window.alert(`${ERROR_MESSAGES.POST_FAILED} ${ERROR_MESSAGES.UNKNOWN_ERROR}`);
       }
     } catch (error) {
       console.error('게시글 작성 오류:', error);

@@ -29,12 +29,20 @@ const ERROR_MESSAGES = {
   UNKNOWN_ERROR: '알 수 없는 오류'
 };
 
+type CommunityPost = {
+  id?: string;
+  title?: string;
+  content?: string;
+  category?: string;
+  tags?: string[];
+};
+
 export const EditPostPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [post, setPost] = useState<any>(null);
+  const [post, setPost] = useState<CommunityPost | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -49,17 +57,19 @@ export const EditPostPage: React.FC = () => {
       if (!postId) return;
       
       try {
-        const response = await communityPostAPI.getPost(postId) as any;
-        if (response.success && response.data) {
-          const postData = response.data;
-          setPost(postData);
+        const fetchedPost = await communityPostAPI.getPost(postId) as CommunityPost | null;
+
+        if (fetchedPost && typeof fetchedPost === 'object') {
+          setPost(fetchedPost);
           setFormData({
-            title: postData.title || '',
-            content: postData.content || '',
-            category: postData.category || '',
-            tags: postData.tags ? postData.tags.join(', ') : '',
+            title: fetchedPost.title || '',
+            content: fetchedPost.content || '',
+            category: fetchedPost.category || '',
+            tags: Array.isArray(fetchedPost.tags) ? fetchedPost.tags.join(', ') : '',
             images: []
           });
+        } else {
+          throw new Error('게시글 데이터를 찾을 수 없습니다.');
         }
       } catch (error) {
         console.error('게시글 로드 실패:', error);
@@ -132,15 +142,20 @@ export const EditPostPage: React.FC = () => {
 
       console.warn('게시글 수정 요청 데이터:', updateData);
 
-      const response = await communityPostAPI.updatePost(postId, updateData) as any;
+      const updatedPost = await communityPostAPI.updatePost(postId, updateData) as CommunityPost | null;
 
-      console.warn('게시글 수정 응답:', response);
+      console.warn('게시글 수정 응답:', updatedPost);
 
-      if (response.success) {
-        window.alert(ERROR_MESSAGES.POST_UPDATE_SUCCESS);
+      if (updatedPost && typeof updatedPost === 'object') {
+        setPost(updatedPost);
+        const successMessage =
+          typeof updatedPost.title === 'string' && updatedPost.title.trim()
+            ? `"${updatedPost.title.trim()}" 게시글이 성공적으로 수정되었습니다.`
+            : ERROR_MESSAGES.POST_UPDATE_SUCCESS;
+        window.alert(successMessage);
         navigate(`/community/${postId}`);
       } else {
-        window.alert(`${ERROR_MESSAGES.POST_UPDATE_FAILED} ${response.message || ERROR_MESSAGES.UNKNOWN_ERROR}`);
+        window.alert(`${ERROR_MESSAGES.POST_UPDATE_FAILED} ${ERROR_MESSAGES.UNKNOWN_ERROR}`);
       }
     } catch (error) {
       console.error('게시글 수정 오류:', error);
