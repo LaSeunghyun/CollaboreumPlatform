@@ -1,5 +1,5 @@
 // Components
-export * from './components/FundingProjectList';
+export * from './components';
 
 // Hooks
 export * from './hooks/useFundingProjects';

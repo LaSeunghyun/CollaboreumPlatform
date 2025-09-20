@@ -1,1 +1,0 @@
-export { FundingProjectDetail } from './FundingProjectDetail/FundingProjectDetail';

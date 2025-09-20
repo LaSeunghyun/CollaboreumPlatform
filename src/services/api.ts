@@ -612,6 +612,12 @@ export const fundingAPI = {
         body: JSON.stringify(projectData)
     }),
 
+    // 프로젝트 업데이트
+    updateProject: (projectId: string, projectData: any) => apiCall(`/funding/projects/${projectId}`, {
+        method: 'PUT',
+        body: JSON.stringify(projectData)
+    }),
+
     // 후원 참여
     backProject: (projectId: string, backData: any) => apiCall(`/funding/projects/${projectId}/back`, {
         method: 'POST',

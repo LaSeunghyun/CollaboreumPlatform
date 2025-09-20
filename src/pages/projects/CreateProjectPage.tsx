@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../shared/ui/Button';
-import { Input } from '../../components/ui/input';
-import { Textarea } from '../../components/ui/textarea';
-import { Label } from '../../components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { Label } from '@radix-ui/react-label';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Textarea
+} from '@/shared/ui';
 import { ArrowLeft, Upload, DollarSign, Target } from 'lucide-react';
-import { fundingAPI } from '../../services/api';
-import { useAuth } from '../../contexts/AuthContext';
+import { FundingModeSelector } from '@/features/funding/components';
+import { fundingAPI } from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 // 타입 정의
 declare global {
@@ -16,6 +26,8 @@ declare global {
     alert: (message?: any) => void;
   }
 }
+
+type FundingMode = 'all-or-nothing' | 'flexible';
 
 export const CreateProjectPage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,7 +41,9 @@ export const CreateProjectPage: React.FC = () => {
     duration: '',
     revenueShare: '',
     tags: '',
-    image: null as File | null
+    image: null as File | null,
+    fundingMode: 'all-or-nothing' as FundingMode,
+    secretPerks: ''
   });
 
   // 숫자 포맷팅 함수 (3자리마다 콤마)
@@ -102,6 +116,11 @@ export const CreateProjectPage: React.FC = () => {
       const endDate = new Date();
       endDate.setDate(endDate.getDate() + duration);
 
+      const secretPerks = formData.secretPerks
+        .split('\n')
+        .map(perk => perk.trim())
+        .filter(Boolean);
+
       const projectData = {
         title: formData.title,
         description: formData.description,
@@ -110,6 +129,8 @@ export const CreateProjectPage: React.FC = () => {
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
+        fundingMode: formData.fundingMode,
+        secretPerks,
         rewards: [], // 기본 보상 없음
         executionPlan: formData.description // 실행 계획은 설명으로 대체
       };
@@ -131,37 +152,39 @@ export const CreateProjectPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+    <div className="min-h-screen bg-surface py-8">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <Button
             variant="ghost"
-            onClick={() => navigate('/projects')}
+            size="sm"
+            tone="default"
             className="mb-4"
+            onClick={() => navigate('/projects')}
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="mr-2 h-4 w-4" />
             프로젝트 목록으로 돌아가기
           </Button>
-          <h1 className="text-3xl font-bold text-gray-900">새 프로젝트 등록</h1>
-          <p className="text-gray-600 mt-2">당신의 창작 프로젝트를 등록하고 후원을 받아보세요.</p>
+          <h1 className="text-3xl font-bold text-foreground">새 프로젝트 등록</h1>
+          <p className="mt-2 text-base text-muted-foreground">
+            당신의 창작 프로젝트를 등록하고 후원을 받아보세요.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* 카테고리 선택 */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-foreground">
+                <Target className="h-5 w-5 text-primary-500" />
                 카테고리 선택
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div>
-                <Label htmlFor="category" className="text-red-500 font-semibold">
-                  카테고리 <span className="text-red-500">*</span>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="category" className="text-sm font-semibold text-foreground">
+                  카테고리 <span className="text-danger-500">*</span>
                 </Label>
-                <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                <Select value={formData.category} onValueChange={value => handleInputChange('category', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="카테고리를 선택하세요" />
                   </SelectTrigger>
@@ -178,145 +201,175 @@ export const CreateProjectPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* 기본 정보 */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-foreground">
+                <Target className="h-5 w-5 text-primary-500" />
                 기본 정보
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div>
-                <Label htmlFor="title" className="text-red-500 font-semibold">
-                  프로젝트 제목 <span className="text-red-500">*</span>
+              <div className="space-y-2">
+                <Label htmlFor="title" className="text-sm font-semibold text-foreground">
+                  프로젝트 제목 <span className="text-danger-500">*</span>
                 </Label>
                 <Input
                   id="title"
                   value={formData.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  onChange={event => handleInputChange('title', event.target.value)}
                   placeholder="프로젝트 제목을 입력하세요"
                   required
                 />
               </div>
 
-              <div>
-                <Label htmlFor="description" className="text-red-500 font-semibold">
-                  프로젝트 설명 <span className="text-red-500">*</span>
+              <div className="space-y-2">
+                <Label htmlFor="description" className="text-sm font-semibold text-foreground">
+                  프로젝트 설명 <span className="text-danger-500">*</span>
                 </Label>
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  onChange={event => handleInputChange('description', event.target.value)}
                   placeholder="프로젝트에 대한 상세한 설명을 입력하세요"
                   rows={6}
                   required
                 />
               </div>
 
-              <div>
-                <Label htmlFor="tags">태그</Label>
+              <div className="space-y-2">
+                <Label htmlFor="tags" className="text-sm font-semibold text-foreground">
+                  태그
+                </Label>
                 <Input
                   id="tags"
                   value={formData.tags}
-                  onChange={(e) => handleInputChange('tags', e.target.value)}
+                  onChange={event => handleInputChange('tags', event.target.value)}
                   placeholder="태그를 쉼표로 구분하여 입력하세요 (예: 음악, 앨범, 인디)"
                 />
               </div>
             </CardContent>
           </Card>
 
-          {/* 펀딩 정보 */}
+          <Card>
+            <CardContent>
+              <FundingModeSelector
+                value={formData.fundingMode}
+                onChange={mode => handleInputChange('fundingMode', mode)}
+              />
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-foreground">
+                <DollarSign className="h-5 w-5 text-primary-500" />
                 펀딩 정보
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div>
-                <Label htmlFor="goal" className="text-red-500 font-semibold">
-                  목표 금액 (원) <span className="text-red-500">*</span>
+              <div className="space-y-2">
+                <Label htmlFor="goal" className="text-sm font-semibold text-foreground">
+                  목표 금액 (원) <span className="text-danger-500">*</span>
                 </Label>
                 <Input
                   id="goal"
                   value={formData.goal ? formatNumber(formData.goal) : ''}
-                  onChange={(e) => handleNumberChange('goal', e.target.value)}
+                  onChange={event => handleNumberChange('goal', event.target.value)}
                   placeholder="1,000,000"
                   required
                 />
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-muted-foreground">
                   숫자만 입력하세요. 자동으로 콤마가 추가됩니다.
                 </p>
               </div>
 
-              <div>
-                <Label htmlFor="duration" className="text-red-500 font-semibold">
-                  펀딩 기간 (일) <span className="text-red-500">*</span>
+              <div className="space-y-2">
+                <Label htmlFor="duration" className="text-sm font-semibold text-foreground">
+                  펀딩 기간 (일) <span className="text-danger-500">*</span>
                 </Label>
                 <Input
                   id="duration"
                   type="number"
                   value={formData.duration}
-                  onChange={(e) => handleInputChange('duration', e.target.value)}
+                  onChange={event => handleInputChange('duration', event.target.value)}
                   placeholder="30"
                   min="1"
                   max="365"
                   required
                 />
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-muted-foreground">
                   1일부터 365일까지 설정 가능합니다.
                 </p>
               </div>
 
-              <div>
-                <Label htmlFor="revenueShare" className="text-red-500 font-semibold">
-                  수익 공유율 (%) <span className="text-red-500">*</span>
+              <div className="space-y-2">
+                <Label htmlFor="revenueShare" className="text-sm font-semibold text-foreground">
+                  수익 공유율 (%) <span className="text-danger-500">*</span>
                 </Label>
                 <Input
                   id="revenueShare"
                   type="number"
                   value={formData.revenueShare}
-                  onChange={(e) => handleInputChange('revenueShare', e.target.value)}
+                  onChange={event => handleInputChange('revenueShare', event.target.value)}
                   placeholder="10"
                   min="1"
                   max="100"
                   required
                 />
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-muted-foreground">
                   후원자들에게 분배할 수익의 비율을 입력하세요. (1% ~ 100%)
                 </p>
               </div>
             </CardContent>
           </Card>
 
-          {/* 프로젝트 이미지 */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Upload className="w-5 h-5" />
+              <CardTitle className="text-foreground">비밀 혜택 구성</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Label htmlFor="secretPerks" className="text-sm font-semibold text-foreground">
+                비밀 혜택 설명
+              </Label>
+              <Textarea
+                id="secretPerks"
+                value={formData.secretPerks}
+                onChange={event => handleInputChange('secretPerks', event.target.value)}
+                placeholder="예: 일정 금액 이상 후원자에게 한정판 굿즈 제공"
+                rows={4}
+              />
+              <p className="text-sm text-muted-foreground">
+                줄바꿈으로 여러 혜택을 구분할 수 있습니다. 이 정보는 후원 완료 시에만 공개됩니다.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-foreground">
+                <Upload className="h-5 w-5 text-primary-500" />
                 프로젝트 이미지
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div>
-                  <Label htmlFor="image">대표 이미지 업로드</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="image" className="text-sm font-semibold text-foreground">
+                    대표 이미지 업로드
+                  </Label>
                   <Input
                     id="image"
                     type="file"
                     accept="image/*"
                     onChange={handleImageUpload}
-                    className="mt-2"
                   />
                 </div>
                 {formData.image && (
-                  <div className="mt-4">
+                  <div className="mt-2">
                     <img
                       src={URL.createObjectURL(formData.image)}
                       alt="프로젝트 미리보기"
-                      className="w-32 h-32 object-cover rounded-lg"
+                      className="h-32 w-32 rounded-2xl object-cover"
                     />
                   </div>
                 )}
@@ -324,20 +377,16 @@ export const CreateProjectPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* 제출 버튼 */}
           <div className="flex justify-end gap-4">
             <Button
               type="button"
               variant="outline"
+              tone="muted"
               onClick={() => navigate('/projects')}
             >
               취소
             </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-              variant="indigo"
-            >
+            <Button type="submit" variant="solid" tone="default" loading={loading} disabled={loading}>
               {loading ? '등록 중...' : '프로젝트 등록하기'}
             </Button>
           </div>
