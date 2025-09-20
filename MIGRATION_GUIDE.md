@@ -98,13 +98,19 @@ npm run check:all
 npm run migrate:components
 ```
 
+## 최신 적용 사례
+
+- `CreateProjectPage`와 `ProjectDetail` 화면은 `@/shared/ui` 버튼·카드·입력 컴포넌트로 전환되었으며 `bg-gray-50`/`text-red-500` 등의 하드코딩된 색상은 `bg-surface`, `text-muted-foreground`, `text-danger-500`와 같은 디자인 토큰으로 대체되었습니다.
+- 신규 `FundingModeSelector`, `SecretPerksEditor` 컴포넌트는 `@/features/funding/components`로 분리하여 페이지와 공유하고, `variant`/`size`/`tone` 프롭을 통해 테마 일관성을 보장합니다.
+- 라디오·알림 버튼에는 `aria-pressed`, `role="status"` 등 접근성 속성을 명시하여 키보드 및 스크린리더 환경을 대비합니다.
+
 ## 마이그레이션 체크리스트
 
-- [ ] Import 경로를 `@/shared/ui/*`로 변경
-- [ ] 하드코딩된 색상 클래스를 디자인 토큰으로 변경
-- [ ] 컴포넌트 props를 새로운 API에 맞게 업데이트
-- [ ] 접근성 속성 확인 (aria-*, role, tabIndex 등)
-- [ ] 테스트 코드 업데이트
+- [x] Import 경로를 `@/shared/ui/*`로 변경
+- [x] 하드코딩된 색상 클래스를 디자인 토큰으로 변경
+- [x] 컴포넌트 props를 새로운 API에 맞게 업데이트
+- [x] 접근성 속성 확인 (aria-*, role, tabIndex 등)
+- [x] 테스트 코드 업데이트
 - [ ] 스토리북 스토리 업데이트
 
 ## 주의사항

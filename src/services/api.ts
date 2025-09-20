@@ -612,6 +612,12 @@ export const fundingAPI = {
         body: JSON.stringify(projectData)
     }),
 
+    // 프로젝트 업데이트
+    updateProject: (projectId: string, projectData: any) => apiCall(`/funding/projects/${projectId}`, {
+        method: 'PUT',
+        body: JSON.stringify(projectData)
+    }),
+
     // 후원 참여
     backProject: (projectId: string, backData: any) => apiCall(`/funding/projects/${projectId}/back`, {
         method: 'POST',
@@ -850,10 +856,12 @@ export const categoryAPI = {
 export const isAPIAvailable = async (): Promise<boolean> => {
     try {
         const response = await api.get<{ success: boolean }>('/health');
-        if (typeof response === 'object' && response !== null && 'success' in response) {
-            return Boolean((response as any).success);
+
+        if (response.data && typeof response.data.success === 'boolean') {
+            return response.data.success;
         }
-        return true;
+
+        return response.success;
     } catch {
         return false;
     }

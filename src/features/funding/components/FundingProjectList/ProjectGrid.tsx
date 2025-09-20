@@ -1,17 +1,11 @@
 import React from "react";
 import { Card, CardContent, CardHeader } from "@/shared/ui/Card";
 import { Button } from "@/shared/ui/Button";
+import { Skeleton } from "@/shared/ui/Skeleton";
 import { FundingProject } from "../../types";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
-import { 
-    Heart, 
-    Users, 
-    Calendar, 
-    Target,
-    TrendingUp,
-    Clock
-} from "lucide-react";
+import { Users, Calendar, Target } from "lucide-react";
 
 interface ProjectGridProps {
   projects: FundingProject[];
@@ -50,11 +44,11 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
       case 'executing':
         return 'bg-warning-100 text-warning-700';
       case 'distributing':
-        return 'bg-info-100 text-info-700';
+        return 'bg-secondary-100 text-secondary-700';
       case 'closed':
-        return 'bg-gray-100 text-gray-700';
+        return 'bg-neutral-100 text-neutral-700';
       default:
-        return 'bg-gray-100 text-gray-700';
+        return 'bg-neutral-100 text-muted-foreground';
     }
   };
 
@@ -81,17 +75,17 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: 6 }).map((_, index) => (
-          <Card key={index} className="animate-pulse">
+          <Card key={index}>
             <CardHeader className="pb-3">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              <Skeleton className="mb-2 h-4 w-3/4" />
+              <Skeleton className="h-3 w-1/2" />
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <div className="h-20 bg-gray-200 rounded"></div>
-                <div className="h-3 bg-gray-200 rounded w-full"></div>
-                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                <div className="h-8 bg-gray-200 rounded"></div>
+                <Skeleton className="h-40 w-full rounded-2xl" />
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-2/3" />
+                <Skeleton className="h-8 w-full rounded-2xl" />
               </div>
             </CardContent>
           </Card>
@@ -103,8 +97,8 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
   if (projects.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="text-gray-500 mb-4">
-          <Target className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+        <div className="mb-4 text-muted-foreground">
+          <Target className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
           <p className="text-lg font-medium">프로젝트가 없습니다</p>
           <p className="text-sm">새로운 펀딩 프로젝트를 확인해보세요</p>
         </div>
@@ -115,18 +109,18 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {projects.map((project) => (
-        <Card 
-          key={project.id} 
-          className="hover:shadow-lg transition-all duration-200 cursor-pointer group"
+        <Card
+          key={project.id}
+          className="group cursor-pointer transition-all duration-200 hover:shadow-apple-lg"
           onClick={() => handleProjectClick(project)}
         >
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between mb-2">
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-primary-600 transition-colors">
+                <h3 className="text-lg font-semibold text-foreground line-clamp-2 transition-colors group-hover:text-primary-600">
                   {project.title}
                 </h3>
-                <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                   {project.shortDescription}
                 </p>
               </div>
@@ -134,8 +128,8 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
                 {getStatusText(project.status)}
               </span>
             </div>
-            
-            <div className="flex items-center space-x-4 text-sm text-gray-500">
+
+            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
               <div className="flex items-center space-x-1">
                 <Users className="w-4 h-4" />
                 <span>{project.backerCount}명</span>
@@ -156,7 +150,7 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
             <div className="space-y-4">
               {/* 프로젝트 이미지 */}
               {project.images.length > 0 && (
-                <div className="relative h-40 rounded-lg overflow-hidden bg-gray-100">
+                <div className="relative h-40 overflow-hidden rounded-2xl bg-neutral-100">
                   <img
                     src={project.images[0]}
                     alt={project.title}
@@ -173,12 +167,12 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
               {/* 진행률 바 */}
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">진행률</span>
-                  <span className="font-medium text-gray-900">{project.progress}%</span>
+                  <span className="text-muted-foreground">진행률</span>
+                  <span className="font-medium text-foreground">{project.progress}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="h-2 w-full rounded-full bg-muted/70">
                   <div
-                    className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                    className="h-2 rounded-full bg-primary-600 transition-all duration-300"
                     style={{ width: `${Math.min(project.progress, 100)}%` }}
                   />
                 </div>
@@ -187,14 +181,14 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
               {/* 금액 정보 */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">모금액</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-sm text-muted-foreground">모금액</span>
+                  <span className="font-semibold text-foreground">
                     {formatCurrency(project.currentAmount)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">목표액</span>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-muted-foreground">목표액</span>
+                  <span className="text-sm text-muted-foreground">
                     {formatCurrency(project.targetAmount)}
                   </span>
                 </div>
@@ -206,13 +200,13 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
                   {project.tags.slice(0, 3).map((tag, index) => (
                     <span
                       key={index}
-                      className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
+                      className="rounded-full bg-neutral-100 px-2 py-1 text-xs text-muted-foreground"
                     >
                       #{tag}
                     </span>
                   ))}
                   {project.tags.length > 3 && (
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-muted-foreground/70">
                       +{project.tags.length - 3}개
                     </span>
                   )}

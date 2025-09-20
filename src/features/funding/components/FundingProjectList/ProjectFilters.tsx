@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/shared/ui/Card";
 import { Button } from "@/shared/ui/Button";
+import { Badge } from "@/shared/ui/Badge";
 import { Input } from "@/shared/ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/Select";
 import { Checkbox } from "@/shared/ui/Checkbox";
@@ -122,10 +123,10 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Filter className="w-5 h-5 text-gray-600" />
-            <h3 className="text-lg font-semibold text-gray-900">필터</h3>
+            <Filter className="h-5 w-5 text-muted-foreground" />
+            <h3 className="text-lg font-semibold text-foreground">필터</h3>
             {hasActiveFilters && (
-              <span className="bg-primary-100 text-primary-700 text-xs px-2 py-1 rounded-full">
+              <span className="rounded-full bg-primary-100 px-2 py-1 text-xs text-primary-700">
                 {(filters.status?.length || 0) + (filters.tags?.length || 0) + (filters.search ? 1 : 0) + (filters.category ? 1 : 0) + (filters.minAmount || filters.maxAmount ? 1 : 0)}개 적용됨
               </span>
             )}
@@ -136,7 +137,7 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleReset}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <RotateCcw className="w-4 h-4 mr-1" />
                 초기화
@@ -146,7 +147,7 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
               variant="ghost"
               size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-muted-foreground hover:text-foreground"
             >
               {isExpanded ? '접기' : '더보기'}
             </Button>
@@ -157,9 +158,9 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
       <CardContent className="space-y-4">
         {/* 검색 */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">검색</label>
+          <label className="text-sm font-medium text-muted-foreground">검색</label>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground/70" />
             <Input
               placeholder="프로젝트 제목, 설명 검색..."
               value={filters.search}
@@ -172,7 +173,7 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
         {/* 기본 필터 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">카테고리</label>
+            <label className="text-sm font-medium text-muted-foreground">카테고리</label>
             <Select
               value={filters.category}
               onValueChange={(value) => handleFilterChange('category', value)}
@@ -192,7 +193,7 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">정렬</label>
+            <label className="text-sm font-medium text-muted-foreground">정렬</label>
             <div className="flex space-x-2">
               <Select
                 value={filters.sortBy}
@@ -227,10 +228,10 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
 
         {/* 확장된 필터 */}
         {isExpanded && (
-          <div className="space-y-6 pt-4 border-t border-gray-200">
+          <div className="space-y-6 border-t border-border/60 pt-4">
             {/* 상태 필터 */}
             <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-700">상태</label>
+              <label className="text-sm font-medium text-muted-foreground">상태</label>
               <div className="flex flex-wrap gap-2">
                 {statusOptions.map((option) => (
                   <label
@@ -241,7 +242,7 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
                       checked={filters.status?.includes(option.value) || false}
                       onCheckedChange={() => handleStatusToggle(option.value)}
                     />
-                    <span className="text-sm text-gray-700">{option.label}</span>
+                    <span className="text-sm text-muted-foreground">{option.label}</span>
                   </label>
                 ))}
               </div>
@@ -249,7 +250,7 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
 
             {/* 금액 범위 */}
             <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-700">목표 금액 범위</label>
+              <label className="text-sm font-medium text-muted-foreground">목표 금액 범위</label>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Input
@@ -272,36 +273,40 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
 
             {/* 인기 태그 */}
             <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-700">인기 태그</label>
+              <label className="text-sm font-medium text-muted-foreground">인기 태그</label>
               <div className="flex flex-wrap gap-2">
                 {popularTags.map((tag) => (
-                  <button
+                  <Button
                     key={tag}
+                    type="button"
+                    size="sm"
+                    variant={filters.tags?.includes(tag) ? "solid" : "outline"}
                     onClick={() => handleTagToggle(tag)}
-                    className={`px-3 py-1 rounded-full text-sm transition-colors ${filters.tags?.includes(tag)
-                        ? 'bg-primary-100 text-primary-700 border border-primary-200'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
+                    className="rounded-full"
                   >
                     #{tag}
-                  </button>
+                  </Button>
                 ))}
               </div>
               {filters.tags && filters.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {filters.tags.map((tag) => (
-                    <span
+                    <Badge
                       key={tag}
-                      className="inline-flex items-center space-x-1 bg-primary-100 text-primary-700 px-2 py-1 rounded-full text-sm"
+                      variant="outline"
+                      className="inline-flex items-center gap-1 rounded-full border-primary-200 bg-primary-50 text-primary-700"
                     >
                       <span>#{tag}</span>
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="size-5 rounded-full text-primary-700 hover:bg-primary-100"
                         onClick={() => handleTagToggle(tag)}
-                        className="hover:text-primary-900"
+                        aria-label={`태그 ${tag} 제거`}
                       >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </Badge>
                   ))}
                 </div>
               )}

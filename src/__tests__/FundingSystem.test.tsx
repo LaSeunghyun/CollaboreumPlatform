@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { BrowserRouter, useParams } from 'react-router-dom';
-import { AuthProvider } from '../contexts/AuthContext';
-import { FundingProjectDetail } from '../components/FundingProjectDetail';
-import { PaymentModal } from '../components/PaymentModal';
-import { FundingProjects } from '../components/FundingProjects';
-import { fundingAPI } from '../services/api';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { FundingProjectDetail } from '@/features/funding/components/FundingProjectDetail';
+import { PaymentModal } from '@/features/funding/components/PaymentModal';
+import { FundingProjects } from '@/features/funding/components/FundingProjects';
+import { fundingAPI } from '@/services/api';
 
 // Mock useParams
 jest.mock('react-router-dom', () => ({
@@ -14,7 +14,7 @@ jest.mock('react-router-dom', () => ({
 }));
 
 // Mock API calls with realistic responses
-jest.mock('../services/api', () => ({
+jest.mock('@/services/api', () => ({
     fundingAPI: {
         getProjectDetail: jest.fn(),
         getProjects: jest.fn(),
@@ -41,7 +41,7 @@ jest.mock('../services/api', () => ({
 }));
 
 // Mock dynamicConstantsService
-jest.mock('../services/constantsService', () => ({
+jest.mock('@/services/constantsService', () => ({
     dynamicConstantsService: {
         getPaymentMethods: jest.fn().mockResolvedValue([
             { id: 'card', label: '신용카드', icon: '💳' },
@@ -63,7 +63,7 @@ jest.mock('../services/constantsService', () => ({
 }));
 
 // Mock useRetry hook
-jest.mock('../hooks/useRetry', () => ({
+jest.mock('@/hooks/useRetry', () => ({
     useRetry: jest.fn(() => ({
         data: null,
         error: null,
@@ -94,7 +94,7 @@ describe('펀딩 시스템 기본 테스트', () => {
         (useParams as jest.Mock).mockReturnValue({ projectId: 'test-project-1' });
 
         // 기본 useRetry 모킹 설정
-        const { useRetry } = require('../hooks/useRetry');
+        const { useRetry } = require('@/hooks/useRetry');
         (useRetry as jest.Mock).mockReturnValue({
             data: null,
             error: null,
@@ -137,7 +137,7 @@ describe('펀딩 시스템 기본 테스트', () => {
             };
 
             // useRetry 모킹 설정 (이 테스트용)
-            const { useRetry } = require('../hooks/useRetry');
+            const { useRetry } = require('@/hooks/useRetry');
             (useRetry as jest.Mock).mockReturnValue({
                 data: mockProjectData,
                 error: null,
@@ -170,7 +170,7 @@ describe('펀딩 시스템 기본 테스트', () => {
 
         test('로딩 상태를 올바르게 표시해야 한다', () => {
             // useRetry 모킹 설정 (로딩 상태)
-            const { useRetry } = require('../hooks/useRetry');
+            const { useRetry } = require('@/hooks/useRetry');
             (useRetry as jest.Mock).mockReturnValue({
                 data: null,
                 error: null,
@@ -199,7 +199,7 @@ describe('펀딩 시스템 기본 테스트', () => {
 
         test('에러 상태를 올바르게 표시해야 한다', async () => {
             // useRetry 모킹 설정 (에러 상태)
-            const { useRetry } = require('../hooks/useRetry');
+            const { useRetry } = require('@/hooks/useRetry');
             (useRetry as jest.Mock).mockReturnValue({
                 data: null,
                 error: 'API 오류',

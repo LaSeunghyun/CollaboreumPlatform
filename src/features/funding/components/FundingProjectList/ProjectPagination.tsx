@@ -81,14 +81,14 @@ const ProjectPagination: React.FC<ProjectPaginationProps> = ({
     const visiblePages = getVisiblePages();
 
     return (
-        <div className="flex items-center justify-center space-x-1 mt-8">
+        <div className="mt-8 flex items-center justify-center space-x-1">
             {/* 이전 버튼 */}
             <Button
                 variant="outline"
                 size="sm"
                 onClick={handlePrevious}
                 disabled={currentPage === 1}
-                className="flex items-center space-x-1"
+                className="flex items-center gap-1"
             >
                 <ChevronLeft className="w-4 h-4" />
                 <span className="hidden sm:inline">이전</span>
@@ -104,7 +104,7 @@ const ProjectPagination: React.FC<ProjectPaginationProps> = ({
                                     key={`ellipsis-${index}`}
                                     className="flex items-center justify-center w-8 h-8"
                                 >
-                                    <MoreHorizontal className="w-4 h-4 text-gray-400" />
+                                    <MoreHorizontal className="h-4 w-4 text-muted-foreground/70" />
                                 </div>
                             );
                         }
@@ -118,11 +118,9 @@ const ProjectPagination: React.FC<ProjectPaginationProps> = ({
                                 variant={isCurrentPage ? "solid" : "outline"}
                                 size="sm"
                                 onClick={() => handlePageClick(pageNumber)}
-                                className={`w-8 h-8 p-0 ${
-                                    isCurrentPage
-                                        ? 'bg-primary-600 text-white hover:bg-primary-700'
-                                        : 'hover:bg-gray-50'
-                                }`}
+                                className="h-8 w-8 p-0"
+                                aria-current={isCurrentPage ? "page" : undefined}
+                                aria-pressed={isCurrentPage}
                             >
                                 {pageNumber}
                             </Button>
@@ -137,14 +135,14 @@ const ProjectPagination: React.FC<ProjectPaginationProps> = ({
                 size="sm"
                 onClick={handleNext}
                 disabled={currentPage === totalPages}
-                className="flex items-center space-x-1"
+                className="flex items-center gap-1"
             >
                 <span className="hidden sm:inline">다음</span>
                 <ChevronRight className="w-4 h-4" />
             </Button>
 
             {/* 페이지 정보 */}
-            <div className="ml-4 text-sm text-gray-500 hidden sm:block">
+            <div className="ml-4 hidden text-sm text-muted-foreground sm:block">
                 {currentPage} / {totalPages} 페이지
             </div>
         </div>

@@ -78,10 +78,16 @@ src/
 │   │   │   │   ├── ProjectHeader.tsx
 │   │   │   │   ├── ProjectTabs.tsx
 │   │   │   │   └── index.ts
+│   │   │   ├── FundingModeSelector/
+│   │   │   │   ├── FundingModeSelector.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── PaymentModal/
 │   │   │   │   ├── PaymentModal.tsx
 │   │   │   │   ├── PaymentForm.tsx
 │   │   │   │   ├── PaymentMethods.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── SecretPerksEditor/
+│   │   │   │   ├── SecretPerksEditor.tsx
 │   │   │   │   └── index.ts
 │   │   │   └── ...
 │   │   ├── hooks/
@@ -146,7 +152,7 @@ src/
 │   │   └── index.ts
 │   ├── funding/
 │   │   ├── FundingPage.tsx
-│   │   ├── CreateFundingPage.tsx
+│   │   ├── CreateProjectPage.tsx
 │   │   └── index.ts
 │   └── ...
 ├── lib/                      # 라이브러리 설정
@@ -345,6 +351,11 @@ export function useFundingProject(id: number) {
   });
 }
 ```
+
+### 경로 별칭 업데이트
+
+- `tsconfig.json`의 `paths` 설정에 `@/shared/*`, `@/features/*`, `@/components/*`, `@/pages/*`, `@/services/*`를 추가하여 기능 모듈과 페이지에서 공통 리소스를 명확하게 import할 수 있도록 했습니다.
+- 신규 펀딩 전용 컴포넌트(`FundingModeSelector`, `SecretPerksEditor`)와 페이지(`CreateProjectPage`)는 이 별칭을 사용해 순환 의존성을 피하고, 테스트에서도 동일한 경로를 사용합니다.
 
 ### Phase 3: 거대한 컴포넌트 분해 (2주)
 

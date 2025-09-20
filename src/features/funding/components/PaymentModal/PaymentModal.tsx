@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '../shared/ui/Button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Textarea } from './ui/textarea';
-import { Badge } from './ui/badge';
-import { Progress } from './ui/progress';
-import { Checkbox } from './ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Button } from '@/shared/ui/Button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   X,
   Lock,
@@ -14,9 +14,9 @@ import {
   AlertCircle,
   Loader2
 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { dynamicConstantsService } from '../services/constantsService';
-import { fundingAPI } from '../services/api';
+import { useAuth } from '@/contexts/AuthContext';
+import { dynamicConstantsService } from '@/services/constantsService';
+import { fundingAPI } from '@/services/api';
 
 interface PaymentModalProps {
   project: any;

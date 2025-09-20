@@ -148,6 +148,34 @@ const mapFundingProjectFromApi = (
   };
 };
 
+const ensureSuccess = <T>(response: ApiResponse<T>, fallbackMessage: string): ApiResponse<T> => {
+  if (!response.success) {
+    throw new Error(response.message || fallbackMessage);
+  }
+
+  return response;
+};
+
+const requireData = <T>(response: ApiResponse<T>, fallbackMessage: string): T => {
+  const safeResponse = ensureSuccess(response, fallbackMessage);
+
+  if (safeResponse.data === undefined || safeResponse.data === null) {
+    throw new Error(fallbackMessage);
+  }
+
+  return safeResponse.data;
+};
+
+const normalizeProjectList = (projects: FundingProjectApi[] | undefined | null): FundingProject[] => {
+  if (!projects) {
+    return [];
+  }
+
+  return projects
+    .map(mapFundingProjectFromApi)
+    .filter((project): project is FundingProject => project !== null);
+};
+
 class FundingService {
   // 펀딩 프로젝트 목록 조회
   async getProjects(filters?: FundingFilters): Promise<FundingProject[]> {
@@ -165,86 +193,117 @@ class FundingService {
     const queryString = params.toString();
     const endpoint = queryString ? `/funding/projects?${queryString}` : '/funding/projects';
 
-    const response = await api.get<ApiResponse<FundingProjectsResponse>>(endpoint);
+    const response = await api.get<FundingProjectsResponse>(endpoint);
+    const payload = ensureSuccess(response, '펀딩 프로젝트를 불러오지 못했습니다.').data;
 
-    if (!response.success) {
-      throw new Error(response.message || '펀딩 프로젝트를 불러오지 못했습니다.');
-    }
-
-    const projects = response.data?.projects ?? [];
-
-    return projects
-      .map(mapFundingProjectFromApi)
-      .filter((project): project is FundingProject => project !== null);
+    return normalizeProjectList(payload?.projects);
   }
 
   // 펀딩 프로젝트 상세 조회
   async getProject(id: number): Promise<FundingProject> {
-    const response = await api.get(`/funding/projects/${id}`);
-    return (response.data as any).data;
+    const response = await api.get<FundingProjectApi>(`/funding/projects/${id}`);
+    const project = requireData(response, '펀딩 프로젝트를 불러오지 못했습니다.');
+    const normalized = mapFundingProjectFromApi(project);
+
+    if (!normalized) {
+      throw new Error('유효한 펀딩 프로젝트 정보를 찾을 수 없습니다.');
+    }
+
+    return normalized;
   }
 
   // 펀딩 통계 조회
   async getStats(): Promise<FundingStats> {
-    const response = await api.get('/funding/stats');
-    return (response.data as any).data;
+    const response = await api.get<FundingStats>('/funding/stats');
+    return requireData(response, '펀딩 통계를 불러오지 못했습니다.');
   }
 
   // 펀딩 프로젝트 생성
   async createProject(data: CreateFundingProjectRequest): Promise<FundingProject> {
-    const response = await api.post('/funding/projects', data);
-    return (response.data as any).data;
+    const response = await api.post<FundingProjectApi>('/funding/projects', data);
+    const project = requireData(response, '펀딩 프로젝트 생성에 실패했습니다.');
+    const normalized = mapFundingProjectFromApi(project);
+
+    if (!normalized) {
+      throw new Error('생성된 펀딩 프로젝트 정보를 처리할 수 없습니다.');
+    }
+
+    return normalized;
   }
 
   // 펀딩 프로젝트 수정
   async updateProject(id: number, data: Partial<CreateFundingProjectRequest>): Promise<FundingProject> {
-    const response = await api.put(`/funding/projects/${id}`, data);
-    return (response.data as any).data;
+    const response = await api.put<FundingProjectApi>(`/funding/projects/${id}`, data);
+    const project = requireData(response, '펀딩 프로젝트 업데이트에 실패했습니다.');
+    const normalized = mapFundingProjectFromApi(project);
+
+    if (!normalized) {
+      throw new Error('업데이트된 펀딩 프로젝트 정보를 처리할 수 없습니다.');
+    }
+
+    return normalized;
   }
 
   // 펀딩 프로젝트 삭제
   async deleteProject(id: number): Promise<void> {
-    await api.delete(`/funding/projects/${id}`);
+    ensureSuccess(await api.delete(`/funding/projects/${id}`), '펀딩 프로젝트 삭제에 실패했습니다.');
   }
 
   // 프로젝트 후원
   async backProject(data: BackProjectRequest): Promise<{ paymentId: number; message: string }> {
-    const response = await api.post(`/funding/projects/${data.projectId}/back`, data);
-    return (response.data as any).data;
+    const response = await api.post<{ paymentId: number; message: string }>(
+      `/funding/projects/${data.projectId}/back`,
+      data
+    );
+
+    return requireData(response, '후원 처리에 실패했습니다.');
   }
 
   // 프로젝트 좋아요
   async likeProject(projectId: number): Promise<{ liked: boolean; likesCount: number }> {
-    const response = await api.post(`/funding/projects/${projectId}/like`);
-    return (response.data as any).data;
+    const response = await api.post<{ liked: boolean; likesCount: number }>(
+      `/funding/projects/${projectId}/like`
+    );
+
+    return requireData(response, '좋아요 처리에 실패했습니다.');
   }
 
   // 프로젝트 북마크
   async bookmarkProject(projectId: number): Promise<{ bookmarked: boolean }> {
-    const response = await api.post(`/funding/projects/${projectId}/bookmark`);
-    return (response.data as any).data;
+    const response = await api.post<{ bookmarked: boolean }>(
+      `/funding/projects/${projectId}/bookmark`
+    );
+
+    return requireData(response, '북마크 처리에 실패했습니다.');
   }
 
   // 사용자 후원 내역 조회
   async getUserBackings(userId: string): Promise<FundingProject[]> {
-    const response = await api.get(`/funding/users/${userId}/backings`);
-    return (response.data as any).data;
+    const response = await api.get<FundingProjectApi[]>(`/funding/users/${userId}/backings`);
+    const projects = ensureSuccess(response, '후원 내역을 불러오지 못했습니다.').data;
+
+    return normalizeProjectList(projects);
   }
 
   // 아티스트 프로젝트 목록 조회
   async getArtistProjects(artistId: string): Promise<FundingProject[]> {
-    const response = await api.get(`/funding/artists/${artistId}/projects`);
-    return (response.data as any).data;
+    const response = await api.get<FundingProjectApi[]>(`/funding/artists/${artistId}/projects`);
+    const projects = ensureSuccess(response, '아티스트 프로젝트를 불러오지 못했습니다.').data;
+
+    return normalizeProjectList(projects);
   }
 
   // 프로젝트 승인 (관리자)
   async approveProject(projectId: number): Promise<void> {
-    await api.post(`/funding/projects/${projectId}/approve`);
+    ensureSuccess(await api.post(`/funding/projects/${projectId}/approve`), '프로젝트 승인에 실패했습니다.');
   }
 
   // 프로젝트 거부 (관리자)
   async rejectProject(projectId: number, reason: string): Promise<void> {
-    await api.post(`/funding/projects/${projectId}/reject`, { reason });
+    ensureSuccess(
+      await api.post(`/funding/projects/${projectId}/reject`, { reason }),
+      '프로젝트 거부에 실패했습니다.'
+    );
   }
 }
 
