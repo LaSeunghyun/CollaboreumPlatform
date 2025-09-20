@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
     ArrowLeft,
     Heart,
@@ -12,7 +12,7 @@ import {
     // Users,
     // TrendingUp
 } from 'lucide-react';
-import { FundingProject } from '../../types/fundingProject';
+import { FundingProject } from '@/types/fundingProject';
 
 interface ProjectHeaderProps {
     project: FundingProject;

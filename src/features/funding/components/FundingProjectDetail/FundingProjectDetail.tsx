@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { fundingAPI } from '../../services/api';
-import { useRetry } from '../../hooks/useRetry';
+import { useAuth } from '@/contexts/AuthContext';
+import { fundingAPI } from '@/services/api';
+import { useRetry } from '@/hooks/useRetry';
 import { ProjectHeader } from './ProjectHeader';
 import { ProjectTabs } from './ProjectTabs';
-import { PaymentModal } from '../PaymentModal';
-import { FundingProject } from '../../types/fundingProject';
+import { PaymentModal } from '@/features/funding/components/PaymentModal';
+import { FundingProject } from '@/types/fundingProject';
 
 export const FundingProjectDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();

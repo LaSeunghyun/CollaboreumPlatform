@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Heart, Star, MessageCircle, Share2, Bookmark } from 'lucide-react';
 import { ImageWithFallback } from './atoms/ImageWithFallback';
-import { PaymentModal } from './PaymentModal';
+import { PaymentModal } from '@/features/funding/components/PaymentModal';
 import { fundingAPI, interactionAPI } from '../services/api';
 import { useCategories } from '../lib/api/useCategories';
 import { getCategoryColor } from '../constants/categories';
