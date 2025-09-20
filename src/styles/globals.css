@@ -5,7 +5,7 @@
 /* 디자인 토큰 CSS 변수 import */
 @import '../shared/theme/vars.css';
 
-@custom-variant dark (&:is(.dark *));
+/* @custom-variant dark (&:is(.dark *)); */
 
 :root {
   --font-size: 16px;
@@ -172,7 +172,7 @@
   * {
     @apply border-border;
   }
-  
+
   *:focus {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
