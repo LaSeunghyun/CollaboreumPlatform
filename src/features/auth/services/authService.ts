@@ -38,7 +38,7 @@ class AuthService {
             throw new Error(response.error || '로그인에 실패했습니다');
         }
 
-        const tokenCandidates = resolveAuthTokenCandidates(response);
+        const tokenCandidates = resolveAuthTokenCandidates(response, response.data);
         const candidateAccessToken = tokenCandidates.accessToken;
         const fallbackToken = tokenCandidates.fallbackToken;
         const rawRefreshToken = tokenCandidates.refreshToken;
@@ -91,7 +91,7 @@ class AuthService {
             throw new Error(response.error || '회원가입에 실패했습니다');
         }
 
-        const tokenCandidates = resolveAuthTokenCandidates(response);
+        const tokenCandidates = resolveAuthTokenCandidates(response, response.data);
         const storedTokens = persistTokens({
             accessToken: tokenCandidates.accessToken,
             fallbackToken: tokenCandidates.fallbackToken,
@@ -158,7 +158,7 @@ class AuthService {
             throw new Error(response.error || '토큰 갱신에 실패했습니다');
         }
 
-        const tokenCandidates = resolveAuthTokenCandidates(response);
+        const tokenCandidates = resolveAuthTokenCandidates(response, response.data);
         const storedTokens = persistTokens({
             accessToken: tokenCandidates.accessToken,
             fallbackToken: tokenCandidates.fallbackToken,

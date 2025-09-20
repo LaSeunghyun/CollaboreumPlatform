@@ -115,20 +115,49 @@ const pickValidToken = (...candidates: Array<string | null | undefined>): string
     return null;
 };
 
-export const resolveAuthTokenCandidates = (payload: unknown): {
+export const resolveAuthTokenCandidates = (
+    ...payloads: Array<unknown>
+): {
     accessToken: string | null;
     fallbackToken: string | null;
     refreshToken: string | null;
 } => {
-    if (typeof payload === 'string') {
+    const inputs = payloads.length > 0 ? payloads : [undefined];
+
+    const directStrings: string[] = [];
+    const nodes: ObjectRecord[] = [];
+    const seen = new Set<ObjectRecord>();
+
+    inputs.forEach(candidate => {
+        if (!candidate) {
+            return;
+        }
+
+        if (typeof candidate === 'string') {
+            const sanitized = sanitizeToken(candidate);
+            if (sanitized) {
+                directStrings.push(sanitized);
+            }
+            return;
+        }
+
+        const collected = collectCandidateObjects(candidate);
+        collected.forEach(node => {
+            if (!seen.has(node)) {
+                seen.add(node);
+                nodes.push(node);
+            }
+        });
+    });
+
+    const firstDirect = directStrings.find(Boolean);
+    if (firstDirect) {
         return {
-            accessToken: payload,
-            fallbackToken: payload,
+            accessToken: firstDirect,
+            fallbackToken: firstDirect,
             refreshToken: null,
         };
     }
-
-    const nodes = collectCandidateObjects(payload);
 
     if (nodes.length === 0) {
         return {

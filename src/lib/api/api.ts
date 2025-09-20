@@ -95,7 +95,7 @@ class ApiClient {
               if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
-                  const tokenCandidates = resolveAuthTokenCandidates(data);
+                  const tokenCandidates = resolveAuthTokenCandidates(data, data?.data);
                   const storedTokens = persistTokens({
                     accessToken: tokenCandidates.accessToken,
                     fallbackToken: tokenCandidates.fallbackToken,

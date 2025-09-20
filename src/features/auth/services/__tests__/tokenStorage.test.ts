@@ -98,6 +98,32 @@ describe('tokenStorage helpers', () => {
             });
         });
 
+        it('merges candidates across multiple payloads', () => {
+            const response = {
+                success: true,
+                message: 'ok',
+                refreshToken: `${SAMPLE_JWT}.refresh`,
+            };
+
+            const nested = {
+                token: SAMPLE_JWT,
+            };
+
+            expect(resolveAuthTokenCandidates(response, nested)).toEqual({
+                accessToken: null,
+                fallbackToken: SAMPLE_JWT,
+                refreshToken: `${SAMPLE_JWT}.refresh`,
+            });
+        });
+
+        it('returns direct string payloads as tokens', () => {
+            expect(resolveAuthTokenCandidates(`Bearer ${SAMPLE_JWT}`)).toEqual({
+                accessToken: SAMPLE_JWT,
+                fallbackToken: SAMPLE_JWT,
+                refreshToken: null,
+            });
+        });
+
         it('supports deeply nested payloads', () => {
             const response = {
                 result: {
