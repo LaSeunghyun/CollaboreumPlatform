@@ -1,6 +1,11 @@
-const getImportMetaEnv = (): Record<string, string | boolean | undefined> | undefined => {
+const getImportMetaEnv = ():
+  | Record<string, string | boolean | undefined>
+  | undefined => {
   try {
-    if (typeof import.meta !== 'undefined' && typeof import.meta.env !== 'undefined') {
+    if (
+      typeof import.meta !== 'undefined' &&
+      typeof import.meta.env !== 'undefined'
+    ) {
       return import.meta.env as Record<string, string | boolean | undefined>;
     }
   } catch {
@@ -33,17 +38,17 @@ export const isLocalEnvironment = (): boolean => {
     return getEnvVar('NODE_ENV') !== 'production';
   }
 
-  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  return (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1'
+  );
 };
 
 export const resolveApiBaseUrl = (): string => {
-  const fallback = isLocalEnvironment()
-    ? 'http://localhost:5000/api'
-    : 'https://collaboreumplatform-production.up.railway.app/api';
+  // 모든 환경에서 Railway 프로덕션 서버 사용
+  const fallback = 'https://collaboreumplatform-production.up.railway.app/api';
 
   return (
-    getEnvVar('VITE_API_BASE_URL') ??
-    getEnvVar('REACT_APP_API_URL') ??
-    fallback
+    getEnvVar('VITE_API_BASE_URL') ?? getEnvVar('REACT_APP_API_URL') ?? fallback
   );
 };

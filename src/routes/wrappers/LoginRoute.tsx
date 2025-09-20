@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import LoginPage from '@/components/LoginPage';
 import { useAuth } from '@/contexts/AuthContext';
-import { authService } from '@/features/auth/services/authService';
+import { authAPI } from '@/services/api';
 
 export const LoginRoute: React.FC = () => {
   const navigate = useNavigate();
@@ -15,33 +15,45 @@ export const LoginRoute: React.FC = () => {
     <LoginPage
       error={error}
       isLoading={isLoading}
-      onBack={() => navigate(-1)}
       onLogin={async ({ email, password, remember }) => {
         try {
           setIsLoading(true);
           setError(undefined);
 
-          const auth = await authService.login({ email, password });
+          const response = await authAPI.login({ email, password });
 
-          login(auth.accessToken, auth.user);
+          if (response.success && response.data) {
+            // 토큰을 localStorage에 저장
+            localStorage.setItem('accessToken', response.data.accessToken);
+            localStorage.setItem('refreshToken', response.data.refreshToken);
 
-          if (remember) {
-            localStorage.setItem('rememberEmail', email);
+            login(response.data.accessToken, response.data.user);
+
+            if (remember) {
+              localStorage.setItem('rememberEmail', email);
+            } else {
+              localStorage.removeItem('rememberEmail');
+            }
+
+            navigate('/');
           } else {
-            localStorage.removeItem('rememberEmail');
+            throw new Error(response.error || '로그인에 실패했습니다');
           }
-
-          navigate('/');
         } catch (err) {
-          setError(err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다.');
+          setError(
+            err instanceof Error
+              ? err.message
+              : '로그인 중 오류가 발생했습니다.',
+          );
         } finally {
           setIsLoading(false);
         }
       }}
       onSignupClick={() => navigate('/signup')}
       onForgotPassword={() => navigate('/account/password-reset')}
-      onSocialLogin={(provider) => {
-        console.info(`소셜 로그인 시도: ${provider}`);
+      onSocialLogin={provider => {
+        // TODO: 소셜 로그인 구현
+        console.warn(`소셜 로그인 시도: ${provider}`);
       }}
     />
   );
