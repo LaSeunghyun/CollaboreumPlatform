@@ -1,6 +1,16 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from 'axios';
 import { resolveApiBaseUrl } from '@/lib/config/env';
-import { ApiResponse, ApiError, ApiRequestConfig, ApiEndpoint } from '@/shared/types';
+import {
+  ApiResponse,
+  ApiError,
+  ApiRequestConfig,
+  ApiEndpoint,
+} from '@/shared/types';
 
 class ApiClient {
   private client: AxiosInstance;
@@ -19,24 +29,83 @@ class ApiClient {
 
   private setupInterceptors() {
     this.client.interceptors.request.use(
-      (config) => {
-        const token = localStorage.getItem('authToken') ?? localStorage.getItem('accessToken');
+      config => {
+        const authToken = localStorage.getItem('authToken');
+        const accessToken = localStorage.getItem('accessToken');
+        const token = authToken ?? accessToken;
+
+        // 디버깅을 위한 로그
+        console.log('🔍 API Request Debug:', {
+          url: config.url,
+          authToken: authToken ? `${authToken.substring(0, 20)}...` : 'null',
+          accessToken: accessToken
+            ? `${accessToken.substring(0, 20)}...`
+            : 'null',
+          selectedToken: token ? `${token.substring(0, 20)}...` : 'null',
+          headers: config.headers,
+        });
+
         if (token) {
           config.headers = config.headers ?? {};
           config.headers.Authorization = `Bearer ${token}`;
+        } else {
+          console.warn('⚠️ No auth token found in localStorage');
         }
         return config;
       },
-      (error) => Promise.reject(this.handleError(error))
+      error => Promise.reject(this.handleError(error)),
     );
 
     this.client.interceptors.response.use(
       (response: AxiosResponse) => response,
-      (error) => Promise.reject(this.handleError(error))
+      async error => {
+        // 401 에러 시 토큰 갱신 시도
+        if (error.response?.status === 401) {
+          const refreshToken = localStorage.getItem('refreshToken');
+          if (refreshToken) {
+            try {
+              console.log('🔄 Attempting token refresh...');
+              const response = await fetch(
+                `${this.client.defaults.baseURL}/auth/refresh`,
+                {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ refreshToken }),
+                },
+              );
+
+              if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.data) {
+                  // 새로운 토큰 저장
+                  localStorage.setItem('authToken', data.data.accessToken);
+                  localStorage.setItem('accessToken', data.data.accessToken);
+                  localStorage.setItem('refreshToken', data.data.refreshToken);
+
+                  console.log('✅ Token refreshed successfully');
+
+                  // 원래 요청 재시도
+                  const originalRequest = error.config;
+                  originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
+                  return this.client.request(originalRequest);
+                }
+              }
+            } catch (refreshError) {
+              console.error('❌ Token refresh failed:', refreshError);
+            }
+          }
+        }
+
+        return Promise.reject(this.handleError(error));
+      },
     );
   }
 
-  private clearStoredAuth(reason: 'unauthorized' | 'forbidden' | 'unknown' = 'unknown') {
+  private clearStoredAuth(
+    reason: 'unauthorized' | 'forbidden' | 'unknown' = 'unknown',
+  ) {
     localStorage.removeItem('authToken');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
@@ -80,7 +149,10 @@ class ApiClient {
     };
   }
 
-  async request<T = unknown>(endpoint: ApiEndpoint, config: ApiRequestConfig = {}): Promise<ApiResponse<T>> {
+  async request<T = unknown>(
+    endpoint: ApiEndpoint,
+    config: ApiRequestConfig = {},
+  ): Promise<ApiResponse<T>> {
     const { method = 'GET', params, headers, data, body, timeout } = config;
 
     const requestConfig: AxiosRequestConfig = {
@@ -96,7 +168,10 @@ class ApiClient {
     return response.data;
   }
 
-  async get<T>(endpoint: ApiEndpoint, params?: Record<string, any>): Promise<ApiResponse<T>> {
+  async get<T>(
+    endpoint: ApiEndpoint,
+    params?: Record<string, any>,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { method: 'GET', params });
   }
 
@@ -117,7 +192,11 @@ class ApiClient {
   }
 
   // 파일 업로드
-  async uploadFile<T>(endpoint: ApiEndpoint, file: File, onProgress?: (progress: number) => void): Promise<ApiResponse<T>> {
+  async uploadFile<T>(
+    endpoint: ApiEndpoint,
+    file: File,
+    onProgress?: (progress: number) => void,
+  ): Promise<ApiResponse<T>> {
     const formData = new FormData();
     formData.append('file', file);
 
@@ -125,20 +204,28 @@ class ApiClient {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      onUploadProgress: (progressEvent) => {
+      onUploadProgress: progressEvent => {
         if (onProgress && progressEvent.total) {
-          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          const progress = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total,
+          );
           onProgress(progress);
         }
       },
     };
 
-    const response = await this.client.post<ApiResponse<T>>(endpoint, formData, config);
+    const response = await this.client.post<ApiResponse<T>>(
+      endpoint,
+      formData,
+      config,
+    );
     return response.data;
   }
 
   // 배치 요청
-  async batch<T>(requests: Array<{ method: string; endpoint: ApiEndpoint; data?: any }>): Promise<Array<ApiResponse<T>>> {
+  async batch<T>(
+    requests: Array<{ method: string; endpoint: ApiEndpoint; data?: any }>,
+  ): Promise<Array<ApiResponse<T>>> {
     const promises = requests.map(({ method, endpoint, data }) => {
       switch (method.toUpperCase()) {
         case 'GET':
