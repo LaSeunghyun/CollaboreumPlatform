@@ -94,7 +94,7 @@ describe('펀딩 시스템 기본 테스트', () => {
         (useParams as jest.Mock).mockReturnValue({ projectId: 'test-project-1' });
 
         // 기본 useRetry 모킹 설정
-        const { useRetry } = require('@/hooks/useRetry');
+        const { useRetry } = await import('@/hooks/useRetry');
         (useRetry as jest.Mock).mockReturnValue({
             data: null,
             error: null,
@@ -137,7 +137,7 @@ describe('펀딩 시스템 기본 테스트', () => {
             };
 
             // useRetry 모킹 설정 (이 테스트용)
-            const { useRetry } = require('@/hooks/useRetry');
+            const { useRetry } = await import('@/hooks/useRetry');
             (useRetry as jest.Mock).mockReturnValue({
                 data: mockProjectData,
                 error: null,
@@ -170,7 +170,7 @@ describe('펀딩 시스템 기본 테스트', () => {
 
         test('로딩 상태를 올바르게 표시해야 한다', () => {
             // useRetry 모킹 설정 (로딩 상태)
-            const { useRetry } = require('@/hooks/useRetry');
+            const { useRetry } = await import('@/hooks/useRetry');
             (useRetry as jest.Mock).mockReturnValue({
                 data: null,
                 error: null,
@@ -199,7 +199,7 @@ describe('펀딩 시스템 기본 테스트', () => {
 
         test('에러 상태를 올바르게 표시해야 한다', async () => {
             // useRetry 모킹 설정 (에러 상태)
-            const { useRetry } = require('@/hooks/useRetry');
+            const { useRetry } = await import('@/hooks/useRetry');
             (useRetry as jest.Mock).mockReturnValue({
                 data: null,
                 error: 'API 오류',

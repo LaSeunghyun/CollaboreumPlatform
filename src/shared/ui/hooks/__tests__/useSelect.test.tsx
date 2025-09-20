@@ -4,10 +4,10 @@ import * as React from 'react'
 
 const mockChildren = (
     <>
-    <div value= "option1" > Option 1 </div>
-        < div value = "option2" > Option 2 </div>
-            < div value = "option3" > Option 3 </div>
-                </>
+        <div value="option1">Option 1</div>
+        <div value="option2">Option 2</div>
+        <div value="option3">Option 3</div>
+    </>
 )
 
 describe('useSelect Hook', () => {

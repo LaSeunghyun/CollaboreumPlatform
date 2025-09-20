@@ -114,6 +114,28 @@ module.exports = [
     }
   },
   {
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: require('@typescript-eslint/parser'),
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true
+        }
+      }
+    },
+    plugins: {
+      '@typescript-eslint': require('@typescript-eslint/eslint-plugin')
+    },
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-require-imports': 'error',
+      'no-undef': 'off'
+    }
+  },
+  {
     files: ['**/*.test.*', '**/*.spec.*', '**/__tests__/**/*'],
     rules: { 
       'no-undef': 'off',
@@ -121,8 +143,6 @@ module.exports = [
   },
   {
     ignores: [
-      '**/*.ts',
-      '**/*.tsx',
       'cypress/',
       'server/',
       'scripts/',
