@@ -4,6 +4,15 @@ import axios, {
   AxiosRequestConfig,
   AxiosResponse,
 } from 'axios';
+import {
+  clearTokens,
+  cleanInvalidTokens,
+  getStoredAccessToken,
+  getStoredRefreshToken,
+  getTokenSnapshot,
+  persistTokens,
+  previewToken,
+} from '@/features/auth/services/tokenStorage';
 import { resolveApiBaseUrl } from '@/lib/config/env';
 import {
   ApiResponse,
@@ -24,38 +33,31 @@ class ApiClient {
       },
     });
 
+    cleanInvalidTokens();
     this.setupInterceptors();
   }
 
   private setupInterceptors() {
     this.client.interceptors.request.use(
       config => {
-        const authToken = localStorage.getItem('authToken');
-        const accessToken = localStorage.getItem('accessToken');
-        
-        // "undefined" 문자열이나 null 값 필터링
-        const validAuthToken = authToken && authToken !== 'null' && authToken !== 'undefined' ? authToken : null;
-        const validAccessToken = accessToken && accessToken !== 'null' && accessToken !== 'undefined' ? accessToken : null;
-        
-        const token = validAuthToken ?? validAccessToken;
+        const token = getStoredAccessToken();
+        const refreshToken = getStoredRefreshToken();
 
         // 디버깅을 위한 로그
         console.log('🔍 API Request Debug:', {
           url: config.url,
-          authToken: authToken ? `${authToken.substring(0, 20)}...` : 'null',
-          accessToken: accessToken
-            ? `${accessToken.substring(0, 20)}...`
-            : 'null',
-          selectedToken: token ? `${token.substring(0, 20)}...` : 'null',
+          accessToken: previewToken(token),
+          refreshToken: previewToken(refreshToken),
           headers: config.headers,
         });
 
         // localStorage 전체 상태 확인
+        const snapshot = getTokenSnapshot();
         console.log('🔍 localStorage 전체 상태:', {
-          allKeys: Object.keys(localStorage),
-          authToken: localStorage.getItem('authToken'),
-          accessToken: localStorage.getItem('accessToken'),
-          refreshToken: localStorage.getItem('refreshToken')
+          keys: snapshot.keys,
+          authToken: previewToken(snapshot.authToken),
+          accessToken: previewToken(snapshot.accessToken),
+          refreshToken: previewToken(snapshot.refreshToken),
         });
 
         if (token) {
@@ -74,7 +76,7 @@ class ApiClient {
       async error => {
         // 401 에러 시 토큰 갱신 시도
         if (error.response?.status === 401) {
-          const refreshToken = localStorage.getItem('refreshToken');
+          const refreshToken = getStoredRefreshToken();
           if (refreshToken) {
             try {
               console.log('🔄 Attempting token refresh...');
@@ -92,17 +94,23 @@ class ApiClient {
               if (response.ok) {
                 const data = await response.json();
                 if (data.success && data.data) {
-                  // 새로운 토큰 저장
-                  localStorage.setItem('authToken', data.data.accessToken);
-                  localStorage.setItem('accessToken', data.data.accessToken);
-                  localStorage.setItem('refreshToken', data.data.refreshToken);
+                  const storedTokens = persistTokens({
+                    accessToken: data.data.accessToken ?? null,
+                    fallbackToken: data.data.token ?? null,
+                    refreshToken: data.data.refreshToken ?? refreshToken,
+                  });
 
-                  console.log('✅ Token refreshed successfully');
+                  if (storedTokens.accessToken) {
+                    console.log('✅ Token refreshed successfully');
 
-                  // 원래 요청 재시도
-                  const originalRequest = error.config;
-                  originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
-                  return this.client.request(originalRequest);
+                    const originalRequest = error.config;
+                    originalRequest.headers = originalRequest.headers ?? {};
+                    originalRequest.headers.Authorization = `Bearer ${storedTokens.accessToken}`;
+                    return this.client.request(originalRequest);
+                  }
+
+                  console.error('❌ Token refresh failed: response did not contain a usable token.');
+                  clearTokens();
                 }
               }
             } catch (refreshError) {
@@ -119,9 +127,7 @@ class ApiClient {
   private clearStoredAuth(
     reason: 'unauthorized' | 'forbidden' | 'unknown' = 'unknown',
   ) {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    clearTokens();
     localStorage.removeItem('authUser');
 
     if (typeof window !== 'undefined') {

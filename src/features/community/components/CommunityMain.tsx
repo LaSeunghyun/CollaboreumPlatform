@@ -7,10 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/ui/Tabs";
 import { ErrorMessage, ProjectListSkeleton } from "@/shared/ui";
 import { useCommunityPosts } from "@/lib/api/useCommunityPosts";
-import type { CommunityPost, CommunityPostListQuery } from "../types";
+import { useCategories } from "@/lib/api/useCategories";
+import { useCreateCommunityPost } from "@/features/community/hooks/useCommunityPosts";
+import { useCommunityStats } from "@/features/community/hooks/useCommunity";
+import type { CommunityPost, CommunityPostListQuery, CreateCommunityPostData } from "../types";
 import PostCard from "./PostCard";
 import PostForm from "./PostForm";
 import { Search, Plus, Filter, TrendingUp, Clock, Star } from "lucide-react";
+import { toast } from "sonner";
 
 interface CommunityMainProps {
     onPostClick?: (post: CommunityPost) => void;
@@ -167,6 +171,14 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
         refetch,
     } = useCommunityPosts(query);
 
+    const { data: categoriesData = [], error: categoriesError, refetch: refetchCategories } = useCategories();
+    const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useCommunityStats();
+    const {
+        mutateAsync: createCommunityPost,
+        isPending: isCreatePending,
+        isLoading: isCreateLoading,
+    } = useCreateCommunityPost();
+
     const posts = useMemo<CommunityPost[]>(() => {
         if (!data) {
             return [];
@@ -201,19 +213,86 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
         return undefined;
     }, [data]);
 
-    const allowedTabs = ["all", "general", "question", "discussion", "collaboration"] as const;
-    const activeTab = allowedTabs.includes(categoryParam as typeof allowedTabs[number]) ? categoryParam : "all";
+    const tabItems = useMemo(() => {
+        if (!categoriesData || !Array.isArray(categoriesData)) {
+            return [{ value: "all", label: "전체" }];
+        }
+
+        const unique = new Map<string, { value: string; label: string }>();
+
+        categoriesData.forEach(category => {
+            const rawValue =
+                (category as any).value ||
+                (category as any).id ||
+                (category as any).name ||
+                (category as any).label;
+
+            if (!rawValue || typeof rawValue !== "string") {
+                return;
+            }
+
+            const normalizedValue = rawValue.trim();
+            if (!normalizedValue) {
+                return;
+            }
+
+            const label =
+                (category as any).label ||
+                (category as any).name ||
+                normalizedValue;
+
+            if (!unique.has(normalizedValue)) {
+                unique.set(normalizedValue, {
+                    value: normalizedValue,
+                    label,
+                });
+            }
+        });
+
+        return [{ value: "all", label: "전체" }, ...Array.from(unique.values())];
+    }, [categoriesData]);
+
+    const allowedTabs = useMemo(() => tabItems.map(item => item.value), [tabItems]);
+    const activeTab = allowedTabs.includes(categoryParam) ? categoryParam : "all";
     const allowedSorts = ["latest", "popular", "trending"] as const;
     const normalizedSort = allowedSorts.includes(sortParam as typeof allowedSorts[number]) ? sortParam : "latest";
-    const totalPosts = pagination?.total ?? posts.length;
+    const normalizedStats = useMemo(() => ({
+        totalPosts: stats?.totalPosts ?? 0,
+        activeUsers: stats?.activeUsers ?? 0,
+        totalComments: stats?.totalComments ?? 0,
+        avgLikes: stats?.avgLikes ?? 0,
+        postsGrowthRate: stats?.postsGrowthRate ?? 0,
+        usersGrowthRate: stats?.usersGrowthRate ?? 0,
+    }), [stats]);
 
-    const handleCreatePost = (data: any) => {
-        console.log("Creating post:", data);
-        setShowCreateForm(false);
-        onCreatePost?.();
-        refetch();
-        // 실제로는 API 호출
-    };
+    const formatGrowth = useCallback((value: number) => {
+        if (value > 0) {
+            return `▲ ${value}%`;
+        }
+        if (value < 0) {
+            return `▼ ${Math.abs(value)}%`;
+        }
+        return "변동 없음";
+    }, []);
+
+    const handleCreatePost = useCallback(async (data: CreateCommunityPostData) => {
+        try {
+            await createCommunityPost(data);
+            toast.success("게시글이 등록되었습니다.");
+            setShowCreateForm(false);
+            onCreatePost?.();
+            refetch();
+            refetchStats();
+        } catch (mutationError) {
+            console.error("게시글 생성 실패:", mutationError);
+            const message = mutationError instanceof Error
+                ? mutationError.message
+                : "게시글 등록 중 오류가 발생했습니다.";
+            toast.error(message);
+        }
+    }, [createCommunityPost, onCreatePost, refetch, refetchStats]);
+
+    const isCreatingPost = (isCreatePending ?? false) || (isCreateLoading ?? false);
 
     const handlePostClick = (post: CommunityPost) => {
         if (onPostClick) {
@@ -268,70 +347,117 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
 
                 {/* 통계 */}
                 {showStats && (
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                        <Card>
-                            <CardContent className="p-4">
-                                <div className="flex items-center space-x-2">
-                                    <TrendingUp className="w-5 h-5 text-primary-600" />
-                                    <div>
-                                        <p className="text-sm text-gray-600">오늘의 게시글</p>
-                                        <p className="text-2xl font-bold text-gray-900">12</p>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardContent className="p-4">
-                                <div className="flex items-center space-x-2">
-                                    <Clock className="w-5 h-5 text-blue-600" />
-                                    <div>
-                                        <p className="text-sm text-gray-600">활성 사용자</p>
-                                        <p className="text-2xl font-bold text-gray-900">156</p>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardContent className="p-4">
-                                <div className="flex items-center space-x-2">
-                                    <Star className="w-5 h-5 text-yellow-600" />
-                                    <div>
-                                        <p className="text-sm text-gray-600">인기 게시글</p>
-                                        <p className="text-2xl font-bold text-gray-900">8</p>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardContent className="p-4">
-                                <div className="flex items-center space-x-2">
-                                    <Filter className="w-5 h-5 text-green-600" />
-                                    <div>
-                                        <p className="text-sm text-gray-600">총 게시글</p>
-                                        <p className="text-2xl font-bold text-gray-900">{totalPosts.toLocaleString()}</p>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
+                    <div className="mb-8 space-y-4">
+                        {statsError ? (
+                            <Card>
+                                <CardContent className="p-6 text-center space-y-3">
+                                    <p className="text-sm text-gray-600">커뮤니티 통계를 불러오지 못했습니다.</p>
+                                    <Button size="sm" variant="outline" onClick={() => refetchStats()}>
+                                        다시 시도
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                                <Card>
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-sm text-gray-600">총 게시글</p>
+                                                <p className="text-2xl font-bold text-gray-900">
+                                                    {statsLoading ? "..." : normalizedStats.totalPosts.toLocaleString()}
+                                                </p>
+                                            </div>
+                                            <TrendingUp className="w-5 h-5 text-primary-600" />
+                                        </div>
+                                        <p className="mt-2 text-xs text-gray-500">
+                                            주간 증감: {statsLoading ? "..." : formatGrowth(normalizedStats.postsGrowthRate)}
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                                <Card>
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-sm text-gray-600">최근 30일 활성 사용자</p>
+                                                <p className="text-2xl font-bold text-gray-900">
+                                                    {statsLoading ? "..." : normalizedStats.activeUsers.toLocaleString()}
+                                                </p>
+                                            </div>
+                                            <Clock className="w-5 h-5 text-blue-600" />
+                                        </div>
+                                        <p className="mt-2 text-xs text-gray-500">
+                                            주간 증감: {statsLoading ? "..." : formatGrowth(normalizedStats.usersGrowthRate)}
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                                <Card>
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-sm text-gray-600">총 댓글</p>
+                                                <p className="text-2xl font-bold text-gray-900">
+                                                    {statsLoading ? "..." : normalizedStats.totalComments.toLocaleString()}
+                                                </p>
+                                            </div>
+                                            <Filter className="w-5 h-5 text-green-600" />
+                                        </div>
+                                        <p className="mt-2 text-xs text-gray-500">
+                                            커뮤니티 참여 지표
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                                <Card>
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-sm text-gray-600">평균 좋아요</p>
+                                                <p className="text-2xl font-bold text-gray-900">
+                                                    {statsLoading ? "..." : normalizedStats.avgLikes.toLocaleString()}
+                                                </p>
+                                            </div>
+                                            <Star className="w-5 h-5 text-yellow-600" />
+                                        </div>
+                                        <p className="mt-2 text-xs text-gray-500">
+                                            게시글당 평균 반응 수
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        )}
                     </div>
                 )}
 
                 {/* 탭 및 게시글 목록 */}
                 <div className="space-y-6">
                     <Tabs value={activeTab} onValueChange={handleTabChange}>
-                        <TabsList className="grid w-full grid-cols-5">
-                            <TabsTrigger value="all">전체</TabsTrigger>
-                            <TabsTrigger value="general">일반</TabsTrigger>
-                            <TabsTrigger value="question">질문</TabsTrigger>
-                            <TabsTrigger value="discussion">토론</TabsTrigger>
-                            <TabsTrigger value="collaboration">협업</TabsTrigger>
+                        <TabsList className="flex w-full flex-wrap gap-2">
+                            {tabItems.map(item => (
+                                <TabsTrigger key={item.value} value={item.value} className="flex-1 sm:flex-none">
+                                    {item.label}
+                                </TabsTrigger>
+                            ))}
                         </TabsList>
+                        {categoriesError && (
+                            <div className="mt-2 flex items-center justify-end gap-2 text-xs text-gray-500">
+                                <span>카테고리를 불러오지 못했습니다.</span>
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => refetchCategories()}
+                                    className="h-6 px-2 text-xs"
+                                >
+                                    다시 시도
+                                </Button>
+                            </div>
+                        )}
 
                         <TabsContent value={activeTab} className="mt-6">
                             {showCreateForm ? (
                                 <PostForm
                                     onSubmit={handleCreatePost}
                                     onCancel={() => setShowCreateForm(false)}
+                                    isLoading={isCreatingPost}
                                 />
                             ) : (
                                 <div className="space-y-4">
