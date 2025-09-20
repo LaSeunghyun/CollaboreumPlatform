@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../shared/ui/Button';
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { ArrowLeft, Save, X } from 'lucide-react';
 import { communityPostAPI } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCategories } from '../../lib/api/useCategories';
 
 // 타입 정의
 declare global {
@@ -42,6 +43,46 @@ export const EditPostPage: React.FC = () => {
     tags: '',
     images: [] as File[]
   });
+  const { data: categories = [], isLoading: categoriesLoading, error: categoriesError, refetch: refetchCategories } = useCategories();
+
+  const categoryOptions = useMemo(() => {
+    if (!categories || !Array.isArray(categories)) {
+      return [];
+    }
+
+    const unique = new Map<string, { value: string; label: string }>();
+
+    categories.forEach(category => {
+      const rawValue =
+        (category as any).value ||
+        (category as any).id ||
+        (category as any).name ||
+        (category as any).label;
+
+      if (!rawValue || typeof rawValue !== 'string') {
+        return;
+      }
+
+      const normalizedValue = rawValue.trim();
+      if (!normalizedValue) {
+        return;
+      }
+
+      const label =
+        (category as any).label ||
+        (category as any).name ||
+        normalizedValue;
+
+      if (!unique.has(normalizedValue)) {
+        unique.set(normalizedValue, {
+          value: normalizedValue,
+          label,
+        });
+      }
+    });
+
+    return Array.from(unique.values());
+  }, [categories]);
 
   // 게시글 데이터 로드
   useEffect(() => {
@@ -203,18 +244,42 @@ export const EditPostPage: React.FC = () => {
               {/* 카테고리 */}
               <div>
                 <Label htmlFor="category">카테고리 *</Label>
-                <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) => handleInputChange('category', value)}
+                  disabled={categoriesLoading || loading}
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="카테고리를 선택하세요" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="general">일반</SelectItem>
-                    <SelectItem value="question">질문</SelectItem>
-                    <SelectItem value="tip">팁</SelectItem>
-                    <SelectItem value="review">리뷰</SelectItem>
-                    <SelectItem value="news">뉴스</SelectItem>
+                    {categoryOptions.length === 0 ? (
+                      <div className="px-3 py-2 text-sm text-gray-500">
+                        {categoriesLoading ? '카테고리를 불러오는 중입니다...' : '사용 가능한 카테고리가 없습니다.'}
+                      </div>
+                    ) : (
+                      categoryOptions.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
+                {categoriesError && (
+                  <div className="mt-2 flex items-center gap-2 text-sm text-red-500">
+                    <span>카테고리를 불러오지 못했습니다.</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => refetchCategories()}
+                    >
+                      다시 시도
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {/* 내용 */}
