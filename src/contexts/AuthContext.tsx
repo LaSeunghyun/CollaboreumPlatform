@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { authAPI } from '../services/api';
 
 interface User {
@@ -33,6 +33,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const logout = useCallback(() => {
+    setToken(null);
+    setUser(null);
+
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('authUser');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+  }, []);
+
   // 컴포넌트 마운트 시 로컬 스토리지에서 토큰과 사용자 정보 복원
   useEffect(() => {
     const initializeAuth = async () => {
@@ -49,15 +59,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setUser(JSON.parse(storedUser));
           } else {
             // 유효하지 않은 토큰 제거
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('authUser');
+            logout();
           }
         }
       } catch (error) {
         console.error('토큰 복원 중 오류:', error);
         // 오류 발생 시 저장된 데이터 제거
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('authUser');
+        logout();
       } finally {
         setIsLoading(false);
       }
@@ -68,7 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => {
       // cleanup function
     }
-  }, []);
+  }, [logout]);
 
   // 토큰 유효성 검증 함수
   const validateToken = async (token: string): Promise<boolean> => {
@@ -93,16 +101,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // 로그아웃 함수
-  const logout = () => {
-    setToken(null);
-    setUser(null);
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
 
-    // 로컬 스토리지에서 제거
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('authUser');
+    const handleForcedLogout = () => {
+      logout();
+    };
 
+    window.addEventListener('auth:logout', handleForcedLogout);
 
-  };
+    return () => {
+      window.removeEventListener('auth:logout', handleForcedLogout);
+    };
+  }, [logout]);
 
   // 사용자 정보 업데이트 함수
   const updateUser = (userData: Partial<User>) => {
@@ -134,7 +147,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return () => clearInterval(tokenRefreshInterval);
     }
     return undefined;
-  }, [token]);
+  }, [token, logout]);
 
   const value: AuthContextType = {
     user,
