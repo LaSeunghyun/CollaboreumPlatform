@@ -170,6 +170,7 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
         content: formData.content.trim(),
         category: formData.category,
         tags: [],
+        images: imageUrls.length > 0 ? imageUrls : undefined,
         status: 'published' as const,
       };
 
@@ -178,7 +179,7 @@ export const CommunityPostForm: React.FC<CommunityPostFormProps> = ({
       setFormData({
         title: '',
         content: '',
-        category: '음악',
+        category: categories[0]?.id ?? 'music',
         images: [],
       });
       onBack(); // 포스트 생성 성공 시 뒤로가기

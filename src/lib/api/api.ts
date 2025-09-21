@@ -22,7 +22,7 @@ import {
   ApiEndpoint,
 } from '@/shared/types';
 
-class ApiClient {
+export class ApiClient {
   private client: AxiosInstance;
 
   constructor() {
@@ -177,14 +177,46 @@ class ApiClient {
     };
   }
 
+  private normalizeEndpoint(endpoint: ApiEndpoint): ApiEndpoint {
+    if (typeof endpoint !== 'string') {
+      return endpoint;
+    }
+
+    const trimmed = endpoint.trim();
+
+    if (trimmed === '' || trimmed === '/') {
+      return '';
+    }
+
+    if (/^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed) || trimmed.startsWith('//')) {
+      return trimmed;
+    }
+
+    const withoutLeadingSlashes = trimmed.replace(/^\/+/, '');
+
+    const baseUrl = this.client.defaults.baseURL ?? '';
+    const normalizedBase = baseUrl.replace(/\/+$/, '');
+
+    if (
+      normalizedBase.toLowerCase().endsWith('/api') &&
+      withoutLeadingSlashes.toLowerCase().startsWith('api/')
+    ) {
+      return withoutLeadingSlashes.slice(4);
+    }
+
+    return withoutLeadingSlashes;
+  }
+
   async request<T = unknown>(
     endpoint: ApiEndpoint,
     config: ApiRequestConfig = {},
   ): Promise<ApiResponse<T>> {
     const { method = 'GET', params, headers, data, body, timeout } = config;
 
+    const url = this.normalizeEndpoint(endpoint);
+
     const requestConfig: AxiosRequestConfig = {
-      url: endpoint,
+      url,
       method,
       params,
       headers,
