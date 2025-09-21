@@ -20,7 +20,42 @@ import {
   ApiError,
   ApiRequestConfig,
   ApiEndpoint,
+  HttpMethod,
 } from '@/shared/types';
+
+type QueryPrimitive = string | number | boolean | null | undefined;
+type QueryParamValue = QueryPrimitive | QueryPrimitive[];
+type QueryParams = Record<string, QueryParamValue>;
+
+export type QueryParamsInput = QueryParams | URLSearchParams;
+export type RequestBody =
+  | Record<string, unknown>
+  | Array<unknown>
+  | string
+  | number
+  | boolean
+  | null
+  | FormData
+  | Blob
+  | ArrayBuffer;
+
+export type ClientRequestConfig<
+  TBody = RequestBody,
+  TParams = QueryParamsInput,
+> = Omit<
+  ApiRequestConfig,
+  'data' | 'body' | 'params'
+> & {
+  data?: TBody;
+  body?: TBody;
+  params?: TParams;
+};
+
+export type BatchRequest<TBody = unknown> = {
+  method: HttpMethod | Lowercase<HttpMethod>;
+  endpoint: ApiEndpoint;
+  data?: TBody;
+};
 
 export class ApiClient {
   private client: AxiosInstance;
@@ -74,7 +109,7 @@ export class ApiClient {
 
     this.client.interceptors.response.use(
       (response: AxiosResponse) => response,
-      async error => {
+      async (error: AxiosError) => {
         // 401 에러 시 토큰 갱신 시도
         if (error.response?.status === 401) {
           const refreshToken = getStoredRefreshToken();
@@ -207,9 +242,13 @@ export class ApiClient {
     return withoutLeadingSlashes;
   }
 
-  async request<T = unknown>(
+  async request<
+    T = unknown,
+    TBody = RequestBody,
+    TParams = QueryParamsInput | undefined,
+  >(
     endpoint: ApiEndpoint,
-    config: ApiRequestConfig = {},
+    config: ClientRequestConfig<TBody, TParams> = {},
   ): Promise<ApiResponse<T>> {
     const { method = 'GET', params, headers, data, body, timeout } = config;
 
@@ -228,27 +267,36 @@ export class ApiClient {
     return response.data;
   }
 
-  async get<T>(
+  async get<T, TParams = QueryParamsInput | undefined>(
     endpoint: ApiEndpoint,
-    params?: Record<string, any>,
+    params?: TParams,
   ): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'GET', params });
+    return this.request<T, never, TParams>(endpoint, { method: 'GET', params });
   }
 
-  async post<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'POST', data });
+  async post<T, TBody = RequestBody>(
+    endpoint: ApiEndpoint,
+    data?: TBody,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T, TBody>(endpoint, { method: 'POST', data });
   }
 
-  async put<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'PUT', data });
+  async put<T, TBody = RequestBody>(
+    endpoint: ApiEndpoint,
+    data?: TBody,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T, TBody>(endpoint, { method: 'PUT', data });
   }
 
-  async patch<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'PATCH', data });
+  async patch<T, TBody = RequestBody>(
+    endpoint: ApiEndpoint,
+    data?: TBody,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T, TBody>(endpoint, { method: 'PATCH', data });
   }
 
   async delete<T>(endpoint: ApiEndpoint): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
+    return this.request<T, never>(endpoint, { method: 'DELETE' });
   }
 
   // 파일 업로드
@@ -283,19 +331,19 @@ export class ApiClient {
   }
 
   // 배치 요청
-  async batch<T>(
-    requests: Array<{ method: string; endpoint: ApiEndpoint; data?: any }>,
+  async batch<T, TBody = RequestBody>(
+    requests: Array<BatchRequest<TBody>>,
   ): Promise<Array<ApiResponse<T>>> {
     const promises = requests.map(({ method, endpoint, data }) => {
-      switch (method.toUpperCase()) {
+      switch (method.toUpperCase() as HttpMethod) {
         case 'GET':
           return this.get<T>(endpoint);
         case 'POST':
-          return this.post<T>(endpoint, data);
+          return this.post<T, TBody>(endpoint, data);
         case 'PUT':
-          return this.put<T>(endpoint, data);
+          return this.put<T, TBody>(endpoint, data);
         case 'PATCH':
-          return this.patch<T>(endpoint, data);
+          return this.patch<T, TBody>(endpoint, data);
         case 'DELETE':
           return this.delete<T>(endpoint);
         default:

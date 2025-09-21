@@ -4,11 +4,88 @@ import {
   usePaginatedQuery,
   useOptimisticMutation,
 } from './useApi';
-import { SearchParams } from '../../types/api';
+import type { SearchParams } from '../../types/api';
+import type { ApiResponse } from '@/shared/types';
+import type { FundingProject as FundingProjectDetail } from '@/types/fundingProject';
+
+interface FundingProjectSummary extends FundingProjectDetail {
+  likesCount?: number;
+  isLiked?: boolean;
+  isBookmarked?: boolean;
+}
+
+interface FundingProjectListData {
+  projects: FundingProjectSummary[];
+}
+
+type FundingProjectsQueryResult = ApiResponse<FundingProjectListData>;
+
+interface BackProjectVariables {
+  projectId: string;
+  amount: number;
+  message?: string;
+  rewardId?: string;
+}
+
+interface ProjectActionVariables {
+  projectId: string;
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const isFundingProjectSummary = (value: unknown): value is FundingProjectSummary =>
+  isRecord(value) && 'id' in value;
+
+const updateFundingProjects = (
+  previous: FundingProjectsQueryResult | undefined,
+  projectId: string,
+  updater: (project: FundingProjectSummary) => FundingProjectSummary,
+): FundingProjectsQueryResult | undefined => {
+  if (!previous?.data?.projects) {
+    return previous;
+  }
+
+  const nextProjects = previous.data.projects.map(project => {
+    if (!isFundingProjectSummary(project)) {
+      return project;
+    }
+
+    const normalizedId = String(project.id);
+    if (normalizedId !== projectId) {
+      return project;
+    }
+
+    const normalizedProject: FundingProjectSummary = {
+      ...project,
+      currentAmount:
+        typeof project.currentAmount === 'number' ? project.currentAmount : 0,
+      backers: typeof project.backers === 'number' ? project.backers : 0,
+      likesCount:
+        typeof project.likesCount === 'number' ? project.likesCount : 0,
+      isLiked:
+        typeof project.isLiked === 'boolean' ? project.isLiked : undefined,
+      isBookmarked:
+        typeof project.isBookmarked === 'boolean'
+          ? project.isBookmarked
+          : undefined,
+    };
+
+    return updater(normalizedProject);
+  });
+
+  return {
+    ...previous,
+    data: {
+      ...previous.data,
+      projects: nextProjects,
+    },
+  };
+};
 
 // 펀딩 프로젝트 목록 조회
 export const useFundingProjects = (params?: SearchParams) => {
-  return usePaginatedQuery(
+  return usePaginatedQuery<FundingProjectListData>(
     ['funding', 'projects', params || {}],
     '/funding/projects',
     params || {},
@@ -17,7 +94,7 @@ export const useFundingProjects = (params?: SearchParams) => {
 
 // 펀딩 프로젝트 상세 조회
 export const useFundingProject = (projectId: string) => {
-  return useApiQuery(
+  return useApiQuery<FundingProjectDetail>(
     ['funding', 'project', projectId],
     `/funding/projects/${projectId}`,
     undefined,
@@ -36,93 +113,52 @@ export const useCreateFundingProject = () => {
 
 // 펀딩 프로젝트 후원
 export const useBackFundingProject = () => {
-  return useOptimisticMutation('/funding/projects/:id/back', 'POST', {
-    queryKey: ['funding', 'projects'],
-    updateFn: (oldData, newData) => {
-      // 옵티미스틱 업데이트 로직
-      if (oldData?.data?.projects) {
-        const updatedProjects = oldData.data.projects.map((project: any) => {
-          if (project.id === newData.projectId) {
-            return {
-              ...project,
-              currentAmount: project.currentAmount + newData.amount,
-              backers: project.backers + 1,
-            };
-          }
-          return project;
-        });
-        return {
-          ...oldData,
-          data: {
-            ...oldData.data,
-            projects: updatedProjects,
-          },
-        };
-      }
-      return oldData;
+  return useOptimisticMutation<FundingProjectListData, BackProjectVariables>(
+    '/funding/projects/:id/back',
+    'POST',
+    {
+      queryKey: ['funding', 'projects'],
+      updateFn: (oldData, newData) =>
+        updateFundingProjects(oldData, newData.projectId, project => ({
+          ...project,
+          currentAmount: project.currentAmount + newData.amount,
+          backers: project.backers + 1,
+        })),
     },
-  });
+  );
 };
 
 // 펀딩 프로젝트 좋아요
 export const useLikeFundingProject = () => {
-  return useOptimisticMutation('/funding/projects/:id/like', 'POST', {
-    queryKey: ['funding', 'projects'],
-    updateFn: (oldData, newData) => {
-      // 옵티미스틱 업데이트 로직
-      if (oldData?.data?.projects) {
-        const updatedProjects = oldData.data.projects.map((project: any) => {
-          if (project.id === newData.projectId) {
-            return {
-              ...project,
-              isLiked: !project.isLiked,
-              likesCount: project.isLiked
-                ? project.likesCount - 1
-                : project.likesCount + 1,
-            };
-          }
-          return project;
-        });
-        return {
-          ...oldData,
-          data: {
-            ...oldData.data,
-            projects: updatedProjects,
-          },
-        };
-      }
-      return oldData;
+  return useOptimisticMutation<FundingProjectListData, ProjectActionVariables>(
+    '/funding/projects/:id/like',
+    'POST',
+    {
+      queryKey: ['funding', 'projects'],
+      updateFn: (oldData, newData) =>
+        updateFundingProjects(oldData, newData.projectId, project => ({
+          ...project,
+          isLiked: !project.isLiked,
+          likesCount: (project.likesCount ?? 0) + (project.isLiked ? -1 : 1),
+        })),
     },
-  });
+  );
 };
 
 // 펀딩 프로젝트 북마크
 export const useBookmarkFundingProject = () => {
-  return useOptimisticMutation('/funding/projects/:id/bookmark', 'POST', {
-    queryKey: ['funding', 'projects'],
-    updateFn: (oldData, newData) => {
-      // 옵티미스틱 업데이트 로직
-      if (oldData?.data?.projects) {
-        const updatedProjects = oldData.data.projects.map((project: any) => {
-          if (project.id === newData.projectId) {
-            return {
-              ...project,
-              isBookmarked: !project.isBookmarked,
-            };
-          }
-          return project;
-        });
-        return {
-          ...oldData,
-          data: {
-            ...oldData.data,
-            projects: updatedProjects,
-          },
-        };
-      }
-      return oldData;
+  return useOptimisticMutation<FundingProjectListData, ProjectActionVariables>(
+    '/funding/projects/:id/bookmark',
+    'POST',
+    {
+      queryKey: ['funding', 'projects'],
+      updateFn: (oldData, newData) =>
+        updateFundingProjects(oldData, newData.projectId, project => ({
+          ...project,
+          isBookmarked: !project.isBookmarked,
+        })),
     },
-  });
+  );
 };
 
 // 펀딩 프로젝트 환불

@@ -1,17 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { communityPostAPI, communityCommentAPI } from '../../services/api';
+import type {
+    CommunityPostListQuery,
+    CreateCommunityPostData,
+    UpdateCommunityPostData,
+    CreateCommunityCommentData,
+} from '@/features/community/types';
+
+type UpdateCommunityCommentData = Pick<CreateCommunityCommentData, 'content'>;
 
 // 커뮤니티 게시글 목록 조회
-export const useCommunityPosts = (params?: {
-    category?: string;
-    search?: string;
-    author?: string;
-    tags?: string[];
-    page?: number;
-    limit?: number;
-    sortBy?: string;
-    order?: 'asc' | 'desc';
-}) => {
+export const useCommunityPosts = (params?: CommunityPostListQuery) => {
     return useQuery({
         queryKey: ['community', 'posts', params],
         queryFn: () => communityPostAPI.getPosts(params),
@@ -35,7 +34,7 @@ export const useCreateCommunityPost = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data: any) => communityPostAPI.createPost(data),
+        mutationFn: (data: CreateCommunityPostData) => communityPostAPI.createPost(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['community', 'posts'] });
         },
@@ -47,7 +46,7 @@ export const useUpdateCommunityPost = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ postId, data }: { postId: string; data: any }) =>
+        mutationFn: ({ postId, data }: { postId: string; data: UpdateCommunityPostData }) =>
             communityPostAPI.updatePost(postId, data),
         onSuccess: (_, { postId }) => {
             queryClient.invalidateQueries({ queryKey: ['community', 'post', postId] });
@@ -109,7 +108,7 @@ export const useCreateComment = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ postId, data }: { postId: string; data: { content: string; parentId?: string } }) =>
+        mutationFn: ({ postId, data }: { postId: string; data: Omit<CreateCommunityCommentData, 'postId'> }) =>
             communityCommentAPI.createComment(postId, data),
         onSuccess: (_, { postId }) => {
             queryClient.invalidateQueries({ queryKey: ['community', 'comments', postId] });
@@ -123,7 +122,7 @@ export const useUpdateComment = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ postId, commentId, data }: { postId: string; commentId: string; data: { content: string } }) =>
+        mutationFn: ({ postId, commentId, data }: { postId: string; commentId: string; data: UpdateCommunityCommentData }) =>
             communityCommentAPI.updateComment(postId, commentId, data),
         onSuccess: (_, { postId }) => {
             queryClient.invalidateQueries({ queryKey: ['community', 'comments', postId] });

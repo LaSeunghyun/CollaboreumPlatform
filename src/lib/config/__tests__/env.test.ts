@@ -103,7 +103,7 @@ describe('resolveApiBaseUrl', () => {
     delete process.env.REACT_APP_API_URL;
 
     const result = resolveApiBaseUrl();
-    expect(result).toMatch(/^https?:\/\/[^\/]+\/api$/);
+    expect(result).toMatch(/^https?:\/\/[^/]+\/api$/);
     expect(result).not.toMatch(/\/$/);
   });
 

@@ -2,6 +2,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService } from '@/features/auth/services/authService';
 import { userAPI, userProfileAPI, interactionAPI } from '../../services/api';
 
+// TODO: 사용자 프로필 편집 API 스펙이 확정되면 정식 DTO 타입으로 대체한다.
+interface UserProfileUpdateInput {
+    name?: string;
+    bio?: string;
+    avatar?: string;
+    socialLinks?: Record<string, string>;
+    preferences?: Record<string, unknown>;
+    [key: string]: unknown;
+}
+
 // 사용자 프로필 조회
 export const useUserProfile = (userId: string) => {
     return useQuery({
@@ -17,7 +27,7 @@ export const useUpdateUserProfile = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ userId, data }: { userId: string; data: any }) =>
+        mutationFn: ({ userId, data }: { userId: string; data: UserProfileUpdateInput }) =>
             userProfileAPI.updateUserProfile(userId, data),
         onSuccess: (_, { userId }) => {
             queryClient.invalidateQueries({ queryKey: ['user', 'profile', userId] });

@@ -1,5 +1,43 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { communityAPI } from '../../services/api';
+import type {
+    CommunityPost,
+    CreateCommunityPostData,
+    UpdateCommunityPostData,
+} from '@/features/community/types';
+import type { ApiResponse } from '@/shared/types';
+
+type NoticeResponse = ApiResponse<{
+    posts: CommunityPost[];
+}> | {
+    posts?: CommunityPost[];
+    data?: {
+        posts?: CommunityPost[];
+    };
+};
+
+interface NoticeMutationPayload extends CreateCommunityPostData {
+    isPinned?: boolean;
+    isImportant?: boolean;
+}
+
+interface NoticeUpdatePayload extends UpdateCommunityPostData {
+    isPinned?: boolean;
+    isImportant?: boolean;
+}
+
+const extractNoticePosts = (response: NoticeResponse): CommunityPost[] => {
+    const directPosts = Array.isArray(response.posts) ? response.posts : undefined;
+    if (directPosts) {
+        return directPosts;
+    }
+
+    if (response.data && Array.isArray(response.data.posts)) {
+        return response.data.posts;
+    }
+
+    return [];
+};
 
 // 공지사항 목록 조회 (커뮤니티 API의 notice 카테고리 사용)
 export const useNotices = (params?: {
@@ -26,15 +64,14 @@ export const useNotices = (params?: {
 
 // 공지사항 상세 조회
 export const useNotice = (noticeId: string) => {
-    return useQuery({
+    return useQuery<CommunityPost | undefined>({
         queryKey: ['notice', noticeId],
         queryFn: () => communityAPI.getForumPosts('notice', {
             search: noticeId,
             limit: 1
-        }).then((response: any) => {
-            // API 응답에서 해당 공지사항 찾기
-            const notices = response.data?.posts || response.posts || [];
-            return notices.find((notice: any) => notice.id === noticeId) || notices[0];
+        }).then((response: NoticeResponse) => {
+            const notices = extractNoticePosts(response);
+            return notices.find(notice => String(notice.id) === noticeId) ?? notices[0];
         }),
         enabled: !!noticeId,
         staleTime: 10 * 60 * 1000,
@@ -46,12 +83,13 @@ export const useCreateNotice = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data: any) => communityAPI.createPost({
-            ...data,
-            category: 'notice',
-            isPinned: data.isPinned || false,
-            isImportant: data.isImportant || false,
-        }),
+        mutationFn: (data: NoticeMutationPayload) =>
+            communityAPI.createPost({
+                ...data,
+                category: 'notice',
+                isPinned: data.isPinned ?? false,
+                isImportant: data.isImportant ?? false,
+            }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notices'] });
         },
@@ -63,11 +101,13 @@ export const useUpdateNotice = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ noticeId, data }: { noticeId: string; data: any }) =>
+        mutationFn: ({ noticeId, data }: { noticeId: string; data: NoticeUpdatePayload }) =>
             communityAPI.createPost({
                 ...data,
                 id: noticeId,
                 category: 'notice',
+                isPinned: data.isPinned ?? false,
+                isImportant: data.isImportant ?? false,
             }),
         onSuccess: (_, { noticeId }) => {
             queryClient.invalidateQueries({ queryKey: ['notice', noticeId] });

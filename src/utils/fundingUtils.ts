@@ -37,9 +37,10 @@ export const getFilteredFundingHistory = (
                     return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
                 case 'amount':
                     return b.currentAmount - a.currentAmount;
-                case 'status':
+                case 'status': {
                     const statusOrder = { success: 3, ongoing: 2, failed: 1 };
                     return statusOrder[b.status] - statusOrder[a.status];
+                }
                 default:
                     return 0;
             }
