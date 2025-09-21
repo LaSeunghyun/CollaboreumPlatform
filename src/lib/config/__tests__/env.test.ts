@@ -67,8 +67,8 @@ describe('ensureApiPath', () => {
       expect(ensureApiPath(undefined as any)).toBe(undefined);
     });
 
-    it('슬래시만 있는 경우는 그대로 유지해야 함', () => {
-      expect(ensureApiPath('///')).toBe('///');
+    it('슬래시만 있는 경우에도 단일 루트 경로로 정규화해야 함', () => {
+      expect(ensureApiPath('///')).toBe('/');
     });
   });
 
@@ -134,5 +134,23 @@ describe('resolveApiBaseUrl', () => {
 
     const result = resolveApiBaseUrl();
     expect(result).toBe('https://api.example.com/api');
+  });
+
+  it('결합된 경로에서 중복 슬래시가 발생하지 않아야 함', () => {
+    process.env.VITE_API_BASE_URL = 'https://api.example.com/api/';
+
+    const baseUrl = resolveApiBaseUrl();
+    const combinedAbsolute = `${baseUrl}/auth/login`;
+    const absolutePathWithoutProtocol = combinedAbsolute.replace(
+      /^https?:\/\//,
+      '',
+    );
+
+    expect(absolutePathWithoutProtocol).not.toContain('//');
+
+    process.env.VITE_API_BASE_URL = '/api/';
+    const combinedRelative = `${resolveApiBaseUrl()}/auth/login`;
+
+    expect(combinedRelative).toBe('/api/auth/login');
   });
 });
