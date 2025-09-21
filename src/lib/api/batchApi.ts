@@ -1,27 +1,32 @@
 // 배치 API 호출을 위한 유틸리티
+import type { ApiResponse } from '@/shared/types';
 import { apiCall } from '../../services/api';
 
-interface BatchRequest {
+type SupportedMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+
+interface BatchRequest<TBody = Record<string, unknown>, TResult = unknown> {
     id: string;
     url: string;
-    method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-    data?: any;
+    method?: SupportedMethod;
+    data?: TBody;
 }
 
-interface BatchResponse {
+export interface BatchResponse<TResult = unknown> {
     id: string;
     success: boolean;
-    data?: any;
+    data?: TResult;
     error?: string;
 }
 
 class BatchApiManager {
-    private requests: Map<string, BatchRequest> = new Map();
+    private requests: Map<string, BatchRequest<unknown, unknown>> = new Map();
     private timeoutId: NodeJS.Timeout | null = null;
     private readonly BATCH_DELAY = 50; // 50ms 지연으로 배치 처리
 
-    addRequest(request: BatchRequest): Promise<BatchResponse> {
-        return new Promise((resolve) => {
+    addRequest<TBody = Record<string, unknown>, TResult = unknown>(
+        request: BatchRequest<TBody, TResult>,
+    ): Promise<BatchResponse<TResult>> {
+        return new Promise(resolve => {
             this.requests.set(request.id, request);
 
             // 기존 타임아웃이 있으면 취소
@@ -33,13 +38,19 @@ class BatchApiManager {
             this.timeoutId = setTimeout(() => {
                 this.processBatch().then(responses => {
                     const response = responses.find(r => r.id === request.id);
-                    resolve(response || { id: request.id, success: false, error: 'Request not found' });
+                    resolve(
+                        (response as BatchResponse<TResult> | undefined) ?? {
+                            id: request.id,
+                            success: false,
+                            error: 'Request not found',
+                        },
+                    );
                 });
             }, this.BATCH_DELAY);
         });
     }
 
-    private async processBatch(): Promise<BatchResponse[]> {
+    private async processBatch(): Promise<Array<BatchResponse<unknown>>> {
         const requests = Array.from(this.requests.values());
         this.requests.clear();
         this.timeoutId = null;
@@ -50,24 +61,34 @@ class BatchApiManager {
             // 서버에 배치 요청 전송
             const response = await apiCall('/api/batch', {
                 method: 'POST',
-                body: JSON.stringify({ requests })
+                body: JSON.stringify({ requests }),
             });
+            if (Array.isArray(response)) {
+                return response as Array<BatchResponse<unknown>>;
+            }
 
-            return (response as any).data || [];
+            const apiResponse = response as ApiResponse<Array<BatchResponse<unknown>>> | null;
+            if (apiResponse?.data && Array.isArray(apiResponse.data)) {
+                return apiResponse.data;
+            }
+
+            return [];
         } catch (error) {
             // 배치 처리 실패 시 개별 요청으로 폴백
             return this.fallbackToIndividualRequests(requests);
         }
     }
 
-    private async fallbackToIndividualRequests(requests: BatchRequest[]): Promise<BatchResponse[]> {
-        const responses: BatchResponse[] = [];
+    private async fallbackToIndividualRequests(
+        requests: Array<BatchRequest<unknown, unknown>>,
+    ): Promise<Array<BatchResponse<unknown>>> {
+        const responses: Array<BatchResponse<unknown>> = [];
 
         for (const request of requests) {
             try {
                 const response = await apiCall(request.url, {
                     method: request.method || 'GET',
-                    body: request.data ? JSON.stringify(request.data) : undefined
+                    body: request.data ? JSON.stringify(request.data) : undefined,
                 });
 
                 responses.push({
@@ -91,17 +112,24 @@ class BatchApiManager {
 export const batchApiManager = new BatchApiManager();
 
 // 편의 함수들
-export const batchGet = (url: string, id?: string) =>
-    batchApiManager.addRequest({
+export const batchGet = <TResult = unknown>(url: string, id?: string) =>
+    batchApiManager.addRequest<Record<string, never>, TResult>({
         id: id || Math.random().toString(36).substr(2, 9),
         url,
-        method: 'GET'
+        method: 'GET',
     });
 
-export const batchPost = (url: string, data: any, id?: string) =>
-    batchApiManager.addRequest({
+export const batchPost = <TBody = Record<string, unknown>, TResult = unknown>(
+    url: string,
+    data?: TBody,
+    id?: string,
+) =>
+    batchApiManager.addRequest<TBody | undefined, TResult>({
         id: id || Math.random().toString(36).substr(2, 9),
         url,
         method: 'POST',
-        data
+        data,
     });
+
+// TODO: 지원되는 요청 본문/응답 타입을 명확히 정의하고,
+//       api/services 계층과 공유할 도메인 DTO를 도입한다.

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { adminAPI } from '../../services/api';
+import { api } from '@/lib/api/api';
+import type { ApiResponse } from '@/shared/types';
 
 export interface AdminStats {
   totalUsers: number;
@@ -14,19 +15,15 @@ export interface AdminStats {
   successRate: number;
 }
 
-export interface AdminStatsResponse {
-  success: boolean;
-  data: AdminStats;
-  message?: string;
-}
+export type AdminStatsResponse = ApiResponse<AdminStats>;
+
+const fetchAdminStats = () => api.get<AdminStats>('/admin/stats');
 
 // 관리자 통계 조회
 export const useAdminStats = () => {
   return useQuery<AdminStatsResponse>({
     queryKey: ['admin', 'stats'],
-    queryFn: async () => {
-      return await (adminAPI as any).getStats();
-    },
+    queryFn: fetchAdminStats,
     staleTime: 5 * 60 * 1000, // 5분
     gcTime: 10 * 60 * 1000, // 10분
     retry: 3,
@@ -38,9 +35,7 @@ export const useAdminStats = () => {
 export const useRealtimeStats = (enabled: boolean = true) => {
   return useQuery<AdminStatsResponse>({
     queryKey: ['admin', 'stats', 'realtime'],
-    queryFn: async () => {
-      return await (adminAPI as any).getStats();
-    },
+    queryFn: fetchAdminStats,
     enabled,
     refetchInterval: 30000, // 30초마다 업데이트
     staleTime: 0, // 항상 최신 데이터 요청

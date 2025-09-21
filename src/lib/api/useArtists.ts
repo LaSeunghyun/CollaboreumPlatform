@@ -1,6 +1,19 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { artistAPI } from '../../services/api';
 
+// TODO: Artist 관리 API 스키마가 확정되면 전용 DTO 타입으로 교체한다.
+interface ArtistProfileUpdateInput {
+    name?: string;
+    username?: string;
+    bio?: string;
+    category?: string;
+    tags?: string[];
+    location?: string;
+    website?: string;
+    socialLinks?: Record<string, string>;
+    [key: string]: unknown;
+}
+
 // 아티스트 목록 조회
 export const useArtists = (params?: {
     page?: number;
@@ -68,7 +81,7 @@ export const useUpdateArtistProfile = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ artistId, data }: { artistId: string; data: any }) =>
+        mutationFn: ({ artistId, data }: { artistId: string; data: ArtistProfileUpdateInput }) =>
             artistAPI.updateArtistProfile(artistId, data),
         onSuccess: (_, { artistId }) => {
             queryClient.invalidateQueries({ queryKey: ['artist', artistId] });

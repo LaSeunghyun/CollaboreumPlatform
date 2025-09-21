@@ -1,5 +1,6 @@
 import { api } from '@/lib/api/api';
 import type { ApiError, ApiRequestConfig, ApiResponse } from '@/shared/types';
+import type { RealTimeAlert } from '@/types/admin';
 import type { FundingProject, RevenueShare } from '@/types/fundingProject';
 
 type ApiCallOptions = RequestInit & {
@@ -21,7 +22,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // 동시 요청 제한을 위한 큐
 class RequestQueue {
-  private queue: Array<() => Promise<any>> = [];
+  private queue: Array<() => Promise<unknown>> = [];
   private running = 0;
   private maxConcurrent = 5; // 최대 동시 요청 수
 
@@ -552,6 +553,11 @@ export const artistAPI = {
 
 // Admin Dashboard APIs
 export const adminAPI = {
+  getAlerts: () => apiCall<RealTimeAlert[]>('/admin/alerts'),
+  dismissAlert: (alertId: string) =>
+    apiCall<void>(`/admin/alerts/${encodeURIComponent(alertId)}/dismiss`, {
+      method: 'POST',
+    }),
   getInquiries: () => apiCall('/admin/inquiries'),
   getMatchingRequests: () => apiCall('/admin/matching-requests'),
   getFinancialData: () => apiCall('/admin/financial-data'),

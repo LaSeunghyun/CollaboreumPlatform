@@ -3,12 +3,16 @@ import {
     useMutation,
     useQueryClient,
     useInfiniteQuery as useInfiniteQueryHook,
-    UseQueryOptions,
-    UseMutationOptions,
+    type QueryKey,
+    type UseQueryOptions,
+    type UseMutationOptions,
+    type UseInfiniteQueryOptions,
 } from '@tanstack/react-query';
-import { api } from '@/lib/api/api';
+import { api, type QueryParamsInput } from '@/lib/api/api';
 import type { ApiResponse } from '@/shared/types';
-import { SearchParams } from '../../types/api';
+import type { SearchParams } from '../../types/api';
+
+type MutationMethod = 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 // 기본 쿼리 옵션
 const defaultQueryOptions = {
@@ -25,41 +29,39 @@ const defaultMutationOptions = {
 };
 
 // 제네릭 API 쿼리 훅
-export function useApiQuery<T = any>(
-    queryKey: (string | number | object)[],
+export function useApiQuery<TData = unknown, TParams extends QueryParamsInput | undefined = QueryParamsInput | undefined, TError = Error>(
+    queryKey: QueryKey,
     endpoint: string,
-    params?: Record<string, any>,
-    options?: Partial<UseQueryOptions<ApiResponse<T>>>
+    params?: TParams,
+    options?: Omit<UseQueryOptions<ApiResponse<TData>, TError, ApiResponse<TData>, QueryKey>, 'queryKey' | 'queryFn'>,
 ) {
-    return useQuery({
+    return useQuery<ApiResponse<TData>, TError>({
         queryKey,
-        queryFn: () => api.get<T>(endpoint, params),
+        queryFn: () => api.get<TData>(endpoint, params),
         ...defaultQueryOptions,
         ...options,
     });
 }
 
 // 제네릭 API 뮤테이션 훅
-export function useApiMutation<T = any, V = any>(
+export function useApiMutation<TData = unknown, TVariables = void, TError = Error>(
     endpoint: string,
-    method: 'POST' | 'PUT' | 'DELETE' | 'PATCH' = 'POST',
-    options?: Partial<UseMutationOptions<ApiResponse<T>, Error, V>>
+    method: MutationMethod = 'POST',
+    options?: Omit<UseMutationOptions<ApiResponse<TData>, TError, TVariables | void>, 'mutationFn'>,
 ) {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (data?: V) => {
+    return useMutation<ApiResponse<TData>, TError, TVariables | void>({
+        mutationFn: (variables?: TVariables | void) => {
             switch (method) {
                 case 'POST':
-                    return api.post<T>(endpoint, data);
+                    return api.post<TData>(endpoint, variables as TVariables);
                 case 'PUT':
-                    return api.put<T>(endpoint, data);
+                    return api.put<TData>(endpoint, variables as TVariables);
                 case 'DELETE':
-                    return api.delete<T>(endpoint);
+                    return api.delete<TData>(endpoint);
                 case 'PATCH':
-                    return api.patch<T>(endpoint, data);
+                    return api.patch<TData>(endpoint, variables as TVariables);
                 default:
-                    return api.post<T>(endpoint, data);
+                    return api.post<TData>(endpoint, variables as TVariables);
             }
         },
         ...defaultMutationOptions,
@@ -68,43 +70,59 @@ export function useApiMutation<T = any, V = any>(
 }
 
 // 페이지네이션 쿼리 훅
-export function usePaginatedQuery<T = any>(
-    queryKey: (string | number | object)[],
+export function usePaginatedQuery<TData = unknown, TError = Error>(
+    queryKey: QueryKey,
     endpoint: string,
     params: SearchParams = {},
-    options?: Partial<UseQueryOptions<ApiResponse<T>>>
+    options?: Omit<UseQueryOptions<ApiResponse<TData>, TError, ApiResponse<TData>, QueryKey>, 'queryKey' | 'queryFn'>,
 ) {
-    return useApiQuery<T>(
+    return useApiQuery<TData, SearchParams, TError>(
         queryKey,
         endpoint,
         params,
         {
             ...options,
-            placeholderData: (previousData) => previousData as any, // 페이지네이션 시 이전 데이터 유지
+            placeholderData: (previousData: ApiResponse<TData> | undefined) => previousData, // 페이지네이션 시 이전 데이터 유지
         }
     );
 }
 
 // 무한 스크롤 쿼리 훅
-export function useInfiniteQuery<T = any>(
-    queryKey: (string | number | object)[],
+export function useInfiniteQuery<TData = unknown, TError = Error>(
+    queryKey: QueryKey,
     endpoint: string,
     params: Omit<SearchParams, 'page'> = {},
-    options?: any
+    options?: Partial<UseInfiniteQueryOptions<ApiResponse<TData>, TError, ApiResponse<TData>, ApiResponse<TData>, QueryKey>>,
 ) {
-    return useInfiniteQueryHook({
+    return useInfiniteQueryHook<ApiResponse<TData>, TError, ApiResponse<TData>, QueryKey>({
         queryKey,
         queryFn: ({ pageParam = 1 }: { pageParam?: number }) =>
-            api.get<T>(endpoint, { ...params, page: pageParam }),
-        getNextPageParam: (lastPage: ApiResponse<any>) => {
+            api.get<TData>(endpoint, { ...params, page: pageParam }),
+        getNextPageParam: (lastPage: ApiResponse<TData>) => {
             if (!lastPage?.pagination) return undefined;
-            const { page } = lastPage.pagination as { page: number; totalPages?: number; pages?: number };
-            const totalPages = lastPage.pagination.totalPages ?? (lastPage.pagination as any).pages;
-            if (typeof totalPages !== 'number') return undefined;
-            return page < totalPages ? page + 1 : undefined;
+            const { page, totalPages, hasNext } = lastPage.pagination;
+
+            if (typeof page !== 'number') {
+                return undefined;
+            }
+
+            if (typeof totalPages === 'number') {
+                return page < totalPages ? page + 1 : undefined;
+            }
+
+            if (typeof hasNext === 'boolean') {
+                return hasNext ? page + 1 : undefined;
+            }
+
+            const legacyPages = (lastPage.pagination as { pages?: number }).pages;
+            if (typeof legacyPages === 'number') {
+                return page < legacyPages ? page + 1 : undefined;
+            }
+
+            return undefined;
         },
         ...defaultQueryOptions,
-        ...options,
+        ...(options ?? {}),
     });
 }
 
@@ -127,60 +145,116 @@ export function useInvalidateQueries() {
 }
 
 // 옵티미스틱 업데이트 헬퍼
-export function useOptimisticMutation<T = any, V = any>(
+interface OptimisticContext<TData> {
+    previousData?: ApiResponse<TData>;
+}
+
+type BaseMutationOptions<TData, TVariables, TError> = Omit<
+    UseMutationOptions<
+        ApiResponse<TData>,
+        TError,
+        TVariables | void,
+        OptimisticContext<TData>
+    >,
+    'mutationFn'
+>;
+
+interface OptimisticMutationOptions<TData, TVariables, TError = Error>
+    extends BaseMutationOptions<TData, TVariables, TError> {
+    queryKey: QueryKey;
+    updateFn: (
+        oldData: ApiResponse<TData> | undefined,
+        newData: TVariables,
+    ) => ApiResponse<TData> | undefined;
+    rollbackFn?: (
+        oldData: ApiResponse<TData> | undefined,
+        newData: TVariables,
+    ) => ApiResponse<TData> | undefined;
+}
+
+export function useOptimisticMutation<TData = unknown, TVariables = void, TError = Error>(
     endpoint: string,
-    method: 'POST' | 'PUT' | 'DELETE' | 'PATCH' = 'POST',
-    options?: {
-        queryKey: (string | number | object)[];
-        updateFn: (oldData: T | undefined, newData: V) => T;
-        rollbackFn?: (oldData: T | undefined, newData: V) => T;
-    }
+    method: MutationMethod = 'POST',
+    options?: OptimisticMutationOptions<TData, TVariables, TError>,
 ) {
     const queryClient = useQueryClient();
+    const {
+        queryKey,
+        updateFn,
+        rollbackFn,
+        onMutate,
+        onError,
+        onSettled,
+        ...restOptions
+    } = options ?? {};
 
-    return useMutation({
-        mutationFn: (data?: V) => {
+    return useMutation<
+        ApiResponse<TData>,
+        TError,
+        TVariables | void,
+        OptimisticContext<TData>
+    >({
+        mutationFn: (variables?: TVariables | void) => {
             switch (method) {
                 case 'POST':
-                    return api.post<T>(endpoint, data);
+                    return api.post<TData>(endpoint, variables as TVariables);
                 case 'PUT':
-                    return api.put<T>(endpoint, data);
+                    return api.put<TData>(endpoint, variables as TVariables);
                 case 'DELETE':
-                    return api.delete<T>(endpoint);
+                    return api.delete<TData>(endpoint);
                 case 'PATCH':
-                    return api.patch<T>(endpoint, data);
+                    return api.patch<TData>(endpoint, variables as TVariables);
                 default:
-                    return api.post<T>(endpoint, data);
+                    return api.post<TData>(endpoint, variables as TVariables);
             }
         },
-        onMutate: async (newData) => {
-            if (!options) return;
+        onMutate: async variables => {
+            if (!queryKey || !updateFn) {
+                return undefined;
+            }
 
             // 진행 중인 쿼리 취소
-            await queryClient.cancelQueries({ queryKey: options.queryKey });
+            await queryClient.cancelQueries({ queryKey });
 
             // 이전 데이터 백업
-            const previousData = queryClient.getQueryData<T>(options.queryKey);
+            const previousData = queryClient.getQueryData<ApiResponse<TData>>(queryKey);
 
             // 옵티미스틱 업데이트
-            queryClient.setQueryData<T>(options.queryKey, (old) =>
-                options.updateFn(old, newData as V)
-            );
+            const nextData = updateFn(previousData, variables as TVariables);
+            if (nextData !== undefined) {
+                queryClient.setQueryData<ApiResponse<TData>>(queryKey, nextData);
+            }
+
+            const userContext = await onMutate?.(variables);
+            if (userContext && typeof userContext === 'object') {
+                return {
+                    previousData,
+                    ...userContext,
+                } as OptimisticContext<TData>;
+            }
 
             return { previousData };
         },
-        onError: (err, newData, context) => {
-            // 에러 시 롤백
-            if (options && context?.previousData) {
-                queryClient.setQueryData<T>(options.queryKey, context.previousData);
+        onError: (error, variables, context) => {
+            if (queryKey && rollbackFn && context?.previousData) {
+                const rollbackData = rollbackFn(context.previousData, variables as TVariables);
+                if (rollbackData !== undefined) {
+                    queryClient.setQueryData<ApiResponse<TData>>(queryKey, rollbackData);
+                }
+            } else if (queryKey && context?.previousData) {
+                queryClient.setQueryData<ApiResponse<TData>>(queryKey, context.previousData);
             }
+
+            onError?.(error, variables, context);
         },
-        onSettled: () => {
-            // 성공/실패 관계없이 쿼리 무효화
-            if (options) {
-                queryClient.invalidateQueries({ queryKey: options.queryKey });
+        onSettled: (data, error, variables, context) => {
+            if (queryKey) {
+                void queryClient.invalidateQueries({ queryKey });
             }
+
+            onSettled?.(data, error, variables, context);
         },
         ...defaultMutationOptions,
+        ...restOptions,
     });
 }
