@@ -6,7 +6,10 @@ export const InquiryManagement = () => (
       <CardTitle>Inquiry management legacy view</CardTitle>
     </CardHeader>
     <CardContent>
-      <p className='text-sm text-muted-foreground'>Legacy inquiry management is no longer in use. Refer to the admin dashboard modules for the updated experience.</p>
+      <p className='text-sm text-muted-foreground'>
+        Legacy inquiry management is no longer in use. Refer to the admin
+        dashboard modules for the updated experience.
+      </p>
     </CardContent>
   </Card>
 );

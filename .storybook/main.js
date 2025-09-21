@@ -22,7 +22,7 @@ const config = {
     autodocs: 'tag',
   },
   staticDirs: ['../public'],
-  webpackFinal: async (config) => {
+  webpackFinal: async config => {
     // CSS 파일 처리
     config.module.rules.push({
       test: /\.css$/,

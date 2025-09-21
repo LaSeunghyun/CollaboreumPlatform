@@ -19,7 +19,7 @@ import {
   BarChart3,
   Palette,
   Settings,
-  LogOut
+  LogOut,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../lib/api/useUser';
@@ -75,27 +75,28 @@ export const Header: React.FC = () => {
   ];
 
   return (
-    <header className="border-b bg-white/95 backdrop-blur sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3 md:py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-8">
+    <header className='sticky top-0 z-50 border-b bg-white/95 backdrop-blur'>
+      <div className='container mx-auto px-4 py-3 md:py-4'>
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center gap-8'>
             <Link
-              to="/"
-              className="text-xl font-semibold text-indigo cursor-pointer hover:opacity-80 transition-opacity"
+              to='/'
+              className='cursor-pointer text-xl font-semibold text-indigo transition-opacity hover:opacity-80'
             >
               Collaboreum
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-6">
-              {navigationItems.map((item) => (
+            <nav className='hidden items-center gap-6 md:flex'>
+              {navigationItems.map(item => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`text-sm transition-colors hover:scale-105 ${isActive(item.path)
-                    ? "text-indigo font-medium"
-                    : "text-muted-foreground hover:text-foreground"
-                    }`}
+                  className={`text-sm transition-colors hover:scale-105 ${
+                    isActive(item.path)
+                      ? 'font-medium text-indigo'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
                 >
                   {item.label}
                 </Link>
@@ -104,17 +105,18 @@ export const Header: React.FC = () => {
               {/* 관리자 메뉴 */}
               {isAuthenticated && user?.role === 'admin' && (
                 <>
-                  <div className="h-4 w-px bg-border" />
-                  {adminNavigationItems.map((item) => (
+                  <div className='h-4 w-px bg-border' />
+                  {adminNavigationItems.map(item => (
                     <Link
                       key={item.path}
                       to={item.path}
-                      className={`flex items-center gap-2 text-sm transition-colors hover:scale-105 ${isActive(item.path)
-                        ? "text-indigo font-medium"
-                        : "text-muted-foreground hover:text-foreground"
-                        }`}
+                      className={`flex items-center gap-2 text-sm transition-colors hover:scale-105 ${
+                        isActive(item.path)
+                          ? 'font-medium text-indigo'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
                     >
-                      <Shield className="w-4 h-4" />
+                      <Shield className='h-4 w-4' />
                       {item.label}
                     </Link>
                   ))}
@@ -123,57 +125,67 @@ export const Header: React.FC = () => {
             </nav>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className='flex items-center gap-3'>
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="hidden md:block">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <form onSubmit={handleSearch} className='hidden md:block'>
+              <div className='relative'>
+                <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground' />
                 <input
-                  type="text"
-                  placeholder="검색..."
+                  type='text'
+                  placeholder='검색...'
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo/20 focus:border-indigo/50 w-64"
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className='focus:ring-indigo/20 focus:border-indigo/50 w-64 rounded-lg border border-border py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2'
                 />
               </div>
             </form>
 
             {/* Desktop Actions */}
-            <div className="hidden md:flex items-center gap-3">
+            <div className='hidden items-center gap-3 md:flex'>
               {isAuthenticated ? (
                 <>
-                  <Button variant="ghost" size="sm" className="relative hover:scale-105">
-                    <Bell className="w-4 h-4" />
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    className='relative hover:scale-105'
+                  >
+                    <Bell className='h-4 w-4' />
                     {unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      <span className='absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white'>
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-2 p-0 h-auto hover:bg-gray-100 rounded-full transition-colors">
-                        <Avatar className="w-8 h-8 cursor-pointer hover:scale-105 transition-transform">
+                      <button className='flex h-auto items-center gap-2 rounded-full p-0 transition-colors hover:bg-gray-100'>
+                        <Avatar className='h-8 w-8 cursor-pointer transition-transform hover:scale-105'>
                           <AvatarImage src={user?.avatar} />
-                          <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
+                          <AvatarFallback>
+                            {user?.name?.[0] || 'U'}
+                          </AvatarFallback>
                         </Avatar>
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuContent align='end' className='w-56'>
                       <DropdownMenuItem onClick={() => navigate('/account')}>
-                        <User className="mr-2 h-4 w-4" />
+                        <User className='mr-2 h-4 w-4' />
                         마이페이지
                       </DropdownMenuItem>
 
                       {(user?.role === 'artist' || user?.role === 'admin') && (
-                        <DropdownMenuItem onClick={() => navigate('/dashboard')}>
-                          <BarChart3 className="mr-2 h-4 w-4" />
-                          {user?.role === 'artist' ? '아티스트 대시보드' : '대시보드'}
+                        <DropdownMenuItem
+                          onClick={() => navigate('/dashboard')}
+                        >
+                          <BarChart3 className='mr-2 h-4 w-4' />
+                          {user?.role === 'artist'
+                            ? '아티스트 대시보드'
+                            : '대시보드'}
                         </DropdownMenuItem>
                       )}
 
                       <DropdownMenuItem onClick={() => navigate('/gallery')}>
-                        <Palette className="mr-2 h-4 w-4" />
+                        <Palette className='mr-2 h-4 w-4' />
                         작품 갤러리
                       </DropdownMenuItem>
 
@@ -182,7 +194,7 @@ export const Header: React.FC = () => {
                       {user?.role === 'admin' && (
                         <>
                           <DropdownMenuItem onClick={() => navigate('/admin')}>
-                            <Shield className="mr-2 h-4 w-4" />
+                            <Shield className='mr-2 h-4 w-4' />
                             어드민 관리
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -190,18 +202,20 @@ export const Header: React.FC = () => {
                       )}
 
                       <DropdownMenuItem>
-                        <Settings className="mr-2 h-4 w-4" />
+                        <Settings className='mr-2 h-4 w-4' />
                         설정
                       </DropdownMenuItem>
 
                       <DropdownMenuSeparator />
 
-                      <DropdownMenuItem onClick={() => {
-                        if (window.confirm('로그아웃하시겠습니까?')) {
-                          handleLogout();
-                        }
-                      }}>
-                        <LogOut className="mr-2 h-4 w-4" />
+                      <DropdownMenuItem
+                        onClick={() => {
+                          if (window.confirm('로그아웃하시겠습니까?')) {
+                            handleLogout();
+                          }
+                        }}
+                      >
+                        <LogOut className='mr-2 h-4 w-4' />
                         로그아웃
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -210,17 +224,17 @@ export const Header: React.FC = () => {
               ) : (
                 <>
                   <Button
-                    variant="ghost"
-                    size="sm"
-                    className="hover:scale-105 transition-transform"
+                    variant='ghost'
+                    size='sm'
+                    className='transition-transform hover:scale-105'
                     onClick={() => navigate('/login')}
                   >
                     로그인
                   </Button>
                   <Button
-                    size="sm"
-                    variant="indigo"
-                    className="hover:scale-105 transition-all shadow-sm"
+                    size='sm'
+                    variant='indigo'
+                    className='shadow-sm transition-all hover:scale-105'
                     onClick={() => navigate('/signup')}
                   >
                     회원가입
@@ -231,43 +245,48 @@ export const Header: React.FC = () => {
 
             {/* Mobile Menu Button */}
             <Button
-              variant="ghost"
-              size="sm"
-              className="md:hidden"
+              variant='ghost'
+              size='sm'
+              className='md:hidden'
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isMenuOpen ? (
+                <X className='h-5 w-5' />
+              ) : (
+                <Menu className='h-5 w-5' />
+              )}
             </Button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-border pt-4 space-y-4">
+          <div className='mt-4 space-y-4 border-t border-border pb-4 pt-4 md:hidden'>
             {/* Mobile Search */}
             <form onSubmit={handleSearch}>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <div className='relative'>
+                <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground' />
                 <input
-                  type="text"
-                  placeholder="검색..."
+                  type='text'
+                  placeholder='검색...'
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo/20 focus:border-indigo/50 w-full"
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className='focus:ring-indigo/20 focus:border-indigo/50 w-full rounded-lg border border-border py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2'
                 />
               </div>
             </form>
 
-            <nav className="flex flex-col space-y-3">
-              {navigationItems.map((item) => (
+            <nav className='flex flex-col space-y-3'>
+              {navigationItems.map(item => (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`text-left py-2 px-3 rounded-lg transition-colors ${isActive(item.path)
-                    ? "bg-indigo/10 text-indigo font-medium"
-                    : "text-muted-foreground hover:bg-surface"
-                    }`}
+                  className={`rounded-lg px-3 py-2 text-left transition-colors ${
+                    isActive(item.path)
+                      ? 'bg-indigo/10 font-medium text-indigo'
+                      : 'text-muted-foreground hover:bg-surface'
+                  }`}
                 >
                   {item.label}
                 </Link>
@@ -276,18 +295,19 @@ export const Header: React.FC = () => {
               {/* 모바일 관리자 메뉴 */}
               {isAuthenticated && user?.role === 'admin' && (
                 <>
-                  <div className="h-px bg-border my-2" />
-                  {adminNavigationItems.map((item) => (
+                  <div className='my-2 h-px bg-border' />
+                  {adminNavigationItems.map(item => (
                     <Link
                       key={item.path}
                       to={item.path}
                       onClick={() => setIsMenuOpen(false)}
-                      className={`flex items-center gap-2 text-left py-2 px-3 rounded-lg transition-colors ${isActive(item.path)
-                        ? "bg-indigo/10 text-indigo font-medium"
-                        : "text-muted-foreground hover:bg-surface"
-                        }`}
+                      className={`flex items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors ${
+                        isActive(item.path)
+                          ? 'bg-indigo/10 font-medium text-indigo'
+                          : 'text-muted-foreground hover:bg-surface'
+                      }`}
                     >
-                      <Shield className="w-4 h-4" />
+                      <Shield className='h-4 w-4' />
                       {item.label}
                     </Link>
                   ))}
@@ -296,20 +316,22 @@ export const Header: React.FC = () => {
             </nav>
 
             {/* Mobile Auth Actions */}
-            <div className="pt-3 border-t border-border">
+            <div className='border-t border-border pt-3'>
               {isAuthenticated ? (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="w-8 h-8">
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center gap-3'>
+                    <Avatar className='h-8 w-8'>
                       <AvatarImage src={user?.avatar} />
                       <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
                     </Avatar>
-                    <span className="text-sm font-medium">{user?.name || '사용자'}</span>
+                    <span className='text-sm font-medium'>
+                      {user?.name || '사용자'}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className='flex items-center gap-2'>
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant='ghost'
+                      size='sm'
                       onClick={() => {
                         navigate('/account');
                         setIsMenuOpen(false);
@@ -317,14 +339,10 @@ export const Header: React.FC = () => {
                     >
                       마이페이지
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="relative"
-                    >
-                      <Bell className="w-4 h-4" />
+                    <Button variant='ghost' size='sm' className='relative'>
+                      <Bell className='h-4 w-4' />
                       {unreadCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                        <span className='absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white'>
                           {unreadCount > 9 ? '9+' : unreadCount}
                         </span>
                       )}
@@ -332,10 +350,10 @@ export const Header: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="flex gap-3">
+                <div className='flex gap-3'>
                   <Button
-                    variant="outline"
-                    className="flex-1"
+                    variant='outline'
+                    className='flex-1'
                     onClick={() => {
                       navigate('/login');
                       setIsMenuOpen(false);
@@ -344,8 +362,8 @@ export const Header: React.FC = () => {
                     로그인
                   </Button>
                   <Button
-                    className="flex-1"
-                    variant="indigo"
+                    className='flex-1'
+                    variant='indigo'
                     onClick={() => {
                       navigate('/signup');
                       setIsMenuOpen(false);

@@ -31,6 +31,8 @@ describe('ProjectGrid', () => {
     expect(screen.getByText('테스트 프로젝트 1')).toBeInTheDocument();
     expect(screen.getByText('테스트 프로젝트 2')).toBeInTheDocument();
     expect(screen.getByText('추천')).toBeInTheDocument();
-    expect(screen.getByText(/첫 번째 테스트 프로젝트에 대한/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/첫 번째 테스트 프로젝트에 대한/),
+    ).toBeInTheDocument();
   });
 });

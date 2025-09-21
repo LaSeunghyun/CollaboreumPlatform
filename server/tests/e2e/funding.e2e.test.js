@@ -101,8 +101,8 @@ describe('Funding E2E Tests', () => {
       testSetup.expectPaginatedResponse(response);
       response.body.data.forEach(project => {
         expect(
-          project.title.includes('테스트') || 
-          project.description.includes('테스트')
+          project.title.includes('테스트') ||
+            project.description.includes('테스트'),
         ).toBe(true);
       });
     });
@@ -111,7 +111,7 @@ describe('Funding E2E Tests', () => {
   describe('POST /api/funding/projects/:id/publish', () => {
     it('should publish a draft project', async () => {
       const project = testData.projects[0];
-      
+
       const response = await request(app)
         .post(`/api/funding/projects/${project._id}/publish`)
         .set(testSetup.createAuthHeaders(project.ownerId));
@@ -122,7 +122,7 @@ describe('Funding E2E Tests', () => {
 
     it('should reject publishing by non-owner', async () => {
       const project = testData.projects[0];
-      
+
       const response = await request(app)
         .post(`/api/funding/projects/${project._id}/publish`)
         .set(testSetup.createAuthHeaders(testData.users[2]._id)); // 다른 사용자
@@ -152,7 +152,7 @@ describe('Funding E2E Tests', () => {
 
     it('should reject pledge for inactive project', async () => {
       const { FundingProject } = require('../../src/models/FundingProject');
-      
+
       // 프로젝트를 비활성화
       await FundingProject.findByIdAndUpdate(testData.projects[0]._id, {
         isActive: false,
@@ -176,10 +176,10 @@ describe('Funding E2E Tests', () => {
     it('should complete full funding lifecycle', async () => {
       const { FundingProject } = require('../../src/models/FundingProject');
       const { Pledge } = require('../../src/models/Pledge');
-      
+
       // 1. 프로젝트 생성
       const project = testData.projects[0];
-      
+
       // 2. 프로젝트 발행
       await request(app)
         .post(`/api/funding/projects/${project._id}/publish`)
@@ -219,8 +219,7 @@ describe('Funding E2E Tests', () => {
       // 데이터베이스 연결 끊기
       await mongoose.connection.close();
 
-      const response = await request(app)
-        .get('/api/funding/projects');
+      const response = await request(app).get('/api/funding/projects');
 
       expect(response.status).toBe(500);
       expect(response.body.success).toBe(false);
@@ -232,7 +231,7 @@ describe('Funding E2E Tests', () => {
 
     it('should handle invalid project ID', async () => {
       const invalidId = new mongoose.Types.ObjectId();
-      
+
       const response = await request(app)
         .get(`/api/funding/projects/${invalidId}`)
         .set(testSetup.createAuthHeaders(testData.users[1]._id));
@@ -257,13 +256,11 @@ describe('Funding E2E Tests', () => {
   describe('Performance Tests', () => {
     it('should handle multiple concurrent requests', async () => {
       const promises = Array.from({ length: 10 }, (_, i) =>
-        request(app)
-          .get('/api/funding/projects')
-          .query({ page: 1, limit: 5 })
+        request(app).get('/api/funding/projects').query({ page: 1, limit: 5 }),
       );
 
       const responses = await Promise.all(promises);
-      
+
       responses.forEach(response => {
         expect(response.status).toBe(200);
         expect(response.body.success).toBe(true);
@@ -272,12 +269,11 @@ describe('Funding E2E Tests', () => {
 
     it('should respond within acceptable time limits', async () => {
       const startTime = Date.now();
-      
-      const response = await request(app)
-        .get('/api/funding/projects');
-      
+
+      const response = await request(app).get('/api/funding/projects');
+
       const responseTime = Date.now() - startTime;
-      
+
       expect(response.status).toBe(200);
       expect(responseTime).toBeLessThan(1000); // 1초 이내
     });

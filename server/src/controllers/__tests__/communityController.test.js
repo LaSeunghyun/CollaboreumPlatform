@@ -15,7 +15,7 @@ jest.mock('../../services/communityService', () => ({
   addComment: jest.fn(),
   updateComment: jest.fn(),
   deleteComment: jest.fn(),
-  reactToComment: jest.fn()
+  reactToComment: jest.fn(),
 }));
 
 const communityService = require('../../services/communityService');
@@ -43,7 +43,7 @@ describe('communityController', () => {
 
     expect(res.json).toHaveBeenCalledWith({
       success: true,
-      data: [{ value: '자유' }]
+      data: [{ value: '자유' }],
     });
     expect(next).not.toHaveBeenCalled();
   });
@@ -73,13 +73,13 @@ describe('communityController', () => {
     expect(communityService.createPost).toHaveBeenCalledWith({
       title: 't',
       author: 'user',
-      authorName: undefined
+      authorName: undefined,
     });
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
       success: true,
       data: created,
-      message: '포스트가 생성되었습니다.'
+      message: '포스트가 생성되었습니다.',
     });
   });
 

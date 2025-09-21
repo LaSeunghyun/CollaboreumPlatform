@@ -1,6 +1,6 @@
 const DEFAULT_LANGUAGE_OPTIONS = {
   ecmaVersion: 2021,
-  sourceType: 'module'
+  sourceType: 'module',
 };
 
 function loadBaseRecommended() {
@@ -32,11 +32,11 @@ module.exports = {
       name: 'eslint:recommended',
       languageOptions: { ...DEFAULT_LANGUAGE_OPTIONS },
       linterOptions: {
-        reportUnusedDisableDirectives: true
+        reportUnusedDisableDirectives: true,
       },
       rules: {
-        ...baseRecommended.rules
-      }
-    }
-  }
+        ...baseRecommended.rules,
+      },
+    },
+  },
 };

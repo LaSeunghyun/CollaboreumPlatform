@@ -5,13 +5,15 @@ require('dotenv').config();
 const checkCategories = async () => {
   try {
     // MongoDB 연결
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/collaboreum');
+    await mongoose.connect(
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/collaboreum',
+    );
     console.log('MongoDB에 연결되었습니다.');
 
     // 모든 게시글의 카테고리 확인
     const posts = await CommunityPost.find({}, 'title category');
     console.log(`총 게시글 수: ${posts.length}`);
-    
+
     // 카테고리별 개수 확인
     const categoryCount = {};
     posts.forEach(post => {
@@ -29,10 +31,11 @@ const checkCategories = async () => {
     if (reviewPosts.length > 0) {
       console.log('\n"review" 카테고리 게시글:');
       reviewPosts.forEach(post => {
-        console.log(`- ID: ${post._id}, 제목: ${post.title}, 카테고리: ${post.category}`);
+        console.log(
+          `- ID: ${post._id}, 제목: ${post.title}, 카테고리: ${post.category}`,
+        );
       });
     }
-
   } catch (error) {
     console.error('오류가 발생했습니다:', error);
   } finally {

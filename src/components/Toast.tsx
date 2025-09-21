@@ -1,21 +1,21 @@
-import { Toaster } from "sonner";
+import { Toaster } from 'sonner';
 
 export function Toast() {
   return (
     <Toaster
-      position="top-center"
+      position='top-center'
       toastOptions={{
         style: {
-          background: "var(--background)",
-          border: "1px solid var(--border)",
-          color: "var(--foreground)",
-          borderRadius: "var(--radius-lg)",
-          fontSize: "14px",
-          fontFamily: "Inter, system-ui, sans-serif",
+          background: 'var(--background)',
+          border: '1px solid var(--border)',
+          color: 'var(--foreground)',
+          borderRadius: 'var(--radius-lg)',
+          fontSize: '14px',
+          fontFamily: 'Inter, system-ui, sans-serif',
         },
-        className: "shadow-md",
+        className: 'shadow-md',
       }}
-      theme="light"
+      theme='light'
       richColors
     />
   );

@@ -27,7 +27,7 @@ export function VirtualizedList<T>({
       containerHeight,
       itemHeight,
       items.length,
-      overscan
+      overscan,
     );
   }, [scrollTop, containerHeight, itemHeight, items.length, overscan]);
 
@@ -60,10 +60,7 @@ export function VirtualizedList<T>({
           }}
         >
           {visibleItems.map((item, index) => (
-            <div
-              key={startIndex + index}
-              style={{ height: itemHeight }}
-            >
+            <div key={startIndex + index} style={{ height: itemHeight }}>
               {renderItem(item, startIndex + index)}
             </div>
           ))}
@@ -104,14 +101,22 @@ export function VirtualizedGrid<T>({
     const startRow = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
     const endRow = Math.min(
       rowCount - 1,
-      Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
+      Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan,
     );
-    
+
     return {
       startIndex: startRow * itemsPerRow,
       endIndex: Math.min(items.length - 1, (endRow + 1) * itemsPerRow - 1),
     };
-  }, [scrollTop, containerHeight, itemHeight, rowCount, itemsPerRow, items.length, overscan]);
+  }, [
+    scrollTop,
+    containerHeight,
+    itemHeight,
+    rowCount,
+    itemsPerRow,
+    items.length,
+    overscan,
+  ]);
 
   const visibleItems = useMemo(() => {
     return items.slice(startIndex, endIndex + 1);
@@ -152,10 +157,7 @@ export function VirtualizedGrid<T>({
           }}
         >
           {visibleItems.map((item, index) => (
-            <div
-              key={startIndex + index}
-              style={{ height: itemHeight }}
-            >
+            <div key={startIndex + index} style={{ height: itemHeight }}>
               {renderItem(item, startIndex + index)}
             </div>
           ))}

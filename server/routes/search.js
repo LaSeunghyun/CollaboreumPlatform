@@ -9,17 +9,17 @@ const Event = require('../models/Event');
 // 통합 검색 API
 router.get('/', async (req, res) => {
   try {
-    const { 
-      query, 
+    const {
+      query,
       type = 'all', // 'all', 'artists', 'projects', 'events', 'posts'
-      page = 1, 
-      limit = 10 
+      page = 1,
+      limit = 10,
     } = req.query;
 
     if (!query || query.trim().length === 0) {
       return res.status(400).json({
         success: false,
-        message: '검색어를 입력해주세요.'
+        message: '검색어를 입력해주세요.',
       });
     }
 
@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
       projects: [],
       events: [],
       posts: [],
-      total: 0
+      total: 0,
     };
 
     // 아티스트 검색
@@ -42,8 +42,8 @@ router.get('/', async (req, res) => {
           { name: { $regex: searchQuery, $options: 'i' } },
           { bio: { $regex: searchQuery, $options: 'i' } },
           { category: { $regex: searchQuery, $options: 'i' } },
-          { genre: { $regex: searchQuery, $options: 'i' } }
-        ]
+          { genre: { $regex: searchQuery, $options: 'i' } },
+        ],
       };
 
       const [artists, artistCount] = await Promise.all([
@@ -53,7 +53,7 @@ router.get('/', async (req, res) => {
           .skip(skip)
           .limit(parseInt(limit))
           .lean(),
-        User.countDocuments(artistQuery)
+        User.countDocuments(artistQuery),
       ]);
 
       results.artists = artists.map(artist => ({
@@ -65,7 +65,7 @@ router.get('/', async (req, res) => {
         category: artist.category || '기타',
         genre: artist.genre || '',
         createdAt: artist.createdAt,
-        type: 'artist'
+        type: 'artist',
       }));
 
       results.total += artistCount;
@@ -79,8 +79,8 @@ router.get('/', async (req, res) => {
           { title: { $regex: searchQuery, $options: 'i' } },
           { description: { $regex: searchQuery, $options: 'i' } },
           { category: { $regex: searchQuery, $options: 'i' } },
-          { tags: { $in: [new RegExp(searchQuery, 'i')] } }
-        ]
+          { tags: { $in: [new RegExp(searchQuery, 'i')] } },
+        ],
       };
 
       const [projects, projectCount] = await Promise.all([
@@ -90,7 +90,7 @@ router.get('/', async (req, res) => {
           .skip(skip)
           .limit(parseInt(limit))
           .lean(),
-        FundingProject.countDocuments(projectQuery)
+        FundingProject.countDocuments(projectQuery),
       ]);
 
       results.projects = projects.map(project => ({
@@ -105,10 +105,10 @@ router.get('/', async (req, res) => {
         creator: {
           id: project.creatorId._id,
           name: project.creatorId.name,
-          avatar: project.creatorId.avatar
+          avatar: project.creatorId.avatar,
         },
         createdAt: project.createdAt,
-        type: 'project'
+        type: 'project',
       }));
 
       results.total += projectCount;
@@ -122,8 +122,8 @@ router.get('/', async (req, res) => {
           { title: { $regex: searchQuery, $options: 'i' } },
           { description: { $regex: searchQuery, $options: 'i' } },
           { location: { $regex: searchQuery, $options: 'i' } },
-          { category: { $regex: searchQuery, $options: 'i' } }
-        ]
+          { category: { $regex: searchQuery, $options: 'i' } },
+        ],
       };
 
       const [events, eventCount] = await Promise.all([
@@ -133,7 +133,7 @@ router.get('/', async (req, res) => {
           .skip(skip)
           .limit(parseInt(limit))
           .lean(),
-        Event.countDocuments(eventQuery)
+        Event.countDocuments(eventQuery),
       ]);
 
       results.events = events.map(event => ({
@@ -148,10 +148,10 @@ router.get('/', async (req, res) => {
         organizer: {
           id: event.organizerId._id,
           name: event.organizerId.name,
-          avatar: event.organizerId.avatar
+          avatar: event.organizerId.avatar,
         },
         createdAt: event.createdAt,
-        type: 'event'
+        type: 'event',
       }));
 
       results.total += eventCount;
@@ -164,8 +164,8 @@ router.get('/', async (req, res) => {
         $or: [
           { title: { $regex: searchQuery, $options: 'i' } },
           { content: { $regex: searchQuery, $options: 'i' } },
-          { category: { $regex: searchQuery, $options: 'i' } }
-        ]
+          { category: { $regex: searchQuery, $options: 'i' } },
+        ],
       };
 
       const [posts, postCount] = await Promise.all([
@@ -175,7 +175,7 @@ router.get('/', async (req, res) => {
           .skip(skip)
           .limit(parseInt(limit))
           .lean(),
-        CommunityPost.countDocuments(postQuery)
+        CommunityPost.countDocuments(postQuery),
       ]);
 
       results.posts = posts.map(post => ({
@@ -190,10 +190,10 @@ router.get('/', async (req, res) => {
         author: {
           id: post.author._id,
           name: post.author.name,
-          avatar: post.author.avatar
+          avatar: post.author.avatar,
         },
         createdAt: post.createdAt,
-        type: 'post'
+        type: 'post',
       }));
 
       results.total += postCount;
@@ -206,18 +206,17 @@ router.get('/', async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total: results.total,
-        pages: Math.ceil(results.total / parseInt(limit))
+        pages: Math.ceil(results.total / parseInt(limit)),
       },
       query: searchQuery,
-      type: type
+      type: type,
     });
-
   } catch (error) {
     console.error('검색 오류:', error);
     res.status(500).json({
       success: false,
       message: '검색 중 오류가 발생했습니다.',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 });
@@ -227,20 +226,31 @@ router.get('/popular', async (req, res) => {
   try {
     // 최근 7일간의 인기 검색어 (실제 구현에서는 검색 로그를 저장해야 함)
     const popularKeywords = [
-      '음악', '아트', '디자인', '영화', '게임', '책', '공연', '전시',
-      '크라우드펀딩', '펀딩', '후원', '아티스트', '창작자', '프로젝트'
+      '음악',
+      '아트',
+      '디자인',
+      '영화',
+      '게임',
+      '책',
+      '공연',
+      '전시',
+      '크라우드펀딩',
+      '펀딩',
+      '후원',
+      '아티스트',
+      '창작자',
+      '프로젝트',
     ];
 
     res.json({
       success: true,
-      data: popularKeywords.slice(0, 10)
+      data: popularKeywords.slice(0, 10),
     });
-
   } catch (error) {
     console.error('인기 검색어 조회 오류:', error);
     res.status(500).json({
       success: false,
-      message: '인기 검색어 조회 중 오류가 발생했습니다.'
+      message: '인기 검색어 조회 중 오류가 발생했습니다.',
     });
   }
 });
@@ -253,7 +263,7 @@ router.get('/suggestions', async (req, res) => {
     if (!query || query.trim().length < 2) {
       return res.json({
         success: true,
-        data: []
+        data: [],
       });
     }
 
@@ -264,55 +274,60 @@ router.get('/suggestions', async (req, res) => {
     const artistSuggestions = await User.find({
       role: 'artist',
       isActive: true,
-      name: { $regex: searchQuery, $options: 'i' }
+      name: { $regex: searchQuery, $options: 'i' },
     })
-    .select('name')
-    .limit(5)
-    .lean();
+      .select('name')
+      .limit(5)
+      .lean();
 
-    suggestions.push(...artistSuggestions.map(artist => ({
-      text: artist.name,
-      type: 'artist'
-    })));
+    suggestions.push(
+      ...artistSuggestions.map(artist => ({
+        text: artist.name,
+        type: 'artist',
+      })),
+    );
 
     // 프로젝트 제목에서 제안
     const projectSuggestions = await FundingProject.find({
       status: { $in: ['진행중', '성공', '완료'] },
-      title: { $regex: searchQuery, $options: 'i' }
+      title: { $regex: searchQuery, $options: 'i' },
     })
-    .select('title')
-    .limit(5)
-    .lean();
+      .select('title')
+      .limit(5)
+      .lean();
 
-    suggestions.push(...projectSuggestions.map(project => ({
-      text: project.title,
-      type: 'project'
-    })));
+    suggestions.push(
+      ...projectSuggestions.map(project => ({
+        text: project.title,
+        type: 'project',
+      })),
+    );
 
     // 이벤트 제목에서 제안
     const eventSuggestions = await Event.find({
       status: { $in: ['예정', '진행중'] },
-      title: { $regex: searchQuery, $options: 'i' }
+      title: { $regex: searchQuery, $options: 'i' },
     })
-    .select('title')
-    .limit(5)
-    .lean();
+      .select('title')
+      .limit(5)
+      .lean();
 
-    suggestions.push(...eventSuggestions.map(event => ({
-      text: event.title,
-      type: 'event'
-    })));
+    suggestions.push(
+      ...eventSuggestions.map(event => ({
+        text: event.title,
+        type: 'event',
+      })),
+    );
 
     res.json({
       success: true,
-      data: suggestions.slice(0, 10)
+      data: suggestions.slice(0, 10),
     });
-
   } catch (error) {
     console.error('검색 제안 오류:', error);
     res.status(500).json({
       success: false,
-      message: '검색 제안 조회 중 오류가 발생했습니다.'
+      message: '검색 제안 조회 중 오류가 발생했습니다.',
     });
   }
 });

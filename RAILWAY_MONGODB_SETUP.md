@@ -1,7 +1,9 @@
 # Railway MongoDB 설정 가이드
 
 ## 문제 상황
+
 현재 MongoDB 연결에서 인증 실패가 발생하고 있습니다:
+
 ```
 ❌ MongoDB connection failed: bad auth : authentication failed
 ```
@@ -13,6 +15,7 @@
 Railway 프로젝트 대시보드에서 다음 환경변수를 설정해야 합니다:
 
 #### 필수 환경변수:
+
 ```
 MONGODB_URI=mongodb+srv://username:password@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster
 JWT_SECRET=your-super-secret-jwt-key-here
@@ -29,6 +32,7 @@ NODE_ENV=production
    - `0.0.0.0/0` (모든 IP 허용) 또는 Railway IP 범위 추가
 
 ### 3. 연결 문자열 형식
+
 ```
 mongodb+srv://[username]:[password]@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster
 ```
@@ -45,6 +49,7 @@ mongodb+srv://[username]:[password]@collaboreum-cluster.tdwqiwn.mongodb.net/?ret
 ### 5. 배포 재시작
 
 환경변수 설정 후:
+
 1. Railway에서 **Deploy** 버튼 클릭하여 재배포
 2. 또는 자동 재배포가 시작될 때까지 대기
 

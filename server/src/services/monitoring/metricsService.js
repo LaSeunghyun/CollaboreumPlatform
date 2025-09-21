@@ -82,7 +82,7 @@ class MetricsService {
 
     this.startTime = Date.now();
     this.resetInterval = 24 * 60 * 60 * 1000; // 24시간마다 리셋
-    
+
     // 주기적 리셋 설정
     setInterval(() => {
       this.resetDailyMetrics();
@@ -94,7 +94,7 @@ class MetricsService {
    */
   recordRequest(method, endpoint, statusCode, responseTime) {
     this.metrics.requests.total++;
-    
+
     if (statusCode >= 200 && statusCode < 400) {
       this.metrics.requests.successful++;
     } else {
@@ -111,7 +111,7 @@ class MetricsService {
         responseTime: { min: Infinity, max: 0, sum: 0, count: 0 },
       };
     }
-    
+
     const endpointMetrics = this.metrics.requests.byEndpoint[key];
     endpointMetrics.total++;
     if (statusCode >= 200 && statusCode < 400) {
@@ -129,7 +129,7 @@ class MetricsService {
         failed: 0,
       };
     }
-    
+
     const methodMetrics = this.metrics.requests.byMethod[method];
     methodMetrics.total++;
     if (statusCode >= 200 && statusCode < 400) {
@@ -147,7 +147,7 @@ class MetricsService {
    */
   recordDatabaseQuery(collection, operation, success, responseTime) {
     this.metrics.database.queries.total++;
-    
+
     if (success) {
       this.metrics.database.queries.successful++;
     } else {
@@ -163,8 +163,9 @@ class MetricsService {
         operations: {},
       };
     }
-    
-    const collectionMetrics = this.metrics.database.queries.byCollection[collection];
+
+    const collectionMetrics =
+      this.metrics.database.queries.byCollection[collection];
     collectionMetrics.total++;
     if (success) {
       collectionMetrics.successful++;
@@ -179,7 +180,10 @@ class MetricsService {
     collectionMetrics.operations[operation]++;
 
     // 응답 시간 통계
-    this.updateResponseTime(this.metrics.database.queries.responseTime, responseTime);
+    this.updateResponseTime(
+      this.metrics.database.queries.responseTime,
+      responseTime,
+    );
   }
 
   /**
@@ -205,11 +209,11 @@ class MetricsService {
     if (!this.metrics.business[category]) {
       this.metrics.business[category] = {};
     }
-    
+
     if (!this.metrics.business[category][metric]) {
       this.metrics.business[category][metric] = 0;
     }
-    
+
     this.metrics.business[category][metric] += value;
   }
 
@@ -221,7 +225,7 @@ class MetricsService {
     this.metrics.system.memory.used = memUsage.heapUsed;
     this.metrics.system.memory.free = memUsage.heapTotal - memUsage.heapUsed;
     this.metrics.system.memory.total = memUsage.heapTotal;
-    
+
     this.metrics.system.uptime = Date.now() - this.startTime;
   }
 
@@ -255,17 +259,27 @@ class MetricsService {
     const cache = this.metrics.cache;
 
     return {
-      successRate: requests.total > 0 ? (requests.successful / requests.total) * 100 : 0,
-      errorRate: requests.total > 0 ? (requests.failed / requests.total) * 100 : 0,
-      avgResponseTime: requests.responseTime.count > 0 ? 
-        requests.responseTime.sum / requests.responseTime.count : 0,
+      successRate:
+        requests.total > 0 ? (requests.successful / requests.total) * 100 : 0,
+      errorRate:
+        requests.total > 0 ? (requests.failed / requests.total) * 100 : 0,
+      avgResponseTime:
+        requests.responseTime.count > 0
+          ? requests.responseTime.sum / requests.responseTime.count
+          : 0,
       dbSuccessRate: db.total > 0 ? (db.successful / db.total) * 100 : 0,
-      cacheHitRate: (cache.hits + cache.misses) > 0 ? 
-        (cache.hits / (cache.hits + cache.misses)) * 100 : 0,
-      avgDbResponseTime: db.responseTime.count > 0 ? 
-        db.responseTime.sum / db.responseTime.count : 0,
-      avgCacheResponseTime: cache.responseTime.count > 0 ? 
-        cache.responseTime.sum / cache.responseTime.count : 0,
+      cacheHitRate:
+        cache.hits + cache.misses > 0
+          ? (cache.hits / (cache.hits + cache.misses)) * 100
+          : 0,
+      avgDbResponseTime:
+        db.responseTime.count > 0
+          ? db.responseTime.sum / db.responseTime.count
+          : 0,
+      avgCacheResponseTime:
+        cache.responseTime.count > 0
+          ? cache.responseTime.sum / cache.responseTime.count
+          : 0,
     };
   }
 
@@ -274,7 +288,7 @@ class MetricsService {
    */
   calculateSLOs() {
     const calculated = this.calculateDerivedMetrics();
-    
+
     return {
       availability: {
         target: 99.9, // 99.9% 가용성 목표
@@ -335,7 +349,9 @@ class MetricsService {
     }
 
     // 메모리 사용률 알람
-    const memoryUsagePercent = (this.metrics.system.memory.used / this.metrics.system.memory.total) * 100;
+    const memoryUsagePercent =
+      (this.metrics.system.memory.used / this.metrics.system.memory.total) *
+      100;
     if (memoryUsagePercent > 90) {
       alerts.push({
         type: 'memory',
@@ -386,37 +402,37 @@ class MetricsService {
   exportPrometheusMetrics() {
     const metrics = this.getMetrics();
     const calculated = metrics.calculated;
-    
+
     let prometheus = '';
-    
+
     // HTTP 요청 메트릭
     prometheus += `# HELP http_requests_total Total number of HTTP requests\n`;
     prometheus += `# TYPE http_requests_total counter\n`;
     prometheus += `http_requests_total ${metrics.requests.total}\n\n`;
-    
+
     prometheus += `# HELP http_requests_successful_total Total number of successful HTTP requests\n`;
     prometheus += `# TYPE http_requests_successful_total counter\n`;
     prometheus += `http_requests_successful_total ${metrics.requests.successful}\n\n`;
-    
+
     prometheus += `# HELP http_request_duration_seconds Average HTTP request duration\n`;
     prometheus += `# TYPE http_request_duration_seconds gauge\n`;
     prometheus += `http_request_duration_seconds ${calculated.avgResponseTime / 1000}\n\n`;
-    
+
     // 데이터베이스 메트릭
     prometheus += `# HELP database_queries_total Total number of database queries\n`;
     prometheus += `# TYPE database_queries_total counter\n`;
     prometheus += `database_queries_total ${metrics.database.queries.total}\n\n`;
-    
+
     // 캐시 메트릭
     prometheus += `# HELP cache_hit_rate Cache hit rate\n`;
     prometheus += `# TYPE cache_hit_rate gauge\n`;
     prometheus += `cache_hit_rate ${calculated.cacheHitRate / 100}\n\n`;
-    
+
     // 비즈니스 메트릭
     prometheus += `# HELP funding_projects_created_total Total number of funding projects created\n`;
     prometheus += `# TYPE funding_projects_created_total counter\n`;
     prometheus += `funding_projects_created_total ${metrics.business.funding.projectsCreated}\n\n`;
-    
+
     return prometheus;
   }
 }

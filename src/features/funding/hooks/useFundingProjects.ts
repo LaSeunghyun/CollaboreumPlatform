@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fundingService } from '../services/fundingService';
-import { 
-  FundingProject, 
-  FundingStats, 
+import {
+  FundingProject,
+  FundingStats,
   FundingFilters,
   CreateFundingProjectRequest,
   UpdateFundingProjectRequest,
-  BackProjectRequest 
+  BackProjectRequest,
 } from '../types/funding.types';
 
 // 펀딩 프로젝트 목록 조회
@@ -39,7 +39,7 @@ export function useCreateFundingProject() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateFundingProjectRequest) => 
+    mutationFn: (data: CreateFundingProjectRequest) =>
       fundingService.createProject(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['funding', 'projects'] });
@@ -53,11 +53,13 @@ export function useUpdateFundingProject() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, ...data }: UpdateFundingProjectRequest) => 
+    mutationFn: ({ id, ...data }: UpdateFundingProjectRequest) =>
       fundingService.updateProject(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['funding', 'projects'] });
-      queryClient.invalidateQueries({ queryKey: ['funding', 'project', variables.id] });
+      queryClient.invalidateQueries({
+        queryKey: ['funding', 'project', variables.id],
+      });
     },
   });
 }
@@ -82,7 +84,9 @@ export function useBackProject() {
   return useMutation({
     mutationFn: (data: BackProjectRequest) => fundingService.backProject(data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['funding', 'project', variables.projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ['funding', 'project', variables.projectId],
+      });
       queryClient.invalidateQueries({ queryKey: ['funding', 'projects'] });
       queryClient.invalidateQueries({ queryKey: ['funding', 'stats'] });
     },
@@ -96,7 +100,9 @@ export function useLikeProject() {
   return useMutation({
     mutationFn: (projectId: number) => fundingService.likeProject(projectId),
     onSuccess: (_, projectId) => {
-      queryClient.invalidateQueries({ queryKey: ['funding', 'project', projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ['funding', 'project', projectId],
+      });
       queryClient.invalidateQueries({ queryKey: ['funding', 'projects'] });
     },
   });
@@ -107,7 +113,8 @@ export function useBookmarkProject() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (projectId: number) => fundingService.bookmarkProject(projectId),
+    mutationFn: (projectId: number) =>
+      fundingService.bookmarkProject(projectId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['funding', 'projects'] });
     },

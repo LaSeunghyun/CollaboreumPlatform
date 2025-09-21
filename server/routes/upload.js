@@ -18,9 +18,12 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     // 파일명 중복 방지를 위해 타임스탬프 추가
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(
+      null,
+      file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname),
+    );
+  },
 });
 
 const fileFilter = (req, file, cb) => {
@@ -36,9 +39,9 @@ const upload = multer({
   storage: storage,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB
-    files: 5 // 최대 5개 파일
+    files: 5, // 최대 5개 파일
   },
-  fileFilter: fileFilter
+  fileFilter: fileFilter,
 });
 
 // 이미지 업로드
@@ -47,7 +50,7 @@ router.post('/images', auth, upload.array('images', 5), async (req, res) => {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({
         success: false,
-        message: '업로드할 이미지가 없습니다.'
+        message: '업로드할 이미지가 없습니다.',
       });
     }
 
@@ -57,25 +60,26 @@ router.post('/images', auth, upload.array('images', 5), async (req, res) => {
       originalname: file.originalname,
       size: file.size,
       mimetype: file.mimetype,
-      path: `/uploads/images/${file.filename}` // 클라이언트에서 접근할 수 있는 경로
+      path: `/uploads/images/${file.filename}`, // 클라이언트에서 접근할 수 있는 경로
     }));
 
     // 실제 서버 URL 구성 (환경변수 사용)
-    const baseUrl = process.env.BASE_URL || `http://${process.env.HOST || 'localhost'}:${process.env.PORT || 5000}`;
+    const baseUrl =
+      process.env.BASE_URL ||
+      `http://${process.env.HOST || 'localhost'}:${process.env.PORT || 5000}`;
     const urls = uploadedFiles.map(file => baseUrl + file.path);
 
     res.json({
       success: true,
       message: '이미지 업로드가 완료되었습니다.',
       files: uploadedFiles,
-      urls: urls
+      urls: urls,
     });
-
   } catch (error) {
     console.error('이미지 업로드 오류:', error);
     res.status(500).json({
       success: false,
-      message: '이미지 업로드 중 오류가 발생했습니다.'
+      message: '이미지 업로드 중 오류가 발생했습니다.',
     });
   }
 });
@@ -90,19 +94,19 @@ router.delete('/images/:filename', auth, async (req, res) => {
       fs.unlinkSync(filepath);
       res.json({
         success: true,
-        message: '이미지가 삭제되었습니다.'
+        message: '이미지가 삭제되었습니다.',
       });
     } else {
       res.status(404).json({
         success: false,
-        message: '파일을 찾을 수 없습니다.'
+        message: '파일을 찾을 수 없습니다.',
       });
     }
   } catch (error) {
     console.error('이미지 삭제 오류:', error);
     res.status(500).json({
       success: false,
-      message: '이미지 삭제 중 오류가 발생했습니다.'
+      message: '이미지 삭제 중 오류가 발생했습니다.',
     });
   }
 });

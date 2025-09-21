@@ -19,12 +19,12 @@ describe('Performance Tests', () => {
             items={largeDataset}
             itemHeight={50}
             containerHeight={400}
-            renderItem={(item) => (
+            renderItem={item => (
               <div key={item.id} data-testid={`item-${item.id}`}>
                 {item.title}
               </div>
             )}
-          />
+          />,
         );
       });
 
@@ -36,12 +36,12 @@ describe('Performance Tests', () => {
       const renderTime = measurePerformance(() => {
         render(
           <OptimizedImage
-            src="https://via.placeholder.com/400x300"
-            alt="Test image"
+            src='https://via.placeholder.com/400x300'
+            alt='Test image'
             width={400}
             height={300}
             lazy={true}
-          />
+          />,
         );
       });
 
@@ -51,7 +51,7 @@ describe('Performance Tests', () => {
 
     it('should not cause memory leaks with frequent re-renders', () => {
       const initialMemory = measureMemory();
-      
+
       if (initialMemory) {
         // 100번의 리렌더링 시뮬레이션
         for (let i = 0; i < 100; i++) {
@@ -63,7 +63,7 @@ describe('Performance Tests', () => {
                 width={400}
                 height={300}
               />
-            </div>
+            </div>,
           );
           unmount();
         }
@@ -74,12 +74,14 @@ describe('Performance Tests', () => {
         }
 
         const finalMemory = measureMemory();
-        
+
         if (finalMemory && initialMemory) {
           // 메모리 사용량이 2배 이상 증가하지 않아야 함
-          const memoryIncrease = finalMemory.usedJSHeapSize - initialMemory.usedJSHeapSize;
-          const memoryIncreaseRatio = memoryIncrease / initialMemory.usedJSHeapSize;
-          
+          const memoryIncrease =
+            finalMemory.usedJSHeapSize - initialMemory.usedJSHeapSize;
+          const memoryIncreaseRatio =
+            memoryIncrease / initialMemory.usedJSHeapSize;
+
           expect(memoryIncreaseRatio).toBeLessThan(1);
         }
       }
@@ -90,16 +92,16 @@ describe('Performance Tests', () => {
     it('should handle rapid state changes efficiently', () => {
       const TestComponent = () => {
         const [count, setCount] = React.useState(0);
-        
+
         React.useEffect(() => {
           const interval = setInterval(() => {
             setCount(prev => prev + 1);
           }, 1);
-          
+
           return () => clearInterval(interval);
         }, []);
 
-        return <div data-testid="count">{count}</div>;
+        return <div data-testid='count'>{count}</div>;
       };
 
       const renderTime = measurePerformance(() => {
@@ -113,19 +115,19 @@ describe('Performance Tests', () => {
     it('should efficiently handle large form inputs', () => {
       const TestForm = () => {
         const [values, setValues] = React.useState<Record<string, string>>({});
-        
+
         const handleChange = (key: string, value: string) => {
           setValues(prev => ({ ...prev, [key]: value }));
         };
 
         return (
-          <form data-testid="large-form">
+          <form data-testid='large-form'>
             {Array.from({ length: 100 }, (_, i) => (
               <input
                 key={i}
                 data-testid={`input-${i}`}
                 value={values[`input-${i}`] || ''}
-                onChange={(e) => handleChange(`input-${i}`, e.target.value)}
+                onChange={e => handleChange(`input-${i}`, e.target.value)}
                 placeholder={`Input ${i}`}
               />
             ))}
@@ -145,19 +147,22 @@ describe('Performance Tests', () => {
   describe('Memory Performance', () => {
     it('should not accumulate memory with component unmounting', () => {
       const initialMemory = measureMemory();
-      
+
       if (initialMemory) {
         // 컴포넌트 마운트/언마운트 반복
         for (let i = 0; i < 50; i++) {
           const { unmount } = render(
             <div>
               <VirtualizedList
-                items={Array.from({ length: 100 }, (_, j) => ({ id: j, title: `Item ${j}` }))}
+                items={Array.from({ length: 100 }, (_, j) => ({
+                  id: j,
+                  title: `Item ${j}`,
+                }))}
                 itemHeight={50}
                 containerHeight={400}
-                renderItem={(item) => <div key={item.id}>{item.title}</div>}
+                renderItem={item => <div key={item.id}>{item.title}</div>}
               />
-            </div>
+            </div>,
           );
           unmount();
         }
@@ -168,12 +173,14 @@ describe('Performance Tests', () => {
         }
 
         const finalMemory = measureMemory();
-        
+
         if (finalMemory && initialMemory) {
           // 메모리 사용량이 50% 이상 증가하지 않아야 함
-          const memoryIncrease = finalMemory.usedJSHeapSize - initialMemory.usedJSHeapSize;
-          const memoryIncreaseRatio = memoryIncrease / initialMemory.usedJSHeapSize;
-          
+          const memoryIncrease =
+            finalMemory.usedJSHeapSize - initialMemory.usedJSHeapSize;
+          const memoryIncreaseRatio =
+            memoryIncrease / initialMemory.usedJSHeapSize;
+
           expect(memoryIncreaseRatio).toBeLessThan(0.5);
         }
       }
@@ -188,29 +195,30 @@ describe('Performance Tests', () => {
       }));
 
       const initialMemory = measureMemory();
-      
+
       if (initialMemory) {
         const { unmount } = render(
           <VirtualizedList
             items={largeDataset}
             itemHeight={50}
             containerHeight={400}
-            renderItem={(item) => (
+            renderItem={item => (
               <div key={item.id}>
                 <div>{item.title}</div>
                 <div>{item.description}</div>
               </div>
             )}
-          />
+          />,
         );
 
         const afterRenderMemory = measureMemory();
-        
+
         if (afterRenderMemory && initialMemory) {
           // 메모리 사용량이 10MB 이하로 증가해야 함
-          const memoryIncrease = afterRenderMemory.usedJSHeapSize - initialMemory.usedJSHeapSize;
+          const memoryIncrease =
+            afterRenderMemory.usedJSHeapSize - initialMemory.usedJSHeapSize;
           const memoryIncreaseMB = memoryIncrease / (1024 * 1024);
-          
+
           expect(memoryIncreaseMB).toBeLessThan(10);
         }
 
@@ -222,18 +230,18 @@ describe('Performance Tests', () => {
   describe('Network Performance', () => {
     it('should handle slow network responses gracefully', async () => {
       // 느린 네트워크 응답 시뮬레이션
-      const slowResponse = new Promise(resolve => 
-        setTimeout(() => resolve({ data: 'slow response' }), 1000)
+      const slowResponse = new Promise(resolve =>
+        setTimeout(() => resolve({ data: 'slow response' }), 1000),
       );
 
       const startTime = performance.now();
-      
+
       try {
         await Promise.race([
           slowResponse,
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout')), 500)
-          )
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Timeout')), 500),
+          ),
         ]);
       } catch (error) {
         // 타임아웃 예상됨
@@ -247,17 +255,17 @@ describe('Performance Tests', () => {
     });
 
     it('should handle concurrent API calls efficiently', async () => {
-      const apiCall = () => 
-        new Promise(resolve => 
-          setTimeout(() => resolve({ data: 'response' }), 100)
+      const apiCall = () =>
+        new Promise(resolve =>
+          setTimeout(() => resolve({ data: 'response' }), 100),
         );
 
       const startTime = performance.now();
-      
+
       // 10개의 동시 API 호출
       const promises = Array.from({ length: 10 }, () => apiCall());
       await Promise.all(promises);
-      
+
       const endTime = performance.now();
       const duration = endTime - startTime;
 
@@ -282,8 +290,8 @@ describe('Performance Tests', () => {
 
         return (
           <div>
-            <button 
-              data-testid="increment-button" 
+            <button
+              data-testid='increment-button'
               onClick={handleClick}
               disabled={isLoading}
             >
@@ -297,12 +305,12 @@ describe('Performance Tests', () => {
       const button = getByTestId('increment-button');
 
       const startTime = performance.now();
-      
+
       // 10번의 빠른 클릭
       for (let i = 0; i < 10; i++) {
         button.click();
       }
-      
+
       const endTime = performance.now();
       const duration = endTime - startTime;
 
@@ -314,18 +322,21 @@ describe('Performance Tests', () => {
       const TestComponent = () => {
         const [scrollPosition, setScrollPosition] = React.useState(0);
 
-        const handleScroll = React.useCallback((e: React.UIEvent<HTMLDivElement>) => {
-          setScrollPosition(e.currentTarget.scrollTop);
-        }, []);
+        const handleScroll = React.useCallback(
+          (e: React.UIEvent<HTMLDivElement>) => {
+            setScrollPosition(e.currentTarget.scrollTop);
+          },
+          [],
+        );
 
         return (
           <div
-            data-testid="scroll-container"
+            data-testid='scroll-container'
             style={{ height: '200px', overflow: 'auto' }}
             onScroll={handleScroll}
           >
             <div style={{ height: '1000px' }}>
-              <div data-testid="scroll-position">{scrollPosition}</div>
+              <div data-testid='scroll-position'>{scrollPosition}</div>
             </div>
           </div>
         );
@@ -335,13 +346,13 @@ describe('Performance Tests', () => {
       const container = getByTestId('scroll-container');
 
       const startTime = performance.now();
-      
+
       // 빠른 스크롤 시뮬레이션
       for (let i = 0; i < 100; i++) {
         container.scrollTop = i * 10;
         container.dispatchEvent(new Event('scroll', { bubbles: true }));
       }
-      
+
       const endTime = performance.now();
       const duration = endTime - startTime;
 

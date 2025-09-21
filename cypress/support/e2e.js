@@ -20,7 +20,7 @@ import './commands';
 // require('./commands')
 
 // Hide fetch/XHR requests from command log
-Cypress.on('window:before:load', (win) => {
+Cypress.on('window:before:load', win => {
   // Mock fetch if needed
   if (win.fetch) {
     cy.stub(win, 'fetch');

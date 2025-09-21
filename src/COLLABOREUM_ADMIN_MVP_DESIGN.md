@@ -1,6 +1,7 @@
 # Collaboreum Admin MVP 설계 문서
 
 ## 개요
+
 Collaboreum은 독립 아티스트와 팬이 협업 및 후원을 통해 지속 가능한 창작 생태계를 만드는 플랫폼입니다. 본 문서는 플랫폼 운영을 위한 관리자(Admin) 패널의 MVP 설계를 다룹니다.
 
 ---
@@ -8,75 +9,90 @@ Collaboreum은 독립 아티스트와 팬이 협업 및 후원을 통해 지속 
 ## 1. 기능별 상세 기획서
 
 ### 1.1 회원 관리 (User Management)
+
 **목적**: 플랫폼 회원의 전반적인 활동을 모니터링하고 관리
 
 **주요 기능**:
+
 - 회원 목록 조회 및 검색/필터링
 - 회원 상태 관리 (활성/정지/탈퇴)
 - 신고 처리 및 제재 관리
 - 회원 가입 추이 모니터링
 
 **운영자 액션**:
+
 - 회원 정지/해제
 - 신고 접수 처리
 - 회원 상세 정보 열람
 - 활동 로그 확인
 
 ### 1.2 아티스트 관리 (Artist Management)
+
 **목적**: 아티스트 등록 요청 관리 및 프로필 검수
 
 **주요 기능**:
+
 - 아티스트 등록 신청 승인/반려
 - 포트폴리오 및 프로필 검수
 - 아티스트 활동 현황 모니터링
 - 이벤트 일정 관리
 
 **운영자 액션**:
+
 - 등록 신청 검토 및 승인
 - 포트폴리오 품질 검수
 - 프로필 정보 수정 요청
 - 활동 제재 조치
 
 ### 1.3 펀딩/후원 관리 (Funding Management)
+
 **목적**: 펀딩 프로젝트의 전체 생명주기 관리
 
 **주요 기능**:
+
 - 프로젝트 제안 승인/반려
 - 펀딩 진행 현황 모니터링
 - 후원자 관리 및 환불 처리
 - 목표 달성률 추적
 
 **운영자 액션**:
+
 - 프로젝트 심사 및 승인
 - 부적절한 프로젝트 제재
 - 환불 요청 처리
 - 정산 승인
 
 ### 1.4 커뮤니티 관리 (Community Management)
+
 **목적**: 건전한 커뮤니티 환경 조성
 
 **주요 기능**:
+
 - 게시글/댓글 신고 처리
 - 스팸/광고성 콘텐츠 관리
 - 카테고리별 활동량 모니터링
 - 라이브 스트리밍 모니터링
 
 **운영자 액션**:
+
 - 부적절한 콘텐츠 삭제
 - 사용자 경고/제재
 - 커뮤니티 가이드라인 적용
 - 실시간 모니터링
 
 ### 1.5 수익 관리 (Revenue Management)
+
 **목적**: 플랫폼 수익 구조 관리 및 정산
 
 **주요 기능**:
+
 - 수익 분배 관리
 - 아티스트 정산 요청 검토
 - 포인트 시스템 관리
 - 재무 리포트 생성
 
 **운영자 액션**:
+
 - 정산 승인/반려
 - 포인트 지급/회수
 - 수수료 정책 적용
@@ -591,24 +607,28 @@ AdminDashboard/
 ## 5. 대시보드 차트 위젯 설계
 
 ### 5.1 사용자 증가 추이 차트
+
 - **목적**: 플랫폼 성장 모니터링
 - **데이터**: 월별 총 사용자 수, 신규 가입자, 아티스트 수
 - **차트 타입**: Line Chart
 - **주요 지표**: 성장률, 아티스트 비율
 
 ### 5.2 펀딩 프로젝트 현황 차트
+
 - **목적**: 펀딩 성공률 및 트렌드 파악
 - **데이터**: 월별 성공/실패 프로젝트 수
 - **차트 타입**: Bar Chart
 - **주요 지표**: 성공률, 평균 펀딩 금액
 
 ### 5.3 수익 분배 현황 차트
+
 - **목적**: 플랫폼 수익 구조 시각화
 - **데이터**: 총 매출, 플랫폼 수수료, 아티스트 정산, 투자자 수익
 - **차트 타입**: Stacked Area Chart
 - **주요 지표**: 수익 성장률, 분배 비율
 
 ### 5.4 커뮤니티 활동 지표
+
 - **목적**: 커뮤니티 건전성 모니터링
 - **데이터**: 게시글 수, 댓글 수, 신고 건수, 제재 조치
 - **차트 타입**: Multi-metric Dashboard
@@ -619,14 +639,15 @@ AdminDashboard/
 ## 6. 보안 및 권한 관리
 
 ### 6.1 접근 권한 체계
+
 ```typescript
 interface AdminPermissions {
-  user_management: boolean;      // 회원 관리
-  artist_approval: boolean;      // 아티스트 승인
-  funding_oversight: boolean;    // 펀딩 관리
-  finance_access: boolean;       // 재무 정보 접근
+  user_management: boolean; // 회원 관리
+  artist_approval: boolean; // 아티스트 승인
+  funding_oversight: boolean; // 펀딩 관리
+  finance_access: boolean; // 재무 정보 접근
   community_moderation: boolean; // 커뮤니티 관리
-  system_admin: boolean;         // 시스템 관리
+  system_admin: boolean; // 시스템 관리
 }
 
 interface AdminRole {
@@ -637,45 +658,46 @@ interface AdminRole {
 
 const adminRoles: AdminRole[] = [
   {
-    id: "super_admin",
-    name: "최고 관리자",
+    id: 'super_admin',
+    name: '최고 관리자',
     permissions: {
       user_management: true,
       artist_approval: true,
       funding_oversight: true,
       finance_access: true,
       community_moderation: true,
-      system_admin: true
-    }
+      system_admin: true,
+    },
   },
   {
-    id: "finance_manager",
-    name: "재무 담당자",
+    id: 'finance_manager',
+    name: '재무 담당자',
     permissions: {
       user_management: false,
       artist_approval: false,
       funding_oversight: true,
       finance_access: true,
       community_moderation: false,
-      system_admin: false
-    }
+      system_admin: false,
+    },
   },
   {
-    id: "community_manager",
-    name: "커뮤니티 매니저",
+    id: 'community_manager',
+    name: '커뮤니티 매니저',
     permissions: {
       user_management: true,
       artist_approval: true,
       funding_oversight: false,
       finance_access: false,
       community_moderation: true,
-      system_admin: false
-    }
-  }
+      system_admin: false,
+    },
+  },
 ];
 ```
 
 ### 6.2 보안 기능
+
 - **2FA 인증**: 관리자 로그인 시 필수
 - **감사 로그**: 모든 관리자 행동 기록
 - **세션 관리**: 일정 시간 후 자동 로그아웃
@@ -686,6 +708,7 @@ const adminRoles: AdminRole[] = [
 ## 7. 알림 시스템
 
 ### 7.1 실시간 알림
+
 ```typescript
 interface AdminNotification {
   id: string;
@@ -699,11 +722,11 @@ interface AdminNotification {
 
 // 알림 유형별 예시
 const notificationTypes = {
-  funding_deadline: "펀딩 마감 24시간 전",
-  report_accumulation: "신고 누적 사용자 발생",
-  payment_delay: "정산 지연 발생",
-  system_alert: "시스템 오류 감지",
-  high_volume_activity: "비정상적 활동 감지"
+  funding_deadline: '펀딩 마감 24시간 전',
+  report_accumulation: '신고 누적 사용자 발생',
+  payment_delay: '정산 지연 발생',
+  system_alert: '시스템 오류 감지',
+  high_volume_activity: '비정상적 활동 감지',
 };
 ```
 
@@ -712,12 +735,14 @@ const notificationTypes = {
 ## 8. 성능 및 최적화
 
 ### 8.1 데이터 최적화
+
 - **페이지네이션**: 대용량 데이터 처리
 - **인덱싱**: 자주 검색되는 필드에 인덱스 적용
 - **캐싱**: 자주 사용되는 통계 데이터 캐싱
 - **실시간 업데이트**: WebSocket을 통한 실시간 데이터 동기화
 
 ### 8.2 UI/UX 최적화
+
 - **지연 로딩**: 큰 테이블의 점진적 로딩
 - **필터링**: 실시간 검색 및 필터 기능
 - **반응형 디자인**: 다양한 화면 크기 지원
@@ -728,11 +753,13 @@ const notificationTypes = {
 ## 9. 배포 및 모니터링
 
 ### 9.1 배포 전략
+
 - **환경 분리**: 개발/스테이징/프로덕션 환경
 - **CI/CD**: 자동화된 배포 파이프라인
 - **롤백 계획**: 문제 발생 시 즉시 롤백 가능
 
 ### 9.2 모니터링 및 로깅
+
 - **성능 모니터링**: 응답 시간, 오류율 추적
 - **사용자 행동 분석**: 관리자 패널 사용 패턴 분석
 - **보안 모니터링**: 비정상 접근 시도 감지
@@ -742,11 +769,13 @@ const notificationTypes = {
 ## 10. 향후 확장 계획
 
 ### 10.1 Phase 2 기능
+
 - **AI 기반 콘텐츠 모더레이션**: 자동 스팸/부적절 콘텐츠 감지
 - **예측 분석**: 펀딩 성공률 예측, 사용자 이탈 예측
 - **자동화된 정산**: 스마트 컨트랙트 기반 자동 수익 분배
 
 ### 10.2 통합 기능
+
 - **외부 결제 시스템 연동**: 다양한 결제 방식 지원
 - **소셜 미디어 통합**: 외부 플랫폼 활동 모니터링
 - **이메일 마케팅 도구**: 자동화된 사용자 커뮤니케이션

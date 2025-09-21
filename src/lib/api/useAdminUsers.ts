@@ -90,7 +90,10 @@ const normalizeAdminUsersResponse = (raw: unknown): AdminUsersResponse => {
   if ('success' in raw && raw.success === false) {
     return {
       success: false,
-      error: typeof raw.error === 'string' ? raw.error : 'Failed to load admin users',
+      error:
+        typeof raw.error === 'string'
+          ? raw.error
+          : 'Failed to load admin users',
       message: typeof raw.message === 'string' ? raw.message : undefined,
       data: {
         users: [],
@@ -114,7 +117,9 @@ const normalizeAdminUsersResponse = (raw: unknown): AdminUsersResponse => {
   };
 };
 
-const fetchAdminUsers = async (filters: UserFilters): Promise<AdminUsersResponse> => {
+const fetchAdminUsers = async (
+  filters: UserFilters,
+): Promise<AdminUsersResponse> => {
   const response = await adminUserAPI.getAllUsers(filters);
   return normalizeAdminUsersResponse(response);
 };
@@ -123,9 +128,11 @@ const fetchSingleAdminUser = async (
   userId: string,
 ): Promise<ApiResponse<AdminUser | null>> => {
   const response = await fetchAdminUsers({ search: userId, limit: 1 });
-  const matched = response.data?.users.find(
-    user => user.id === userId || user.email === userId || user.username === userId,
-  ) ?? null;
+  const matched =
+    response.data?.users.find(
+      user =>
+        user.id === userId || user.email === userId || user.username === userId,
+    ) ?? null;
 
   return {
     success: response.success,

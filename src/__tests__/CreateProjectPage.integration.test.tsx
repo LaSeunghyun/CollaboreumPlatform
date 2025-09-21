@@ -6,13 +6,13 @@ import { CreateProjectPage } from '@/pages/projects/CreateProjectPage';
 
 jest.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
-    user: { id: 'user-1' }
-  })
+    user: { id: 'user-1' },
+  }),
 }));
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useNavigate: () => jest.fn()
+  useNavigate: () => jest.fn(),
 }));
 
 const requests: any[] = [];
@@ -22,7 +22,7 @@ const server = setupServer(
     const body = await req.json();
     requests.push(body);
     return res(ctx.json({ success: true, data: { id: 1 } }));
-  })
+  }),
 );
 
 describe('CreateProjectPage integration', () => {
@@ -34,11 +34,16 @@ describe('CreateProjectPage integration', () => {
   afterAll(() => server.close());
 
   it('submits funding mode and secret perks to the backend', async () => {
-    const alertMock = jest.spyOn(window, 'alert').mockImplementation(() => undefined);
+    const alertMock = jest
+      .spyOn(window, 'alert')
+      .mockImplementation(() => undefined);
 
     render(<CreateProjectPage />);
 
-    await userEvent.type(screen.getByLabelText(/프로젝트 제목/), '테스트 프로젝트');
+    await userEvent.type(
+      screen.getByLabelText(/프로젝트 제목/),
+      '테스트 프로젝트',
+    );
     await userEvent.type(screen.getByLabelText(/프로젝트 설명/), '설명입니다');
 
     const categoryTrigger = screen.getByRole('combobox');
@@ -51,12 +56,19 @@ describe('CreateProjectPage integration', () => {
 
     await userEvent.click(screen.getByText('Flexible Funding'));
 
-    await userEvent.type(screen.getByLabelText('비밀 혜택 설명'), '첫 번째 혜택');
+    await userEvent.type(
+      screen.getByLabelText('비밀 혜택 설명'),
+      '첫 번째 혜택',
+    );
 
-    await userEvent.click(screen.getByRole('button', { name: '프로젝트 등록하기' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: '프로젝트 등록하기' }),
+    );
 
     await waitFor(() => {
-      expect(alertMock).toHaveBeenCalledWith('프로젝트가 성공적으로 등록되었습니다.');
+      expect(alertMock).toHaveBeenCalledWith(
+        '프로젝트가 성공적으로 등록되었습니다.',
+      );
     });
 
     expect(requests[0].fundingMode).toBe('flexible');

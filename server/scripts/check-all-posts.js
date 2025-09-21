@@ -5,13 +5,18 @@ require('dotenv').config();
 const checkAllPosts = async () => {
   try {
     // MongoDB 연결
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/collaboreum');
+    await mongoose.connect(
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/collaboreum',
+    );
     console.log('MongoDB에 연결되었습니다.');
 
     // 모든 게시글 조회 (isActive 상관없이)
-    const posts = await CommunityPost.find({}, 'title category authorName createdAt isActive');
+    const posts = await CommunityPost.find(
+      {},
+      'title category authorName createdAt isActive',
+    );
     console.log(`총 게시글 수: ${posts.length}`);
-    
+
     if (posts.length === 0) {
       console.log('게시글이 없습니다.');
       return;
@@ -34,7 +39,9 @@ const checkAllPosts = async () => {
     if (reviewPosts.length > 0) {
       console.log('\n"review" 카테고리 게시글:');
       reviewPosts.forEach(post => {
-        console.log(`- ID: ${post._id}, 제목: ${post.title}, 카테고리: ${post.category}, 활성: ${post.isActive}`);
+        console.log(
+          `- ID: ${post._id}, 제목: ${post.title}, 카테고리: ${post.category}, 활성: ${post.isActive}`,
+        );
       });
     }
 
@@ -44,11 +51,12 @@ const checkAllPosts = async () => {
       .sort({ createdAt: -1 })
       .limit(5)
       .select('title category authorName createdAt isActive');
-    
-    recentPosts.forEach((post, index) => {
-      console.log(`${index + 1}. 제목: ${post.title}, 카테고리: ${post.category}, 작성자: ${post.authorName}, 활성: ${post.isActive}`);
-    });
 
+    recentPosts.forEach((post, index) => {
+      console.log(
+        `${index + 1}. 제목: ${post.title}, 카테고리: ${post.category}, 작성자: ${post.authorName}, 활성: ${post.isActive}`,
+      );
+    });
   } catch (error) {
     console.error('오류가 발생했습니다:', error);
   } finally {

@@ -59,9 +59,7 @@
       "linkReferences": [],
       "testReferences": [],
       "isOrphan": false,
-      "reasons": [
-        "링크 참조가 없음"
-      ]
+      "reasons": ["링크 참조가 없음"]
     },
     {
       "filePath": "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\pages\\artists\\ArtistsPage.tsx",
@@ -74,9 +72,7 @@
       "linkReferences": [],
       "testReferences": [],
       "isOrphan": false,
-      "reasons": [
-        "링크 참조가 없음"
-      ]
+      "reasons": ["링크 참조가 없음"]
     },
     {
       "filePath": "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\pages\\community\\CommunityPage.tsx",
@@ -89,9 +85,7 @@
       "linkReferences": [],
       "testReferences": [],
       "isOrphan": false,
-      "reasons": [
-        "링크 참조가 없음"
-      ]
+      "reasons": ["링크 참조가 없음"]
     },
     {
       "filePath": "C:\\Users\\xx005\\Downloads\\Collaboreum MVP Platform\\src\\pages\\account\\AccountPage.tsx",
@@ -104,9 +98,7 @@
       "linkReferences": [],
       "testReferences": [],
       "isOrphan": false,
-      "reasons": [
-        "링크 참조가 없음"
-      ]
+      "reasons": ["링크 참조가 없음"]
     }
   ],
   "summary": {

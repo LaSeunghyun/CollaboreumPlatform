@@ -12,29 +12,38 @@ async function calculateMonthlyEarnings(artistId) {
   try {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-    
+    const endOfMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
+
     // 이번 달에 완료된 프로젝트들의 수익 계산
     const completedProjects = await FundingProject.find({
       artist: artistId,
       status: { $in: ['성공', '완료'] },
       updatedAt: {
         $gte: startOfMonth,
-        $lte: endOfMonth
-      }
+        $lte: endOfMonth,
+      },
     });
-    
+
     let monthlyEarnings = 0;
-    
+
     for (const project of completedProjects) {
       // 아티스트 수익 계산 (플랫폼 수수료 제외)
-      const artistShare = project.revenueDistribution?.artistShare || 0.70;
-      const totalRevenue = project.revenueDistribution?.totalRevenue || project.currentAmount;
+      const artistShare = project.revenueDistribution?.artistShare || 0.7;
+      const totalRevenue =
+        project.revenueDistribution?.totalRevenue || project.currentAmount;
       const artistEarnings = totalRevenue * artistShare;
-      
+
       monthlyEarnings += artistEarnings;
     }
-    
+
     return Math.round(monthlyEarnings);
   } catch (error) {
     console.error('월별 수익 계산 오류:', error);
@@ -60,41 +69,45 @@ async function getRecentActivity(artistId) {
   try {
     const activities = [];
     const now = new Date();
-    const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
-    
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
     // 최근 30일 내 프로젝트 활동
     const recentProjects = await FundingProject.find({
       artist: artistId,
-      updatedAt: { $gte: thirtyDaysAgo }
-    }).sort({ updatedAt: -1 }).limit(5);
-    
+      updatedAt: { $gte: thirtyDaysAgo },
+    })
+      .sort({ updatedAt: -1 })
+      .limit(5);
+
     for (const project of recentProjects) {
       activities.push({
         type: 'project',
         title: `프로젝트 "${project.title}" 업데이트`,
         description: `상태: ${project.status}, 진행률: ${project.progress}%`,
         date: project.updatedAt,
-        link: `/projects/${project._id}`
+        link: `/projects/${project._id}`,
       });
     }
-    
+
     // 최근 30일 내 완료된 프로젝트
     const completedProjects = await FundingProject.find({
       artist: artistId,
       status: { $in: ['성공', '완료'] },
-      updatedAt: { $gte: thirtyDaysAgo }
-    }).sort({ updatedAt: -1 }).limit(3);
-    
+      updatedAt: { $gte: thirtyDaysAgo },
+    })
+      .sort({ updatedAt: -1 })
+      .limit(3);
+
     for (const project of completedProjects) {
       activities.push({
         type: 'completion',
         title: `프로젝트 "${project.title}" 완료`,
         description: `목표 달성률: ${project.progress}%`,
         date: project.updatedAt,
-        link: `/projects/${project._id}`
+        link: `/projects/${project._id}`,
       });
     }
-    
+
     // 날짜순으로 정렬하고 최대 10개까지만 반환
     return activities
       .sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -106,7 +119,7 @@ async function getRecentActivity(artistId) {
 }
 
 // MongoDB ObjectId 검증 함수
-const isValidObjectId = (id) => {
+const isValidObjectId = id => {
   return mongoose.Types.ObjectId.isValid(id);
 };
 
@@ -118,7 +131,7 @@ router.get('/', async (req, res) => {
       limit = 10,
       search,
       sortBy = 'createdAt',
-      order = 'desc'
+      order = 'desc',
     } = req.query;
 
     // 정렬 조건 구성
@@ -127,14 +140,14 @@ router.get('/', async (req, res) => {
 
     // 페이지네이션
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    
+
     // User 모델에서 role이 'artist'인 사용자들만 조회
     const userFilter = { role: 'artist', isActive: true };
-    
+
     if (search) {
       userFilter.$or = [
         { name: { $regex: search, $options: 'i' } },
-        { bio: { $regex: search, $options: 'i' } }
+        { bio: { $regex: search, $options: 'i' } },
       ];
     }
 
@@ -145,13 +158,13 @@ router.get('/', async (req, res) => {
         .skip(skip)
         .limit(parseInt(limit))
         .lean(),
-      User.countDocuments(userFilter)
+      User.countDocuments(userFilter),
     ]);
 
     // 응답 데이터 포맷팅
     // 아티스트 프로필 정보와 함께 조회
     const artistsWithProfiles = await Promise.all(
-      artists.map(async (user) => {
+      artists.map(async user => {
         const artistProfile = await Artist.findOne({ userId: user._id });
         return {
           id: user._id,
@@ -170,9 +183,9 @@ router.get('/', async (req, res) => {
           isVerified: artistProfile?.isVerified || false,
           featured: artistProfile?.featured || false,
           createdAt: user.createdAt,
-          lastActivityAt: user.lastActivityAt
+          lastActivityAt: user.lastActivityAt,
         };
-      })
+      }),
     );
 
     res.json({
@@ -182,15 +195,15 @@ router.get('/', async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        pages: Math.ceil(total / parseInt(limit))
-      }
+        pages: Math.ceil(total / parseInt(limit)),
+      },
     });
   } catch (error) {
     console.error('아티스트 조회 오류:', error);
     res.status(500).json({
       success: false,
       message: '아티스트 조회 중 오류가 발생했습니다.',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 });
@@ -198,18 +211,18 @@ router.get('/', async (req, res) => {
 // 인기 아티스트 조회
 router.get('/featured/popular', async (req, res) => {
   try {
-    const artists = await User.find({ 
-      role: 'artist', 
-      isActive: true 
+    const artists = await User.find({
+      role: 'artist',
+      isActive: true,
     })
-    .select('name email avatar bio role createdAt')
-    .sort({ createdAt: -1 })
-    .limit(6)
-    .lean();
+      .select('name email avatar bio role createdAt')
+      .sort({ createdAt: -1 })
+      .limit(6)
+      .lean();
 
     // 아티스트 프로필 정보와 함께 조회
     const artistsWithProfiles = await Promise.all(
-      artists.map(async (user) => {
+      artists.map(async user => {
         const artistProfile = await Artist.findOne({ userId: user._id });
         return {
           id: user._id,
@@ -227,21 +240,21 @@ router.get('/featured/popular', async (req, res) => {
           totalEarned: artistProfile?.totalEarned || 0,
           isVerified: artistProfile?.isVerified || false,
           featured: artistProfile?.featured || false,
-          createdAt: user.createdAt
+          createdAt: user.createdAt,
         };
-      })
+      }),
     );
 
     res.json({
       success: true,
-      data: artistsWithProfiles
+      data: artistsWithProfiles,
     });
   } catch (error) {
     console.error('인기 아티스트 조회 오류:', error);
     res.status(500).json({
       success: false,
       message: '인기 아티스트 조회 중 오류가 발생했습니다.',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 });
@@ -250,24 +263,24 @@ router.get('/featured/popular', async (req, res) => {
 router.get('/new', async (req, res) => {
   try {
     const { limit = 12 } = req.query;
-    
+
     // 최근 30일 내에 가입한 아티스트들 조회
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 7);
-    
-    const newArtists = await User.find({ 
-      role: 'artist', 
+
+    const newArtists = await User.find({
+      role: 'artist',
       isActive: true,
-      createdAt: { $gte: thirtyDaysAgo }
+      createdAt: { $gte: thirtyDaysAgo },
     })
-    .select('name email avatar bio role createdAt')
-    .sort({ createdAt: -1 })
-    .limit(parseInt(limit))
-    .lean();
+      .select('name email avatar bio role createdAt')
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .lean();
 
     // 아티스트 프로필 정보와 함께 조회
     const newArtistsWithProfiles = await Promise.all(
-      newArtists.map(async (user) => {
+      newArtists.map(async user => {
         const artistProfile = await Artist.findOne({ userId: user._id });
         return {
           id: user._id,
@@ -286,24 +299,24 @@ router.get('/new', async (req, res) => {
           isVerified: artistProfile?.isVerified || false,
           featured: artistProfile?.featured || false,
           isNew: true, // 새로 가입한 아티스트 표시
-          createdAt: user.createdAt
+          createdAt: user.createdAt,
         };
-      })
+      }),
     );
 
     res.json({
       success: true,
       data: {
         artists: newArtistsWithProfiles,
-        count: newArtistsWithProfiles.length
-      }
+        count: newArtistsWithProfiles.length,
+      },
     });
   } catch (error) {
     console.error('새 아티스트 조회 오류:', error);
     res.status(500).json({
       success: false,
       message: '새 아티스트 조회 중 오류가 발생했습니다.',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 });
@@ -311,16 +324,16 @@ router.get('/new', async (req, res) => {
 // 특정 아티스트 조회
 router.get('/:id', async (req, res) => {
   try {
-    const artist = await User.findOne({ 
-      _id: req.params.id, 
-      role: 'artist', 
-      isActive: true 
+    const artist = await User.findOne({
+      _id: req.params.id,
+      role: 'artist',
+      isActive: true,
     }).select('-password');
 
     if (!artist) {
       return res.status(404).json({
         success: false,
-        message: '아티스트를 찾을 수 없습니다.'
+        message: '아티스트를 찾을 수 없습니다.',
       });
     }
 
@@ -341,19 +354,19 @@ router.get('/:id', async (req, res) => {
       isVerified: false,
       featured: false,
       createdAt: artist.createdAt,
-      lastActivityAt: artist.lastActivityAt
+      lastActivityAt: artist.lastActivityAt,
     };
 
     res.json({
       success: true,
-      data: formattedArtist
+      data: formattedArtist,
     });
   } catch (error) {
     console.error('아티스트 상세 조회 오류:', error);
     res.status(500).json({
       success: false,
       message: '아티스트 상세 조회 중 오류가 발생했습니다.',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 });
@@ -362,46 +375,50 @@ router.get('/:id', async (req, res) => {
 router.get('/:id/dashboard', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     console.log(`📊 아티스트 대시보드 조회 요청: ID ${id}`);
-    
+
     // ObjectId 검증
     if (!isValidObjectId(id)) {
-      console.log(`❌ 아티스트 대시보드 조회 실패: 유효하지 않은 ID 형식 - ${id}`);
+      console.log(
+        `❌ 아티스트 대시보드 조회 실패: 유효하지 않은 ID 형식 - ${id}`,
+      );
       return res.status(400).json({
         success: false,
-        message: '유효하지 않은 아티스트 ID입니다.'
+        message: '유효하지 않은 아티스트 ID입니다.',
       });
     }
 
-    const artist = await User.findOne({ 
-      _id: id, 
-      role: 'artist', 
-      isActive: true 
+    const artist = await User.findOne({
+      _id: id,
+      role: 'artist',
+      isActive: true,
     }).select('-password');
 
     if (!artist) {
-      console.log(`❌ 아티스트 대시보드 조회 실패: 아티스트를 찾을 수 없음 - ID ${id}`);
+      console.log(
+        `❌ 아티스트 대시보드 조회 실패: 아티스트를 찾을 수 없음 - ID ${id}`,
+      );
       return res.status(404).json({
         success: false,
-        message: '아티스트를 찾을 수 없습니다.'
+        message: '아티스트를 찾을 수 없습니다.',
       });
     }
 
     // 실제 프로젝트 통계 조회
     const totalProjects = await Project.countDocuments({ artist: id });
-    const completedProjects = await Project.countDocuments({ 
-      artist: id, 
-      status: '완료' 
+    const completedProjects = await Project.countDocuments({
+      artist: id,
+      status: '완료',
     });
-    const activeProjects = await Project.countDocuments({ 
-      artist: id, 
-      status: { $in: ['진행중', '계획중'] } 
+    const activeProjects = await Project.countDocuments({
+      artist: id,
+      status: { $in: ['진행중', '계획중'] },
     });
 
     // 실제 아티스트 프로필 정보 조회
     const artistProfile = await Artist.findOne({ userId: id });
-    
+
     // 대시보드 데이터 구성
     const dashboardData = {
       artist: {
@@ -421,7 +438,7 @@ router.get('/:id/dashboard', async (req, res) => {
         isVerified: artistProfile?.isVerified || false,
         featured: artistProfile?.featured || false,
         createdAt: artist.createdAt,
-        lastActivityAt: artist.lastActivityAt
+        lastActivityAt: artist.lastActivityAt,
       },
       stats: {
         totalProjects: totalProjects,
@@ -431,23 +448,25 @@ router.get('/:id/dashboard', async (req, res) => {
         monthlyEarnings: await calculateMonthlyEarnings(artist._id),
         followers: artistProfile?.followers || 0,
         following: await calculateFollowingCount(artist._id),
-        rating: artistProfile?.rating || 0
+        rating: artistProfile?.rating || 0,
       },
-      recentActivity: await getRecentActivity(artist._id)
+      recentActivity: await getRecentActivity(artist._id),
     };
 
-    console.log(`✅ 아티스트 대시보드 조회 성공: ${artist.name} (${artist.email})`);
+    console.log(
+      `✅ 아티스트 대시보드 조회 성공: ${artist.name} (${artist.email})`,
+    );
 
     res.json({
       success: true,
-      data: dashboardData
+      data: dashboardData,
     });
   } catch (error) {
     console.error(`💥 아티스트 대시보드 조회 오류: ${error.message}`);
     res.status(500).json({
       success: false,
       message: '아티스트 대시보드 조회 중 오류가 발생했습니다.',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 });
@@ -461,15 +480,18 @@ router.get('/profile', auth, async (req, res) => {
     if (req.user.role !== 'artist') {
       return res.status(403).json({
         success: false,
-        message: '아티스트만 접근할 수 있습니다.'
+        message: '아티스트만 접근할 수 있습니다.',
       });
     }
 
-    const artist = await Artist.findOne({ userId }).populate('userId', 'name email avatar bio');
+    const artist = await Artist.findOne({ userId }).populate(
+      'userId',
+      'name email avatar bio',
+    );
     if (!artist) {
       return res.status(404).json({
         success: false,
-        message: '아티스트 프로필을 찾을 수 없습니다.'
+        message: '아티스트 프로필을 찾을 수 없습니다.',
       });
     }
 
@@ -477,14 +499,14 @@ router.get('/profile', auth, async (req, res) => {
       success: true,
       data: {
         ...artist.toObject(),
-        user: artist.userId
-      }
+        user: artist.userId,
+      },
     });
   } catch (error) {
     console.error('아티스트 프로필 조회 실패:', error);
     res.status(500).json({
       success: false,
-      message: '아티스트 프로필을 불러올 수 없습니다.'
+      message: '아티스트 프로필을 불러올 수 없습니다.',
     });
   }
 });
@@ -498,22 +520,23 @@ router.get('/projects', auth, async (req, res) => {
     if (req.user.role !== 'artist') {
       return res.status(403).json({
         success: false,
-        message: '아티스트만 접근할 수 있습니다.'
+        message: '아티스트만 접근할 수 있습니다.',
       });
     }
 
-    const projects = await Project.find({ artist: userId })
-      .sort({ createdAt: -1 });
+    const projects = await Project.find({ artist: userId }).sort({
+      createdAt: -1,
+    });
 
     res.json({
       success: true,
-      data: projects
+      data: projects,
     });
   } catch (error) {
     console.error('아티스트 프로젝트 조회 실패:', error);
     res.status(500).json({
       success: false,
-      message: '프로젝트 목록을 불러올 수 없습니다.'
+      message: '프로젝트 목록을 불러올 수 없습니다.',
     });
   }
 });
@@ -527,39 +550,39 @@ router.get('/wbs', auth, async (req, res) => {
     if (req.user.role !== 'artist') {
       return res.status(403).json({
         success: false,
-        message: '아티스트만 접근할 수 있습니다.'
+        message: '아티스트만 접근할 수 있습니다.',
       });
     }
 
     // 사용자의 프로젝트에서 WBS 항목들을 가져옴
     const projects = await Project.find({ artist: userId });
-    
+
     // 모든 프로젝트의 태스크를 하나의 배열로 합침
     const allTasks = projects.reduce((acc, project) => {
       const projectTasks = project.tasks.map(task => ({
         ...task.toObject(),
         projectId: project._id,
         projectTitle: project.title,
-        projectStatus: project.status
+        projectStatus: project.status,
       }));
       return acc.concat(projectTasks);
     }, []);
 
     // 태스크를 상태별로 정렬 (진행중 > 대기 > 완료)
     const sortedTasks = allTasks.sort((a, b) => {
-      const statusOrder = { '진행중': 0, '대기': 1, '완료': 2, '보류': 3 };
+      const statusOrder = { 진행중: 0, 대기: 1, 완료: 2, 보류: 3 };
       return statusOrder[a.status] - statusOrder[b.status];
     });
 
     res.json({
       success: true,
-      data: sortedTasks
+      data: sortedTasks,
     });
   } catch (error) {
     console.error('아티스트 WBS 조회 실패:', error);
     res.status(500).json({
       success: false,
-      message: 'WBS 항목을 불러올 수 없습니다.'
+      message: 'WBS 항목을 불러올 수 없습니다.',
     });
   }
 });
@@ -574,7 +597,7 @@ router.put('/profile', auth, async (req, res) => {
     if (req.user.role !== 'artist') {
       return res.status(403).json({
         success: false,
-        message: '아티스트만 접근할 수 있습니다.'
+        message: '아티스트만 접근할 수 있습니다.',
       });
     }
 
@@ -582,14 +605,21 @@ router.put('/profile', auth, async (req, res) => {
     if (!artist) {
       return res.status(404).json({
         success: false,
-        message: '아티스트 프로필을 찾을 수 없습니다.'
+        message: '아티스트 프로필을 찾을 수 없습니다.',
       });
     }
 
     // 업데이트 가능한 필드들
     const allowedFields = [
-      'category', 'location', 'rating', 'tags', 'coverImage', 'profileImage',
-      'genre', 'socialLinks', 'bio'
+      'category',
+      'location',
+      'rating',
+      'tags',
+      'coverImage',
+      'profileImage',
+      'genre',
+      'socialLinks',
+      'bio',
     ];
 
     allowedFields.forEach(field => {
@@ -600,21 +630,24 @@ router.put('/profile', auth, async (req, res) => {
 
     await artist.save();
 
-    const updatedArtist = await Artist.findOne({ userId }).populate('userId', 'name email avatar bio');
+    const updatedArtist = await Artist.findOne({ userId }).populate(
+      'userId',
+      'name email avatar bio',
+    );
 
     res.json({
       success: true,
       data: {
         ...updatedArtist.toObject(),
-        user: updatedArtist.userId
+        user: updatedArtist.userId,
       },
-      message: '프로필이 업데이트되었습니다.'
+      message: '프로필이 업데이트되었습니다.',
     });
   } catch (error) {
     console.error('아티스트 프로필 업데이트 실패:', error);
     res.status(500).json({
       success: false,
-      message: '프로필을 업데이트할 수 없습니다.'
+      message: '프로필을 업데이트할 수 없습니다.',
     });
   }
 });
@@ -628,7 +661,7 @@ router.get('/stats', auth, async (req, res) => {
     if (req.user.role !== 'artist') {
       return res.status(403).json({
         success: false,
-        message: '아티스트만 접근할 수 있습니다.'
+        message: '아티스트만 접근할 수 있습니다.',
       });
     }
 
@@ -636,19 +669,19 @@ router.get('/stats', auth, async (req, res) => {
     if (!artist) {
       return res.status(404).json({
         success: false,
-        message: '아티스트 프로필을 찾을 수 없습니다.'
+        message: '아티스트 프로필을 찾을 수 없습니다.',
       });
     }
 
     // 프로젝트 통계
     const totalProjects = await Project.countDocuments({ artist: userId });
-    const activeProjects = await Project.countDocuments({ 
-      artist: userId, 
-      status: { $in: ['진행중', '계획중'] } 
+    const activeProjects = await Project.countDocuments({
+      artist: userId,
+      status: { $in: ['진행중', '계획중'] },
     });
-    const completedProjects = await Project.countDocuments({ 
-      artist: userId, 
-      status: '완료' 
+    const completedProjects = await Project.countDocuments({
+      artist: userId,
+      status: '완료',
     });
 
     // 최근 프로젝트
@@ -665,21 +698,21 @@ router.get('/stats', auth, async (req, res) => {
           rating: artist.rating,
           totalEarned: artist.totalEarned,
           completedProjects: artist.completedProjects,
-          activeProjects: artist.activeProjects
+          activeProjects: artist.activeProjects,
         },
         projects: {
           total: totalProjects,
           active: activeProjects,
           completed: completedProjects,
-          recent: recentProjects
-        }
-      }
+          recent: recentProjects,
+        },
+      },
     });
   } catch (error) {
     console.error('아티스트 통계 조회 실패:', error);
     res.status(500).json({
       success: false,
-      message: '통계를 불러올 수 없습니다.'
+      message: '통계를 불러올 수 없습니다.',
     });
   }
 });
@@ -692,16 +725,16 @@ router.post('/:id/follow', auth, async (req, res) => {
     const userId = req.user.id;
 
     // 아티스트 존재 확인
-    const artist = await User.findOne({ 
-      _id: id, 
-      role: 'artist', 
-      isActive: true 
+    const artist = await User.findOne({
+      _id: id,
+      role: 'artist',
+      isActive: true,
     });
 
     if (!artist) {
       return res.status(404).json({
         success: false,
-        message: '아티스트를 찾을 수 없습니다.'
+        message: '아티스트를 찾을 수 없습니다.',
       });
     }
 
@@ -709,7 +742,7 @@ router.post('/:id/follow', auth, async (req, res) => {
     if (id === userId) {
       return res.status(400).json({
         success: false,
-        message: '본인을 팔로우할 수 없습니다.'
+        message: '본인을 팔로우할 수 없습니다.',
       });
     }
 
@@ -718,7 +751,7 @@ router.post('/:id/follow', auth, async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: '사용자를 찾을 수 없습니다.'
+        message: '사용자를 찾을 수 없습니다.',
       });
     }
 
@@ -727,7 +760,7 @@ router.post('/:id/follow', auth, async (req, res) => {
       if (user.following && user.following.includes(id)) {
         return res.status(400).json({
           success: false,
-          message: '이미 팔로우 중인 아티스트입니다.'
+          message: '이미 팔로우 중인 아티스트입니다.',
         });
       }
 
@@ -742,19 +775,21 @@ router.post('/:id/follow', auth, async (req, res) => {
       res.json({
         success: true,
         message: '아티스트를 팔로우했습니다.',
-        data: { isFollowing: true }
+        data: { isFollowing: true },
       });
     } else if (action === 'unfollow') {
       // 팔로우 중인지 확인
       if (!user.following || !user.following.includes(id)) {
         return res.status(400).json({
           success: false,
-          message: '팔로우하지 않은 아티스트입니다.'
+          message: '팔로우하지 않은 아티스트입니다.',
         });
       }
 
       // 팔로우 제거
-      user.following = user.following.filter(followId => followId.toString() !== id);
+      user.following = user.following.filter(
+        followId => followId.toString() !== id,
+      );
       await user.save();
 
       // 아티스트 팔로워 수 감소
@@ -763,21 +798,20 @@ router.post('/:id/follow', auth, async (req, res) => {
       res.json({
         success: true,
         message: '아티스트 팔로우를 취소했습니다.',
-        data: { isFollowing: false }
+        data: { isFollowing: false },
       });
     } else {
       return res.status(400).json({
         success: false,
-        message: '유효하지 않은 액션입니다. (follow 또는 unfollow)'
+        message: '유효하지 않은 액션입니다. (follow 또는 unfollow)',
       });
     }
-
   } catch (error) {
     console.error('아티스트 팔로우/언팔로우 오류:', error);
     res.status(500).json({
       success: false,
       message: '팔로우 처리 중 오류가 발생했습니다.',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 });
@@ -793,7 +827,7 @@ router.put('/:id', auth, async (req, res) => {
     if (id !== userId) {
       return res.status(403).json({
         success: false,
-        message: '본인의 프로필만 수정할 수 있습니다.'
+        message: '본인의 프로필만 수정할 수 있습니다.',
       });
     }
 
@@ -801,14 +835,22 @@ router.put('/:id', auth, async (req, res) => {
     if (req.user.role !== 'artist') {
       return res.status(403).json({
         success: false,
-        message: '아티스트만 프로필을 수정할 수 있습니다.'
+        message: '아티스트만 프로필을 수정할 수 있습니다.',
       });
     }
 
     // 업데이트 가능한 필드들
     const allowedFields = [
-      'name', 'bio', 'avatar', 'location', 'category', 'genre', 
-      'socialLinks', 'portfolio', 'skills', 'experience'
+      'name',
+      'bio',
+      'avatar',
+      'location',
+      'category',
+      'genre',
+      'socialLinks',
+      'portfolio',
+      'skills',
+      'experience',
     ];
 
     const filteredData = {};
@@ -822,13 +864,13 @@ router.put('/:id', auth, async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       id,
       { ...filteredData, updatedAt: new Date() },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     ).select('-password');
 
     if (!updatedUser) {
       return res.status(404).json({
         success: false,
-        message: '사용자를 찾을 수 없습니다.'
+        message: '사용자를 찾을 수 없습니다.',
       });
     }
 
@@ -849,16 +891,15 @@ router.put('/:id', auth, async (req, res) => {
         portfolio: updatedUser.portfolio,
         skills: updatedUser.skills,
         experience: updatedUser.experience,
-        updatedAt: updatedUser.updatedAt
-      }
+        updatedAt: updatedUser.updatedAt,
+      },
     });
-
   } catch (error) {
     console.error('아티스트 프로필 업데이트 오류:', error);
     res.status(500).json({
       success: false,
       message: '프로필 업데이트 중 오류가 발생했습니다.',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 });

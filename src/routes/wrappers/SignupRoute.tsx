@@ -17,7 +17,7 @@ export const SignupRoute: React.FC = () => {
       error={error}
       isLoading={isLoading}
       onBack={() => navigate(-1)}
-      onSignup={async (data) => {
+      onSignup={async data => {
         try {
           setError(undefined);
           setIsLoading(true);
@@ -34,13 +34,17 @@ export const SignupRoute: React.FC = () => {
           login(auth.accessToken, auth.user);
           navigate('/');
         } catch (err) {
-          setError(err instanceof Error ? err.message : '회원가입 중 오류가 발생했습니다.');
+          setError(
+            err instanceof Error
+              ? err.message
+              : '회원가입 중 오류가 발생했습니다.',
+          );
         } finally {
           setIsLoading(false);
         }
       }}
       onLoginClick={() => navigate('/login')}
-      onSocialSignup={(provider) => {
+      onSocialSignup={provider => {
         console.info(`소셜 회원가입 시도: ${provider}`);
       }}
     />

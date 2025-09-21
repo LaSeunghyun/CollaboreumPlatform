@@ -4,65 +4,65 @@
 
 // 기본 API 응답 구조
 export interface ApiResponse<T = unknown> {
-    success: boolean;
-    data?: T;
-    message?: string;
-    error?: string;
-    status?: number;
-    pagination?: {
-        page: number;
-        limit: number;
-        total: number;
-        totalPages: number;
-        hasNext?: boolean;
-        hasPrev?: boolean;
-    };
-    errors?: Record<string, string[]>;
-    details?: Record<string, any>;
+  success: boolean;
+  data?: T;
+  message?: string;
+  error?: string;
+  status?: number;
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext?: boolean;
+    hasPrev?: boolean;
+  };
+  errors?: Record<string, string[]>;
+  details?: Record<string, any>;
 }
 
 // 에러 응답 구조
 export interface ApiError {
-    success?: false;
-    error?: string;
-    message: string;
-    status?: number;
-    details?: Record<string, any>;
+  success?: false;
+  error?: string;
+  message: string;
+  status?: number;
+  details?: Record<string, any>;
 }
 
 // 페이지네이션 응답 구조
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {
-    pagination: {
-        page: number;
-        limit: number;
-        total: number;
-        totalPages: number;
-        hasNext?: boolean;
-        hasPrev?: boolean;
-    };
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext?: boolean;
+    hasPrev?: boolean;
+  };
 }
 
 // 페이지네이션 요청 파라미터
 export interface PaginationParams {
-    page?: number;
-    limit?: number;
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 // 검색 요청 파라미터
 export interface SearchParams extends PaginationParams {
-    query?: string;
-    filters?: Record<string, any>;
+  query?: string;
+  filters?: Record<string, any>;
 }
 
 // 파일 업로드 응답
 export interface UploadResponse {
-    url: string;
-    filename: string;
-    size: number;
-    mimeType: string;
-    uploadedAt: string;
+  url: string;
+  filename: string;
+  size: number;
+  mimeType: string;
+  uploadedAt: string;
 }
 
 // API 엔드포인트 타입
@@ -73,73 +73,78 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 // API 요청 설정
 export interface ApiRequestConfig {
-    method?: HttpMethod;
-    params?: Record<string, any>;
-    data?: any;
-    body?: any;
-    headers?: Record<string, string>;
-    timeout?: number;
+  method?: HttpMethod;
+  params?: Record<string, any>;
+  data?: any;
+  body?: any;
+  headers?: Record<string, string>;
+  timeout?: number;
 }
 
 // API 클라이언트 인터페이스
 export interface ApiClient {
-    get<T>(endpoint: ApiEndpoint, params?: Record<string, any>): Promise<ApiResponse<T>>;
-    post<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>>;
-    put<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>>;
-    patch<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>>;
-    delete<T>(endpoint: ApiEndpoint): Promise<ApiResponse<T>>;
+  get<T>(
+    endpoint: ApiEndpoint,
+    params?: Record<string, any>,
+  ): Promise<ApiResponse<T>>;
+  post<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>>;
+  put<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>>;
+  patch<T>(endpoint: ApiEndpoint, data?: any): Promise<ApiResponse<T>>;
+  delete<T>(endpoint: ApiEndpoint): Promise<ApiResponse<T>>;
 }
 
 // API 상태 타입
 export interface ApiState {
-    loading: boolean;
-    error: ApiError | null;
-    data: any;
+  loading: boolean;
+  error: ApiError | null;
+  data: any;
 }
 
 // API 훅 반환 타입
 export interface UseApiReturn<T> {
-    data: T | null;
-    loading: boolean;
-    error: ApiError | null;
-    refetch: () => Promise<void>;
-    mutate: (data: Partial<T>) => Promise<void>;
+  data: T | null;
+  loading: boolean;
+  error: ApiError | null;
+  refetch: () => Promise<void>;
+  mutate: (data: Partial<T>) => Promise<void>;
 }
 
 // API 미들웨어 타입
 export type ApiMiddleware = (
-    config: ApiRequestConfig,
-    next: (config: ApiRequestConfig) => Promise<ApiResponse>
+  config: ApiRequestConfig,
+  next: (config: ApiRequestConfig) => Promise<ApiResponse>,
 ) => Promise<ApiResponse>;
 
 // API 인터셉터 타입
 export interface ApiInterceptor {
-    request?: (config: ApiRequestConfig) => ApiRequestConfig | Promise<ApiRequestConfig>;
-    response?: (response: ApiResponse) => ApiResponse | Promise<ApiResponse>;
-    error?: (error: ApiError) => ApiError | Promise<ApiError>;
+  request?: (
+    config: ApiRequestConfig,
+  ) => ApiRequestConfig | Promise<ApiRequestConfig>;
+  response?: (response: ApiResponse) => ApiResponse | Promise<ApiResponse>;
+  error?: (error: ApiError) => ApiError | Promise<ApiError>;
 }
 
 // API 캐시 설정
 export interface ApiCacheConfig {
-    enabled: boolean;
-    ttl: number; // Time to live in milliseconds
-    key?: string;
+  enabled: boolean;
+  ttl: number; // Time to live in milliseconds
+  key?: string;
 }
 
 // API 재시도 설정
 export interface ApiRetryConfig {
-    enabled: boolean;
-    maxAttempts: number;
-    delay: number; // Delay between retries in milliseconds
-    backoffMultiplier: number;
+  enabled: boolean;
+  maxAttempts: number;
+  delay: number; // Delay between retries in milliseconds
+  backoffMultiplier: number;
 }
 
 // API 설정
 export interface ApiConfig {
-    baseURL: string;
-    timeout: number;
-    retry: ApiRetryConfig;
-    cache: ApiCacheConfig;
-    interceptors: ApiInterceptor[];
-    middlewares: ApiMiddleware[];
+  baseURL: string;
+  timeout: number;
+  retry: ApiRetryConfig;
+  cache: ApiCacheConfig;
+  interceptors: ApiInterceptor[];
+  middlewares: ApiMiddleware[];
 }

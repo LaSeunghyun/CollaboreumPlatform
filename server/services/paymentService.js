@@ -7,16 +7,17 @@ const PAYMENT_CONFIG = {
   toss: {
     clientKey: process.env.TOSS_CLIENT_KEY || 'test_ck_xxx',
     secretKey: process.env.TOSS_SECRET_KEY || 'test_sk_xxx',
-    baseURL: process.env.NODE_ENV === 'production' 
-      ? 'https://api.tosspayments.com' 
-      : 'https://api.tosspayments.com',
+    baseURL:
+      process.env.NODE_ENV === 'production'
+        ? 'https://api.tosspayments.com'
+        : 'https://api.tosspayments.com',
   },
   // 아임포트 설정 (백업용)
   iamport: {
     impKey: process.env.IMP_KEY || 'imp_xxx',
     impSecret: process.env.IMP_SECRET || 'imp_xxx',
     baseURL: 'https://api.iamport.kr',
-  }
+  },
 };
 
 class PaymentService {
@@ -24,7 +25,7 @@ class PaymentService {
     this.tossClient = axios.create({
       baseURL: PAYMENT_CONFIG.toss.baseURL,
       headers: {
-        'Authorization': `Basic ${Buffer.from(PAYMENT_CONFIG.toss.secretKey + ':').toString('base64')}`,
+        Authorization: `Basic ${Buffer.from(PAYMENT_CONFIG.toss.secretKey + ':').toString('base64')}`,
         'Content-Type': 'application/json',
       },
     });
@@ -41,10 +42,10 @@ class PaymentService {
   async createTossPayment(paymentData) {
     try {
       const { projectId, amount, backerInfo, rewardId } = paymentData;
-      
+
       // 주문 ID 생성 (고유성 보장)
       const orderId = `collaboreum_${projectId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
+
       const paymentRequest = {
         orderId,
         amount: amount,
@@ -59,11 +60,14 @@ class PaymentService {
           projectId,
           rewardId,
           backerName: backerInfo.name,
-        }
+        },
       };
 
-      const response = await this.tossClient.post('/v1/payments', paymentRequest);
-      
+      const response = await this.tossClient.post(
+        '/v1/payments',
+        paymentRequest,
+      );
+
       return {
         success: true,
         data: {
@@ -73,14 +77,17 @@ class PaymentService {
           status: 'pending',
           paymentUrl: response.data.checkoutPage,
           expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30분 후 만료
-        }
+        },
       };
     } catch (error) {
-      console.error('토스페이먼츠 결제 생성 실패:', error.response?.data || error.message);
+      console.error(
+        '토스페이먼츠 결제 생성 실패:',
+        error.response?.data || error.message,
+      );
       return {
         success: false,
         message: '결제 요청 생성에 실패했습니다.',
-        error: error.response?.data?.message || error.message
+        error: error.response?.data?.message || error.message,
       };
     }
   }
@@ -88,10 +95,13 @@ class PaymentService {
   // 결제 승인 처리
   async confirmTossPayment(paymentKey, orderId, amount) {
     try {
-      const response = await this.tossClient.post(`/v1/payments/${paymentKey}`, {
-        orderId,
-        amount
-      });
+      const response = await this.tossClient.post(
+        `/v1/payments/${paymentKey}`,
+        {
+          orderId,
+          amount,
+        },
+      );
 
       return {
         success: true,
@@ -104,14 +114,17 @@ class PaymentService {
           approvedAt: response.data.approvedAt,
           method: response.data.method,
           card: response.data.card,
-        }
+        },
       };
     } catch (error) {
-      console.error('토스페이먼츠 결제 승인 실패:', error.response?.data || error.message);
+      console.error(
+        '토스페이먼츠 결제 승인 실패:',
+        error.response?.data || error.message,
+      );
       return {
         success: false,
         message: '결제 승인에 실패했습니다.',
-        error: error.response?.data?.message || error.message
+        error: error.response?.data?.message || error.message,
       };
     }
   }
@@ -119,10 +132,13 @@ class PaymentService {
   // 결제 취소
   async cancelTossPayment(paymentKey, cancelReason, cancelAmount) {
     try {
-      const response = await this.tossClient.post(`/v1/payments/${paymentKey}/cancel`, {
-        cancelReason,
-        cancelAmount
-      });
+      const response = await this.tossClient.post(
+        `/v1/payments/${paymentKey}/cancel`,
+        {
+          cancelReason,
+          cancelAmount,
+        },
+      );
 
       return {
         success: true,
@@ -132,14 +148,17 @@ class PaymentService {
           cancelledAt: response.data.cancelledAt,
           cancelAmount: cancelAmount,
           cancelReason: cancelReason,
-        }
+        },
       };
     } catch (error) {
-      console.error('토스페이먼츠 결제 취소 실패:', error.response?.data || error.message);
+      console.error(
+        '토스페이먼츠 결제 취소 실패:',
+        error.response?.data || error.message,
+      );
       return {
         success: false,
         message: '결제 취소에 실패했습니다.',
-        error: error.response?.data?.message || error.message
+        error: error.response?.data?.message || error.message,
       };
     }
   }
@@ -147,11 +166,14 @@ class PaymentService {
   // 환불 처리
   async refundTossPayment(paymentKey, refundReason, refundAmount) {
     try {
-      const response = await this.tossClient.post(`/v1/payments/${paymentKey}/cancel`, {
-        cancelReason: refundReason,
-        cancelAmount: refundAmount,
-        refundableAmount: refundAmount
-      });
+      const response = await this.tossClient.post(
+        `/v1/payments/${paymentKey}/cancel`,
+        {
+          cancelReason: refundReason,
+          cancelAmount: refundAmount,
+          refundableAmount: refundAmount,
+        },
+      );
 
       return {
         success: true,
@@ -162,14 +184,17 @@ class PaymentService {
           status: 'completed',
           refundedAt: response.data.cancelledAt,
           reason: refundReason,
-        }
+        },
       };
     } catch (error) {
-      console.error('토스페이먼츠 환불 실패:', error.response?.data || error.message);
+      console.error(
+        '토스페이먼츠 환불 실패:',
+        error.response?.data || error.message,
+      );
       return {
         success: false,
         message: '환불 처리에 실패했습니다.',
-        error: error.response?.data?.message || error.message
+        error: error.response?.data?.message || error.message,
       };
     }
   }
@@ -189,14 +214,17 @@ class PaymentService {
           method: response.data.method,
           approvedAt: response.data.approvedAt,
           card: response.data.card,
-        }
+        },
       };
     } catch (error) {
-      console.error('토스페이먼츠 결제 상태 조회 실패:', error.response?.data || error.message);
+      console.error(
+        '토스페이먼츠 결제 상태 조회 실패:',
+        error.response?.data || error.message,
+      );
       return {
         success: false,
         message: '결제 상태 조회에 실패했습니다.',
-        error: error.response?.data?.message || error.message
+        error: error.response?.data?.message || error.message,
       };
     }
   }
@@ -207,17 +235,17 @@ class PaymentService {
       .createHmac('sha256', secret)
       .update(payload)
       .digest('hex');
-    
+
     return crypto.timingSafeEqual(
       Buffer.from(signature, 'hex'),
-      Buffer.from(expectedSignature, 'hex')
+      Buffer.from(expectedSignature, 'hex'),
     );
   }
 
   // 결제 검증 (중복 결제 방지)
   async validatePayment(paymentData) {
     const { projectId, amount, backerInfo } = paymentData;
-    
+
     // 1. 프로젝트 존재 여부 확인
     const Project = require('../models/FundingProject');
     const project = await Project.findById(projectId);
@@ -232,7 +260,10 @@ class PaymentService {
 
     // 3. 목표 금액 달성 여부 확인
     if (project.currentAmount >= project.targetAmount) {
-      return { valid: false, message: '이미 목표 금액을 달성한 프로젝트입니다.' };
+      return {
+        valid: false,
+        message: '이미 목표 금액을 달성한 프로젝트입니다.',
+      };
     }
 
     // 4. 최소/최대 후원 금액 확인
@@ -249,7 +280,7 @@ class PaymentService {
     const existingPayment = await Payment.findOne({
       projectId,
       backerEmail: backerInfo.email,
-      status: { $in: ['pending', 'completed'] }
+      status: { $in: ['pending', 'completed'] },
     });
 
     if (existingPayment) {

@@ -39,13 +39,13 @@ export type RequestBody =
   | Blob
   | ArrayBuffer;
 
+// API 요청에 사용할 수 있는 타입들
+export type RequestBodyInput = RequestBody | { [key: string]: any };
+
 export type ClientRequestConfig<
   TBody = RequestBody,
   TParams = QueryParamsInput,
-> = Omit<
-  ApiRequestConfig,
-  'data' | 'body' | 'params'
-> & {
+> = Omit<ApiRequestConfig, 'data' | 'body' | 'params'> & {
   data?: TBody;
   body?: TBody;
   params?: TParams;
@@ -146,9 +146,11 @@ export class ApiClient {
                     });
 
                     const originalRequest = error.config;
-                    originalRequest.headers = originalRequest.headers ?? {};
-                    originalRequest.headers.Authorization = `Bearer ${storedTokens.accessToken}`;
-                    return this.client.request(originalRequest);
+                    if (originalRequest) {
+                      originalRequest.headers = originalRequest.headers ?? {};
+                      originalRequest.headers.Authorization = `Bearer ${storedTokens.accessToken}`;
+                      return this.client.request(originalRequest);
+                    }
                   }
 
                   console.error(

@@ -50,11 +50,7 @@ class FundingProjectStateMachine {
         'view_distributions',
         'close', // closed로 전이
       ],
-      closed: [
-        'view',
-        'view_executions',
-        'view_distributions',
-      ],
+      closed: ['view', 'view_executions', 'view_distributions'],
     };
   }
 
@@ -79,7 +75,7 @@ class FundingProjectStateMachine {
     if (!this.canTransition(currentStatus, newStatus)) {
       throw new BusinessLogicError(
         `상태 전이가 허용되지 않습니다: ${currentStatus} → ${newStatus}`,
-        { currentStatus, newStatus, context }
+        { currentStatus, newStatus, context },
       );
     }
 
@@ -104,7 +100,7 @@ class FundingProjectStateMachine {
           this.validatePublishRequirements(context);
         }
         break;
-      
+
       case 'collecting':
         if (to === 'succeeded') {
           this.validateSuccessRequirements(context);
@@ -112,25 +108,25 @@ class FundingProjectStateMachine {
           this.validateFailureRequirements(context);
         }
         break;
-      
+
       case 'succeeded':
         if (to === 'executing') {
           this.validateExecutionStartRequirements(context);
         }
         break;
-      
+
       case 'failed':
         if (to === 'closed') {
           this.validateRefundCompletion(context);
         }
         break;
-      
+
       case 'executing':
         if (to === 'distributing') {
           this.validateDistributionStartRequirements(context);
         }
         break;
-      
+
       case 'distributing':
         if (to === 'closed') {
           this.validateDistributionCompletion(context);
@@ -144,7 +140,7 @@ class FundingProjectStateMachine {
    */
   validatePublishRequirements(context) {
     const { project } = context;
-    
+
     if (!project) {
       throw new BusinessLogicError('프로젝트 정보가 필요합니다');
     }
@@ -175,7 +171,7 @@ class FundingProjectStateMachine {
    */
   validateSuccessRequirements(context) {
     const { project } = context;
-    
+
     if (!project) {
       throw new BusinessLogicError('프로젝트 정보가 필요합니다');
     }
@@ -194,13 +190,15 @@ class FundingProjectStateMachine {
    */
   validateFailureRequirements(context) {
     const { project } = context;
-    
+
     if (!project) {
       throw new BusinessLogicError('프로젝트 정보가 필요합니다');
     }
 
     if (project.currentAmount >= project.targetAmount) {
-      throw new BusinessLogicError('목표 금액에 도달했으므로 실패 상태로 전이할 수 없습니다');
+      throw new BusinessLogicError(
+        '목표 금액에 도달했으므로 실패 상태로 전이할 수 없습니다',
+      );
     }
 
     if (project.endDate > new Date()) {
@@ -213,7 +211,7 @@ class FundingProjectStateMachine {
    */
   validateExecutionStartRequirements(context) {
     const { project } = context;
-    
+
     if (!project) {
       throw new BusinessLogicError('프로젝트 정보가 필요합니다');
     }
@@ -229,15 +227,17 @@ class FundingProjectStateMachine {
    */
   validateRefundCompletion(context) {
     const { project } = context;
-    
+
     if (!project) {
       throw new BusinessLogicError('프로젝트 정보가 필요합니다');
     }
 
     // 모든 환불이 완료되었는지 확인
-    const pendingRefunds = project.pledges?.filter(
-      pledge => pledge.status === 'authorized' || pledge.status === 'captured'
-    ) || [];
+    const pendingRefunds =
+      project.pledges?.filter(
+        pledge =>
+          pledge.status === 'authorized' || pledge.status === 'captured',
+      ) || [];
 
     if (pendingRefunds.length > 0) {
       throw new BusinessLogicError('아직 환불되지 않은 후원이 있습니다');
@@ -249,15 +249,17 @@ class FundingProjectStateMachine {
    */
   validateDistributionStartRequirements(context) {
     const { project } = context;
-    
+
     if (!project) {
       throw new BusinessLogicError('프로젝트 정보가 필요합니다');
     }
 
     // 집행이 완료되었는지 확인
-    const pendingExecutions = project.executions?.filter(
-      execution => execution.status === 'pending' || execution.status === 'approved'
-    ) || [];
+    const pendingExecutions =
+      project.executions?.filter(
+        execution =>
+          execution.status === 'pending' || execution.status === 'approved',
+      ) || [];
 
     if (pendingExecutions.length > 0) {
       throw new BusinessLogicError('아직 완료되지 않은 집행이 있습니다');
@@ -269,15 +271,16 @@ class FundingProjectStateMachine {
    */
   validateDistributionCompletion(context) {
     const { project } = context;
-    
+
     if (!project) {
       throw new BusinessLogicError('프로젝트 정보가 필요합니다');
     }
 
     // 모든 분배가 완료되었는지 확인
-    const pendingDistributions = project.distributions?.filter(
-      distribution => distribution.status !== 'executed'
-    ) || [];
+    const pendingDistributions =
+      project.distributions?.filter(
+        distribution => distribution.status !== 'executed',
+      ) || [];
 
     if (pendingDistributions.length > 0) {
       throw new BusinessLogicError('아직 완료되지 않은 분배가 있습니다');

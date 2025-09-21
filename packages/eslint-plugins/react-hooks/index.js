@@ -4,24 +4,24 @@ function createNoopRule(name, type = 'problem') {
       type,
       docs: {
         description: `Stub implementation for react-hooks/${name}.`,
-        recommended: false
+        recommended: false,
       },
-      schema: []
+      schema: [],
     },
     create() {
       return {};
-    }
+    },
   };
 }
 
 module.exports = {
   configs: {
     recommended: {
-      rules: {}
-    }
+      rules: {},
+    },
   },
   rules: {
     'rules-of-hooks': createNoopRule('rules-of-hooks', 'problem'),
-    'exhaustive-deps': createNoopRule('exhaustive-deps', 'suggestion')
-  }
+    'exhaustive-deps': createNoopRule('exhaustive-deps', 'suggestion'),
+  },
 };

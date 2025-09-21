@@ -1,7 +1,7 @@
 const {
   ValidationError,
   NotFoundError,
-  AuthorizationError
+  AuthorizationError,
 } = require('../errors/AppError');
 const communityRepository = require('../repositories/communityRepository');
 
@@ -14,7 +14,7 @@ const DEFAULT_CATEGORIES = [
   { value: '공연', label: '공연', color: 'bg-orange-100 text-orange-700' },
   { value: '사진', label: '사진', color: 'bg-indigo-100 text-indigo-700' },
   { value: '기술', label: '기술', color: 'bg-cyan-100 text-cyan-700' },
-  { value: '기타', label: '기타', color: 'bg-gray-100 text-gray-700' }
+  { value: '기타', label: '기타', color: 'bg-gray-100 text-gray-700' },
 ];
 
 const parsePositiveInt = (value, defaultValue) => {
@@ -25,7 +25,10 @@ const parsePositiveInt = (value, defaultValue) => {
   return parsed;
 };
 
-const ensureActivePost = (post, notFoundMessage = '포스트를 찾을 수 없습니다.') => {
+const ensureActivePost = (
+  post,
+  notFoundMessage = '포스트를 찾을 수 없습니다.',
+) => {
   if (!post || !post.isActive) {
     throw new NotFoundError(notFoundMessage);
   }
@@ -33,7 +36,13 @@ const ensureActivePost = (post, notFoundMessage = '포스트를 찾을 수 없�
 
 const getCategories = () => DEFAULT_CATEGORIES;
 
-const getPosts = async ({ page = 1, limit = 20, search = '', category = '', sortBy = 'latest' }) => {
+const getPosts = async ({
+  page = 1,
+  limit = 20,
+  search = '',
+  category = '',
+  sortBy = 'latest',
+}) => {
   const parsedPage = parsePositiveInt(page, 1);
   const parsedLimit = parsePositiveInt(limit, 20);
 
@@ -43,7 +52,7 @@ const getPosts = async ({ page = 1, limit = 20, search = '', category = '', sort
     query.$or = [
       { title: { $regex: search, $options: 'i' } },
       { content: { $regex: search, $options: 'i' } },
-      { tags: { $in: [new RegExp(search, 'i')] } }
+      { tags: { $in: [new RegExp(search, 'i')] } },
     ];
   }
 
@@ -68,8 +77,13 @@ const getPosts = async ({ page = 1, limit = 20, search = '', category = '', sort
   }
 
   const [posts, total] = await Promise.all([
-    communityRepository.findPosts({ query, sort: sortQuery, skip, limit: parsedLimit }),
-    communityRepository.countPosts(query)
+    communityRepository.findPosts({
+      query,
+      sort: sortQuery,
+      skip,
+      limit: parsedLimit,
+    }),
+    communityRepository.countPosts(query),
   ]);
 
   return {
@@ -78,8 +92,8 @@ const getPosts = async ({ page = 1, limit = 20, search = '', category = '', sort
       page: parsedPage,
       limit: parsedLimit,
       total,
-      pages: Math.ceil(total / parsedLimit)
-    }
+      pages: Math.ceil(total / parsedLimit),
+    },
   };
 };
 
@@ -94,7 +108,9 @@ const getRecentPosts = async ({ limit = 10 }) => {
 };
 
 const getPostById = async id => {
-  const post = await communityRepository.findPostById(id, { includeComments: true });
+  const post = await communityRepository.findPostById(id, {
+    includeComments: true,
+  });
   ensureActivePost(post, '포스트를 찾을 수 없습니다.');
 
   post.viewCount += 1;
@@ -119,17 +135,27 @@ const getPostReactions = async (id, userId) => {
 
   const userIdString = userId.toString();
   const isLiked = post.likes.some(like => like.toString() === userIdString);
-  const isDisliked = post.dislikes.some(dislike => dislike.toString() === userIdString);
+  const isDisliked = post.dislikes.some(
+    dislike => dislike.toString() === userIdString,
+  );
 
   return {
     isLiked,
     isDisliked,
     likes: post.likes.length,
-    dislikes: post.dislikes.length
+    dislikes: post.dislikes.length,
   };
 };
 
-const createPost = async ({ title, content, category, tags = [], images = [], author, authorName }) => {
+const createPost = async ({
+  title,
+  content,
+  category,
+  tags = [],
+  images = [],
+  author,
+  authorName,
+}) => {
   if (!title || !content || !category) {
     throw new ValidationError('제목, 내용, 카테고리는 필수입니다.');
   }
@@ -141,10 +167,12 @@ const createPost = async ({ title, content, category, tags = [], images = [], au
     tags,
     images,
     author,
-    authorName: authorName || '사용자'
+    authorName: authorName || '사용자',
   });
 
-  return communityRepository.findPostById(createdPost._id, { includeComments: false });
+  return communityRepository.findPostById(createdPost._id, {
+    includeComments: false,
+  });
 };
 
 const updatePost = async (id, user, { title, content, category, tags }) => {
@@ -194,18 +222,24 @@ const updatePostReaction = async (id, userId, reaction) => {
 
   const userIdString = userId.toString();
   const isLiked = post.likes.some(like => like.toString() === userIdString);
-  const isDisliked = post.dislikes.some(dislike => dislike.toString() === userIdString);
+  const isDisliked = post.dislikes.some(
+    dislike => dislike.toString() === userIdString,
+  );
 
   if (reaction === 'like') {
     if (isLiked) {
       post.likes = post.likes.filter(like => like.toString() !== userIdString);
     } else {
       post.likes.push(userId);
-      post.dislikes = post.dislikes.filter(dislike => dislike.toString() !== userIdString);
+      post.dislikes = post.dislikes.filter(
+        dislike => dislike.toString() !== userIdString,
+      );
     }
   } else if (reaction === 'dislike') {
     if (isDisliked) {
-      post.dislikes = post.dislikes.filter(dislike => dislike.toString() !== userIdString);
+      post.dislikes = post.dislikes.filter(
+        dislike => dislike.toString() !== userIdString,
+      );
     } else {
       post.dislikes.push(userId);
       post.likes = post.likes.filter(like => like.toString() !== userIdString);
@@ -213,7 +247,9 @@ const updatePostReaction = async (id, userId, reaction) => {
   } else if (reaction === 'unlike') {
     post.likes = post.likes.filter(like => like.toString() !== userIdString);
   } else if (reaction === 'undislike') {
-    post.dislikes = post.dislikes.filter(dislike => dislike.toString() !== userIdString);
+    post.dislikes = post.dislikes.filter(
+      dislike => dislike.toString() !== userIdString,
+    );
   }
 
   await communityRepository.savePost(post);
@@ -222,7 +258,9 @@ const updatePostReaction = async (id, userId, reaction) => {
     likes: post.likes.length,
     dislikes: post.dislikes.length,
     isLiked: post.likes.some(like => like.toString() === userIdString),
-    isDisliked: post.dislikes.some(dislike => dislike.toString() === userIdString)
+    isDisliked: post.dislikes.some(
+      dislike => dislike.toString() === userIdString,
+    ),
   };
 };
 
@@ -234,7 +272,9 @@ const reportPost = async (id, userId, reason) => {
   const post = await communityRepository.findPostDocumentById(id);
   ensureActivePost(post, '포스트를 찾을 수 없습니다.');
 
-  const alreadyReported = post.reports.some(report => report.reporter.toString() === userId.toString());
+  const alreadyReported = post.reports.some(
+    report => report.reporter.toString() === userId.toString(),
+  );
   if (alreadyReported) {
     throw new ValidationError('이미 신고한 포스트입니다.');
   }
@@ -242,7 +282,7 @@ const reportPost = async (id, userId, reason) => {
   post.reports.push({
     reporter: userId,
     reason,
-    reportedAt: new Date()
+    reportedAt: new Date(),
   });
 
   if (post.reports.length >= 5) {
@@ -253,7 +293,10 @@ const reportPost = async (id, userId, reason) => {
   await communityRepository.savePost(post);
 };
 
-const getComments = async (id, { page = 1, limit = 20, sortBy = 'createdAt', order = 'desc' }) => {
+const getComments = async (
+  id,
+  { page = 1, limit = 20, sortBy = 'createdAt', order = 'desc' },
+) => {
   const post = await communityRepository.findPostDocumentById(id);
   ensureActivePost(post, '포스트를 찾을 수 없습니다.');
 
@@ -269,8 +312,8 @@ const getComments = async (id, { page = 1, limit = 20, sortBy = 'createdAt', ord
         page: parsedPage,
         limit: parsedLimit,
         total: 0,
-        pages: 0
-      }
+        pages: 0,
+      },
     };
   }
 
@@ -294,8 +337,8 @@ const getComments = async (id, { page = 1, limit = 20, sortBy = 'createdAt', ord
       page: parsedPage,
       limit: parsedLimit,
       total: commentsDocument.comments.length,
-      pages: Math.ceil(commentsDocument.comments.length / parsedLimit)
-    }
+      pages: Math.ceil(commentsDocument.comments.length / parsedLimit),
+    },
   };
 };
 
@@ -316,7 +359,7 @@ const addComment = async (id, user, { content, parentId }) => {
     updatedAt: new Date(),
     likes: [],
     dislikes: [],
-    replies: []
+    replies: [],
   };
 
   if (parentId) {
@@ -331,7 +374,9 @@ const addComment = async (id, user, { content, parentId }) => {
 
   await communityRepository.savePost(post);
 
-  const populatedPost = await communityRepository.findPostById(id, { includeComments: true });
+  const populatedPost = await communityRepository.findPostById(id, {
+    includeComments: true,
+  });
 
   if (parentId) {
     const parent = populatedPost.comments.id(parentId);
@@ -376,7 +421,9 @@ const updateComment = async (id, commentId, user, content) => {
 
   await communityRepository.savePost(post);
 
-  return parentComment ? parentComment.replies.id(commentId) : post.comments.id(commentId);
+  return parentComment
+    ? parentComment.replies.id(commentId)
+    : post.comments.id(commentId);
 };
 
 const deleteComment = async (id, commentId, user) => {
@@ -462,7 +509,7 @@ const reactToComment = async (id, commentId, userId, reaction) => {
 
   return {
     likes: comment.likes.length,
-    dislikes: comment.dislikes.length
+    dislikes: comment.dislikes.length,
   };
 };
 
@@ -483,5 +530,5 @@ module.exports = {
   addComment,
   updateComment,
   deleteComment,
-  reactToComment
+  reactToComment,
 };

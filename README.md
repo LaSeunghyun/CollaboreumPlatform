@@ -5,29 +5,35 @@
 ## 🚀 주요 기능
 
 ### 1. 사용자 관리 시스템
+
 - 회원가입/로그인 (아티스트/팬 역할 구분)
 - 사용자 프로필 관리
 - 권한 기반 접근 제어
 
 ### 2. 아티스트 섹션
+
 - 아티스트 프로필 및 갤러리
 - 작품 업로드 및 관리
 - 아티스트 대시보드
 
 ### 3. 커뮤니티 시스템
+
 - 커뮤니티 포스트 작성/조회
 - 댓글 및 대댓글 시스템
 - 좋아요 및 인기 게시물 관리
 
 ### 4. **펀딩 시스템 (NEW! 🎯)**
+
 완전한 펀딩 플로우를 지원하는 시스템으로, 아티스트의 창작 활동을 후원하고 투명한 집행을 보장합니다.
 
 #### 펀딩 플로우
+
 ```
 아티스트 → 펀딩 프로젝트 등록 → 팬/후원자 → 프로젝트 탐색 → 후원 참여 → 결제 처리 → 펀딩 목표 달성 여부 확인 → [실패: 환불 처리] / [성공: 집행 → 비용 공개 → 수익 분배]
 ```
 
 #### 주요 기능
+
 - **펀딩 프로젝트 관리**: 프로젝트 생성, 수정, 상태 관리
 - **후원 시스템**: 단계별 결제 프로세스, 리워드 선택, 익명/실명 후원
 - **집행 관리**: 단계별 집행 계획, 진행률 추적, 예산 관리
@@ -36,6 +42,7 @@
 - **자동화 시스템**: 펀딩 성공/실패 판정, 자동 환불, 상태 업데이트
 
 ### 5. 이벤트 및 라이브스트림
+
 - 이벤트 등록 및 관리
 - 라이브스트림 기능
 - 실시간 상호작용
@@ -43,6 +50,7 @@
 ## 🏗️ 기술 스택
 
 ### Frontend
+
 - **Vite 5** 번들러 & 개발 서버
 - **React 18** + **TypeScript**
 - **Tailwind CSS** + **shadcn/ui** 컴포넌트
@@ -52,12 +60,14 @@
 - **Cypress** (E2E 테스트)
 
 ### Backend
+
 - **Node.js** + **Express.js**
 - **MongoDB** + **Mongoose** ODM
 - **JWT** 인증 시스템
 - **Multer** 파일 업로드
 
 ### 개발 도구
+
 - **ESLint 9 (Flat config)** + **Prettier** 코드 품질
 - **TypeScript** 정적 타입 검사
 - **Git** 버전 관리
@@ -95,12 +105,14 @@ Collaboreum MVP Platform/
 TDD(Test-Driven Development) 방법론을 적용하여 펀딩 시스템의 모든 기능에 대한 테스트를 작성했습니다.
 
 ### 테스트 범위
+
 - **컴포넌트 테스트**: 각 React 컴포넌트의 렌더링 및 상호작용
 - **통합 테스트**: 전체 펀딩 플로우의 연동 테스트
 - **에러 처리 테스트**: API 오류 및 네트워크 오류 상황
 - **접근성 테스트**: 키보드 네비게이션 및 스크린 리더 지원
 
 ### 테스트 실행
+
 ```bash
 npm test                    # 전체 테스트 실행
 npm test -- --watch        # 감시 모드로 테스트 실행
@@ -110,12 +122,14 @@ npm test -- --coverage     # 커버리지 리포트 생성
 ## 🚀 설치 및 실행
 
 ### 1. 저장소 클론
+
 ```bash
 git clone https://github.com/your-username/collaboreum-mvp-platform.git
 cd collaboreum-mvp-platform
 ```
 
 ### 2. 의존성 설치
+
 ```bash
 # Frontend 의존성
 npm install
@@ -129,6 +143,7 @@ cd ..
 > ℹ️ CRA 기반의 `react-scripts`는 제거되었으며, 프런트엔드는 Vite 빌드 체인과 Flat ESLint 구성을 그대로 사용합니다.
 
 ### 3. 환경 변수 설정
+
 ```bash
 # server/.env 파일 생성
 cp server/env.example server/.env
@@ -140,9 +155,11 @@ PORT=5000
 ```
 
 ### 4. 데이터베이스 설정
+
 MongoDB 데이터베이스를 설정하고 연결 문자열을 환경 변수에 추가하세요.
 
 ### 5. 개발 서버 실행
+
 ```bash
 # Backend 서버 실행
 cd server
@@ -155,6 +172,7 @@ npm run dev
 ## 📊 펀딩 시스템 상세 설명
 
 ### 아티스트 워크플로우
+
 1. **프로젝트 등록**: 제목, 설명, 목표 금액, 기간, 리워드 설정
 2. **집행 계획 수립**: 단계별 예산 계획 및 일정 설정
 3. **프로젝트 진행**: 실시간 진행률 업데이트 및 상태 관리
@@ -162,6 +180,7 @@ npm run dev
 5. **수익 분배**: 후원자들에게 수익 배분 및 지급 처리
 
 ### 후원자 워크플로우
+
 1. **프로젝트 탐색**: 카테고리별, 상태별 프로젝트 검색
 2. **후원 참여**: 금액 선택, 리워드 선택, 결제 정보 입력
 3. **진행 상황 모니터링**: 실시간 진행률 및 집행 현황 확인
@@ -169,6 +188,7 @@ npm run dev
 5. **수익 수령**: 프로젝트 성공 시 원금 + 수익 배분
 
 ### 시스템 특징
+
 - **투명성**: 모든 비용 사용 내역과 영수증 공개
 - **자동화**: 펀딩 성공/실패 자동 판정 및 환불 처리
 - **보안**: SSL 암호화, JWT 인증, 권한 기반 접근 제어
@@ -193,6 +213,7 @@ CI가 다음 항목들을 강제합니다. 실패 시 PR 머지 불가:
 ## 🧪 Quick Commands
 
 ### 전체 점검 (로컬)
+
 ```bash
 # Frontend
 npm run lint && npm run typecheck && npm run format && npm run semgrep && npm run depcheck && npm run test && npm run env:verify
@@ -203,16 +224,19 @@ npm run lint && npm run typecheck && npm run format && npm run semgrep && npm ru
 ```
 
 ### 계약 타입 생성
+
 ```bash
 npm run openapi:gen
 ```
 
 ### 계약 테스트
+
 ```bash
 npm run pact:test
 ```
 
 ### E2E 테스트
+
 ```bash
 npm run cypress:ci
 ```
@@ -228,6 +252,7 @@ npm run cypress:ci
 ### CI 체크 목록과 실패 시 조치
 
 #### 필수 통과 기준
+
 - **Lint/Type/Format**: 오류 0, 경고 기준은 팀 합의치 이하
 - **Semgrep**: 커스텀 규칙 + 기본 CI rulepack 위반 0
 - **Depcheck**: 미사용/누락 의존성 0
@@ -237,6 +262,7 @@ npm run cypress:ci
 - **Security Audit**: 보안 취약점 0
 
 #### 실패 시 조치
+
 1. **Lint 실패**: `npm run lint:fix` 실행 후 재커밋
 2. **Format 실패**: `npm run format:fix` 실행 후 재커밋
 3. **Type 실패**: TypeScript 오류 수정 후 재커밋

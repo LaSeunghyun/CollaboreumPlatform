@@ -19,7 +19,7 @@ import {
   Users,
   TrendingUp,
   Shield,
-  LogOut
+  LogOut,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { getFirstChar } from '../utils/typeGuards';
@@ -68,14 +68,14 @@ interface Revenue {
 }
 
 // Common Profile Edit Component
-export const ProfileEditForm: React.FC<{ profile: UserProfile; onSave: (data: Partial<UserProfile>) => void }> = ({
-  profile,
-  onSave
-}) => {
+export const ProfileEditForm: React.FC<{
+  profile: UserProfile;
+  onSave: (data: Partial<UserProfile>) => void;
+}> = ({ profile, onSave }) => {
   const [formData, setFormData] = useState({
     username: profile.username,
     bio: profile.bio || '',
-    avatar: profile.avatar || ''
+    avatar: profile.avatar || '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -102,58 +102,68 @@ export const ProfileEditForm: React.FC<{ profile: UserProfile; onSave: (data: Pa
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className='space-y-4'>
       <div>
-        <label className="block text-sm font-medium mb-2">프로필 이미지</label>
-        <div className="flex items-center gap-4">
-          <Avatar className="w-20 h-20">
+        <label className='mb-2 block text-sm font-medium'>프로필 이미지</label>
+        <div className='flex items-center gap-4'>
+          <Avatar className='h-20 w-20'>
             <AvatarImage src={formData.avatar} />
             <AvatarFallback>{getFirstChar(profile.username)}</AvatarFallback>
           </Avatar>
           <div>
             <Input
               value={formData.avatar}
-              onChange={(e) => setFormData(prev => ({ ...prev, avatar: e.target.value }))}
-              placeholder="이미지 URL을 입력하세요"
+              onChange={e =>
+                setFormData(prev => ({ ...prev, avatar: e.target.value }))
+              }
+              placeholder='이미지 URL을 입력하세요'
             />
-            <p className="text-sm text-gray-500 mt-1">프로필 이미지 URL을 입력하세요</p>
+            <p className='mt-1 text-sm text-gray-500'>
+              프로필 이미지 URL을 입력하세요
+            </p>
           </div>
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">사용자명 *</label>
+        <label className='mb-2 block text-sm font-medium'>사용자명 *</label>
         <Input
           value={formData.username}
-          onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+          onChange={e =>
+            setFormData(prev => ({ ...prev, username: e.target.value }))
+          }
           className={errors.username ? 'border-red-500' : ''}
         />
-        {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
+        {errors.username && (
+          <p className='mt-1 text-sm text-red-500'>{errors.username}</p>
+        )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">자기소개</label>
+        <label className='mb-2 block text-sm font-medium'>자기소개</label>
         <Textarea
           value={formData.bio}
-          onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-          placeholder="자기소개를 입력하세요"
+          onChange={e =>
+            setFormData(prev => ({ ...prev, bio: e.target.value }))
+          }
+          placeholder='자기소개를 입력하세요'
           rows={4}
           maxLength={500}
           className={errors.bio ? 'border-red-500' : ''}
         />
-        <div className="flex justify-between items-center mt-1">
-          {errors.bio && <p className="text-red-500 text-sm">{errors.bio}</p>}
-          <span className="text-sm text-gray-500">
+        <div className='mt-1 flex items-center justify-between'>
+          {errors.bio && <p className='text-sm text-red-500'>{errors.bio}</p>}
+          <span className='text-sm text-gray-500'>
             {formData.bio.length}/500
           </span>
         </div>
       </div>
 
-      <div className="flex gap-2 pt-4">
-        <Button type="submit" className="flex-1">
+      <div className='flex gap-2 pt-4'>
+        <Button type='submit' className='flex-1'>
           저장
         </Button>
-        <Button type="button" variant="outline" className="flex-1">
+        <Button type='button' variant='outline' className='flex-1'>
           취소
         </Button>
       </div>
@@ -166,7 +176,7 @@ export const PasswordChangeForm: React.FC = () => {
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -200,7 +210,7 @@ export const PasswordChangeForm: React.FC = () => {
         setFormData({
           currentPassword: '',
           newPassword: '',
-          confirmPassword: ''
+          confirmPassword: '',
         });
       } catch (error) {
         console.error('비밀번호 변경 실패:', error);
@@ -210,42 +220,58 @@ export const PasswordChangeForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className='space-y-4'>
       <div>
-        <label className="block text-sm font-medium mb-2">현재 비밀번호 *</label>
+        <label className='mb-2 block text-sm font-medium'>
+          현재 비밀번호 *
+        </label>
         <Input
-          type="password"
+          type='password'
           value={formData.currentPassword}
-          onChange={(e) => setFormData(prev => ({ ...prev, currentPassword: e.target.value }))}
+          onChange={e =>
+            setFormData(prev => ({ ...prev, currentPassword: e.target.value }))
+          }
           className={errors.currentPassword ? 'border-red-500' : ''}
         />
-        {errors.currentPassword && <p className="text-red-500 text-sm mt-1">{errors.currentPassword}</p>}
+        {errors.currentPassword && (
+          <p className='mt-1 text-sm text-red-500'>{errors.currentPassword}</p>
+        )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">새 비밀번호 *</label>
+        <label className='mb-2 block text-sm font-medium'>새 비밀번호 *</label>
         <Input
-          type="password"
+          type='password'
           value={formData.newPassword}
-          onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
+          onChange={e =>
+            setFormData(prev => ({ ...prev, newPassword: e.target.value }))
+          }
           className={errors.newPassword ? 'border-red-500' : ''}
         />
-        {errors.newPassword && <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>}
+        {errors.newPassword && (
+          <p className='mt-1 text-sm text-red-500'>{errors.newPassword}</p>
+        )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">새 비밀번호 확인 *</label>
+        <label className='mb-2 block text-sm font-medium'>
+          새 비밀번호 확인 *
+        </label>
         <Input
-          type="password"
+          type='password'
           value={formData.confirmPassword}
-          onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+          onChange={e =>
+            setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))
+          }
           className={errors.confirmPassword ? 'border-red-500' : ''}
         />
-        {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+        {errors.confirmPassword && (
+          <p className='mt-1 text-sm text-red-500'>{errors.confirmPassword}</p>
+        )}
       </div>
 
-      <div className="pt-4">
-        <Button type="submit" className="w-full">
+      <div className='pt-4'>
+        <Button type='submit' className='w-full'>
           비밀번호 변경
         </Button>
       </div>
@@ -260,7 +286,9 @@ export const ArtistMyPage: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [revenues, setRevenues] = useState<Revenue[]>([]);
   const [activeTab, setActiveTab] = useState('profile');
-  const [statusConfig, setStatusConfig] = useState<Record<string, { label: string; variant: any }>>({});
+  const [statusConfig, setStatusConfig] = useState<
+    Record<string, { label: string; variant: any }>
+  >({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -281,7 +309,7 @@ export const ArtistMyPage: React.FC = () => {
           bio: user.bio || '',
           createdAt: new Date(user.createdAt || new Date()),
           lastLoginAt: new Date(),
-          status: 'active'
+          status: 'active',
         });
 
         // API에서 프로젝트 정보 가져오기
@@ -295,7 +323,8 @@ export const ArtistMyPage: React.FC = () => {
         // setRevenues(revenuesResponse || []);
 
         // API에서 상태 설정 가져오기
-        const statusConfigData = await dynamicConstantsService.getProjectStatusConfig();
+        const statusConfigData =
+          await dynamicConstantsService.getProjectStatusConfig();
         setStatusConfig(statusConfigData);
       } catch (error) {
         console.error('아티스트 데이터 로드 실패:', error);
@@ -307,7 +336,7 @@ export const ArtistMyPage: React.FC = () => {
           pending: { label: '승인 대기', variant: 'secondary' },
           active: { label: '진행중', variant: 'default' },
           completed: { label: '완료', variant: 'outline' },
-          failed: { label: '실패', variant: 'destructive' }
+          failed: { label: '실패', variant: 'destructive' },
         });
       } finally {
         setLoading(false);
@@ -324,10 +353,13 @@ export const ArtistMyPage: React.FC = () => {
     }
 
     try {
-      const response = await artistAPI.updateArtistProfile(profile.id, data) as ApiResponse<any>;
+      const response = (await artistAPI.updateArtistProfile(
+        profile.id,
+        data,
+      )) as ApiResponse<any>;
 
       if (response && response.success) {
-        setProfile(prev => prev ? { ...prev, ...data } : null);
+        setProfile(prev => (prev ? { ...prev, ...data } : null));
         alert('프로필이 성공적으로 업데이트되었습니다.');
       } else {
         alert('프로필 업데이트에 실패했습니다.');
@@ -339,15 +371,18 @@ export const ArtistMyPage: React.FC = () => {
   };
 
   const getStatusBadge = (status: string) => {
-    const config = statusConfig[status] || { label: status, variant: 'secondary' };
+    const config = statusConfig[status] || {
+      label: status,
+      variant: 'secondary',
+    };
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
   // 로딩 상태 처리
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <LoadingState title="데이터를 불러오는 중..." />
+      <div className='container mx-auto px-4 py-8'>
+        <LoadingState title='데이터를 불러오는 중...' />
       </div>
     );
   }
@@ -355,13 +390,13 @@ export const ArtistMyPage: React.FC = () => {
   // 에러 상태 처리
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className='container mx-auto px-4 py-8'>
         <ErrorState
-          title="데이터 로드 실패"
+          title='데이터 로드 실패'
           description={error}
           action={{
-            label: "다시 시도",
-            onClick: () => window.location.reload()
+            label: '다시 시도',
+            onClick: () => window.location.reload(),
           }}
         />
       </div>
@@ -371,67 +406,78 @@ export const ArtistMyPage: React.FC = () => {
   // 프로필이 없는 경우
   if (!profile) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className='container mx-auto px-4 py-8'>
         <ErrorState
-          title="프로필을 찾을 수 없습니다"
-          description="사용자 정보를 불러올 수 없습니다."
+          title='프로필을 찾을 수 없습니다'
+          description='사용자 정보를 불러올 수 없습니다.'
         />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">아티스트 마이페이지</h1>
-        <p className="text-gray-600">프로젝트와 수익을 관리하세요</p>
+    <div className='container mx-auto px-4 py-8'>
+      <div className='mb-8'>
+        <h1 className='mb-2 text-3xl font-bold'>아티스트 마이페이지</h1>
+        <p className='text-gray-600'>프로젝트와 수익을 관리하세요</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="profile">프로필</TabsTrigger>
-          <TabsTrigger value="projects">프로젝트</TabsTrigger>
-          <TabsTrigger value="revenue">수익 관리</TabsTrigger>
-          <TabsTrigger value="settings">설정</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
+        <TabsList className='grid w-full grid-cols-4'>
+          <TabsTrigger value='profile'>프로필</TabsTrigger>
+          <TabsTrigger value='projects'>프로젝트</TabsTrigger>
+          <TabsTrigger value='revenue'>수익 관리</TabsTrigger>
+          <TabsTrigger value='settings'>설정</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="profile" className="mt-6">
-          <div className="grid lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+        <TabsContent value='profile' className='mt-6'>
+          <div className='grid gap-6 lg:grid-cols-3'>
+            <div className='lg:col-span-2'>
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="w-5 h-5" />
+                  <CardTitle className='flex items-center gap-2'>
+                    <User className='h-5 w-5' />
                     프로필 정보
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ProfileEditForm profile={profile} onSave={handleProfileSave} />
+                  <ProfileEditForm
+                    profile={profile}
+                    onSave={handleProfileSave}
+                  />
                 </CardContent>
               </Card>
             </div>
 
-            <div className="space-y-4">
+            <div className='space-y-4'>
               <Card>
                 <CardHeader>
                   <CardTitle>계정 정보</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className='space-y-3'>
                   <div>
-                    <p className="text-sm text-gray-500">이메일</p>
-                    <p className="font-medium">{profile.email}</p>
+                    <p className='text-sm text-gray-500'>이메일</p>
+                    <p className='font-medium'>{profile.email}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">가입일</p>
-                    <p className="font-medium">{format(profile.createdAt, 'PPP', { locale: ko })}</p>
+                    <p className='text-sm text-gray-500'>가입일</p>
+                    <p className='font-medium'>
+                      {format(profile.createdAt, 'PPP', { locale: ko })}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">마지막 로그인</p>
-                    <p className="font-medium">{format(profile.lastLoginAt, 'PPP', { locale: ko })}</p>
+                    <p className='text-sm text-gray-500'>마지막 로그인</p>
+                    <p className='font-medium'>
+                      {format(profile.lastLoginAt, 'PPP', { locale: ko })}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">상태</p>
-                    <Badge variant={profile.status === 'active' ? 'default' : 'destructive'}>
+                    <p className='text-sm text-gray-500'>상태</p>
+                    <Badge
+                      variant={
+                        profile.status === 'active' ? 'default' : 'destructive'
+                      }
+                    >
                       {profile.status === 'active' ? '활성' : '정지'}
                     </Badge>
                   </div>
@@ -442,21 +488,24 @@ export const ArtistMyPage: React.FC = () => {
                 <CardHeader>
                   <CardTitle>통계</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center justify-between">
+                <CardContent className='space-y-3'>
+                  <div className='flex items-center justify-between'>
                     <span>총 프로젝트</span>
-                    <span className="font-bold">{projects.length}</span>
+                    <span className='font-bold'>{projects.length}</span>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className='flex items-center justify-between'>
                     <span>성공한 프로젝트</span>
-                    <span className="font-bold text-green-600">
+                    <span className='font-bold text-green-600'>
                       {projects.filter(p => p.status === 'completed').length}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className='flex items-center justify-between'>
                     <span>총 수익</span>
-                    <span className="font-bold text-blue-600">
-                      {revenues.reduce((sum, r) => sum + r.amount, 0).toLocaleString()}원
+                    <span className='font-bold text-blue-600'>
+                      {revenues
+                        .reduce((sum, r) => sum + r.amount, 0)
+                        .toLocaleString()}
+                      원
                     </span>
                   </div>
                 </CardContent>
@@ -465,33 +514,45 @@ export const ArtistMyPage: React.FC = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="projects" className="mt-6">
+        <TabsContent value='projects' className='mt-6'>
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className='flex items-center justify-between'>
                 <span>내 프로젝트</span>
                 <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  새 프로젝트
+                  <Plus className='mr-2 h-4 w-4' />새 프로젝트
                 </Button>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className='space-y-4'>
                 {projects.map(project => (
-                  <div key={project.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{project.title}</h3>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                        <span>목표: {project.goalAmount.toLocaleString()}원</span>
-                        <span>현재: {project.currentAmount.toLocaleString()}원</span>
-                        <span>달성률: {Math.round((project.currentAmount / project.goalAmount) * 100)}%</span>
+                  <div
+                    key={project.id}
+                    className='flex items-center justify-between rounded-lg border p-4'
+                  >
+                    <div className='flex-1'>
+                      <h3 className='font-semibold'>{project.title}</h3>
+                      <div className='mt-2 flex items-center gap-4 text-sm text-gray-600'>
+                        <span>
+                          목표: {project.goalAmount.toLocaleString()}원
+                        </span>
+                        <span>
+                          현재: {project.currentAmount.toLocaleString()}원
+                        </span>
+                        <span>
+                          달성률:{' '}
+                          {Math.round(
+                            (project.currentAmount / project.goalAmount) * 100,
+                          )}
+                          %
+                        </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className='flex items-center gap-3'>
                       {getStatusBadge(project.status)}
-                      <Button variant="outline" size="sm">
-                        <Eye className="w-4 h-4 mr-2" />
+                      <Button variant='outline' size='sm'>
+                        <Eye className='mr-2 h-4 w-4' />
                         보기
                       </Button>
                     </div>
@@ -502,27 +563,38 @@ export const ArtistMyPage: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="revenue" className="mt-6">
+        <TabsContent value='revenue' className='mt-6'>
           <Card>
             <CardHeader>
               <CardTitle>수익 관리</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className='space-y-4'>
                 {revenues.map(revenue => (
-                  <div key={revenue.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div
+                    key={revenue.id}
+                    className='flex items-center justify-between rounded-lg border p-4'
+                  >
                     <div>
-                      <h3 className="font-semibold">{revenue.projectTitle}</h3>
-                      <p className="text-sm text-gray-600">
+                      <h3 className='font-semibold'>{revenue.projectTitle}</h3>
+                      <p className='text-sm text-gray-600'>
                         {format(revenue.distributedAt, 'PPP', { locale: ko })}
                       </p>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg font-bold text-green-600">
+                    <div className='flex items-center gap-3'>
+                      <span className='text-lg font-bold text-green-600'>
                         {revenue.amount.toLocaleString()}원
                       </span>
-                      <Badge variant={revenue.status === 'completed' ? 'default' : 'secondary'}>
-                        {revenue.status === 'completed' ? '지급 완료' : '대기중'}
+                      <Badge
+                        variant={
+                          revenue.status === 'completed'
+                            ? 'default'
+                            : 'secondary'
+                        }
+                      >
+                        {revenue.status === 'completed'
+                          ? '지급 완료'
+                          : '대기중'}
                       </Badge>
                     </div>
                   </div>
@@ -532,12 +604,12 @@ export const ArtistMyPage: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="settings" className="mt-6">
-          <div className="grid lg:grid-cols-2 gap-6">
+        <TabsContent value='settings' className='mt-6'>
+          <div className='grid gap-6 lg:grid-cols-2'>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lock className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Lock className='h-5 w-5' />
                   비밀번호 변경
                 </CardTitle>
               </CardHeader>
@@ -548,16 +620,16 @@ export const ArtistMyPage: React.FC = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Trash2 className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Trash2 className='h-5 w-5' />
                   계정 삭제
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600 mb-4">
+                <p className='mb-4 text-gray-600'>
                   계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
                 </p>
-                <Button variant="solid" tone="danger">
+                <Button variant='solid' tone='danger'>
                   계정 삭제
                 </Button>
               </CardContent>
@@ -580,7 +652,7 @@ export const FanMyPage: React.FC = () => {
     bio: '',
     createdAt: new Date(),
     lastLoginAt: new Date(),
-    status: 'active'
+    status: 'active',
   });
 
   const [backings, setBackings] = useState<Backing[]>([]);
@@ -590,7 +662,7 @@ export const FanMyPage: React.FC = () => {
     // API에서 백킹 정보 가져오기
     const fetchBackingInfo = async () => {
       try {
-        const response = await userAPI.getInvestments(user?.id || '') as any;
+        const response = (await userAPI.getInvestments(user?.id || '')) as any;
         if (response.success) {
           setBackings(response.data || []);
         }
@@ -607,7 +679,7 @@ export const FanMyPage: React.FC = () => {
     setProfile(prev => ({ ...prev, ...data }));
     // API 호출하여 프로필 업데이트
     try {
-      const response = await userAPI.updateProfile(profile.id, data) as any;
+      const response = (await userAPI.updateProfile(profile.id, data)) as any;
 
       if (response.success) {
         alert('프로필이 성공적으로 업데이트되었습니다.');
@@ -621,52 +693,59 @@ export const FanMyPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">팬 마이페이지</h1>
-        <p className="text-gray-600">후원 내역과 프로필을 관리하세요</p>
+    <div className='container mx-auto px-4 py-8'>
+      <div className='mb-8'>
+        <h1 className='mb-2 text-3xl font-bold'>팬 마이페이지</h1>
+        <p className='text-gray-600'>후원 내역과 프로필을 관리하세요</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="profile">프로필</TabsTrigger>
-          <TabsTrigger value="backings">후원 내역</TabsTrigger>
-          <TabsTrigger value="settings">설정</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
+        <TabsList className='grid w-full grid-cols-3'>
+          <TabsTrigger value='profile'>프로필</TabsTrigger>
+          <TabsTrigger value='backings'>후원 내역</TabsTrigger>
+          <TabsTrigger value='settings'>설정</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="profile" className="mt-6">
-          <div className="grid lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+        <TabsContent value='profile' className='mt-6'>
+          <div className='grid gap-6 lg:grid-cols-3'>
+            <div className='lg:col-span-2'>
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="w-5 h-5" />
+                  <CardTitle className='flex items-center gap-2'>
+                    <User className='h-5 w-5' />
                     프로필 정보
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ProfileEditForm profile={profile} onSave={handleProfileSave} />
+                  <ProfileEditForm
+                    profile={profile}
+                    onSave={handleProfileSave}
+                  />
                 </CardContent>
               </Card>
             </div>
 
-            <div className="space-y-4">
+            <div className='space-y-4'>
               <Card>
                 <CardHeader>
                   <CardTitle>계정 정보</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className='space-y-3'>
                   <div>
-                    <p className="text-sm text-gray-500">이메일</p>
-                    <p className="font-medium">{profile.email}</p>
+                    <p className='text-sm text-gray-500'>이메일</p>
+                    <p className='font-medium'>{profile.email}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">가입일</p>
-                    <p className="font-medium">{format(profile.createdAt, 'PPP', { locale: ko })}</p>
+                    <p className='text-sm text-gray-500'>가입일</p>
+                    <p className='font-medium'>
+                      {format(profile.createdAt, 'PPP', { locale: ko })}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">마지막 로그인</p>
-                    <p className="font-medium">{format(profile.lastLoginAt, 'PPP', { locale: ko })}</p>
+                    <p className='text-sm text-gray-500'>마지막 로그인</p>
+                    <p className='font-medium'>
+                      {format(profile.lastLoginAt, 'PPP', { locale: ko })}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -675,21 +754,27 @@ export const FanMyPage: React.FC = () => {
                 <CardHeader>
                   <CardTitle>후원 통계</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center justify-between">
+                <CardContent className='space-y-3'>
+                  <div className='flex items-center justify-between'>
                     <span>총 후원 프로젝트</span>
-                    <span className="font-bold">{backings.length}</span>
+                    <span className='font-bold'>{backings.length}</span>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className='flex items-center justify-between'>
                     <span>총 후원 금액</span>
-                    <span className="font-bold text-blue-600">
-                      {backings.reduce((sum, b) => sum + b.amount, 0).toLocaleString()}원
+                    <span className='font-bold text-blue-600'>
+                      {backings
+                        .reduce((sum, b) => sum + b.amount, 0)
+                        .toLocaleString()}
+                      원
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className='flex items-center justify-between'>
                     <span>성공한 프로젝트</span>
-                    <span className="font-bold text-green-600">
-                      {backings.filter(b => b.projectStatus === 'completed').length}
+                    <span className='font-bold text-green-600'>
+                      {
+                        backings.filter(b => b.projectStatus === 'completed')
+                          .length
+                      }
                     </span>
                   </div>
                 </CardContent>
@@ -698,33 +783,44 @@ export const FanMyPage: React.FC = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="backings" className="mt-6">
+        <TabsContent value='backings' className='mt-6'>
           <Card>
             <CardHeader>
               <CardTitle>후원 내역</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className='space-y-4'>
                 {backings.map(backing => (
-                  <div key={backing.id} className="p-4 border rounded-lg">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{backing.projectTitle}</h3>
-                        <p className="text-sm text-gray-600 mt-1">
-                          후원일: {format(backing.backedAt, 'PPP', { locale: ko })}
+                  <div key={backing.id} className='rounded-lg border p-4'>
+                    <div className='flex items-start justify-between'>
+                      <div className='flex-1'>
+                        <h3 className='font-semibold'>
+                          {backing.projectTitle}
+                        </h3>
+                        <p className='mt-1 text-sm text-gray-600'>
+                          후원일:{' '}
+                          {format(backing.backedAt, 'PPP', { locale: ko })}
                         </p>
                         {backing.reward && (
-                          <p className="text-sm text-blue-600 mt-1">
+                          <p className='mt-1 text-sm text-blue-600'>
                             리워드: {backing.reward}
                           </p>
                         )}
                       </div>
-                      <div className="text-right">
-                        <div className="text-lg font-bold text-blue-600">
+                      <div className='text-right'>
+                        <div className='text-lg font-bold text-blue-600'>
                           {backing.amount.toLocaleString()}원
                         </div>
-                        <Badge variant={backing.projectStatus === 'completed' ? 'default' : 'secondary'}>
-                          {backing.projectStatus === 'completed' ? '성공' : '진행중'}
+                        <Badge
+                          variant={
+                            backing.projectStatus === 'completed'
+                              ? 'default'
+                              : 'secondary'
+                          }
+                        >
+                          {backing.projectStatus === 'completed'
+                            ? '성공'
+                            : '진행중'}
                         </Badge>
                       </div>
                     </div>
@@ -735,12 +831,12 @@ export const FanMyPage: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="settings" className="mt-6">
-          <div className="grid lg:grid-cols-2 gap-6">
+        <TabsContent value='settings' className='mt-6'>
+          <div className='grid gap-6 lg:grid-cols-2'>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lock className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Lock className='h-5 w-5' />
                   비밀번호 변경
                 </CardTitle>
               </CardHeader>
@@ -751,16 +847,16 @@ export const FanMyPage: React.FC = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Trash2 className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Trash2 className='h-5 w-5' />
                   계정 삭제
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600 mb-4">
+                <p className='mb-4 text-gray-600'>
                   계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
                 </p>
-                <Button variant="solid" tone="danger">
+                <Button variant='solid' tone='danger'>
                   계정 삭제
                 </Button>
               </CardContent>
@@ -783,7 +879,7 @@ export const AdminMyPage: React.FC = () => {
     bio: '플랫폼 관리자입니다.',
     createdAt: new Date('2023-01-01'),
     lastLoginAt: new Date('2024-01-15'),
-    status: 'active'
+    status: 'active',
   });
 
   const [activeTab, setActiveTab] = useState('profile');
@@ -792,7 +888,7 @@ export const AdminMyPage: React.FC = () => {
     setProfile(prev => ({ ...prev, ...data }));
     // API 호출하여 프로필 업데이트
     try {
-      const response = await userAPI.updateProfile(profile.id, data) as any;
+      const response = (await userAPI.updateProfile(profile.id, data)) as any;
 
       if (response.success) {
         alert('프로필이 성공적으로 업데이트되었습니다.');
@@ -806,55 +902,62 @@ export const AdminMyPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">관리자 마이페이지</h1>
-        <p className="text-gray-600">관리자 계정을 관리하세요</p>
+    <div className='container mx-auto px-4 py-8'>
+      <div className='mb-8'>
+        <h1 className='mb-2 text-3xl font-bold'>관리자 마이페이지</h1>
+        <p className='text-gray-600'>관리자 계정을 관리하세요</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="profile">프로필</TabsTrigger>
-          <TabsTrigger value="settings">설정</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
+        <TabsList className='grid w-full grid-cols-2'>
+          <TabsTrigger value='profile'>프로필</TabsTrigger>
+          <TabsTrigger value='settings'>설정</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="profile" className="mt-6">
-          <div className="grid lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+        <TabsContent value='profile' className='mt-6'>
+          <div className='grid gap-6 lg:grid-cols-3'>
+            <div className='lg:col-span-2'>
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Shield className="w-5 h-5" />
+                  <CardTitle className='flex items-center gap-2'>
+                    <Shield className='h-5 w-5' />
                     관리자 프로필
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ProfileEditForm profile={profile} onSave={handleProfileSave} />
+                  <ProfileEditForm
+                    profile={profile}
+                    onSave={handleProfileSave}
+                  />
                 </CardContent>
               </Card>
             </div>
 
-            <div className="space-y-4">
+            <div className='space-y-4'>
               <Card>
                 <CardHeader>
                   <CardTitle>계정 정보</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className='space-y-3'>
                   <div>
-                    <p className="text-sm text-gray-500">이메일</p>
-                    <p className="font-medium">{profile.email}</p>
+                    <p className='text-sm text-gray-500'>이메일</p>
+                    <p className='font-medium'>{profile.email}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">가입일</p>
-                    <p className="font-medium">{format(profile.createdAt, 'PPP', { locale: ko })}</p>
+                    <p className='text-sm text-gray-500'>가입일</p>
+                    <p className='font-medium'>
+                      {format(profile.createdAt, 'PPP', { locale: ko })}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">마지막 로그인</p>
-                    <p className="font-medium">{format(profile.lastLoginAt, 'PPP', { locale: ko })}</p>
+                    <p className='text-sm text-gray-500'>마지막 로그인</p>
+                    <p className='font-medium'>
+                      {format(profile.lastLoginAt, 'PPP', { locale: ko })}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">권한</p>
-                    <Badge variant="default" className="bg-red-600">
+                    <p className='text-sm text-gray-500'>권한</p>
+                    <Badge variant='default' className='bg-red-600'>
                       관리자
                     </Badge>
                   </div>
@@ -865,17 +968,17 @@ export const AdminMyPage: React.FC = () => {
                 <CardHeader>
                   <CardTitle>관리자 기능</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Users className="w-4 h-4 mr-2" />
+                <CardContent className='space-y-3'>
+                  <Button variant='outline' className='w-full justify-start'>
+                    <Users className='mr-2 h-4 w-4' />
                     사용자 관리
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <TrendingUp className="w-4 h-4 mr-2" />
+                  <Button variant='outline' className='w-full justify-start'>
+                    <TrendingUp className='mr-2 h-4 w-4' />
                     프로젝트 승인
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <Shield className="w-4 h-4 mr-2" />
+                  <Button variant='outline' className='w-full justify-start'>
+                    <Shield className='mr-2 h-4 w-4' />
                     콘텐츠 검토
                   </Button>
                 </CardContent>
@@ -884,12 +987,12 @@ export const AdminMyPage: React.FC = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="settings" className="mt-6">
-          <div className="grid lg:grid-cols-2 gap-6">
+        <TabsContent value='settings' className='mt-6'>
+          <div className='grid gap-6 lg:grid-cols-2'>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lock className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Lock className='h-5 w-5' />
                   비밀번호 변경
                 </CardTitle>
               </CardHeader>
@@ -900,18 +1003,16 @@ export const AdminMyPage: React.FC = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <LogOut className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <LogOut className='h-5 w-5' />
                   로그아웃
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600 mb-4">
+                <p className='mb-4 text-gray-600'>
                   현재 세션에서 로그아웃합니다.
                 </p>
-                <Button variant="outline">
-                  로그아웃
-                </Button>
+                <Button variant='outline'>로그아웃</Button>
               </CardContent>
             </Card>
           </div>
@@ -938,11 +1039,7 @@ export const UserProfileSystem: React.FC = () => {
     }
   };
 
-  return (
-    <div>
-      {renderMyPage()}
-    </div>
-  );
+  return <div>{renderMyPage()}</div>;
 };
 
 export default UserProfileSystem;

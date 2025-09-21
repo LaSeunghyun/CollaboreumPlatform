@@ -66,8 +66,8 @@ const preview = {
       },
       defaultTheme: 'light',
     }),
-    (Story) => (
-      <div className="p-4">
+    Story => (
+      <div className='p-4'>
         <Story />
       </div>
     ),

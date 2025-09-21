@@ -25,7 +25,7 @@ Collaboreum MVP Platform의 백엔드 서버입니다. 아티스트와 팬들을
 
 ## 📋 요구사항
 
-- Node.js 18+ 
+- Node.js 18+
 - MongoDB 6+
 - npm 또는 yarn
 
@@ -61,6 +61,7 @@ CLIENT_URL=http://localhost:3000
 ### 3. MongoDB 설정
 
 #### 로컬 MongoDB 사용
+
 ```bash
 # MongoDB Community Edition 설치
 # https://www.mongodb.com/try/download/community
@@ -70,6 +71,7 @@ mongod
 ```
 
 #### Docker 사용
+
 ```bash
 docker run -d -p 27017:27017 --name mongodb mongo:latest
 ```
@@ -132,22 +134,26 @@ npm run start:check
 ## 🗄️ 데이터베이스 스키마
 
 ### User 모델
+
 - 기본 정보 (이름, 이메일, 비밀번호)
 - 역할 (artist, fan, admin)
 - 프로필 정보 (아바타, 바이오)
 
 ### Category 모델
+
 - 카테고리 ID, 라벨, 아이콘
 - 활성화 상태, 정렬 순서
 - 생성/수정 시간
 
 ### Artist 모델
+
 - 카테고리, 위치, 평점
 - 팔로워 수, 프로젝트 통계
 - 소셜 링크, 성과
 - 인증 상태, 추천 여부
 
 ### Project 모델
+
 - 프로젝트 정보 (제목, 설명, 목표)
 - 펀딩 정보 (목표 금액, 현재 금액)
 - 진행 상태, 마감일
@@ -179,15 +185,18 @@ DEBUG=* npm run dev
 ## 🚨 문제 해결
 
 ### MongoDB 연결 실패
+
 1. MongoDB 서비스가 실행 중인지 확인
 2. `.env` 파일의 `MONGODB_URI` 확인
 3. 방화벽 설정 확인
 
 ### 포트 충돌
+
 1. 다른 프로세스가 5000번 포트를 사용 중인지 확인
 2. `.env` 파일에서 `PORT` 변경
 
 ### 권한 문제
+
 1. MongoDB 사용자 권한 확인
 2. 데이터베이스 접근 권한 확인
 

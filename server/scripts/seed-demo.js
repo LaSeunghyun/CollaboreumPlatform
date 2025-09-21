@@ -1,4 +1,4 @@
-yconst mongoose = require('mongoose');
+const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const FundingProject = require('../models/FundingProject');
 const CommunityPost = require('../models/CommunityPost');
@@ -26,8 +26,14 @@ const seedDemoData = async () => {
       { id: 'music', label: '음악', icon: '🎵', order: 1, isActive: true },
       { id: 'art', label: '미술', icon: '🎨', order: 2, isActive: true },
       { id: 'literature', label: '문학', icon: '📚', order: 3, isActive: true },
-      { id: 'performance', label: '공연', icon: '🎭', order: 4, isActive: true },
-      { id: 'photo', label: '사진', icon: '📸', order: 5, isActive: true }
+      {
+        id: 'performance',
+        label: '공연',
+        icon: '🎭',
+        order: 4,
+        isActive: true,
+      },
+      { id: 'photo', label: '사진', icon: '📸', order: 5, isActive: true },
     ];
 
     await Category.insertMany(categories);
@@ -37,7 +43,8 @@ const seedDemoData = async () => {
     const fundingProjects = [
       {
         title: '인디 뮤지션의 첫 번째 앨범',
-        description: '10년간 거리에서 공연해온 인디 뮤지션의 첫 번째 정규 앨범 제작 프로젝트입니다.',
+        description:
+          '10년간 거리에서 공연해온 인디 뮤지션의 첫 번째 정규 앨범 제작 프로젝트입니다.',
         artist: new mongoose.Types.ObjectId(),
         artistName: '김아티스트',
         category: '음악',
@@ -58,30 +65,30 @@ const seedDemoData = async () => {
               startDate: new Date('2024-01-15'),
               endDate: new Date('2024-02-15'),
               status: '진행중',
-              progress: 60
-            }
+              progress: 60,
+            },
           ],
-          totalBudget: 5000000
+          totalBudget: 5000000,
         },
         daysLeft: 45,
         progress: 64,
         rewards: [
-          { 
-            title: '디지털 앨범', 
-            description: 'MP3 디지털 앨범 + 감사 메시지', 
+          {
+            title: '디지털 앨범',
+            description: 'MP3 디지털 앨범 + 감사 메시지',
             amount: 10000,
-            claimed: 50
-          }
+            claimed: 50,
+          },
         ],
         updates: [
-          { 
-            title: '녹음 진행 상황', 
-            content: '첫 번째 곡 녹음이 완료되었습니다!', 
+          {
+            title: '녹음 진행 상황',
+            content: '첫 번째 곡 녹음이 완료되었습니다!',
             createdAt: new Date('2024-01-15'),
-            type: '일반'
-          }
-        ]
-      }
+            type: '일반',
+          },
+        ],
+      },
     ];
 
     await FundingProject.insertMany(fundingProjects);
@@ -91,7 +98,8 @@ const seedDemoData = async () => {
     const communityPosts = [
       {
         title: '첫 번째 공연 후기',
-        content: '어제 홍대에서 첫 번째 공연을 마쳤습니다. 많은 분들이 와주셔서 감사했어요!',
+        content:
+          '어제 홍대에서 첫 번째 공연을 마쳤습니다. 많은 분들이 와주셔서 감사했어요!',
         author: new mongoose.Types.ObjectId(),
         category: '음악',
         likes: 24,
@@ -99,8 +107,8 @@ const seedDemoData = async () => {
         commentCount: 8,
         isActive: true,
         tags: ['공연', '홍대', '감사'],
-        createdAt: new Date('2024-01-10')
-      }
+        createdAt: new Date('2024-01-10'),
+      },
     ];
 
     await CommunityPost.insertMany(communityPosts);
@@ -123,8 +131,8 @@ const seedDemoData = async () => {
         isActive: true,
         image: 'https://picsum.photos/400/300?random=3',
         tags: ['팬미팅', '홍대', '인디음악'],
-        createdBy: new mongoose.Types.ObjectId()
-      }
+        createdBy: new mongoose.Types.ObjectId(),
+      },
     ];
 
     await Event.insertMany(events);
@@ -132,7 +140,6 @@ const seedDemoData = async () => {
 
     console.log('모든 데모 데이터 추가 완료!');
     process.exit(0);
-
   } catch (error) {
     console.error('데모 데이터 추가 실패:', error);
     process.exit(1);

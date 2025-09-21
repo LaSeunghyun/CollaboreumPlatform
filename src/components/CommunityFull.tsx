@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Button } from "../shared/ui/Button";
-import { Input } from "./ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Search, Filter, MessageCircle, Heart, ArrowLeft } from "lucide-react";
-import { communityAPI, userAPI } from "../services/api";
-import { KOREAN_CATEGORIES, getCategoryColor } from "../constants/categories";
-import { getFirstChar, getUsername } from "../utils/typeGuards";
-import { ApiResponse } from "../types";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { Button } from '../shared/ui/Button';
+import { Input } from './ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Search, Filter, MessageCircle, Heart, ArrowLeft } from 'lucide-react';
+import { communityAPI, userAPI } from '../services/api';
+import { KOREAN_CATEGORIES, getCategoryColor } from '../constants/categories';
+import { getFirstChar, getUsername } from '../utils/typeGuards';
+import { ApiResponse } from '../types';
 
 interface CommunityFullProps {
   onBack: () => void;
@@ -18,12 +18,12 @@ interface CommunityFullProps {
 
 export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState("전체");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState('전체');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedArtist, setSelectedArtist] = useState<number | null>(null);
   const [artists, setArtists] = useState<any[]>([]);
   const [forumPosts, setForumPosts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<string[]>(["전체"]);
+  const [categories, setCategories] = useState<string[]>(['전체']);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,26 +36,32 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
         setError(null);
 
         // 카테고리 목록 가져오기
-        const categoriesResponse = await communityAPI.getCategories() as ApiResponse<any>;
+        const categoriesResponse =
+          (await communityAPI.getCategories()) as ApiResponse<any>;
         if (categoriesResponse.success) {
-          const categoryLabels = ["전체", ...(categoriesResponse as any).data.map((cat: any) => cat.label)];
+          const categoryLabels = [
+            '전체',
+            ...(categoriesResponse as any).data.map((cat: any) => cat.label),
+          ];
           setCategories(categoryLabels);
         } else {
           setCategories(KOREAN_CATEGORIES);
         }
 
         // 아티스트 목록 가져오기
-        const artistsResponse = await userAPI.getFollowingArtists('current-user') as ApiResponse<any>;
+        const artistsResponse = (await userAPI.getFollowingArtists(
+          'current-user',
+        )) as ApiResponse<any>;
         if (artistsResponse.success) {
           setArtists(artistsResponse.data || []);
         }
 
         // 포럼 게시물 가져오기
-        const postsResponse = await communityAPI.getForumPosts() as ApiResponse<any>;
+        const postsResponse =
+          (await communityAPI.getForumPosts()) as ApiResponse<any>;
         if (postsResponse.success) {
           setForumPosts(postsResponse.data || []);
         }
-
       } catch (err) {
         console.error('Failed to fetch community data:', err);
         setError('데이터를 불러오는데 실패했습니다.');
@@ -69,24 +75,33 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
     fetchData();
   }, []);
 
-  const filteredArtists = (Array.isArray(artists) ? artists : []).filter(artist => {
-    const categoryMatch = selectedCategory === "전체" || artist.category === selectedCategory;
-    const searchMatch = artist.name?.toLowerCase().includes(searchQuery.toLowerCase());
-    return categoryMatch && searchMatch;
-  });
+  const filteredArtists = (Array.isArray(artists) ? artists : []).filter(
+    artist => {
+      const categoryMatch =
+        selectedCategory === '전체' || artist.category === selectedCategory;
+      const searchMatch = artist.name
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      return categoryMatch && searchMatch;
+    },
+  );
 
-  const filteredPosts = (Array.isArray(forumPosts) ? forumPosts : []).filter(post => {
-    const categoryMatch = selectedCategory === "전체" || post.category === selectedCategory;
-    const artistMatch = selectedArtist === null || post.artistId === selectedArtist;
-    return categoryMatch && artistMatch;
-  });
+  const filteredPosts = (Array.isArray(forumPosts) ? forumPosts : []).filter(
+    post => {
+      const categoryMatch =
+        selectedCategory === '전체' || post.category === selectedCategory;
+      const artistMatch =
+        selectedArtist === null || post.artistId === selectedArtist;
+      return categoryMatch && artistMatch;
+    },
+  );
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">커뮤니티 데이터를 불러오는 중...</p>
+      <div className='flex min-h-screen items-center justify-center bg-gray-50'>
+        <div className='text-center'>
+          <div className='mx-auto h-32 w-32 animate-spin rounded-full border-b-2 border-blue-600'></div>
+          <p className='mt-4 text-gray-600'>커뮤니티 데이터를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -94,55 +109,56 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-500 text-lg mb-4">{error}</div>
-          <Button onClick={() => window.location.reload()}>
-            다시 시도
-          </Button>
+      <div className='flex min-h-screen items-center justify-center bg-gray-50'>
+        <div className='text-center'>
+          <div className='mb-4 text-lg text-red-500'>{error}</div>
+          <Button onClick={() => window.location.reload()}>다시 시도</Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className='min-h-screen bg-gray-50'>
+      <div className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'>
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" onClick={onBack} className="p-2">
-            <ArrowLeft className="w-5 h-5" />
+        <div className='mb-8 flex items-center gap-4'>
+          <Button variant='ghost' onClick={onBack} className='p-2'>
+            <ArrowLeft className='h-5 w-5' />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">커뮤니티</h1>
-            <p className="text-gray-600">아티스트와 팬들이 소통하는 공간</p>
+            <h1 className='text-3xl font-bold text-gray-900'>커뮤니티</h1>
+            <p className='text-gray-600'>아티스트와 팬들이 소통하는 공간</p>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-4 gap-8">
+        <div className='grid gap-8 lg:grid-cols-4'>
           {/* Sidebar - Filters */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className='space-y-6 lg:col-span-1'>
             {/* Category Filter */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">카테고리</CardTitle>
+                <CardTitle className='text-lg'>카테고리</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-2">
+                <div className='flex flex-wrap gap-2'>
                   {isLoadingCategories ? (
-                    <div className="text-sm text-gray-500">카테고리 로딩 중...</div>
+                    <div className='text-sm text-gray-500'>
+                      카테고리 로딩 중...
+                    </div>
                   ) : (
-                    categories.map((category) => (
+                    categories.map(category => (
                       <button
                         key={category}
                         onClick={() => {
                           setSelectedCategory(category);
                           setSelectedArtist(null);
                         }}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedCategory === category
-                          ? "bg-blue-100 text-blue-700 border-2 border-blue-300"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                          }`}
+                        className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                          selectedCategory === category
+                            ? 'border-2 border-blue-300 bg-blue-100 text-blue-700'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
                       >
                         {category}
                       </button>
@@ -155,46 +171,52 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
             {/* Artist Search & Select */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">아티스트</CardTitle>
+                <CardTitle className='text-lg'>아티스트</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <div className='space-y-4'>
+                  <div className='relative'>
+                    <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400' />
                     <Input
-                      placeholder="아티스트 검색..."
-                      className="pl-10"
+                      placeholder='아티스트 검색...'
+                      className='pl-10'
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={e => setSearchQuery(e.target.value)}
                     />
                   </div>
 
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                  <div className='max-h-64 space-y-2 overflow-y-auto'>
                     <button
                       onClick={() => setSelectedArtist(null)}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedArtist === null
-                        ? "bg-blue-100 text-blue-800 font-medium"
-                        : "text-gray-600 hover:bg-gray-100"
-                        }`}
+                      className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                        selectedArtist === null
+                          ? 'bg-blue-100 font-medium text-blue-800'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
                     >
                       전체 아티스트
                     </button>
-                    {filteredArtists.map((artist) => (
+                    {filteredArtists.map(artist => (
                       <button
                         key={artist.id}
                         onClick={() => setSelectedArtist(artist.id)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-3 ${selectedArtist === artist.id
-                          ? "bg-blue-100 text-blue-800 font-medium"
-                          : "text-gray-600 hover:bg-gray-100"
-                          }`}
+                        className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                          selectedArtist === artist.id
+                            ? 'bg-blue-100 font-medium text-blue-800'
+                            : 'text-gray-600 hover:bg-gray-100'
+                        }`}
                       >
-                        <Avatar className="w-8 h-8">
+                        <Avatar className='h-8 w-8'>
                           <AvatarImage src={artist.avatar} alt={artist.name} />
-                          <AvatarFallback className="text-xs">{getFirstChar(artist.name)}</AvatarFallback>
+                          <AvatarFallback className='text-xs'>
+                            {getFirstChar(artist.name)}
+                          </AvatarFallback>
                         </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <p className="truncate">{artist.name}</p>
-                          <p className="text-xs text-gray-500">{artist.posts}개 글</p>
+                        <div className='min-w-0 flex-1'>
+                          <p className='truncate'>{artist.name}</p>
+                          <p className='text-xs text-gray-500'>
+                            {artist.posts}개 글
+                          </p>
                         </div>
                       </button>
                     ))}
@@ -205,54 +227,60 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3">
+          <div className='lg:col-span-3'>
             {/* Action Bar */}
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">
+            <div className='mb-6 flex items-center justify-between'>
+              <div className='flex items-center gap-4'>
+                <span className='text-sm text-gray-600'>
                   {filteredPosts.length}개의 글
                   {selectedArtist && (
-                    <span className="ml-2">
+                    <span className='ml-2'>
                       • {artists.find(a => a.id === selectedArtist)?.name}
                     </span>
                   )}
                 </span>
               </div>
-              <div className="flex gap-3">
-                <Button variant="outline" size="sm">
-                  <Filter className="w-4 h-4 mr-2" />
+              <div className='flex gap-3'>
+                <Button variant='outline' size='sm'>
+                  <Filter className='mr-2 h-4 w-4' />
                   정렬
                 </Button>
-                <Button onClick={() => navigate('/community/create')}>새 글 작성</Button>
+                <Button onClick={() => navigate('/community/create')}>
+                  새 글 작성
+                </Button>
               </div>
             </div>
 
             {/* Selected Artist Info */}
             {selectedArtist && (
-              <Card className="mb-6 bg-blue-50 border-blue-200">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-4">
-                    <Avatar className="w-12 h-12">
+              <Card className='mb-6 border-blue-200 bg-blue-50'>
+                <CardContent className='p-4'>
+                  <div className='flex items-center gap-4'>
+                    <Avatar className='h-12 w-12'>
                       <AvatarImage
                         src={artists.find(a => a.id === selectedArtist)?.avatar}
                         alt={artists.find(a => a.id === selectedArtist)?.name}
                       />
                       <AvatarFallback>
-                        {getFirstChar(artists.find(a => a.id === selectedArtist)?.name)}
+                        {getFirstChar(
+                          artists.find(a => a.id === selectedArtist)?.name,
+                        )}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">
+                    <div className='flex-1'>
+                      <h3 className='font-medium text-gray-900'>
                         {artists.find(a => a.id === selectedArtist)?.name}
                       </h3>
-                      <p className="text-sm text-gray-600">
-                        팔로워 {artists.find(a => a.id === selectedArtist)?.followers}명 •
-                        글 {artists.find(a => a.id === selectedArtist)?.posts}개
+                      <p className='text-sm text-gray-600'>
+                        팔로워{' '}
+                        {artists.find(a => a.id === selectedArtist)?.followers}
+                        명 • 글{' '}
+                        {artists.find(a => a.id === selectedArtist)?.posts}개
                       </p>
                     </div>
                     <Button
-                      variant="outline"
-                      size="sm"
+                      variant='outline'
+                      size='sm'
                       onClick={() => onSelectArtist(selectedArtist)}
                     >
                       아티스트 프로필 보기
@@ -263,48 +291,59 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
             )}
 
             {/* Posts */}
-            <div className="space-y-4">
-              {filteredPosts.map((post) => (
-                <Card key={post.id} className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex items-center gap-3">
-                        <Badge
-                          className={getCategoryColor(post.category)}
-                        >
+            <div className='space-y-4'>
+              {filteredPosts.map(post => (
+                <Card
+                  key={post.id}
+                  className='cursor-pointer transition-shadow hover:shadow-md'
+                >
+                  <CardContent className='p-6'>
+                    <div className='mb-3 flex items-start justify-between'>
+                      <div className='flex items-center gap-3'>
+                        <Badge className={getCategoryColor(post.category)}>
                           {post.category}
                         </Badge>
                         {post.isHot && (
-                          <Badge className="bg-red-100 text-red-800">HOT</Badge>
+                          <Badge className='bg-red-100 text-red-800'>HOT</Badge>
                         )}
                       </div>
-                      <span className="text-sm text-gray-500">{post.timeAgo}</span>
+                      <span className='text-sm text-gray-500'>
+                        {post.timeAgo}
+                      </span>
                     </div>
 
-                    <h3 className="font-medium text-gray-900 mb-2 hover:text-blue-600 transition-colors">
+                    <h3 className='mb-2 font-medium text-gray-900 transition-colors hover:text-blue-600'>
                       {post.title || '제목 없음'}
                     </h3>
 
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">{post.content || '내용 없음'}</p>
+                    <p className='mb-4 line-clamp-2 text-sm text-gray-600'>
+                      {post.content || '내용 없음'}
+                    </p>
 
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <Avatar className="w-6 h-6">
+                    <div className='flex items-center justify-between'>
+                      <div className='flex items-center gap-2'>
+                        <Avatar className='h-6 w-6'>
                           <AvatarImage
-                            src={artists.find(a => a.id === post.artistId)?.avatar}
+                            src={
+                              artists.find(a => a.id === post.artistId)?.avatar
+                            }
                             alt={getUsername(post.author)}
                           />
-                          <AvatarFallback className="text-xs">{getFirstChar(post.author)}</AvatarFallback>
+                          <AvatarFallback className='text-xs'>
+                            {getFirstChar(post.author)}
+                          </AvatarFallback>
                         </Avatar>
-                        <span className="text-sm text-gray-600">by {getUsername(post.author)}</span>
+                        <span className='text-sm text-gray-600'>
+                          by {getUsername(post.author)}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <MessageCircle className="w-4 h-4" />
+                      <div className='flex items-center gap-4 text-sm text-gray-600'>
+                        <div className='flex items-center gap-1'>
+                          <MessageCircle className='h-4 w-4' />
                           <span>{post.replies}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Heart className="w-4 h-4" />
+                        <div className='flex items-center gap-1'>
+                          <Heart className='h-4 w-4' />
                           <span>{post.likes}</span>
                         </div>
                       </div>
@@ -315,8 +354,8 @@ export function CommunityFull({ onBack, onSelectArtist }: CommunityFullProps) {
             </div>
 
             {/* Load More */}
-            <div className="text-center mt-8">
-              <Button variant="outline">더 많은 글 보기</Button>
+            <div className='mt-8 text-center'>
+              <Button variant='outline'>더 많은 글 보기</Button>
             </div>
           </div>
         </div>

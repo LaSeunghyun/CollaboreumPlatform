@@ -24,14 +24,17 @@ const now = Date.now();
 const sevenDays = 7 * 24 * 60 * 60 * 1000;
 const fourteenDays = 14 * 24 * 60 * 60 * 1000;
 
-export const fundingProjectsApiResponse: ApiResponse<{ projects: FundingProjectApiFixture[] }> = {
+export const fundingProjectsApiResponse: ApiResponse<{
+  projects: FundingProjectApiFixture[];
+}> = {
   success: true,
   data: {
     projects: [
       {
         id: 'project-1',
         title: '테스트 프로젝트 1',
-        description: '이것은 첫 번째 테스트 프로젝트에 대한 상세 설명입니다. 다양한 콘텐츠 제작과 이벤트를 포함하고 있습니다.',
+        description:
+          '이것은 첫 번째 테스트 프로젝트에 대한 상세 설명입니다. 다양한 콘텐츠 제작과 이벤트를 포함하고 있습니다.',
         goalAmount: 1000000,
         currentAmount: 450000,
         status: '진행중',
@@ -50,7 +53,8 @@ export const fundingProjectsApiResponse: ApiResponse<{ projects: FundingProjectA
       {
         id: 'project-2',
         title: '테스트 프로젝트 2',
-        description: '두 번째 테스트 프로젝트입니다. 짧은 설명만 제공되어 요약 처리 로직을 검증합니다.',
+        description:
+          '두 번째 테스트 프로젝트입니다. 짧은 설명만 제공되어 요약 처리 로직을 검증합니다.',
         goalAmount: 2000000,
         currentAmount: 2000000,
         status: '성공',

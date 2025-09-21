@@ -7,8 +7,7 @@ const httpLogger = pinoHttp({
   logger,
   genReqId: function (req, res) {
     const headerId =
-      req.headers['x-request-id'] ||
-      req.headers['x-correlation-id'];
+      req.headers['x-request-id'] || req.headers['x-correlation-id'];
     const id = headerId || randomUUID();
     res.setHeader('X-Request-ID', id);
     return id;
@@ -33,11 +32,13 @@ const httpLogger = pinoHttp({
         headers: {
           'user-agent': req.headers['user-agent'],
         },
-        user: req.user ? {
-          id: req.user._id,
-          email: req.user.email,
-          role: req.user.role
-        } : undefined,
+        user: req.user
+          ? {
+              id: req.user._id,
+              email: req.user.email,
+              role: req.user.role,
+            }
+          : undefined,
       };
     },
     res(res) {
@@ -52,11 +53,11 @@ const httpLogger = pinoHttp({
 const requestContextMiddleware = (req, res, next) => {
   const reqId = req.id || req.headers['x-request-id'] || randomUUID();
   const userId = req.user?.id;
-  
+
   // AsyncLocalStorage를 사용하지 않고 req 객체에 직접 저장
   req.reqId = String(reqId);
   req.userId = userId;
-  
+
   next();
 };
 

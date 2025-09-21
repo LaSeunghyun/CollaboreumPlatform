@@ -65,7 +65,8 @@ export interface CreateFundingProjectRequest {
   budgetBreakdown: Omit<BudgetItem, 'percentage'>[];
 }
 
-export interface UpdateFundingProjectRequest extends Partial<CreateFundingProjectRequest> {
+export interface UpdateFundingProjectRequest
+  extends Partial<CreateFundingProjectRequest> {
   id: number;
 }
 

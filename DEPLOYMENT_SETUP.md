@@ -11,6 +11,7 @@
 GitHub 저장소의 Settings > Secrets and variables > Actions에서 다음 시크릿들을 추가해야 합니다:
 
 #### Vercel 관련
+
 ```
 VERCEL_TOKEN=your_vercel_token
 VERCEL_ORG_ID=your_vercel_org_id
@@ -18,12 +19,14 @@ VERCEL_PROJECT_ID=your_vercel_project_id
 ```
 
 #### Railway 관련
+
 ```
 RAILWAY_TOKEN=your_railway_token
 RAILWAY_SERVICE_NAME=your_railway_service_name
 ```
 
 #### 환경 변수
+
 ```
 REACT_APP_API_URL=https://your-railway-app.railway.app/api
 ```
@@ -54,10 +57,12 @@ REACT_APP_API_URL=https://your-railway-app.railway.app/api
 ## 🔄 배포 프로세스
 
 ### 자동 배포 트리거
+
 - `master` 또는 `main` 브랜치에 푸시할 때
 - Pull Request가 생성될 때
 
 ### 배포 단계
+
 1. **프론트엔드 (Vercel)**:
    - Node.js 18 환경 설정
    - 의존성 설치 (`npm ci`)
@@ -74,11 +79,13 @@ REACT_APP_API_URL=https://your-railway-app.railway.app/api
 ## 🛠️ 수동 배포
 
 ### Vercel 수동 배포
+
 ```bash
 vercel --prod
 ```
 
 ### Railway 수동 배포
+
 ```bash
 railway up
 ```
@@ -86,12 +93,15 @@ railway up
 ## 📊 배포 상태 확인
 
 ### GitHub Actions
+
 - GitHub 저장소 > Actions 탭에서 배포 상태 확인
 
 ### Vercel
+
 - Vercel 대시보드에서 배포 로그 및 상태 확인
 
 ### Railway
+
 - Railway 대시보드에서 배포 로그 및 상태 확인
 
 ## 🔧 문제 해결
@@ -111,6 +121,7 @@ railway up
    - 권한 설정 확인
 
 ### 로그 확인 방법
+
 ```bash
 # GitHub Actions 로그
 gh run list
@@ -126,11 +137,13 @@ railway logs
 ## 📝 추가 설정
 
 ### 브랜치별 배포
+
 - `master`: 프로덕션 배포
 - `develop`: 스테이징 배포
 - `feature/*`: 프리뷰 배포
 
 ### 환경별 설정
+
 - **Production**: 프로덕션 환경 변수
 - **Preview**: 스테이징 환경 변수
 - **Development**: 개발 환경 변수

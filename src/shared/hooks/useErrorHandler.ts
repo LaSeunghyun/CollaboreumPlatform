@@ -7,7 +7,7 @@ import {
   collectErrorMetrics,
   sendErrorNotification,
   ErrorType,
-  ErrorLevel
+  ErrorLevel,
 } from '../lib/errorHandler';
 import { ApiError, AppError } from '../types';
 
@@ -42,28 +42,31 @@ export function useErrorHandler(): UseErrorHandlerReturn {
   });
   const [isRetrying, setIsRetrying] = useState(false);
 
-  const handleError = useCallback((error: unknown, context?: Record<string, any>) => {
-    const classification = classifyError(error);
+  const handleError = useCallback(
+    (error: unknown, context?: Record<string, any>) => {
+      const classification = classifyError(error);
 
-    // 에러 로깅
-    logError(error, context);
+      // 에러 로깅
+      logError(error, context);
 
-    // 에러 메트릭 수집
-    collectErrorMetrics(error, context);
+      // 에러 메트릭 수집
+      collectErrorMetrics(error, context);
 
-    // 에러 알림 전송
-    sendErrorNotification(error, context);
+      // 에러 알림 전송
+      sendErrorNotification(error, context);
 
-    // 에러 상태 업데이트
-    setErrorState({
-      error: error as AppError,
-      isError: true,
-      errorMessage: getUserFriendlyMessage(error),
-      errorType: classification.type,
-      errorLevel: classification.level,
-      retryable: classification.retryable,
-    });
-  }, []);
+      // 에러 상태 업데이트
+      setErrorState({
+        error: error as AppError,
+        isError: true,
+        errorMessage: getUserFriendlyMessage(error),
+        errorType: classification.type,
+        errorLevel: classification.level,
+        retryable: classification.retryable,
+      });
+    },
+    [],
+  );
 
   const clearError = useCallback(() => {
     setErrorState({
@@ -109,21 +112,33 @@ export function useErrorHandler(): UseErrorHandlerReturn {
 export function useSpecificErrorHandler() {
   const { handleError, clearError } = useErrorHandler();
 
-  const handleApiError = useCallback((error: ApiError, context?: Record<string, any>) => {
-    handleError(error, { ...context, errorSource: 'API' });
-  }, [handleError]);
+  const handleApiError = useCallback(
+    (error: ApiError, context?: Record<string, any>) => {
+      handleError(error, { ...context, errorSource: 'API' });
+    },
+    [handleError],
+  );
 
-  const handleNetworkError = useCallback((error: Error, context?: Record<string, any>) => {
-    handleError(error, { ...context, errorSource: 'NETWORK' });
-  }, [handleError]);
+  const handleNetworkError = useCallback(
+    (error: Error, context?: Record<string, any>) => {
+      handleError(error, { ...context, errorSource: 'NETWORK' });
+    },
+    [handleError],
+  );
 
-  const handleValidationError = useCallback((error: Error, context?: Record<string, any>) => {
-    handleError(error, { ...context, errorSource: 'VALIDATION' });
-  }, [handleError]);
+  const handleValidationError = useCallback(
+    (error: Error, context?: Record<string, any>) => {
+      handleError(error, { ...context, errorSource: 'VALIDATION' });
+    },
+    [handleError],
+  );
 
-  const handleAuthError = useCallback((error: ApiError, context?: Record<string, any>) => {
-    handleError(error, { ...context, errorSource: 'AUTHENTICATION' });
-  }, [handleError]);
+  const handleAuthError = useCallback(
+    (error: ApiError, context?: Record<string, any>) => {
+      handleError(error, { ...context, errorSource: 'AUTHENTICATION' });
+    },
+    [handleError],
+  );
 
   return {
     handleApiError,
@@ -139,41 +154,44 @@ export function useErrorRecovery() {
   const [retryCount, setRetryCount] = useState(0);
   const [isRecovering, setIsRecovering] = useState(false);
 
-  const attemptRecovery = useCallback(async (
-    error: unknown,
-    recoveryFn: () => Promise<void>,
-    context?: Record<string, any>
-  ): Promise<boolean> => {
-    const strategy = getErrorRecoveryStrategy(error);
+  const attemptRecovery = useCallback(
+    async (
+      error: unknown,
+      recoveryFn: () => Promise<void>,
+      context?: Record<string, any>,
+    ): Promise<boolean> => {
+      const strategy = getErrorRecoveryStrategy(error);
 
-    if (!strategy.shouldRetry || retryCount >= strategy.maxRetries) {
-      return false;
-    }
-
-    setIsRecovering(true);
-    setRetryCount(prev => prev + 1);
-
-    try {
-      // 재시도 지연
-      await new Promise(resolve => setTimeout(resolve, strategy.retryDelay));
-
-      // 복구 함수 실행
-      await recoveryFn();
-
-      // 복구 성공
-      setRetryCount(0);
-      return true;
-    } catch (recoveryError) {
-      // 복구 실패
-      if (retryCount < strategy.maxRetries) {
-        // 재귀적으로 재시도
-        return attemptRecovery(recoveryError, recoveryFn, context);
+      if (!strategy.shouldRetry || retryCount >= strategy.maxRetries) {
+        return false;
       }
-      return false;
-    } finally {
-      setIsRecovering(false);
-    }
-  }, [retryCount]);
+
+      setIsRecovering(true);
+      setRetryCount(prev => prev + 1);
+
+      try {
+        // 재시도 지연
+        await new Promise(resolve => setTimeout(resolve, strategy.retryDelay));
+
+        // 복구 함수 실행
+        await recoveryFn();
+
+        // 복구 성공
+        setRetryCount(0);
+        return true;
+      } catch (recoveryError) {
+        // 복구 실패
+        if (retryCount < strategy.maxRetries) {
+          // 재귀적으로 재시도
+          return attemptRecovery(recoveryError, recoveryFn, context);
+        }
+        return false;
+      } finally {
+        setIsRecovering(false);
+      }
+    },
+    [retryCount],
+  );
 
   const resetRetryCount = useCallback(() => {
     setRetryCount(0);

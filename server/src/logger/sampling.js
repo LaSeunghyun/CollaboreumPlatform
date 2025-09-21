@@ -23,15 +23,15 @@ function shouldSample(rate = 1) {
 function shouldSampleByRequest(requestId, rate = 1) {
   if (rate >= 1) return true;
   if (rate <= 0) return false;
-  
+
   // 요청 ID의 해시를 사용하여 일관된 샘플링
   let hash = 0;
   for (let i = 0; i < requestId.length; i++) {
     const char = requestId.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // 32bit 정수로 변환
   }
-  
+
   // 절댓값을 사용하여 양수로 변환하고 0-1 범위로 정규화
   const normalizedHash = Math.abs(hash) / 2147483647; // 2^31 - 1
   return normalizedHash < rate;
@@ -45,7 +45,7 @@ function shouldSampleByRequest(requestId, rate = 1) {
  */
 function shouldSampleByTime(intervalMs, lastLogTime) {
   if (!lastLogTime) return true;
-  
+
   const now = new Date();
   const timeDiff = now.getTime() - lastLogTime.getTime();
   return timeDiff >= intervalMs;
@@ -64,10 +64,10 @@ const LOG_SAMPLING_CONFIG = {
   },
   // 프로덕션 환경에서는 일부 로그만 샘플링
   production: {
-    info: 0.1,    // 10%만 로그
-    warn: 0.5,    // 50%만 로그
-    error: 1.0,   // 모든 에러 로그
-    debug: 0.01,  // 1%만 로그
+    info: 0.1, // 10%만 로그
+    warn: 0.5, // 50%만 로그
+    error: 1.0, // 모든 에러 로그
+    debug: 0.01, // 1%만 로그
   },
   // 테스트 환경에서는 최소한의 로그
   test: {
@@ -97,11 +97,11 @@ function getSamplingRate(level) {
  */
 function shouldLog(level, requestId) {
   const rate = getSamplingRate(level);
-  
+
   if (requestId) {
     return shouldSampleByRequest(requestId, rate);
   }
-  
+
   return shouldSample(rate);
 }
 

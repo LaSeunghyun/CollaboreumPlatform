@@ -1,4 +1,7 @@
-import type { ApiResponse as SharedApiResponse, ApiError as SharedApiError } from '@/shared/types';
+import type {
+  ApiResponse as SharedApiResponse,
+  ApiError as SharedApiError,
+} from '@/shared/types';
 
 // API 응답 표준 타입 정의
 export type ApiResponse<T = any> = SharedApiResponse<T>;
@@ -35,7 +38,7 @@ export interface ApiSuccess<T = any> {
 }
 
 // API 엔드포인트 타입
-export type ApiEndpoint = 
+export type ApiEndpoint =
   | '/auth/signup'
   | '/auth/login'
   | '/auth/logout'

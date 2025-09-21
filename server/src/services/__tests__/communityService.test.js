@@ -7,7 +7,7 @@ jest.mock('../../repositories/communityRepository', () => ({
   findPostDocumentById: jest.fn(),
   createPost: jest.fn(),
   savePost: jest.fn(),
-  findCommentsByPostId: jest.fn()
+  findCommentsByPostId: jest.fn(),
 }));
 
 const communityRepository = require('../../repositories/communityRepository');
@@ -30,7 +30,7 @@ describe('communityService', () => {
         limit: 5,
         search: '테스트',
         category: '자유',
-        sortBy: 'popular'
+        sortBy: 'popular',
       });
 
       expect(communityRepository.findPosts).toHaveBeenCalledTimes(1);
@@ -48,8 +48,8 @@ describe('communityService', () => {
           page: 2,
           limit: 5,
           total: 25,
-          pages: 5
-        }
+          pages: 5,
+        },
       });
     });
   });
@@ -71,13 +71,16 @@ describe('communityService', () => {
   describe('createPost', () => {
     it('creates post with default author name when missing', async () => {
       communityRepository.createPost.mockResolvedValue({ _id: 'new-id' });
-      communityRepository.findPostById.mockResolvedValue({ _id: 'new-id', title: 'post' });
+      communityRepository.findPostById.mockResolvedValue({
+        _id: 'new-id',
+        title: 'post',
+      });
 
       await communityService.createPost({
         title: 'title',
         content: 'content',
         category: '자유',
-        author: 'user-id'
+        author: 'user-id',
       });
 
       expect(communityRepository.createPost).toHaveBeenCalledWith({
@@ -87,7 +90,7 @@ describe('communityService', () => {
         tags: [],
         images: [],
         author: 'user-id',
-        authorName: '사용자'
+        authorName: '사용자',
       });
     });
   });
@@ -97,12 +100,16 @@ describe('communityService', () => {
       const post = {
         isActive: true,
         likes: [],
-        dislikes: []
+        dislikes: [],
       };
       communityRepository.findPostDocumentById.mockResolvedValue(post);
       communityRepository.savePost.mockResolvedValue();
 
-      const result = await communityService.updatePostReaction('post-id', 'user-id', 'like');
+      const result = await communityService.updatePostReaction(
+        'post-id',
+        'user-id',
+        'like',
+      );
 
       expect(post.likes).toContain('user-id');
       expect(post.dislikes).toHaveLength(0);
@@ -111,13 +118,13 @@ describe('communityService', () => {
         likes: 1,
         dislikes: 0,
         isLiked: true,
-        isDisliked: false
+        isDisliked: false,
       });
     });
 
     it('throws validation error when reaction is invalid', async () => {
       await expect(
-        communityService.updatePostReaction('post', 'user', 'invalid')
+        communityService.updatePostReaction('post', 'user', 'invalid'),
       ).rejects.toBeInstanceOf(ValidationError);
     });
   });

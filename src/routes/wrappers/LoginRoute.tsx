@@ -33,14 +33,18 @@ export const LoginRoute: React.FC = () => {
 
           navigate('/');
         } catch (err) {
-          setError(err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다.');
+          setError(
+            err instanceof Error
+              ? err.message
+              : '로그인 중 오류가 발생했습니다.',
+          );
         } finally {
           setIsLoading(false);
         }
       }}
       onSignupClick={() => navigate('/signup')}
       onForgotPassword={() => navigate('/account/password-reset')}
-      onSocialLogin={(provider) => {
+      onSocialLogin={provider => {
         console.info(`소셜 로그인 시도: ${provider}`);
       }}
     />

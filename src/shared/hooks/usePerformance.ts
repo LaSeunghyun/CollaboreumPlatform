@@ -1,5 +1,9 @@
 import { useCallback, useMemo, useRef, useEffect, useState } from 'react';
-import { useDebounce, useThrottle, usePerformanceMeasure } from '../lib/performance';
+import {
+  useDebounce,
+  useThrottle,
+  usePerformanceMeasure,
+} from '../lib/performance';
 
 /**
  * 성능 최적화를 위한 커스텀 훅들
@@ -11,22 +15,25 @@ import { useDebounce, useThrottle, usePerformanceMeasure } from '../lib/performa
 export function useDebouncedSearch<T>(
   items: T[],
   searchFn: (items: T[], query: string) => T[],
-  delay: number = 300
+  delay: number = 300,
 ) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<T[]>(items);
 
   const debouncedSearch = useDebounce(
-    useCallback((searchQuery: string) => {
-      if (!searchQuery.trim()) {
-        setResults(items);
-        return;
-      }
+    useCallback(
+      (searchQuery: string) => {
+        if (!searchQuery.trim()) {
+          setResults(items);
+          return;
+        }
 
-      const filtered = searchFn(items, searchQuery);
-      setResults(filtered);
-    }, [items, searchFn]),
-    delay
+        const filtered = searchFn(items, searchQuery);
+        setResults(filtered);
+      },
+      [items, searchFn],
+    ),
+    delay,
   );
 
   useEffect(() => {
@@ -47,7 +54,7 @@ export function useVirtualizedList<T>(
   items: T[],
   itemHeight: number,
   containerHeight: number,
-  overscan: number = 5
+  overscan: number = 5,
 ) {
   const [scrollTop, setScrollTop] = useState(0);
 
@@ -55,7 +62,7 @@ export function useVirtualizedList<T>(
     const start = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
     const end = Math.min(
       items.length - 1,
-      Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
+      Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan,
     );
 
     return { startIndex: start, endIndex: end };
@@ -89,7 +96,7 @@ export function useInfiniteScroll<T>(
   items: T[],
   loadMore: () => void,
   hasMore: boolean = true,
-  threshold: number = 100
+  threshold: number = 100,
 ) {
   const [isLoading, setIsLoading] = useState(false);
   const observerRef = useRef<IntersectionObserver>();
@@ -103,7 +110,7 @@ export function useInfiniteScroll<T>(
       }
 
       observerRef.current = new IntersectionObserver(
-        (entries) => {
+        entries => {
           if (entries[0]?.isIntersecting && hasMore) {
             setIsLoading(true);
             loadMore();
@@ -112,14 +119,14 @@ export function useInfiniteScroll<T>(
         {
           threshold: 0.1,
           rootMargin: `${threshold}px`,
-        }
+        },
       );
 
       if (node) {
         observerRef.current.observe(node);
       }
     },
-    [isLoading, hasMore, loadMore, threshold]
+    [isLoading, hasMore, loadMore, threshold],
   );
 
   useEffect(() => {
@@ -139,7 +146,7 @@ export function useMemoizedData<T>(
   items: T[],
   sortKey?: keyof T,
   sortOrder: 'asc' | 'desc' = 'asc',
-  filterFn?: (item: T) => boolean
+  filterFn?: (item: T) => boolean,
 ) {
   const sortedItems = useMemo(() => {
     if (!sortKey) return items;
@@ -195,8 +202,8 @@ export function useLazyImage(src: string, fallback?: string) {
     if (!imgRef.current) return;
 
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) {
             setImageSrc(src);
             observer.disconnect();
@@ -206,7 +213,7 @@ export function useLazyImage(src: string, fallback?: string) {
       {
         threshold: 0.1,
         rootMargin: '50px',
-      }
+      },
     );
 
     observer.observe(imgRef.current);
@@ -242,7 +249,7 @@ export function useLazyImage(src: string, fallback?: string) {
  */
 export function useThrottledHandler<T extends (...args: any[]) => any>(
   handler: T,
-  delay: number
+  delay: number,
 ): T {
   return useThrottle(handler, delay);
 }
@@ -252,7 +259,7 @@ export function useThrottledHandler<T extends (...args: any[]) => any>(
  */
 export function useDebouncedHandler<T extends (...args: any[]) => any>(
   handler: T,
-  delay: number
+  delay: number,
 ): T {
   return useDebounce(handler, delay);
 }

@@ -18,7 +18,7 @@ const createQueryMock = () => ({
   limit: jest.fn().mockReturnThis(),
   select: jest.fn().mockReturnThis(),
   populate: jest.fn().mockReturnThis(),
-  lean: jest.fn().mockReturnThis()
+  lean: jest.fn().mockReturnThis(),
 });
 
 describe('communityRepository', () => {
@@ -34,14 +34,17 @@ describe('communityRepository', () => {
       query: { isActive: true },
       sort: { createdAt: -1 },
       skip: 20,
-      limit: 10
+      limit: 10,
     });
 
     expect(CommunityPost.find).toHaveBeenCalledWith({ isActive: true });
     expect(queryMock.sort).toHaveBeenCalledWith({ createdAt: -1 });
     expect(queryMock.skip).toHaveBeenCalledWith(20);
     expect(queryMock.limit).toHaveBeenCalledWith(10);
-    expect(queryMock.populate).toHaveBeenCalledWith('author', 'name role avatar');
+    expect(queryMock.populate).toHaveBeenCalledWith(
+      'author',
+      'name role avatar',
+    );
     expect(result).toBe(queryMock);
   });
 
@@ -49,12 +52,26 @@ describe('communityRepository', () => {
     const findByIdMock = createQueryMock();
     CommunityPost.findById.mockReturnValue(findByIdMock);
 
-    const result = await communityRepository.findPostById('id', { includeComments: true });
+    const result = await communityRepository.findPostById('id', {
+      includeComments: true,
+    });
 
     expect(CommunityPost.findById).toHaveBeenCalledWith('id');
-    expect(findByIdMock.populate).toHaveBeenNthCalledWith(1, 'author', 'name role avatar');
-    expect(findByIdMock.populate).toHaveBeenNthCalledWith(2, 'comments.author', 'name role avatar');
-    expect(findByIdMock.populate).toHaveBeenNthCalledWith(3, 'comments.replies.author', 'name role avatar');
+    expect(findByIdMock.populate).toHaveBeenNthCalledWith(
+      1,
+      'author',
+      'name role avatar',
+    );
+    expect(findByIdMock.populate).toHaveBeenNthCalledWith(
+      2,
+      'comments.author',
+      'name role avatar',
+    );
+    expect(findByIdMock.populate).toHaveBeenNthCalledWith(
+      3,
+      'comments.replies.author',
+      'name role avatar',
+    );
     expect(result).toBe(findByIdMock);
   });
 
@@ -78,9 +95,21 @@ describe('communityRepository', () => {
 
     expect(CommunityPost.findById).toHaveBeenCalledWith('id');
     expect(findByIdMock.select).toHaveBeenCalledWith('comments');
-    expect(findByIdMock.populate).toHaveBeenNthCalledWith(1, 'author', 'name role avatar');
-    expect(findByIdMock.populate).toHaveBeenNthCalledWith(2, 'comments.author', 'name role avatar');
-    expect(findByIdMock.populate).toHaveBeenNthCalledWith(3, 'comments.replies.author', 'name role avatar');
+    expect(findByIdMock.populate).toHaveBeenNthCalledWith(
+      1,
+      'author',
+      'name role avatar',
+    );
+    expect(findByIdMock.populate).toHaveBeenNthCalledWith(
+      2,
+      'comments.author',
+      'name role avatar',
+    );
+    expect(findByIdMock.populate).toHaveBeenNthCalledWith(
+      3,
+      'comments.replies.author',
+      'name role avatar',
+    );
     expect(findByIdMock.lean).toHaveBeenCalled();
   });
 });

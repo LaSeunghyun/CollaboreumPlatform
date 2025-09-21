@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
 
 interface HistoryEntry {
   view: string;
@@ -29,9 +35,11 @@ interface HistoryProviderProps {
   children: ReactNode;
 }
 
-export const HistoryProvider: React.FC<HistoryProviderProps> = ({ children }) => {
+export const HistoryProvider: React.FC<HistoryProviderProps> = ({
+  children,
+}) => {
   const [history, setHistory] = useState<HistoryEntry[]>([
-    { view: 'home', params: {}, timestamp: Date.now() }
+    { view: 'home', params: {}, timestamp: Date.now() },
   ]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -42,11 +50,14 @@ export const HistoryProvider: React.FC<HistoryProviderProps> = ({ children }) =>
     const newEntry: HistoryEntry = {
       view,
       params: params || {},
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     // 현재 인덱스 이후의 히스토리를 제거하고 새 엔트리 추가
-    const newHistory = (Array.isArray(history) ? history : []).slice(0, currentIndex + 1);
+    const newHistory = (Array.isArray(history) ? history : []).slice(
+      0,
+      currentIndex + 1,
+    );
     newHistory.push(newEntry);
 
     setHistory(newHistory);
@@ -88,9 +99,13 @@ export const HistoryProvider: React.FC<HistoryProviderProps> = ({ children }) =>
     if (currentEntry) {
       // 브라우저 히스토리에 상태 저장
       window.history.replaceState(
-        { index: currentIndex, view: currentEntry.view, params: currentEntry.params },
+        {
+          index: currentIndex,
+          view: currentEntry.view,
+          params: currentEntry.params,
+        },
         '',
-        window.location.href
+        window.location.href,
       );
     }
   }, [currentIndex, history]);
@@ -103,13 +118,11 @@ export const HistoryProvider: React.FC<HistoryProviderProps> = ({ children }) =>
     navigateTo,
     goBack,
     goForward,
-    clearHistory
+    clearHistory,
   };
 
   return (
-    <HistoryContext.Provider value={value}>
-      {children}
-    </HistoryContext.Provider>
+    <HistoryContext.Provider value={value}>{children}</HistoryContext.Provider>
   );
 };
 

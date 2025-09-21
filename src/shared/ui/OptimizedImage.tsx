@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supportsWebP, getOptimizedImageUrl } from '../lib/performance';
 
-interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+interface OptimizedImageProps
+  extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
   alt: string;
   width?: number;
@@ -49,7 +50,7 @@ export function OptimizedImage({
       src,
       width,
       height,
-      webpSupported ? 'webp' : 'jpg'
+      webpSupported ? 'webp' : 'jpg',
     );
 
     setImageSrc(optimizedUrl);
@@ -60,8 +61,8 @@ export function OptimizedImage({
     if (!lazy || !imgRef.current) return;
 
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) {
             setImageSrc(src);
             observer.disconnect();
@@ -71,7 +72,7 @@ export function OptimizedImage({
       {
         threshold: 0.1,
         rootMargin: '50px',
-      }
+      },
     );
 
     observer.observe(imgRef.current);
@@ -103,22 +104,25 @@ export function OptimizedImage({
         onLoad={handleLoad}
         onError={handleError}
         loading={lazy ? 'lazy' : 'eager'}
-        className={`transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
+        className={`transition-opacity duration-300 ${
+          isLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
         {...props}
       />
 
       {/* 로딩 상태 */}
       {!isLoaded && !hasError && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+        <div className='absolute inset-0 flex animate-pulse items-center justify-center bg-gray-200'>
+          <div className='h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600' />
         </div>
       )}
 
       {/* 에러 상태 */}
       {hasError && (
-        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-          <div className="text-gray-400 text-sm">이미지를 불러올 수 없습니다</div>
+        <div className='absolute inset-0 flex items-center justify-center bg-gray-100'>
+          <div className='text-sm text-gray-400'>
+            이미지를 불러올 수 없습니다
+          </div>
         </div>
       )}
     </div>
@@ -143,11 +147,11 @@ export function ImageGallery({
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const nextImage = () => {
-    setCurrentIndex((prev) => (prev + 1) % images.length);
+    setCurrentIndex(prev => (prev + 1) % images.length);
   };
 
   const prevImage = () => {
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+    setCurrentIndex(prev => (prev - 1 + images.length) % images.length);
   };
 
   if (images.length === 0) return null;
@@ -159,33 +163,34 @@ export function ImageGallery({
         alt={`${alt} ${currentIndex + 1}`}
         width={width}
         height={height}
-        className="w-full h-full object-cover"
+        className='h-full w-full object-cover'
       />
 
       {images.length > 1 && (
         <>
           <button
             onClick={prevImage}
-            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-opacity"
-            aria-label="이전 이미지"
+            className='absolute left-2 top-1/2 -translate-y-1/2 transform rounded-full bg-black bg-opacity-50 p-2 text-white transition-opacity hover:bg-opacity-70'
+            aria-label='이전 이미지'
           >
             ←
           </button>
           <button
             onClick={nextImage}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-opacity"
-            aria-label="다음 이미지"
+            className='absolute right-2 top-1/2 -translate-y-1/2 transform rounded-full bg-black bg-opacity-50 p-2 text-white transition-opacity hover:bg-opacity-70'
+            aria-label='다음 이미지'
           >
             →
           </button>
 
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
+          <div className='absolute bottom-2 left-1/2 flex -translate-x-1/2 transform space-x-1'>
             {images.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-2 h-2 rounded-full transition-colors ${index === currentIndex ? 'bg-white' : 'bg-white bg-opacity-50'
-                  }`}
+                className={`h-2 w-2 rounded-full transition-colors ${
+                  index === currentIndex ? 'bg-white' : 'bg-white bg-opacity-50'
+                }`}
                 aria-label={`이미지 ${index + 1}로 이동`}
               />
             ))}

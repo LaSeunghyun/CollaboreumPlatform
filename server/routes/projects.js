@@ -7,7 +7,7 @@ const auth = require('../middleware/auth');
 router.get('/', async (req, res) => {
   try {
     const { category, search, status, page = 1, limit = 20 } = req.query;
-    
+
     // 쿼리 조건 구성
     const query = { isActive: true };
     if (category && category !== '전체') {
@@ -19,10 +19,10 @@ router.get('/', async (req, res) => {
     if (search) {
       query.$text = { $search: search };
     }
-    
+
     // 페이지네이션
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    
+
     // 프로젝트 조회
     const projects = await Project.find(query)
       .populate('artist', 'name')
@@ -30,10 +30,10 @@ router.get('/', async (req, res) => {
       .skip(skip)
       .limit(parseInt(limit))
       .lean();
-    
+
     // 전체 개수 조회
     const total = await Project.countDocuments(query);
-    
+
     // 응답 데이터 가공
     const formattedProjects = projects.map(project => ({
       id: project._id,
@@ -48,7 +48,7 @@ router.get('/', async (req, res) => {
       budget: project.budget,
       spent: project.spent,
       image: project.image,
-      tags: project.tags
+      tags: project.tags,
     }));
 
     res.json({
@@ -57,14 +57,14 @@ router.get('/', async (req, res) => {
       pagination: {
         current: parseInt(page),
         total: Math.ceil(total / parseInt(limit)),
-        totalProjects: total
-      }
+        totalProjects: total,
+      },
     });
   } catch (error) {
     console.error('프로젝트 조회 오류:', error);
     res.status(500).json({
       success: false,
-      message: '프로젝트 조회 중 오류가 발생했습니다.'
+      message: '프로젝트 조회 중 오류가 발생했습니다.',
     });
   }
 });
@@ -73,15 +73,15 @@ router.get('/', async (req, res) => {
 router.get('/:id/wbs', async (req, res) => {
   try {
     const projectId = req.params.id;
-    
+
     console.log(`📋 WBS 조회 요청: 프로젝트 ID ${projectId}`);
-    
+
     // 프로젝트 존재 여부 확인 (실제로는 Project 모델에서 조회해야 함)
     if (!projectId) {
       console.log(`❌ WBS 조회 실패: 프로젝트 ID 누락`);
       return res.status(400).json({
         success: false,
-        message: '프로젝트 ID가 필요합니다.'
+        message: '프로젝트 ID가 필요합니다.',
       });
     }
 
@@ -97,7 +97,7 @@ router.get('/:id/wbs', async (req, res) => {
         endDate: '2024-01-05',
         assignee: '김아티스트',
         priority: 'high',
-        dependencies: []
+        dependencies: [],
       },
       {
         id: 2,
@@ -109,7 +109,7 @@ router.get('/:id/wbs', async (req, res) => {
         endDate: '2024-01-10',
         assignee: '김아티스트',
         priority: 'high',
-        dependencies: [1]
+        dependencies: [1],
       },
       {
         id: 3,
@@ -121,7 +121,7 @@ router.get('/:id/wbs', async (req, res) => {
         endDate: '2024-01-12',
         assignee: '김아티스트',
         priority: 'medium',
-        dependencies: [2]
+        dependencies: [2],
       },
       {
         id: 4,
@@ -133,7 +133,7 @@ router.get('/:id/wbs', async (req, res) => {
         endDate: '2024-01-18',
         assignee: '김아티스트',
         priority: 'high',
-        dependencies: [3]
+        dependencies: [3],
       },
       {
         id: 5,
@@ -145,22 +145,24 @@ router.get('/:id/wbs', async (req, res) => {
         endDate: '2024-01-20',
         assignee: '김아티스트',
         priority: 'medium',
-        dependencies: [4]
-      }
+        dependencies: [4],
+      },
     ];
 
-    console.log(`✅ WBS 조회 성공: 프로젝트 ID ${projectId}, 항목 수 ${wbsItems.length}`);
+    console.log(
+      `✅ WBS 조회 성공: 프로젝트 ID ${projectId}, 항목 수 ${wbsItems.length}`,
+    );
 
     res.json({
       success: true,
-      data: wbsItems
+      data: wbsItems,
     });
   } catch (error) {
     console.error(`💥 WBS 조회 오류: ${error.message}`);
     res.status(500).json({
       success: false,
       message: 'WBS 조회 중 오류가 발생했습니다.',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 });

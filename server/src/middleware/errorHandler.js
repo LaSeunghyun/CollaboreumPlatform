@@ -33,11 +33,13 @@ const errorHandler = (err, req, res, next) => {
       query: req.query,
       params: req.params,
     },
-    user: req.user ? {
-      id: req.user.id,
-      email: req.user.email,
-      role: req.user.role,
-    } : null,
+    user: req.user
+      ? {
+          id: req.user.id,
+          email: req.user.email,
+          role: req.user.role,
+        }
+      : null,
   });
 
   // Mongoose 잘못된 ObjectId
@@ -117,7 +119,7 @@ const notFoundHandler = (req, res, next) => {
   const error = new AppError(
     `요청한 경로를 찾을 수 없습니다: ${req.originalUrl}`,
     404,
-    'ROUTE_NOT_FOUND'
+    'ROUTE_NOT_FOUND',
   );
   next(error);
 };
@@ -125,7 +127,7 @@ const notFoundHandler = (req, res, next) => {
 /**
  * 비동기 에러 래퍼
  */
-const asyncHandler = (fn) => {
+const asyncHandler = fn => {
   return (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
@@ -141,7 +143,8 @@ const formatErrorResponse = (error, requestId = null) => {
     code: error.code || 'INTERNAL_ERROR',
     requestId,
     timestamp: error.timestamp || new Date().toISOString(),
-    ...(process.env.NODE_ENV !== 'production' && error.details && { details: error.details }),
+    ...(process.env.NODE_ENV !== 'production' &&
+      error.details && { details: error.details }),
   };
 };
 

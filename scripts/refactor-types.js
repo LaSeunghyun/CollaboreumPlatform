@@ -15,43 +15,47 @@ function log(message) {
 
 function findAnyTypes() {
   log('any 타입 사용 현황 분석...');
-  
+
   const anyTypes = [];
   const srcDir = 'src';
-  
+
   function scanDirectory(dir) {
     const files = fs.readdirSync(dir);
-    
+
     files.forEach(file => {
       const filePath = path.join(dir, file);
       const stat = fs.statSync(filePath);
-      
+
       if (stat.isDirectory()) {
         scanDirectory(filePath);
       } else if (file.endsWith('.ts') || file.endsWith('.tsx')) {
         const content = fs.readFileSync(filePath, 'utf8');
         const lines = content.split('\n');
-        
+
         lines.forEach((line, index) => {
-          if (line.includes(': any') || line.includes('<any>') || line.includes('any[]')) {
+          if (
+            line.includes(': any') ||
+            line.includes('<any>') ||
+            line.includes('any[]')
+          ) {
             anyTypes.push({
               file: filePath,
               line: index + 1,
-              content: line.trim()
+              content: line.trim(),
             });
           }
         });
       }
     });
   }
-  
+
   scanDirectory(srcDir);
   return anyTypes;
 }
 
 function generateTypeDefinitions() {
   log('공통 타입 정의 생성...');
-  
+
   const commonTypes = `// src/shared/types/common.ts
 // 공통 타입 정의
 
@@ -126,7 +130,7 @@ export interface FormState<T> {
 
 function generateApiTypes() {
   log('API 타입 정의 생성...');
-  
+
   const apiTypes = `// src/shared/types/api.ts
 // API 관련 타입 정의
 
@@ -206,7 +210,7 @@ export type PostListResponse = PaginatedResponse<CommunityPost>;
 
 function generateValidationSchemas() {
   log('Zod 검증 스키마 생성...');
-  
+
   const validationSchemas = `// src/shared/validators/schemas.ts
 import { z } from 'zod';
 
@@ -265,31 +269,31 @@ export const signupSchema = z.object({
 
 function main() {
   log('🚀 타입 안정성 개선 자동화 시작');
-  
+
   // 1. any 타입 사용 현황 분석
   const anyTypes = findAnyTypes();
   log(`📊 any 타입 사용: ${anyTypes.length}건`);
-  
+
   if (anyTypes.length > 0) {
     log('⚠️  any 타입 사용 현황:');
     anyTypes.slice(0, 10).forEach((item, index) => {
       log(`${index + 1}. ${item.file}:${item.line} - ${item.content}`);
     });
-    
+
     if (anyTypes.length > 10) {
       log(`... 외 ${anyTypes.length - 10}건 더`);
     }
   }
-  
+
   // 2. 공통 타입 정의 생성
   generateTypeDefinitions();
-  
+
   // 3. API 타입 정의 생성
   generateApiTypes();
-  
+
   // 4. 검증 스키마 생성
   generateValidationSchemas();
-  
+
   log('✅ 타입 안정성 개선 자동화 완료');
   log('다음 단계: any 타입을 구체적인 타입으로 교체하세요');
 }
@@ -298,4 +302,9 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { findAnyTypes, generateTypeDefinitions, generateApiTypes, generateValidationSchemas };
+module.exports = {
+  findAnyTypes,
+  generateTypeDefinitions,
+  generateApiTypes,
+  generateValidationSchemas,
+};

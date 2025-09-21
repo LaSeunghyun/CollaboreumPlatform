@@ -18,7 +18,11 @@ declare namespace createHttpError {
     <T>(status: number, options?: HttpErrorOptions): HttpError;
     (message: string, options?: HttpErrorOptions): HttpError;
     isHttpError(value: unknown): value is HttpError;
-    HttpError: new (status: number, message?: string, options?: HttpErrorOptions) => HttpError;
+    HttpError: new (
+      status: number,
+      message?: string,
+      options?: HttpErrorOptions,
+    ) => HttpError;
   }
 }
 

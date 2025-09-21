@@ -7,6 +7,7 @@ Collaboreum MVP Platform의 UI 컴포넌트 시스템을 표준화하고 디자�
 ## ✅ 완료된 작업
 
 ### STEP 1: 폴더/설정 스캐폴딩
+
 - ✅ `src/shared/ui`, `src/shared/lib`, `src/shared/theme` 디렉터리 생성
 - ✅ Tailwind CSS 디자인 토큰 정의 (색상, 간격, 라운드, 쉐도우)
 - ✅ CSS 변수 시스템 구축 (`src/shared/theme/vars.css`)
@@ -14,6 +15,7 @@ Collaboreum MVP Platform의 UI 컴포넌트 시스템을 표준화하고 디자�
 - ✅ ESLint 규칙 설정 (import 제한, 색상 하드코딩 금지)
 
 ### STEP 2: 프리미티브 8종 정의
+
 - ✅ **Button**: variant(solid/outline/ghost/link), size(sm/md/lg/icon), tone(default/success/warning/danger)
 - ✅ **Input**: size(sm/md/lg), tone(default/success/warning/danger)
 - ✅ **Select**: size(sm/md/lg), tone(default/success/warning/danger)
@@ -24,6 +26,7 @@ Collaboreum MVP Platform의 UI 컴포넌트 시스템을 표준화하고 디자�
 - ✅ **Modal**: size(sm/md/lg/xl/2xl/full), 접근성 완비
 
 ### STEP 3: 모달/다이얼로그 표준 구현
+
 - ✅ 포커스 트랩 (Tab/Shift+Tab 순환)
 - ✅ ESC 키로 닫기
 - ✅ 배경 클릭으로 닫기
@@ -32,23 +35,27 @@ Collaboreum MVP Platform의 UI 컴포넌트 시스템을 표준화하고 디자�
 - ✅ 서버 렌더링 안전 (Portal 사용)
 
 ### STEP 4: 디자인 토큰만 쓰기 강제 룰
+
 - ✅ 색상 하드코딩 탐지 스크립트 (`scripts/check-colors.js`)
 - ✅ ESLint 규칙으로 import 제한
 - ✅ CI/CD 통합 가능한 검사 시스템
 
 ### STEP 5: 마이그레이션 규칙 & 자동화
+
 - ✅ 컴포넌트 매핑표 작성
 - ✅ 자동 마이그레이션 스크립트 (`scripts/migrate-components.js`)
 - ✅ 사용하지 않는 컴포넌트 탐지 (`scripts/find-unused-components.js`)
 - ✅ 마이그레이션 가이드 문서
 
 ### STEP 6: 스토리북 & 스냅샷
+
 - ✅ Storybook 설정 및 구성
 - ✅ Button, Input, Modal 스토리 작성
 - ✅ 모든 variant/size/tone 조합 스토리
 - ✅ 접근성 테스트 통합
 
 ### STEP 7: 접근성 자동 점검
+
 - ✅ jest-axe 통합
 - ✅ 접근성 테스트 유틸리티 함수
 - ✅ Button, Modal 접근성 테스트 작성
@@ -57,6 +64,7 @@ Collaboreum MVP Platform의 UI 컴포넌트 시스템을 표준화하고 디자�
 ## 🎯 핵심 성과
 
 ### 1. 디자인 토큰 시스템
+
 ```css
 /* 색상 팔레트 */
 --primary-50 ~ --primary-900
@@ -74,6 +82,7 @@ Collaboreum MVP Platform의 UI 컴포넌트 시스템을 표준화하고 디자�
 ```
 
 ### 2. 컴포넌트 API 표준화
+
 ```tsx
 // 일관된 props 구조
 <Button variant="solid" size="md" tone="success">
@@ -93,6 +102,7 @@ Collaboreum MVP Platform의 UI 컴포넌트 시스템을 표준화하고 디자�
 ```
 
 ### 3. 접근성 보장
+
 - WCAG 2.1 AA 준수
 - 키보드 네비게이션 지원
 - 스크린 리더 호환성
@@ -150,16 +160,19 @@ src/
 ## 🚀 다음 단계
 
 ### 1. 즉시 실행 가능
+
 - [ ] `npm run migrate:components` 실행하여 기존 컴포넌트 마이그레이션
 - [ ] `npm run check:colors` 실행하여 색상 하드코딩 제거
 - [ ] `npm run storybook` 실행하여 컴포넌트 문서 확인
 
 ### 2. 점진적 개선
+
 - [ ] 기존 컴포넌트를 새로운 시스템으로 점진적 교체
 - [ ] 팀 내 디자인 시스템 가이드라인 수립
 - [ ] CI/CD에 색상 체크 및 접근성 테스트 통합
 
 ### 3. 장기적 확장
+
 - [ ] 추가 컴포넌트 개발 시 `src/shared/ui`에서만 생성
 - [ ] 디자인 토큰 확장 (애니메이션, 타이포그래피 등)
 - [ ] 다크 모드 지원 강화

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
-process.env.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/collaboreum-test';
+process.env.MONGODB_URI =
+  process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/collaboreum-test';
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-secret';
 process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 process.env.RAILWAY_ENVIRONMENT = process.env.RAILWAY_ENVIRONMENT || 'test';
@@ -9,7 +10,9 @@ let MongoMemoryServer;
 try {
   ({ MongoMemoryServer } = require('mongodb-memory-server'));
 } catch (error) {
-  console.warn('mongodb-memory-server 모듈을 찾을 수 없어 메모리 데이터베이스를 건너뜁니다.');
+  console.warn(
+    'mongodb-memory-server 모듈을 찾을 수 없어 메모리 데이터베이스를 건너뜁니다.',
+  );
 }
 
 /**
@@ -27,7 +30,9 @@ class TestSetup {
   async setupDatabase() {
     try {
       if (!MongoMemoryServer) {
-        console.warn('메모리 MongoDB 서버를 사용할 수 없어 데이터베이스 연결을 생략합니다.');
+        console.warn(
+          '메모리 MongoDB 서버를 사용할 수 없어 데이터베이스 연결을 생략합니다.',
+        );
         return null;
       }
 
@@ -83,7 +88,7 @@ class TestSetup {
    */
   async clearCollections() {
     const collections = mongoose.connection.collections;
-    
+
     for (const key in collections) {
       const collection = collections[key];
       await collection.deleteMany({});
@@ -216,7 +221,9 @@ class TestSetup {
     // 이벤트 스토어 모킹
     jest.mock('../../src/services/funding/eventStore', () => ({
       storeEvent: jest.fn().mockResolvedValue({ _id: 'mock-event-id' }),
-      storeProjectCreated: jest.fn().mockResolvedValue({ _id: 'mock-event-id' }),
+      storeProjectCreated: jest
+        .fn()
+        .mockResolvedValue({ _id: 'mock-event-id' }),
       storePledgeCreated: jest.fn().mockResolvedValue({ _id: 'mock-event-id' }),
     }));
 
@@ -286,7 +293,7 @@ class TestSetup {
    */
   createAuthHeaders(userId = 'mock-user-id') {
     return {
-      'Authorization': 'Bearer mock-access-token',
+      Authorization: 'Bearer mock-access-token',
       'Content-Type': 'application/json',
     };
   }
@@ -323,7 +330,7 @@ class TestSetup {
     expect(response.body.pagination.limit).toBeDefined();
     expect(response.body.pagination.total).toBeDefined();
     expect(response.body.pagination.totalPages).toBeDefined();
-    
+
     if (expectedCount !== null) {
       expect(response.body.data.length).toBe(expectedCount);
     }

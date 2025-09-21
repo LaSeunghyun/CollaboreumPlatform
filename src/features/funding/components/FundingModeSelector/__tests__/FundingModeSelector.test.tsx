@@ -5,7 +5,7 @@ import { FundingModeSelector } from '../FundingModeSelector';
 describe('FundingModeSelector', () => {
   it('renders both funding mode options and allows selection', async () => {
     const onChange = jest.fn();
-    render(<FundingModeSelector value="all-or-nothing" onChange={onChange} />);
+    render(<FundingModeSelector value='all-or-nothing' onChange={onChange} />);
 
     expect(screen.getByText('All-or-Nothing')).toBeInTheDocument();
     expect(screen.getByText('Flexible Funding')).toBeInTheDocument();
@@ -15,9 +15,11 @@ describe('FundingModeSelector', () => {
   });
 
   it('marks the selected option as checked', () => {
-    render(<FundingModeSelector value="flexible" onChange={jest.fn()} />);
+    render(<FundingModeSelector value='flexible' onChange={jest.fn()} />);
 
-    const flexibleOption = screen.getByLabelText('Flexible Funding') as HTMLInputElement;
+    const flexibleOption = screen.getByLabelText(
+      'Flexible Funding',
+    ) as HTMLInputElement;
     expect(flexibleOption.checked).toBe(true);
   });
 });

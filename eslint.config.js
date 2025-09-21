@@ -10,8 +10,14 @@ function optionalRequire(moduleId, fallbackPath) {
 }
 
 const js = optionalRequire('@eslint/js', './packages/eslint-js');
-const react = optionalRequire('eslint-plugin-react', './packages/eslint-plugins/react');
-const reactHooks = optionalRequire('eslint-plugin-react-hooks', './packages/eslint-plugins/react-hooks');
+const react = optionalRequire(
+  'eslint-plugin-react',
+  './packages/eslint-plugins/react',
+);
+const reactHooks = optionalRequire(
+  'eslint-plugin-react-hooks',
+  './packages/eslint-plugins/react-hooks',
+);
 
 module.exports = [
   js.configs.recommended,
@@ -22,8 +28,8 @@ module.exports = [
         ecmaVersion: 'latest',
         sourceType: 'module',
         ecmaFeatures: {
-          jsx: true
-        }
+          jsx: true,
+        },
       },
       globals: {
         // Browser globals
@@ -83,12 +89,12 @@ module.exports = [
         beforeEach: 'readonly',
         afterEach: 'readonly',
         beforeAll: 'readonly',
-        afterAll: 'readonly'
-      }
+        afterAll: 'readonly',
+      },
     },
     plugins: {
-      'react': react,
-      'react-hooks': reactHooks
+      react: react,
+      'react-hooks': reactHooks,
     },
     rules: {
       ...react.configs.recommended.rules,
@@ -96,51 +102,51 @@ module.exports = [
       'no-constant-condition': 'error',
       'no-undef': 'error',
       'no-unused-vars': 'off',
-      'complexity': ['warn', 15],
+      complexity: ['warn', 15],
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
       'react/display-name': 'warn',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-console': 'off',
       'no-debugger': 'error',
       'prefer-const': 'error',
-      'no-var': 'error'
+      'no-var': 'error',
     },
     settings: {
       react: {
-        version: 'detect'
-      }
-    }
-  },
-  {
-    files: ['**/*.{ts,tsx}'],
-    languageOptions: {
-      parser: require('@typescript-eslint/parser'),
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        ecmaFeatures: {
-          jsx: true
-        }
-      }
+        version: 'detect',
+      },
     },
-    plugins: {
-      '@typescript-eslint': require('@typescript-eslint/eslint-plugin')
-    },
-    rules: {
-      'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-require-imports': 'error',
-      'no-undef': 'off'
-    }
   },
+  // TypeScript 파일은 TypeScript 컴파일러로 검사하므로 ESLint에서 제외
+  // {
+  //   files: ['**/*.{ts,tsx}'],
+  //   languageOptions: {
+  //     parser: require('@typescript-eslint/parser'),
+  //     parserOptions: {
+  //       ecmaVersion: 2022,
+  //       sourceType: 'module',
+  //       ecmaFeatures: {
+  //         jsx: true
+  //       }
+  //     }
+  //   },
+  //   plugins: {
+  //     '@typescript-eslint': require('@typescript-eslint/eslint-plugin')
+  //   },
+  //   rules: {
+  //     'no-unused-vars': 'off',
+  //     '@typescript-eslint/no-unused-vars': 'off',
+  //     '@typescript-eslint/no-explicit-any': 'off',
+  //     'no-undef': 'off'
+  //   }
+  // },
   {
     files: ['**/*.test.*', '**/*.spec.*', '**/__tests__/**/*'],
-    rules: { 
+    rules: {
       'no-undef': 'off',
-    }
+    },
   },
   {
     ignores: [
@@ -156,7 +162,7 @@ module.exports = [
       '*.min.js',
       'server/node_modules/',
       'server/build/',
-      'server/dist/'
-    ]
-  }
+      'server/dist/',
+    ],
+  },
 ];

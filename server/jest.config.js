@@ -2,7 +2,7 @@ const createTransformConfig = () => {
   try {
     require.resolve('ts-jest');
     return {
-      '^.+\\.(t|j)sx?$': ['ts-jest', { tsconfig: 'tsconfig.json' }]
+      '^.+\\.(t|j)sx?$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
     };
   } catch (_error) {
     return {};
@@ -16,7 +16,7 @@ module.exports = {
   testMatch: [
     '**/tests/**/*.(ts|js)',
     '**/*.(test|spec).(ts|js)',
-    '**/pact/**/*.test.(ts|js)'
+    '**/pact/**/*.test.(ts|js)',
   ],
   collectCoverageFrom: [
     '**/*.{ts,js}',
@@ -25,10 +25,10 @@ module.exports = {
     '!**/tests/**',
     '!**/coverage/**',
     '!**/dist/**',
-    '!**/build/**'
+    '!**/build/**',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup/testSetup.js'],
-  testTimeout: 10000
+  testTimeout: 10000,
 };

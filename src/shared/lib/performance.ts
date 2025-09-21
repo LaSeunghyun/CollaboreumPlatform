@@ -9,7 +9,7 @@ import { useCallback, useMemo, useRef, useEffect } from 'react';
  */
 export function useDebounce<T extends (...args: any[]) => any>(
   callback: T,
-  delay: number
+  delay: number,
 ): T {
   const timeoutRef = useRef<NodeJS.Timeout>();
 
@@ -20,7 +20,7 @@ export function useDebounce<T extends (...args: any[]) => any>(
       }
       timeoutRef.current = setTimeout(() => callback(...args), delay);
     },
-    [callback, delay]
+    [callback, delay],
   ) as T;
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export function useDebounce<T extends (...args: any[]) => any>(
  */
 export function useThrottle<T extends (...args: any[]) => any>(
   callback: T,
-  delay: number
+  delay: number,
 ): T {
   const lastRun = useRef<number>(0);
 
@@ -51,7 +51,7 @@ export function useThrottle<T extends (...args: any[]) => any>(
         callback(...args);
       }
     },
-    [callback, delay]
+    [callback, delay],
   ) as T;
 }
 
@@ -61,7 +61,7 @@ export function useThrottle<T extends (...args: any[]) => any>(
 export function calculateItemSize(
   itemCount: number,
   containerHeight: number,
-  minItemHeight: number = 50
+  minItemHeight: number = 50,
 ): number {
   const calculatedSize = Math.floor(containerHeight / itemCount);
   return Math.max(calculatedSize, minItemHeight);
@@ -72,7 +72,7 @@ export function calculateItemSize(
  */
 export function useIntersectionObserver(
   callback: (entries: IntersectionObserverEntry[]) => void,
-  options: IntersectionObserverInit = {}
+  options: IntersectionObserverInit = {},
 ) {
   const targetRef = useRef<HTMLElement>(null);
 
@@ -102,13 +102,13 @@ export function useIntersectionObserver(
 export function useMemoizedSort<T>(
   items: T[],
   sortKey: keyof T,
-  sortOrder: 'asc' | 'desc' = 'asc'
+  sortOrder: 'asc' | 'desc' = 'asc',
 ) {
   return useMemo(() => {
     return [...items].sort((a, b) => {
       const aVal = a[sortKey];
       const bVal = b[sortKey];
-      
+
       if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
       if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
       return 0;
@@ -121,7 +121,7 @@ export function useMemoizedSort<T>(
  */
 export function useMemoizedFilter<T>(
   items: T[],
-  filterFn: (item: T) => boolean
+  filterFn: (item: T) => boolean,
 ) {
   return useMemo(() => {
     return items.filter(filterFn);
@@ -141,11 +141,11 @@ export function usePerformanceMeasure(name: string) {
   const endMeasure = useCallback(() => {
     const endTime = performance.now();
     const duration = endTime - startTime.current;
-    
+
     if (process.env.NODE_ENV === 'development') {
       console.log(`Performance [${name}]: ${duration.toFixed(2)}ms`);
     }
-    
+
     return duration;
   }, [name]);
 
@@ -156,12 +156,13 @@ export function usePerformanceMeasure(name: string) {
  * WebP 이미지 지원 확인
  */
 export function supportsWebP(): Promise<boolean> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const webP = new Image();
     webP.onload = webP.onerror = () => {
       resolve(webP.height === 2);
     };
-    webP.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
+    webP.src =
+      'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
   });
 }
 
@@ -172,24 +173,24 @@ export function getOptimizedImageUrl(
   originalUrl: string,
   width?: number,
   height?: number,
-  format: 'webp' | 'jpg' | 'png' = 'webp'
+  format: 'webp' | 'jpg' | 'png' = 'webp',
 ): string {
   if (!originalUrl) return '';
-  
+
   // Cloudinary URL 최적화
   if (originalUrl.includes('cloudinary.com')) {
     const baseUrl = originalUrl.split('/upload/')[0];
     const imagePath = originalUrl.split('/upload/')[1];
-    
+
     const transformations = [];
     if (width) transformations.push(`w_${width}`);
     if (height) transformations.push(`h_${height}`);
     transformations.push(`f_${format}`);
     transformations.push('q_auto');
-    
+
     return `${baseUrl}/upload/${transformations.join(',')}/${imagePath}`;
   }
-  
+
   return originalUrl;
 }
 
@@ -201,14 +202,14 @@ export function calculateVisibleRange(
   containerHeight: number,
   itemHeight: number,
   itemCount: number,
-  overscan: number = 5
+  overscan: number = 5,
 ) {
   const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
   const endIndex = Math.min(
     itemCount - 1,
-    Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
+    Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan,
   );
-  
+
   return { startIndex, endIndex };
 }
 
@@ -218,23 +219,23 @@ export function calculateVisibleRange(
 export function measureWebVitals() {
   if (typeof window === 'undefined') return;
 
-  import('web-vitals').then((vitals) => {
+  import('web-vitals').then(vitals => {
     vitals.onCLS((metric: any) => {
       console.log('CLS:', metric);
     });
-    
+
     vitals.onINP((metric: any) => {
       console.log('INP:', metric);
     });
-    
+
     vitals.onFCP((metric: any) => {
       console.log('FCP:', metric);
     });
-    
+
     vitals.onLCP((metric: any) => {
       console.log('LCP:', metric);
     });
-    
+
     vitals.onTTFB((metric: any) => {
       console.log('TTFB:', metric);
     });

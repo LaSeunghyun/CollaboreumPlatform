@@ -14,33 +14,33 @@ function log(message) {
 
 function findSpacingInconsistencies() {
   log('간격 사용 현황 분석...');
-  
+
   const spacingPatterns = {
     padding: /p-\d+/g,
     margin: /m-\d+/g,
     space: /space-[xy]-\d+/g,
-    gap: /gap-\d+/g
+    gap: /gap-\d+/g,
   };
-  
+
   const inconsistencies = {
     padding: new Set(),
     margin: new Set(),
     space: new Set(),
-    gap: new Set()
+    gap: new Set(),
   };
-  
+
   function scanDirectory(dir) {
     const files = fs.readdirSync(dir);
-    
+
     files.forEach(file => {
       const filePath = path.join(dir, file);
       const stat = fs.statSync(filePath);
-      
+
       if (stat.isDirectory()) {
         scanDirectory(filePath);
       } else if (file.endsWith('.tsx') || file.endsWith('.ts')) {
         const content = fs.readFileSync(filePath, 'utf8');
-        
+
         Object.entries(spacingPatterns).forEach(([type, pattern]) => {
           const matches = content.match(pattern);
           if (matches) {
@@ -50,20 +50,20 @@ function findSpacingInconsistencies() {
       }
     });
   }
-  
+
   scanDirectory('src');
-  
+
   return {
     padding: Array.from(inconsistencies.padding).sort(),
     margin: Array.from(inconsistencies.margin).sort(),
     space: Array.from(inconsistencies.space).sort(),
-    gap: Array.from(inconsistencies.gap).sort()
+    gap: Array.from(inconsistencies.gap).sort(),
   };
 }
 
 function generateDesignTokens() {
   log('디자인 토큰 생성...');
-  
+
   const designTokens = `// src/shared/design-tokens/spacing.ts
 // 간격 디자인 토큰
 
@@ -142,14 +142,14 @@ export type SpacingType = keyof typeof spacingClasses;
   if (!fs.existsSync(tokensDir)) {
     fs.mkdirSync(tokensDir, { recursive: true });
   }
-  
+
   fs.writeFileSync(path.join(tokensDir, 'spacing.ts'), designTokens);
   log('✅ 디자인 토큰 생성 완료');
 }
 
 function generateCVAComponents() {
   log('CVA 패턴 컴포넌트 생성...');
-  
+
   const cardComponent = `// src/shared/ui/Card/Card.tsx
 import React, { forwardRef } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -338,16 +338,16 @@ export { Card, CardHeader, CardTitle, CardDescription, CardContent };
   if (!fs.existsSync(cardDir)) {
     fs.mkdirSync(cardDir, { recursive: true });
   }
-  
+
   fs.writeFileSync(path.join(cardDir, 'Card.tsx'), cardComponent);
   fs.writeFileSync(path.join(cardDir, 'index.ts'), 'export * from "./Card";');
-  
+
   log('✅ CVA 패턴 컴포넌트 생성 완료');
 }
 
 function generateSpacingUtils() {
   log('간격 유틸리티 함수 생성...');
-  
+
   const spacingUtils = `// src/shared/lib/spacingUtils.ts
 import { spacingClasses, type SpacingSize, type SpacingType } from '../design-tokens/spacing';
 
@@ -411,25 +411,25 @@ export function isValidSpacingSize(size: string): size is SpacingSize {
 
 function main() {
   log('🚀 UI 일관성 개선 자동화 시작');
-  
+
   // 1. 간격 사용 현황 분석
   const inconsistencies = findSpacingInconsistencies();
-  
+
   log('📊 간격 사용 현황:');
   log(`Padding: ${inconsistencies.padding.join(', ')}`);
   log(`Margin: ${inconsistencies.margin.join(', ')}`);
   log(`Space: ${inconsistencies.space.join(', ')}`);
   log(`Gap: ${inconsistencies.gap.join(', ')}`);
-  
+
   // 2. 디자인 토큰 생성
   generateDesignTokens();
-  
+
   // 3. CVA 패턴 컴포넌트 생성
   generateCVAComponents();
-  
+
   // 4. 간격 유틸리티 함수 생성
   generateSpacingUtils();
-  
+
   log('✅ UI 일관성 개선 자동화 완료');
   log('다음 단계: 기존 컴포넌트에 새로운 간격 시스템을 적용하세요');
 }
@@ -438,9 +438,9 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { 
-  findSpacingInconsistencies, 
-  generateDesignTokens, 
-  generateCVAComponents, 
-  generateSpacingUtils 
+module.exports = {
+  findSpacingInconsistencies,
+  generateDesignTokens,
+  generateCVAComponents,
+  generateSpacingUtils,
 };

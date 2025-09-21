@@ -2,9 +2,9 @@ name: Deploy to Vercel and Railway
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [master, main]
   pull_request:
-    branches: [ master, main ]
+    branches: [master, main]
 
 jobs:
   deploy-frontend:
@@ -72,7 +72,7 @@ jobs:
           echo "📊 배포 상태 확인:"
           echo "Frontend (Vercel): ${{ needs.deploy-frontend.result || 'skipped' }}"
           echo "Backend (Railway): ${{ needs.deploy-backend.result || 'skipped' }}"
-          
+
           if [[ "${{ needs.deploy-frontend.result }}" == "success" && "${{ needs.deploy-backend.result }}" == "success" ]]; then
             echo "✅ 모든 배포 성공!"
           elif [[ "${{ needs.deploy-frontend.result }}" == "skipped" && "${{ needs.deploy-backend.result }}" == "skipped" ]]; then

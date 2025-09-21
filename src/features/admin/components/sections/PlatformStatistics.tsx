@@ -1,5 +1,10 @@
 ﻿import { RefreshCw } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../../shared/ui/Card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '../../../../shared/ui/Card';
 import { Button } from '../../../../shared/ui/Button';
 import { Badge } from '../../../../shared/ui/Badge';
 import { cn } from '../../../../shared/lib/cn';
@@ -35,7 +40,9 @@ export const PlatformStatistics = ({ className }: PlatformStatisticsProps) => {
           <CardTitle>플랫폼 지표</CardTitle>
         </CardHeader>
         <CardContent className='space-y-3'>
-          <p className='text-sm text-muted-foreground'>지표를 불러오지 못했습니다.</p>
+          <p className='text-sm text-muted-foreground'>
+            지표를 불러오지 못했습니다.
+          </p>
           <Button variant='outline' size='sm' onClick={() => refetch()}>
             <RefreshCw className='mr-2 h-4 w-4' /> 다시 시도
           </Button>
@@ -89,20 +96,34 @@ export const PlatformStatistics = ({ className }: PlatformStatisticsProps) => {
         </CardHeader>
         <CardContent className='grid gap-3 sm:grid-cols-2'>
           <div>
-            <span className='text-sm text-muted-foreground'>대기 중 프로젝트</span>
-            <p className='text-lg font-semibold'>{stats.pendingProjects.toLocaleString()}건</p>
+            <span className='text-sm text-muted-foreground'>
+              대기 중 프로젝트
+            </span>
+            <p className='text-lg font-semibold'>
+              {stats.pendingProjects.toLocaleString()}건
+            </p>
           </div>
           <div>
-            <span className='text-sm text-muted-foreground'>평균 펀딩 금액</span>
-            <p className='text-lg font-semibold'>{stats.averageFundingAmount.toLocaleString()}원</p>
+            <span className='text-sm text-muted-foreground'>
+              평균 펀딩 금액
+            </span>
+            <p className='text-lg font-semibold'>
+              {stats.averageFundingAmount.toLocaleString()}원
+            </p>
           </div>
           <div>
             <span className='text-sm text-muted-foreground'>성공률</span>
-            <p className='text-lg font-semibold'>{Math.round(stats.successRate * 100)}%</p>
+            <p className='text-lg font-semibold'>
+              {Math.round(stats.successRate * 100)}%
+            </p>
           </div>
           <div>
-            <span className='text-sm text-muted-foreground'>이번 주 신규 프로젝트</span>
-            <p className='text-lg font-semibold'>{stats.weeklyNewProjects.toLocaleString()}건</p>
+            <span className='text-sm text-muted-foreground'>
+              이번 주 신규 프로젝트
+            </span>
+            <p className='text-lg font-semibold'>
+              {stats.weeklyNewProjects.toLocaleString()}건
+            </p>
           </div>
         </CardContent>
       </Card>

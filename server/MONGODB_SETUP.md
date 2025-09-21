@@ -3,11 +3,13 @@
 ## 1. MongoDB 설치
 
 ### Windows에서 MongoDB 설치
+
 1. [MongoDB Community Server](https://www.mongodb.com/try/download/community) 다운로드
 2. 설치 프로그램 실행 및 기본 설정으로 설치
 3. MongoDB 서비스가 자동으로 시작됩니다
 
 ### 또는 Docker 사용
+
 ```bash
 docker run -d -p 27017:27017 --name mongodb mongo:latest
 ```
@@ -34,12 +36,14 @@ CLIENT_URL=http://localhost:3000
 ## 3. 연결 테스트
 
 ### 데이터베이스 연결 테스트
+
 ```bash
 cd server
 npm run test-db
 ```
 
 ### 서버 시작
+
 ```bash
 npm run dev
 ```
@@ -47,6 +51,7 @@ npm run dev
 ## 4. 연결 상태 확인
 
 서버가 실행되면 다음 메시지가 표시됩니다:
+
 ```
 ✅ MongoDB Connected: localhost
 Server running on port 5000
@@ -56,6 +61,7 @@ Environment: development
 ## 5. 문제 해결
 
 ### 연결 실패 시 확인사항:
+
 1. **MongoDB 서비스 실행 확인**
    - Windows: 서비스 관리자에서 "MongoDB" 서비스 상태 확인
    - 또는 명령 프롬프트에서 `net start MongoDB` 실행
@@ -71,6 +77,7 @@ Environment: development
    - localhost 대신 127.0.0.1 사용 시도
 
 ### MongoDB Compass 사용 (GUI 도구)
+
 1. [MongoDB Compass](https://www.mongodb.com/try/download/compass) 다운로드
 2. 연결 문자열: `mongodb://localhost:27017`
 3. 데이터베이스 및 컬렉션을 시각적으로 관리
@@ -78,6 +85,7 @@ Environment: development
 ## 6. 프로덕션 환경
 
 클라우드 MongoDB 사용 시:
+
 - MongoDB Atlas 계정 생성
 - 클러스터 생성 및 연결 문자열 복사
 - .env 파일의 MONGODB_URI_PROD 사용
@@ -111,11 +119,13 @@ npm run add-user "홍길동" "hong@example.com" "password123" "artist" "음악�
 ## 8. 회원 데이터 관리
 
 ### 샘플 회원 데이터
+
 - **아티스트**: 재즈, 힙합, 클래식, 일렉트로닉, 팝 음악가
 - **팬**: 음악, 미술, 영상 애호가
 - **관리자**: 시스템 관리자
 
 ### 로그인 정보
+
 - 아티스트: `jazz@example.com` / `password123`
 - 팬: `musicfan@example.com` / `password123`
 - 관리자: `admin@collaboreum.com` / `admin123`

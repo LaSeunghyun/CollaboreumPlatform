@@ -3,11 +3,13 @@
 ## 🗄️ MongoDB URI
 
 ### 프로덕션 데이터베이스 (Railway)
+
 ```
 mongodb+srv://rmwl2356_db_user:f8NaljAJhfZpTc7J@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster
 ```
 
 ### 연결 정보
+
 - **호스트**: Railway MongoDB Atlas 클러스터
 - **데이터베이스명**: test
 - **컬렉션 수**: 14개
@@ -16,6 +18,7 @@ mongodb+srv://rmwl2356_db_user:f8NaljAJhfZpTc7J@collaboreum-cluster.tdwqiwn.mong
 ## 📊 현재 데이터 현황
 
 ### 컬렉션 목록
+
 1. `events` - 이벤트 데이터
 2. `livestreams` - 라이브 스트림 데이터
 3. `users` - 사용자 데이터
@@ -32,6 +35,7 @@ mongodb+srv://rmwl2356_db_user:f8NaljAJhfZpTc7J@collaboreum-cluster.tdwqiwn.mong
 14. `categories` - 카테고리 데이터
 
 ### 데이터 통계
+
 - **커뮤니티 게시글**: 3개
 - **사용자**: 2명
 - **아티스트**: 1명
@@ -39,11 +43,13 @@ mongodb+srv://rmwl2356_db_user:f8NaljAJhfZpTc7J@collaboreum-cluster.tdwqiwn.mong
 ## 🔧 연결 설정
 
 ### 환경 변수
+
 ```bash
 MONGODB_URI=mongodb+srv://rmwl2356_db_user:f8NaljAJhfZpTc7J@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster
 ```
 
 ### 연결 옵션
+
 ```javascript
 const mongoose = require('mongoose');
 
@@ -69,6 +75,7 @@ await mongoose.connect(process.env.MONGODB_URI, {
 ## 📞 문제 해결
 
 연결 문제가 발생하면:
+
 1. Railway 대시보드에서 클러스터 상태 확인
 2. 네트워크 연결 확인
 3. 인증 정보 확인

@@ -17,7 +17,7 @@ const applyAuthorPopulation = (query, { includeComments = false } = {}) => {
 const findPosts = async ({ query, sort, skip, limit }) => {
   return applyAuthorPopulation(
     CommunityPost.find(query).sort(sort).skip(skip).limit(limit),
-    { includeComments: false }
+    { includeComments: false },
   );
 };
 
@@ -27,15 +27,17 @@ const countPosts = async query => {
 
 const findPopularPosts = async limit => {
   return applyAuthorPopulation(
-    CommunityPost.find({ isActive: true }).sort({ likes: -1, viewCount: -1 }).limit(limit),
-    { includeComments: false }
+    CommunityPost.find({ isActive: true })
+      .sort({ likes: -1, viewCount: -1 })
+      .limit(limit),
+    { includeComments: false },
   );
 };
 
 const findRecentPosts = async limit => {
   return applyAuthorPopulation(
     CommunityPost.find({ isActive: true }).sort({ createdAt: -1 }).limit(limit),
-    { includeComments: false }
+    { includeComments: false },
   );
 };
 
@@ -57,10 +59,9 @@ const savePost = async post => {
 };
 
 const findCommentsByPostId = async id => {
-  return applyAuthorPopulation(
-    CommunityPost.findById(id).select('comments'),
-    { includeComments: true }
-  ).lean();
+  return applyAuthorPopulation(CommunityPost.findById(id).select('comments'), {
+    includeComments: true,
+  }).lean();
 };
 
 module.exports = {
@@ -72,5 +73,5 @@ module.exports = {
   findPostDocumentById,
   createPost,
   savePost,
-  findCommentsByPostId
+  findCommentsByPostId,
 };

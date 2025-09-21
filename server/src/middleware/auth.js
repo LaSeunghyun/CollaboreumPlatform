@@ -1,4 +1,7 @@
-const { AuthenticationError, AuthorizationError } = require('../errors/AppError');
+const {
+  AuthenticationError,
+  AuthorizationError,
+} = require('../errors/AppError');
 const { jwtService } = require('../services/auth/jwtService');
 const { businessLogger } = require('./logger');
 
@@ -8,16 +11,16 @@ const { businessLogger } = require('./logger');
 const authenticate = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       throw new AuthenticationError('인증 토큰이 필요합니다');
     }
 
     const token = authHeader.substring(7); // 'Bearer ' 제거
-    
+
     // 토큰 검증
     const decoded = jwtService.verifyAccessToken(token);
-    
+
     // 사용자 정보를 요청 객체에 추가
     req.user = {
       id: decoded.userId,
@@ -26,13 +29,17 @@ const authenticate = async (req, res, next) => {
       role: decoded.role,
       permissions: decoded.permissions || [],
     };
-    
+
     // 요청 ID 추가 (로깅용)
     req.requestId = req.headers['x-request-id'] || require('uuid').v4();
-    
+
     next();
   } catch (error) {
-    businessLogger.auth.login(null, req.headers.authorization ? 'token_invalid' : 'no_token', false);
+    businessLogger.auth.login(
+      null,
+      req.headers.authorization ? 'token_invalid' : 'no_token',
+      false,
+    );
     next(error);
   }
 };
@@ -43,11 +50,11 @@ const authenticate = async (req, res, next) => {
 const optionalAuth = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
       const decoded = jwtService.verifyAccessToken(token);
-      
+
       req.user = {
         id: decoded.userId,
         userId: decoded.userId,
@@ -56,7 +63,7 @@ const optionalAuth = async (req, res, next) => {
         permissions: decoded.permissions || [],
       };
     }
-    
+
     next();
   } catch (error) {
     // 토큰이 있지만 유효하지 않은 경우에만 에러
@@ -78,7 +85,9 @@ const requireRole = (...roles) => {
 
     if (!roles.includes(req.user.role)) {
       businessLogger.auth.login(req.user.id, req.user.email, false);
-      return next(new AuthorizationError(`다음 역할이 필요합니다: ${roles.join(', ')}`));
+      return next(
+        new AuthorizationError(`다음 역할이 필요합니다: ${roles.join(', ')}`),
+      );
     }
 
     next();
@@ -88,7 +97,7 @@ const requireRole = (...roles) => {
 /**
  * 권한 기반 검증 미들웨어
  */
-const requirePermission = (permission) => {
+const requirePermission = permission => {
   return (req, res, next) => {
     if (!req.user) {
       return next(new AuthenticationError('인증이 필요합니다'));
@@ -101,7 +110,9 @@ const requirePermission = (permission) => {
 
     if (!req.user.permissions || !req.user.permissions.includes(permission)) {
       businessLogger.auth.login(req.user.id, req.user.email, false);
-      return next(new AuthorizationError(`다음 권한이 필요합니다: ${permission}`));
+      return next(
+        new AuthorizationError(`다음 권한이 필요합니다: ${permission}`),
+      );
     }
 
     next();
@@ -122,13 +133,18 @@ const requireAnyPermission = (...permissions) => {
       return next();
     }
 
-    const hasPermission = permissions.some(permission => 
-      req.user.permissions && req.user.permissions.includes(permission)
+    const hasPermission = permissions.some(
+      permission =>
+        req.user.permissions && req.user.permissions.includes(permission),
     );
 
     if (!hasPermission) {
       businessLogger.auth.login(req.user.id, req.user.email, false);
-      return next(new AuthorizationError(`다음 권한 중 하나가 필요합니다: ${permissions.join(', ')}`));
+      return next(
+        new AuthorizationError(
+          `다음 권한 중 하나가 필요합니다: ${permissions.join(', ')}`,
+        ),
+      );
     }
 
     next();
@@ -151,7 +167,7 @@ const requireOwnership = (resourceIdParam = 'id', resourceModel = null) => {
       }
 
       const resourceId = req.params[resourceIdParam];
-      
+
       if (!resourceId) {
         return next(new AuthorizationError('리소스 ID가 필요합니다'));
       }
@@ -159,16 +175,19 @@ const requireOwnership = (resourceIdParam = 'id', resourceModel = null) => {
       // 리소스 모델이 제공된 경우 소유자 확인
       if (resourceModel) {
         const resource = await resourceModel.findById(resourceId);
-        
+
         if (!resource) {
           return next(new AuthorizationError('리소스를 찾을 수 없습니다'));
         }
 
         // 소유자 ID 필드 확인 (ownerId, userId, createdBy 등)
-        const ownerField = resource.ownerId || resource.userId || resource.createdBy;
-        
+        const ownerField =
+          resource.ownerId || resource.userId || resource.createdBy;
+
         if (!ownerField || ownerField.toString() !== req.user.id) {
-          return next(new AuthorizationError('이 리소스에 대한 권한이 없습니다'));
+          return next(
+            new AuthorizationError('이 리소스에 대한 권한이 없습니다'),
+          );
         }
       }
 
@@ -194,14 +213,14 @@ const requireProjectOwnership = async (req, res, next) => {
     }
 
     const projectId = req.params.id || req.params.projectId;
-    
+
     if (!projectId) {
       return next(new AuthorizationError('프로젝트 ID가 필요합니다'));
     }
 
     const { FundingProject } = require('../models/FundingProject');
     const project = await FundingProject.findById(projectId);
-    
+
     if (!project) {
       return next(new AuthorizationError('프로젝트를 찾을 수 없습니다'));
     }
@@ -224,22 +243,24 @@ const requireProjectStatus = (...allowedStatuses) => {
   return async (req, res, next) => {
     try {
       const projectId = req.params.id || req.params.projectId;
-      
+
       if (!projectId) {
         return next(new AuthorizationError('프로젝트 ID가 필요합니다'));
       }
 
       const { FundingProject } = require('../models/FundingProject');
       const project = await FundingProject.findById(projectId);
-      
+
       if (!project) {
         return next(new AuthorizationError('프로젝트를 찾을 수 없습니다'));
       }
 
       if (!allowedStatuses.includes(project.status)) {
-        return next(new AuthorizationError(
-          `프로젝트 상태가 허용되지 않습니다. 현재 상태: ${project.status}, 허용된 상태: ${allowedStatuses.join(', ')}`
-        ));
+        return next(
+          new AuthorizationError(
+            `프로젝트 상태가 허용되지 않습니다. 현재 상태: ${project.status}, 허용된 상태: ${allowedStatuses.join(', ')}`,
+          ),
+        );
       }
 
       req.project = project;
@@ -255,14 +276,14 @@ const requireProjectStatus = (...allowedStatuses) => {
  */
 const authenticateApiKey = (req, res, next) => {
   const apiKey = req.headers['x-api-key'];
-  
+
   if (!apiKey) {
     return next(new AuthenticationError('API 키가 필요합니다'));
   }
 
   // API 키 검증 로직 (실제로는 데이터베이스에서 확인)
   const validApiKeys = process.env.VALID_API_KEYS?.split(',') || [];
-  
+
   if (!validApiKeys.includes(apiKey)) {
     return next(new AuthenticationError('유효하지 않은 API 키입니다'));
   }
@@ -276,12 +297,12 @@ const authenticateApiKey = (req, res, next) => {
  */
 const rateLimit = (windowMs = 15 * 60 * 1000, max = 100) => {
   const requests = new Map();
-  
+
   return (req, res, next) => {
     const key = req.ip || req.connection.remoteAddress;
     const now = Date.now();
     const windowStart = now - windowMs;
-    
+
     // 오래된 요청 제거
     if (requests.has(key)) {
       const userRequests = requests.get(key).filter(time => time > windowStart);
@@ -289,13 +310,13 @@ const rateLimit = (windowMs = 15 * 60 * 1000, max = 100) => {
     } else {
       requests.set(key, []);
     }
-    
+
     const userRequests = requests.get(key);
-    
+
     if (userRequests.length >= max) {
       return next(new AuthorizationError('요청 제한을 초과했습니다'));
     }
-    
+
     userRequests.push(now);
     next();
   };
@@ -310,7 +331,7 @@ const corsOptions = {
       process.env.CLIENT_URL || 'http://localhost:3000',
       'https://collaboreum-mvp-platform.vercel.app',
     ];
-    
+
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {

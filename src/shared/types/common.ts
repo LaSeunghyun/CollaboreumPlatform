@@ -16,16 +16,33 @@ export type UserRole = 'admin' | 'artist' | 'fan';
 export type UserStatus = 'active' | 'inactive' | 'suspended' | 'pending';
 
 // 프로젝트 상태 타입
-export type ProjectStatus = 'draft' | 'pending' | 'active' | 'completed' | 'cancelled' | 'failed';
+export type ProjectStatus =
+  | 'draft'
+  | 'pending'
+  | 'active'
+  | 'completed'
+  | 'cancelled'
+  | 'failed';
 
 // 결제 상태 타입
-export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded' | 'cancelled';
+export type PaymentStatus =
+  | 'pending'
+  | 'completed'
+  | 'failed'
+  | 'refunded'
+  | 'cancelled';
 
 // 결제 방법 타입
-export type PaymentMethod = 'card' | 'phone' | 'bank' | 'paypal' | 'kakao' | 'naver';
+export type PaymentMethod =
+  | 'card'
+  | 'phone'
+  | 'bank'
+  | 'paypal'
+  | 'kakao'
+  | 'naver';
 
 // 알림 타입
-export type NotificationType = 
+export type NotificationType =
   | 'project_approved'
   | 'project_rejected'
   | 'project_completed'
@@ -38,28 +55,40 @@ export type NotificationType =
   | 'system_announcement';
 
 // 파일 타입
-export type FileType = 'image' | 'video' | 'audio' | 'document' | 'archive' | 'other';
+export type FileType =
+  | 'image'
+  | 'video'
+  | 'audio'
+  | 'document'
+  | 'archive'
+  | 'other';
 
 // 정렬 방향 타입
 export type SortOrder = 'asc' | 'desc';
 
 // 정렬 기준 타입
-export type SortBy = 'createdAt' | 'updatedAt' | 'title' | 'amount' | 'popularity' | 'deadline';
+export type SortBy =
+  | 'createdAt'
+  | 'updatedAt'
+  | 'title'
+  | 'amount'
+  | 'popularity'
+  | 'deadline';
 
 // 필터 연산자 타입
-export type FilterOperator = 
-  | 'eq'        // equals
-  | 'ne'        // not equals
-  | 'gt'        // greater than
-  | 'gte'       // greater than or equal
-  | 'lt'        // less than
-  | 'lte'       // less than or equal
-  | 'in'        // in array
-  | 'nin'       // not in array
-  | 'contains'  // contains string
+export type FilterOperator =
+  | 'eq' // equals
+  | 'ne' // not equals
+  | 'gt' // greater than
+  | 'gte' // greater than or equal
+  | 'lt' // less than
+  | 'lte' // less than or equal
+  | 'in' // in array
+  | 'nin' // not in array
+  | 'contains' // contains string
   | 'startsWith' // starts with
-  | 'endsWith'  // ends with
-  | 'regex';    // regular expression
+  | 'endsWith' // ends with
+  | 'regex'; // regular expression
 
 // 필터 조건 타입
 export interface FilterCondition {
@@ -192,48 +221,75 @@ export type Selector<T, R> = (state: T) => R;
 export type Dispatcher<A extends Action> = (action: A) => void;
 
 // 미들웨어 타입
-export type Middleware<S, A extends Action> = (
-  store: { getState: () => S; dispatch: Dispatcher<A> }
-) => (next: Dispatcher<A>) => (action: A) => void;
+export type Middleware<S, A extends Action> = (store: {
+  getState: () => S;
+  dispatch: Dispatcher<A>;
+}) => (next: Dispatcher<A>) => (action: A) => void;
 
 // 이벤트 핸들러 타입
 export type EventHandler<T = Event> = (event: T) => void;
 
 // 마우스 이벤트 핸들러 타입
-export type MouseEventHandler<T = HTMLButtonElement> = (event: React.MouseEvent<T>) => void;
+export type MouseEventHandler<T = HTMLButtonElement> = (
+  event: React.MouseEvent<T>,
+) => void;
 
 // 키보드 이벤트 핸들러 타입
-export type KeyboardEventHandler<T = HTMLInputElement> = (event: React.KeyboardEvent<T>) => void;
+export type KeyboardEventHandler<T = HTMLInputElement> = (
+  event: React.KeyboardEvent<T>,
+) => void;
 
 // 폼 이벤트 핸들러 타입
-export type FormEventHandler<T = HTMLFormElement> = (event: React.FormEvent<T>) => void;
+export type FormEventHandler<T = HTMLFormElement> = (
+  event: React.FormEvent<T>,
+) => void;
 
 // 변경 이벤트 핸들러 타입
-export type ChangeEventHandler<T = HTMLInputElement> = (event: React.ChangeEvent<T>) => void;
+export type ChangeEventHandler<T = HTMLInputElement> = (
+  event: React.ChangeEvent<T>,
+) => void;
 
 // 포커스 이벤트 핸들러 타입
-export type FocusEventHandler<T = HTMLInputElement> = (event: React.FocusEvent<T>) => void;
+export type FocusEventHandler<T = HTMLInputElement> = (
+  event: React.FocusEvent<T>,
+) => void;
 
 // 블러 이벤트 핸들러 타입
-export type BlurEventHandler<T = HTMLInputElement> = (event: React.FocusEvent<T>) => void;
+export type BlurEventHandler<T = HTMLInputElement> = (
+  event: React.FocusEvent<T>,
+) => void;
 
 // 스크롤 이벤트 핸들러 타입
-export type ScrollEventHandler<T = HTMLDivElement> = (event: React.UIEvent<T>) => void;
+export type ScrollEventHandler<T = HTMLDivElement> = (
+  event: React.UIEvent<T>,
+) => void;
 
 // 리사이즈 이벤트 핸들러 타입
-export type ResizeEventHandler<T = HTMLDivElement> = (event: React.UIEvent<T>) => void;
+export type ResizeEventHandler<T = HTMLDivElement> = (
+  event: React.UIEvent<T>,
+) => void;
 
 // 드래그 이벤트 핸들러 타입
-export type DragEventHandler<T = HTMLDivElement> = (event: React.DragEvent<T>) => void;
+export type DragEventHandler<T = HTMLDivElement> = (
+  event: React.DragEvent<T>,
+) => void;
 
 // 터치 이벤트 핸들러 타입
-export type TouchEventHandler<T = HTMLDivElement> = (event: React.TouchEvent<T>) => void;
+export type TouchEventHandler<T = HTMLDivElement> = (
+  event: React.TouchEvent<T>,
+) => void;
 
 // 휠 이벤트 핸들러 타입
-export type WheelEventHandler<T = HTMLDivElement> = (event: React.WheelEvent<T>) => void;
+export type WheelEventHandler<T = HTMLDivElement> = (
+  event: React.WheelEvent<T>,
+) => void;
 
 // 애니메이션 이벤트 핸들러 타입
-export type AnimationEventHandler<T = HTMLDivElement> = (event: React.AnimationEvent<T>) => void;
+export type AnimationEventHandler<T = HTMLDivElement> = (
+  event: React.AnimationEvent<T>,
+) => void;
 
 // 전환 이벤트 핸들러 타입
-export type TransitionEventHandler<T = HTMLDivElement> = (event: React.TransitionEvent<T>) => void;
+export type TransitionEventHandler<T = HTMLDivElement> = (
+  event: React.TransitionEvent<T>,
+) => void;

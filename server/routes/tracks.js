@@ -7,7 +7,7 @@ const auth = require('../middleware/auth');
 router.get('/', async (req, res) => {
   try {
     const { genre, search, page = 1, limit = 20 } = req.query;
-    
+
     // 쿼리 조건 구성
     const query = { isActive: true };
     if (genre && genre !== '전체') {
@@ -16,10 +16,10 @@ router.get('/', async (req, res) => {
     if (search) {
       query.$text = { $search: search };
     }
-    
+
     // 페이지네이션
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    
+
     // 트랙 조회
     const tracks = await Track.find(query)
       .populate('artist', 'name')
@@ -27,10 +27,10 @@ router.get('/', async (req, res) => {
       .skip(skip)
       .limit(parseInt(limit))
       .lean();
-    
+
     // 전체 개수 조회
     const total = await Track.countDocuments(query);
-    
+
     // 응답 데이터 가공
     const formattedTracks = tracks.map(track => ({
       id: track._id,
@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
       likes: track.likes?.length || 0,
       image: track.image,
       audioUrl: track.audioUrl,
-      tags: track.tags
+      tags: track.tags,
     }));
 
     res.json({
@@ -53,14 +53,14 @@ router.get('/', async (req, res) => {
       pagination: {
         current: parseInt(page),
         total: Math.ceil(total / parseInt(limit)),
-        totalTracks: total
-      }
+        totalTracks: total,
+      },
     });
   } catch (error) {
     console.error('트랙 조회 오류:', error);
     res.status(500).json({
       success: false,
-      message: '트랙 조회 중 오류가 발생했습니다.'
+      message: '트랙 조회 중 오류가 발생했습니다.',
     });
   }
 });
@@ -69,19 +69,19 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const trackId = req.params.id;
-    
+
     // 데이터베이스에서 트랙 조회
     const track = await Track.findById(trackId)
       .populate('artist', 'name email avatar')
       .lean();
-    
+
     if (!track) {
       return res.status(404).json({
         success: false,
-        message: '트랙을 찾을 수 없습니다.'
+        message: '트랙을 찾을 수 없습니다.',
       });
     }
-    
+
     // 응답 데이터 가공
     const formattedTrack = {
       id: track._id,
@@ -100,7 +100,7 @@ router.get('/:id', async (req, res) => {
         lyrics: track.artist?.name || track.artistName,
         music: track.artist?.name || track.artistName,
         arrangement: track.artist?.name || track.artistName,
-        producer: track.artist?.name || track.artistName
+        producer: track.artist?.name || track.artistName,
       },
       tags: track.tags || [],
       description: track.description,
@@ -108,18 +108,18 @@ router.get('/:id', async (req, res) => {
       key: track.key,
       mood: track.mood,
       artistAvatar: track.artist?.avatar || null,
-      artistId: track.artist?._id || null
+      artistId: track.artist?._id || null,
     };
 
     res.json({
       success: true,
-      data: formattedTrack
+      data: formattedTrack,
     });
   } catch (error) {
     console.error('트랙 상세 조회 오류:', error);
     res.status(500).json({
       success: false,
-      message: '트랙 상세 조회 중 오류가 발생했습니다.'
+      message: '트랙 상세 조회 중 오류가 발생했습니다.',
     });
   }
 });

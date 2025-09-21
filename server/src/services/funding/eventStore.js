@@ -14,7 +14,13 @@ class EventStore {
   /**
    * 이벤트 저장
    */
-  async storeEvent(eventType, aggregateId, aggregateType, eventData, metadata = {}) {
+  async storeEvent(
+    eventType,
+    aggregateId,
+    aggregateType,
+    eventData,
+    metadata = {},
+  ) {
     try {
       const event = new EventLog({
         eventType,
@@ -37,10 +43,12 @@ class EventStore {
 
       return event;
     } catch (error) {
-      throw new BusinessLogicError(
-        `이벤트 저장 실패: ${error.message}`,
-        { eventType, aggregateId, aggregateType, error: error.message }
-      );
+      throw new BusinessLogicError(`이벤트 저장 실패: ${error.message}`, {
+        eventType,
+        aggregateId,
+        aggregateType,
+        error: error.message,
+      });
     }
   }
 
@@ -60,11 +68,17 @@ class EventStore {
           endDate: projectData.endDate,
         },
       },
-      { source: 'funding_service' }
+      { source: 'funding_service' },
     );
   }
 
-  async storeProjectStatusChanged(projectId, oldStatus, newStatus, userId, reason = null) {
+  async storeProjectStatusChanged(
+    projectId,
+    oldStatus,
+    newStatus,
+    userId,
+    reason = null,
+  ) {
     return this.storeEvent(
       'PROJECT_STATUS_CHANGED',
       projectId,
@@ -76,7 +90,7 @@ class EventStore {
         reason,
         timestamp: new Date(),
       },
-      { source: 'state_machine' }
+      { source: 'state_machine' },
     );
   }
 
@@ -90,14 +104,20 @@ class EventStore {
         changes,
         timestamp: new Date(),
       },
-      { source: 'funding_service' }
+      { source: 'funding_service' },
     );
   }
 
   /**
    * 후원 이벤트들
    */
-  async storePledgeCreated(pledgeId, projectId, userId, amount, rewardId = null) {
+  async storePledgeCreated(
+    pledgeId,
+    projectId,
+    userId,
+    amount,
+    rewardId = null,
+  ) {
     return this.storeEvent(
       'PLEDGE_CREATED',
       pledgeId,
@@ -109,7 +129,7 @@ class EventStore {
         rewardId,
         timestamp: new Date(),
       },
-      { source: 'payment_service' }
+      { source: 'payment_service' },
     );
   }
 
@@ -125,7 +145,7 @@ class EventStore {
         paymentId,
         timestamp: new Date(),
       },
-      { source: 'payment_service' }
+      { source: 'payment_service' },
     );
   }
 
@@ -141,7 +161,7 @@ class EventStore {
         reason,
         timestamp: new Date(),
       },
-      { source: 'payment_service' }
+      { source: 'payment_service' },
     );
   }
 
@@ -159,11 +179,16 @@ class EventStore {
         budgetAmount,
         timestamp: new Date(),
       },
-      { source: 'execution_service' }
+      { source: 'execution_service' },
     );
   }
 
-  async storeExecutionApproved(executionId, projectId, approvedBy, actualAmount) {
+  async storeExecutionApproved(
+    executionId,
+    projectId,
+    approvedBy,
+    actualAmount,
+  ) {
     return this.storeEvent(
       'EXECUTION_APPROVED',
       executionId,
@@ -174,14 +199,19 @@ class EventStore {
         actualAmount,
         timestamp: new Date(),
       },
-      { source: 'execution_service' }
+      { source: 'execution_service' },
     );
   }
 
   /**
    * 분배 이벤트들
    */
-  async storeDistributionCreated(distributionId, projectId, totalAmount, rules) {
+  async storeDistributionCreated(
+    distributionId,
+    projectId,
+    totalAmount,
+    rules,
+  ) {
     return this.storeEvent(
       'DISTRIBUTION_CREATED',
       distributionId,
@@ -192,11 +222,16 @@ class EventStore {
         rules,
         timestamp: new Date(),
       },
-      { source: 'distribution_service' }
+      { source: 'distribution_service' },
     );
   }
 
-  async storeDistributionExecuted(distributionId, projectId, executedBy, totalAmount) {
+  async storeDistributionExecuted(
+    distributionId,
+    projectId,
+    executedBy,
+    totalAmount,
+  ) {
     return this.storeEvent(
       'DISTRIBUTION_EXECUTED',
       distributionId,
@@ -207,7 +242,7 @@ class EventStore {
         totalAmount,
         timestamp: new Date(),
       },
-      { source: 'distribution_service' }
+      { source: 'distribution_service' },
     );
   }
 
@@ -226,7 +261,7 @@ class EventStore {
         success,
         timestamp: new Date(),
       },
-      { source: 'payment_service' }
+      { source: 'payment_service' },
     );
   }
 
@@ -242,7 +277,7 @@ class EventStore {
         reason,
         timestamp: new Date(),
       },
-      { source: 'payment_service' }
+      { source: 'payment_service' },
     );
   }
 
@@ -255,8 +290,8 @@ class EventStore {
       nextAttemptAt: { $lte: new Date() },
       retryCount: { $lt: this.maxRetries },
     })
-    .sort({ createdAt: 1 })
-    .limit(limit);
+      .sort({ createdAt: 1 })
+      .limit(limit);
   }
 
   /**
@@ -276,7 +311,9 @@ class EventStore {
       updateData.processedAt = new Date();
     } else if (status === 'failed') {
       updateData.retryCount = { $inc: 1 };
-      updateData.nextAttemptAt = this.calculateNextAttemptTime(updateData.retryCount);
+      updateData.nextAttemptAt = this.calculateNextAttemptTime(
+        updateData.retryCount,
+      );
     }
 
     return EventLog.findByIdAndUpdate(eventId, updateData, { new: true });
@@ -296,7 +333,7 @@ class EventStore {
    */
   async retryEvent(eventId) {
     const event = await EventLog.findById(eventId);
-    
+
     if (!event) {
       throw new BusinessLogicError('이벤트를 찾을 수 없습니다');
     }
@@ -318,14 +355,12 @@ class EventStore {
    */
   async getEventHistory(aggregateId, aggregateType = null, limit = 50) {
     const query = { aggregateId };
-    
+
     if (aggregateType) {
       query.aggregateType = aggregateType;
     }
 
-    return EventLog.find(query)
-      .sort({ createdAt: -1 })
-      .limit(limit);
+    return EventLog.find(query).sort({ createdAt: -1 }).limit(limit);
   }
 
   /**

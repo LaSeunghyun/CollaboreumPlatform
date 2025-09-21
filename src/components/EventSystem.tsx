@@ -3,7 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from '../shared/ui/Button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select';
 import { Badge } from './ui/badge';
 import { Calendar } from './ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -12,7 +18,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { eventManagementAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { dynamicConstantsService } from '../services/constantsService';
-import { CalendarIcon, Users, MapPin, Search, UserPlus, Eye, Edit } from 'lucide-react';
+import {
+  CalendarIcon,
+  Users,
+  MapPin,
+  Search,
+  UserPlus,
+  Eye,
+  Edit,
+} from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
@@ -61,11 +75,13 @@ export const EventCreationForm: React.FC = () => {
     location: '',
     startDate: new Date(),
     endDate: new Date(),
-    maxParticipants: 10
+    maxParticipants: 10,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState<Array<{ id: string, label: string }>>([]);
+  const [categories, setCategories] = useState<
+    Array<{ id: string; label: string }>
+  >([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
 
   const { user } = useAuth();
@@ -75,9 +91,11 @@ export const EventCreationForm: React.FC = () => {
       try {
         setLoadingCategories(true);
         const enums = await dynamicConstantsService.getEnums();
-        const eventCategories = Object.entries(enums.EVENT_CATEGORIES || {}).map(([key, value]) => ({
+        const eventCategories = Object.entries(
+          enums.EVENT_CATEGORIES || {},
+        ).map(([key, value]) => ({
           id: key,
-          label: value
+          label: value,
         }));
         setCategories(eventCategories);
       } catch (error) {
@@ -133,8 +151,11 @@ export const EventCreationForm: React.FC = () => {
       setLoading(true);
       const eventData = {
         ...formData,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-        organizer: user
+        tags: formData.tags
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(tag => tag),
+        organizer: user,
       };
 
       await eventManagementAPI.createEvent(eventData);
@@ -148,7 +169,7 @@ export const EventCreationForm: React.FC = () => {
         location: '',
         startDate: new Date(),
         endDate: new Date(),
-        maxParticipants: 10
+        maxParticipants: 10,
       });
 
       alert('이벤트가 성공적으로 생성되었습니다!');
@@ -161,48 +182,63 @@ export const EventCreationForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className='mx-auto max-w-2xl'>
       <Card>
         <CardHeader>
           <CardTitle>새 이벤트 생성</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className='space-y-6'>
             <div>
-              <label className="block text-sm font-medium mb-2">제목 *</label>
+              <label className='mb-2 block text-sm font-medium'>제목 *</label>
               <Input
                 value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
+                onChange={e => handleInputChange('title', e.target.value)}
                 className={errors.title ? 'border-red-500' : ''}
-                placeholder="이벤트 제목을 입력하세요"
+                placeholder='이벤트 제목을 입력하세요'
               />
-              {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+              {errors.title && (
+                <p className='mt-1 text-sm text-red-500'>{errors.title}</p>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">설명 *</label>
+              <label className='mb-2 block text-sm font-medium'>설명 *</label>
               <Textarea
                 value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                onChange={e => handleInputChange('description', e.target.value)}
                 className={errors.description ? 'border-red-500' : ''}
-                placeholder="이벤트에 대한 자세한 설명을 입력하세요"
+                placeholder='이벤트에 대한 자세한 설명을 입력하세요'
                 rows={4}
               />
-              {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+              {errors.description && (
+                <p className='mt-1 text-sm text-red-500'>
+                  {errors.description}
+                </p>
+              )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className='grid grid-cols-2 gap-4'>
               <div>
-                <label className="block text-sm font-medium mb-2">카테고리 *</label>
-                <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-                  <SelectTrigger className={`h-10 ${errors.category ? 'border-red-500' : ''}`}>
-                    <SelectValue placeholder="카테고리 선택" />
+                <label className='mb-2 block text-sm font-medium'>
+                  카테고리 *
+                </label>
+                <Select
+                  value={formData.category}
+                  onValueChange={value => handleInputChange('category', value)}
+                >
+                  <SelectTrigger
+                    className={`h-10 ${errors.category ? 'border-red-500' : ''}`}
+                  >
+                    <SelectValue placeholder='카테고리 선택' />
                   </SelectTrigger>
                   <SelectContent>
                     {loadingCategories ? (
-                      <SelectItem value="loading" disabled>카테고리 로딩 중...</SelectItem>
+                      <SelectItem value='loading' disabled>
+                        카테고리 로딩 중...
+                      </SelectItem>
                     ) : (
-                      categories.map((category) => (
+                      categories.map(category => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.label}
                         </SelectItem>
@@ -210,57 +246,79 @@ export const EventCreationForm: React.FC = () => {
                     )}
                   </SelectContent>
                 </Select>
-                {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
+                {errors.category && (
+                  <p className='mt-1 text-sm text-red-500'>{errors.category}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">최대 참가자 수 *</label>
+                <label className='mb-2 block text-sm font-medium'>
+                  최대 참가자 수 *
+                </label>
                 <Input
-                  type="number"
+                  type='number'
                   value={formData.maxParticipants}
-                  onChange={(e) => handleInputChange('maxParticipants', parseInt(e.target.value))}
-                  min="1"
+                  onChange={e =>
+                    handleInputChange(
+                      'maxParticipants',
+                      parseInt(e.target.value),
+                    )
+                  }
+                  min='1'
                   className={errors.maxParticipants ? 'border-red-500' : ''}
                 />
-                {errors.maxParticipants && <p className="text-red-500 text-sm mt-1">{errors.maxParticipants}</p>}
+                {errors.maxParticipants && (
+                  <p className='mt-1 text-sm text-red-500'>
+                    {errors.maxParticipants}
+                  </p>
+                )}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">태그</label>
+              <label className='mb-2 block text-sm font-medium'>태그</label>
               <Input
                 value={formData.tags}
-                onChange={(e) => handleInputChange('tags', e.target.value)}
-                placeholder="태그를 쉼표로 구분하여 입력하세요 (예: 음악, 공연, 무료)"
+                onChange={e => handleInputChange('tags', e.target.value)}
+                placeholder='태그를 쉼표로 구분하여 입력하세요 (예: 음악, 공연, 무료)'
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">장소 *</label>
+              <label className='mb-2 block text-sm font-medium'>장소 *</label>
               <Input
                 value={formData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
+                onChange={e => handleInputChange('location', e.target.value)}
                 className={errors.location ? 'border-red-500' : ''}
-                placeholder="이벤트 장소를 입력하세요"
+                placeholder='이벤트 장소를 입력하세요'
               />
-              {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
+              {errors.location && (
+                <p className='mt-1 text-sm text-red-500'>{errors.location}</p>
+              )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className='grid grid-cols-2 gap-4'>
               <div>
-                <label className="block text-sm font-medium mb-2">시작 날짜</label>
+                <label className='mb-2 block text-sm font-medium'>
+                  시작 날짜
+                </label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
+                    <Button
+                      variant='outline'
+                      className='w-full justify-start text-left font-normal'
+                    >
+                      <CalendarIcon className='mr-2 h-4 w-4' />
                       {format(formData.startDate, 'yyyy-MM-dd', { locale: ko })}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
+                  <PopoverContent className='w-auto p-0'>
                     <Calendar
-                      mode="single"
+                      mode='single'
                       selected={formData.startDate}
-                      onSelect={(date) => date && handleInputChange('startDate', date)}
+                      onSelect={date =>
+                        date && handleInputChange('startDate', date)
+                      }
                       initialFocus
                     />
                   </PopoverContent>
@@ -268,19 +326,26 @@ export const EventCreationForm: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">종료 날짜</label>
+                <label className='mb-2 block text-sm font-medium'>
+                  종료 날짜
+                </label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
+                    <Button
+                      variant='outline'
+                      className='w-full justify-start text-left font-normal'
+                    >
+                      <CalendarIcon className='mr-2 h-4 w-4' />
                       {format(formData.endDate, 'yyyy-MM-dd', { locale: ko })}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
+                  <PopoverContent className='w-auto p-0'>
                     <Calendar
-                      mode="single"
+                      mode='single'
                       selected={formData.endDate}
-                      onSelect={(date) => date && handleInputChange('endDate', date)}
+                      onSelect={date =>
+                        date && handleInputChange('endDate', date)
+                      }
                       initialFocus
                     />
                   </PopoverContent>
@@ -288,11 +353,11 @@ export const EventCreationForm: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <Button type="submit" disabled={loading} className="flex-1">
+            <div className='flex gap-4'>
+              <Button type='submit' disabled={loading} className='flex-1'>
                 {loading ? '생성 중...' : '이벤트 생성'}
               </Button>
-              <Button type="button" variant="outline" className="flex-1">
+              <Button type='button' variant='outline' className='flex-1'>
                 취소
               </Button>
             </div>
@@ -309,7 +374,9 @@ const EventList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [categories, setCategories] = useState<Array<{ id: string, label: string }>>([]);
+  const [categories, setCategories] = useState<
+    Array<{ id: string; label: string }>
+  >([]);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -327,9 +394,11 @@ const EventList: React.FC = () => {
     const fetchCategories = async () => {
       try {
         const enums = await dynamicConstantsService.getEnums();
-        const eventCategories = Object.entries(enums.EVENT_CATEGORIES || {}).map(([key, value]) => ({
+        const eventCategories = Object.entries(
+          enums.EVENT_CATEGORIES || {},
+        ).map(([key, value]) => ({
           id: key,
-          label: value
+          label: value,
         }));
         setCategories([{ id: 'all', label: '전체' }, ...eventCategories]);
       } catch (error) {
@@ -341,7 +410,7 @@ const EventList: React.FC = () => {
           { id: 'competition', label: '경연' },
           { id: 'workshop', label: '워크샵' },
           { id: 'seminar', label: '세미나' },
-          { id: 'other', label: '기타' }
+          { id: 'other', label: '기타' },
         ]);
       }
     };
@@ -351,41 +420,43 @@ const EventList: React.FC = () => {
   }, []);
 
   const filteredEvents = events.filter(event => {
-    const matchesSearch = event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch =
+      event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || event.category === selectedCategory;
+    const matchesCategory =
+      selectedCategory === 'all' || event.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   if (loading) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">이벤트를 불러오는 중...</p>
+      <div className='py-12 text-center'>
+        <p className='text-gray-500'>이벤트를 불러오는 중...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* 검색 및 필터 */}
-      <div className="flex gap-4">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+      <div className='flex gap-4'>
+        <div className='flex-1'>
+          <div className='relative'>
+            <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400' />
             <Input
-              placeholder="이벤트 검색..."
+              placeholder='이벤트 검색...'
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              onChange={e => setSearchTerm(e.target.value)}
+              className='pl-10'
             />
           </div>
         </div>
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className='w-48'>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {categories.map((category) => (
+            {categories.map(category => (
               <SelectItem key={category.id} value={category.id}>
                 {category.label}
               </SelectItem>
@@ -395,39 +466,45 @@ const EventList: React.FC = () => {
       </div>
 
       {/* 이벤트 목록 */}
-      <div className="grid gap-4">
+      <div className='grid gap-4'>
         {filteredEvents.map(event => (
           <Card key={event.id}>
-            <CardContent className="p-6">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-lg font-semibold">{event.title}</h3>
-                    <Badge variant="outline">{event.category}</Badge>
+            <CardContent className='p-6'>
+              <div className='flex items-start justify-between'>
+                <div className='flex-1'>
+                  <div className='mb-2 flex items-center gap-2'>
+                    <h3 className='text-lg font-semibold'>{event.title}</h3>
+                    <Badge variant='outline'>{event.category}</Badge>
                   </div>
-                  <p className="text-gray-600 mb-4">{event.description}</p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <CalendarIcon className="h-4 w-4" />
-                      <span>{format(event.startDate, 'yyyy-MM-dd HH:mm', { locale: ko })}</span>
+                  <p className='mb-4 text-gray-600'>{event.description}</p>
+                  <div className='flex items-center gap-4 text-sm text-gray-500'>
+                    <div className='flex items-center gap-1'>
+                      <CalendarIcon className='h-4 w-4' />
+                      <span>
+                        {format(event.startDate, 'yyyy-MM-dd HH:mm', {
+                          locale: ko,
+                        })}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
+                    <div className='flex items-center gap-1'>
+                      <MapPin className='h-4 w-4' />
                       <span>{event.location}</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      <span>{event.participants.length}/{event.maxParticipants}</span>
+                    <div className='flex items-center gap-1'>
+                      <Users className='h-4 w-4' />
+                      <span>
+                        {event.participants.length}/{event.maxParticipants}
+                      </span>
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Eye className="h-4 w-4 mr-2" />
+                <div className='flex gap-2'>
+                  <Button variant='outline' size='sm'>
+                    <Eye className='mr-2 h-4 w-4' />
                     보기
                   </Button>
-                  <Button size="sm">
-                    <UserPlus className="h-4 w-4 mr-2" />
+                  <Button size='sm'>
+                    <UserPlus className='mr-2 h-4 w-4' />
                     참가
                   </Button>
                 </div>
@@ -438,8 +515,8 @@ const EventList: React.FC = () => {
       </div>
 
       {filteredEvents.length === 0 && (
-        <div className="text-center py-8">
-          <p className="text-gray-500">등록된 이벤트가 없습니다.</p>
+        <div className='py-8 text-center'>
+          <p className='text-gray-500'>등록된 이벤트가 없습니다.</p>
         </div>
       )}
     </div>
@@ -472,20 +549,17 @@ const MyEventsList: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">이벤트를 불러오는 중...</p>
+      <div className='py-12 text-center'>
+        <p className='text-gray-500'>이벤트를 불러오는 중...</p>
       </div>
     );
   }
 
   if (myEvents.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">참가한 이벤트가 없습니다.</p>
-        <Button
-          className="mt-4"
-          onClick={() => window.location.reload()}
-        >
+      <div className='py-12 text-center'>
+        <p className='text-gray-500'>참가한 이벤트가 없습니다.</p>
+        <Button className='mt-4' onClick={() => window.location.reload()}>
           이벤트 목록 보기
         </Button>
       </div>
@@ -493,36 +567,42 @@ const MyEventsList: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className='space-y-4'>
       {myEvents.map(event => (
         <Card key={event.id}>
-          <CardContent className="p-6">
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold mb-2">{event.title}</h3>
-                <p className="text-gray-600 mb-4">{event.description}</p>
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <div className="flex items-center gap-1">
-                    <CalendarIcon className="h-4 w-4" />
-                    <span>{format(event.startDate, 'yyyy-MM-dd HH:mm', { locale: ko })}</span>
+          <CardContent className='p-6'>
+            <div className='flex items-start justify-between'>
+              <div className='flex-1'>
+                <h3 className='mb-2 text-lg font-semibold'>{event.title}</h3>
+                <p className='mb-4 text-gray-600'>{event.description}</p>
+                <div className='flex items-center gap-4 text-sm text-gray-500'>
+                  <div className='flex items-center gap-1'>
+                    <CalendarIcon className='h-4 w-4' />
+                    <span>
+                      {format(event.startDate, 'yyyy-MM-dd HH:mm', {
+                        locale: ko,
+                      })}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
+                  <div className='flex items-center gap-1'>
+                    <MapPin className='h-4 w-4' />
                     <span>{event.location}</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
-                    <span>{event.currentParticipants}/{event.maxParticipants}</span>
+                  <div className='flex items-center gap-1'>
+                    <Users className='h-4 w-4' />
+                    <span>
+                      {event.currentParticipants}/{event.maxParticipants}
+                    </span>
                   </div>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Eye className="h-4 w-4 mr-2" />
+              <div className='flex gap-2'>
+                <Button variant='outline' size='sm'>
+                  <Eye className='mr-2 h-4 w-4' />
                   보기
                 </Button>
-                <Button size="sm">
-                  <Edit className="h-4 w-4 mr-2" />
+                <Button size='sm'>
+                  <Edit className='mr-2 h-4 w-4' />
                   수정
                 </Button>
               </div>
@@ -537,34 +617,33 @@ const MyEventsList: React.FC = () => {
 // Main Event System Component
 const EventSystem: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">이벤트 관리</h1>
-        <p className="text-gray-600">다양한 이벤트를 생성하고 참가하세요</p>
+    <div className='container mx-auto px-4 py-8'>
+      <div className='mb-8'>
+        <h1 className='mb-2 text-3xl font-bold'>이벤트 관리</h1>
+        <p className='text-gray-600'>다양한 이벤트를 생성하고 참가하세요</p>
       </div>
 
-      <Tabs defaultValue="list" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="list">이벤트 목록</TabsTrigger>
-          <TabsTrigger value="create">이벤트 생성</TabsTrigger>
-          <TabsTrigger value="my-events">내 이벤트</TabsTrigger>
+      <Tabs defaultValue='list' className='w-full'>
+        <TabsList className='grid w-full grid-cols-3'>
+          <TabsTrigger value='list'>이벤트 목록</TabsTrigger>
+          <TabsTrigger value='create'>이벤트 생성</TabsTrigger>
+          <TabsTrigger value='my-events'>내 이벤트</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="list" className="mt-6">
+        <TabsContent value='list' className='mt-6'>
           <EventList />
         </TabsContent>
 
-        <TabsContent value="create" className="mt-6">
+        <TabsContent value='create' className='mt-6'>
           <EventCreationForm />
         </TabsContent>
 
-        <TabsContent value="my-events" className="mt-6">
+        <TabsContent value='my-events' className='mt-6'>
           <MyEventsList />
         </TabsContent>
       </Tabs>
     </div>
   );
 };
-
 
 export default EventSystem;

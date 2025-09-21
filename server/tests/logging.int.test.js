@@ -14,16 +14,15 @@ const logger = pino({
   level: 'info',
   transport: {
     target: 'pino-pretty',
-    options: { colorize: true }
-  }
+    options: { colorize: true },
+  },
 });
 
 const httpLogger = pinoHttp({
   logger,
   genReqId: function (req, res) {
     const headerId =
-      req.headers['x-request-id'] ||
-      req.headers['x-correlation-id'];
+      req.headers['x-request-id'] || req.headers['x-correlation-id'];
     const id = headerId || randomUUID();
     res.setHeader('X-Request-ID', id);
     return id;
@@ -62,7 +61,7 @@ app.use((_req, res) => {
 describe('Logging & Request ID Integration Tests', () => {
   it('should set X-Request-ID header for successful requests', async () => {
     const res = await request(app).get('/healthz');
-    
+
     expect(res.status).toBe(200);
     expect(res.headers['x-request-id']).toBeTruthy();
     expect(typeof res.headers['x-request-id']).toBe('string');
@@ -71,7 +70,7 @@ describe('Logging & Request ID Integration Tests', () => {
 
   it('should set X-Request-ID header for error responses', async () => {
     const res = await request(app).get('/error');
-    
+
     expect(res.status).toBe(500);
     expect(res.headers['x-request-id']).toBeTruthy();
     expect(typeof res.headers['x-request-id']).toBe('string');
@@ -79,7 +78,7 @@ describe('Logging & Request ID Integration Tests', () => {
 
   it('should set X-Request-ID header for 404 responses', async () => {
     const res = await request(app).get('/nonexistent');
-    
+
     expect(res.status).toBe(404);
     expect(res.headers['x-request-id']).toBeTruthy();
     expect(typeof res.headers['x-request-id']).toBe('string');
@@ -87,10 +86,8 @@ describe('Logging & Request ID Integration Tests', () => {
 
   it('should accept custom X-Request-ID header', async () => {
     const customId = 'custom-request-id-123';
-    const res = await request(app)
-      .get('/test')
-      .set('X-Request-ID', customId);
-    
+    const res = await request(app).get('/test').set('X-Request-ID', customId);
+
     expect(res.status).toBe(200);
     expect(res.headers['x-request-id']).toBe(customId);
   });
@@ -100,7 +97,7 @@ describe('Logging & Request ID Integration Tests', () => {
     const res = await request(app)
       .get('/test')
       .set('X-Correlation-ID', correlationId);
-    
+
     expect(res.status).toBe(200);
     expect(res.headers['x-request-id']).toBe(correlationId);
   });
@@ -108,7 +105,7 @@ describe('Logging & Request ID Integration Tests', () => {
   it('should generate unique request IDs for multiple requests', async () => {
     const res1 = await request(app).get('/test');
     const res2 = await request(app).get('/test');
-    
+
     expect(res1.headers['x-request-id']).toBeTruthy();
     expect(res2.headers['x-request-id']).toBeTruthy();
     expect(res1.headers['x-request-id']).not.toBe(res2.headers['x-request-id']);
@@ -116,10 +113,8 @@ describe('Logging & Request ID Integration Tests', () => {
 
   it('should handle JSON request body logging', async () => {
     const testData = { message: 'test data', number: 123 };
-    const res = await request(app)
-      .post('/test')
-      .send(testData);
-    
+    const res = await request(app).post('/test').send(testData);
+
     expect(res.status).toBe(404); // POST /test는 정의되지 않음
     expect(res.headers['x-request-id']).toBeTruthy();
   });
@@ -134,21 +129,21 @@ describe('Logger Configuration Tests', () => {
     expect(typeof logger.debug).toBe('function');
   });
 
-  it('should log with proper structure', (done) => {
+  it('should log with proper structure', done => {
     const originalInfo = logger.info;
     let loggedData = null;
-    
-    logger.info = function(data, message) {
+
+    logger.info = function (data, message) {
       loggedData = { data, message };
       originalInfo.call(this, data, message);
     };
 
     logger.info({ test: 'data' }, 'Test message');
-    
+
     expect(loggedData).toBeDefined();
     expect(loggedData.message).toBe('Test message');
     expect(loggedData.data.test).toBe('data');
-    
+
     // 원래 함수 복원
     logger.info = originalInfo;
     done();

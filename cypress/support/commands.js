@@ -18,7 +18,7 @@ Cypress.Commands.add('login', (email, password) => {
 
 // Custom command for logout
 Cypress.Commands.add('logout', () => {
-  cy.window().then((win) => {
+  cy.window().then(win => {
     win.localStorage.removeItem('token');
     win.localStorage.removeItem('user');
   });
@@ -31,6 +31,6 @@ Cypress.Commands.add('mockApi', (method, url, response) => {
 });
 
 // Custom command for waiting for API calls
-Cypress.Commands.add('waitForApi', (alias) => {
+Cypress.Commands.add('waitForApi', alias => {
   cy.wait(`@${alias}`);
 });

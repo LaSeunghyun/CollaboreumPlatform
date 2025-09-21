@@ -9,7 +9,8 @@ const User = require('../models/User');
 // 결제 요청 생성
 router.post('/', auth, async (req, res) => {
   try {
-    const { projectId, amount, paymentMethod, backerInfo, rewardId, message } = req.body;
+    const { projectId, amount, paymentMethod, backerInfo, rewardId, message } =
+      req.body;
     const userId = req.user.id;
 
     // 결제 데이터 검증
@@ -19,7 +20,7 @@ router.post('/', auth, async (req, res) => {
       paymentMethod,
       backerInfo,
       rewardId,
-      message
+      message,
     };
 
     // 결제 검증
@@ -27,7 +28,7 @@ router.post('/', auth, async (req, res) => {
     if (!validation.valid) {
       return res.status(400).json({
         success: false,
-        message: validation.message
+        message: validation.message,
       });
     }
 
@@ -36,7 +37,7 @@ router.post('/', auth, async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: '사용자 정보를 찾을 수 없습니다.'
+        message: '사용자 정보를 찾을 수 없습니다.',
       });
     }
 
@@ -45,7 +46,7 @@ router.post('/', auth, async (req, res) => {
     if (!project) {
       return res.status(404).json({
         success: false,
-        message: '프로젝트를 찾을 수 없습니다.'
+        message: '프로젝트를 찾을 수 없습니다.',
       });
     }
 
@@ -74,8 +75,8 @@ router.post('/', auth, async (req, res) => {
       message: message || '',
       metadata: {
         projectTitle: project.title,
-        creatorName: project.creatorName
-      }
+        creatorName: project.creatorName,
+      },
     });
 
     await payment.save();
@@ -84,15 +85,15 @@ router.post('/', auth, async (req, res) => {
       success: true,
       data: {
         ...paymentResult.data,
-        paymentId: payment._id
-      }
+        paymentId: payment._id,
+      },
     });
   } catch (error) {
     console.error('결제 요청 생성 실패:', error);
     res.status(500).json({
       success: false,
       message: '결제 요청 생성에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -108,7 +109,7 @@ router.post('/:paymentId/confirm', async (req, res) => {
     if (!payment) {
       return res.status(404).json({
         success: false,
-        message: '결제 정보를 찾을 수 없습니다.'
+        message: '결제 정보를 찾을 수 없습니다.',
       });
     }
 
@@ -117,7 +118,7 @@ router.post('/:paymentId/confirm', async (req, res) => {
       return res.json({
         success: true,
         message: '이미 처리된 결제입니다.',
-        data: payment
+        data: payment,
       });
     }
 
@@ -125,7 +126,7 @@ router.post('/:paymentId/confirm', async (req, res) => {
     const confirmResult = await paymentService.confirmTossPayment(
       paymentId,
       payment.orderId,
-      payment.amount
+      payment.amount,
     );
 
     if (!confirmResult.success) {
@@ -147,10 +148,9 @@ router.post('/:paymentId/confirm', async (req, res) => {
     await payment.save();
 
     // 프로젝트 현재 금액 업데이트
-    await FundingProject.findByIdAndUpdate(
-      payment.projectId,
-      { $inc: { currentAmount: payment.amount } }
-    );
+    await FundingProject.findByIdAndUpdate(payment.projectId, {
+      $inc: { currentAmount: payment.amount },
+    });
 
     // 프로젝트 목표 달성 확인
     const project = await FundingProject.findById(payment.projectId);
@@ -165,14 +165,14 @@ router.post('/:paymentId/confirm', async (req, res) => {
 
     res.json({
       success: true,
-      data: payment
+      data: payment,
     });
   } catch (error) {
     console.error('결제 승인 처리 실패:', error);
     res.status(500).json({
       success: false,
       message: '결제 승인 처리에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -185,26 +185,26 @@ router.get('/:paymentId', auth, async (req, res) => {
 
     const payment = await Payment.findOne({
       paymentId,
-      backerId: userId
+      backerId: userId,
     });
 
     if (!payment) {
       return res.status(404).json({
         success: false,
-        message: '결제 정보를 찾을 수 없습니다.'
+        message: '결제 정보를 찾을 수 없습니다.',
       });
     }
 
     res.json({
       success: true,
-      data: payment
+      data: payment,
     });
   } catch (error) {
     console.error('결제 상태 조회 실패:', error);
     res.status(500).json({
       success: false,
       message: '결제 상태 조회에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -218,20 +218,20 @@ router.post('/:paymentId/cancel', auth, async (req, res) => {
 
     const payment = await Payment.findOne({
       paymentId,
-      backerId: userId
+      backerId: userId,
     });
 
     if (!payment) {
       return res.status(404).json({
         success: false,
-        message: '결제 정보를 찾을 수 없습니다.'
+        message: '결제 정보를 찾을 수 없습니다.',
       });
     }
 
     if (payment.status !== 'completed') {
       return res.status(400).json({
         success: false,
-        message: '취소할 수 없는 결제입니다.'
+        message: '취소할 수 없는 결제입니다.',
       });
     }
 
@@ -239,7 +239,7 @@ router.post('/:paymentId/cancel', auth, async (req, res) => {
     const cancelResult = await paymentService.cancelTossPayment(
       paymentId,
       reason,
-      payment.amount
+      payment.amount,
     );
 
     if (!cancelResult.success) {
@@ -250,21 +250,20 @@ router.post('/:paymentId/cancel', auth, async (req, res) => {
     await payment.cancel(reason);
 
     // 프로젝트 현재 금액 차감
-    await FundingProject.findByIdAndUpdate(
-      payment.projectId,
-      { $inc: { currentAmount: -payment.amount } }
-    );
+    await FundingProject.findByIdAndUpdate(payment.projectId, {
+      $inc: { currentAmount: -payment.amount },
+    });
 
     res.json({
       success: true,
-      data: payment
+      data: payment,
     });
   } catch (error) {
     console.error('결제 취소 실패:', error);
     res.status(500).json({
       success: false,
       message: '결제 취소에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -295,15 +294,15 @@ router.get('/', auth, async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     console.error('결제 내역 조회 실패:', error);
     res.status(500).json({
       success: false,
       message: '결제 내역 조회에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -316,7 +315,7 @@ router.get('/stats/project/:projectId', async (req, res) => {
     const stats = await Payment.getProjectStats(projectId);
     const dailyStats = await Payment.getDailyStats(
       new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30일 전
-      new Date()
+      new Date(),
     );
 
     const paymentMethodStats = await Payment.aggregate([
@@ -325,9 +324,9 @@ router.get('/stats/project/:projectId', async (req, res) => {
         $group: {
           _id: '$paymentMethod',
           count: { $sum: 1 },
-          totalAmount: { $sum: '$amount' }
-        }
-      }
+          totalAmount: { $sum: '$amount' },
+        },
+      },
     ]);
 
     res.json({
@@ -339,15 +338,15 @@ router.get('/stats/project/:projectId', async (req, res) => {
         paymentMethodStats: paymentMethodStats.reduce((acc, stat) => {
           acc[stat._id] = stat.totalAmount;
           return acc;
-        }, {})
-      }
+        }, {}),
+      },
     });
   } catch (error) {
     console.error('프로젝트 결제 통계 조회 실패:', error);
     res.status(500).json({
       success: false,
       message: '프로젝트 결제 통계 조회에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });

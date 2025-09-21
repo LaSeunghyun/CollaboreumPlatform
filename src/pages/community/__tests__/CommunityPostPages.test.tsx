@@ -10,9 +10,9 @@ jest.mock('../../contexts/AuthContext', () => ({
     user: {
       id: 'user-1',
       name: '테스트 사용자',
-      email: 'tester@example.com'
-    }
-  })
+      email: 'tester@example.com',
+    },
+  }),
 }));
 
 const mockNavigate = jest.fn();
@@ -21,18 +21,20 @@ const mockUseParams = jest.fn(() => ({}));
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
-  useParams: () => mockUseParams()
+  useParams: () => mockUseParams(),
 }));
 
 jest.mock('../../services/api', () => ({
   communityPostAPI: {
     createPost: jest.fn(),
     getPost: jest.fn(),
-    updatePost: jest.fn()
-  }
+    updatePost: jest.fn(),
+  },
 }));
 
-const mockedCommunityPostAPI = communityPostAPI as jest.Mocked<typeof communityPostAPI>;
+const mockedCommunityPostAPI = communityPostAPI as jest.Mocked<
+  typeof communityPostAPI
+>;
 
 describe('Community post pages', () => {
   let user: ReturnType<typeof userEvent.setup>;
@@ -55,7 +57,7 @@ describe('Community post pages', () => {
     it('게시글 객체 응답으로 성공 흐름을 처리한다', async () => {
       mockedCommunityPostAPI.createPost.mockResolvedValue({
         id: 'post-1',
-        title: '새 게시글 제목'
+        title: '새 게시글 제목',
       } as any);
 
       render(<CreatePostPage />);
@@ -67,7 +69,9 @@ describe('Community post pages', () => {
         expect(mockedCommunityPostAPI.createPost).toHaveBeenCalled();
       });
 
-      expect(window.alert).toHaveBeenCalledWith('"새 게시글 제목" 게시글이 성공적으로 작성되었습니다.');
+      expect(window.alert).toHaveBeenCalledWith(
+        '"새 게시글 제목" 게시글이 성공적으로 작성되었습니다.',
+      );
       expect(mockNavigate).toHaveBeenCalledWith('/community');
     });
 
@@ -83,7 +87,9 @@ describe('Community post pages', () => {
         expect(mockedCommunityPostAPI.createPost).toHaveBeenCalled();
       });
 
-      expect(window.alert).toHaveBeenCalledWith('게시글 작성에 실패했습니다: 알 수 없는 오류');
+      expect(window.alert).toHaveBeenCalledWith(
+        '게시글 작성에 실패했습니다: 알 수 없는 오류',
+      );
       expect(mockNavigate).not.toHaveBeenCalled();
     });
   });
@@ -94,7 +100,7 @@ describe('Community post pages', () => {
       title: '기존 제목',
       content: '기존 내용',
       category: 'general',
-      tags: ['태그1', '태그2']
+      tags: ['태그1', '태그2'],
     };
 
     beforeEach(() => {
@@ -105,7 +111,7 @@ describe('Community post pages', () => {
     it('게시글 객체를 로드하고 수정 성공 흐름을 처리한다', async () => {
       mockedCommunityPostAPI.updatePost.mockResolvedValue({
         ...basePost,
-        title: '수정된 제목'
+        title: '수정된 제목',
       } as any);
 
       render(<EditPostPage />);
@@ -126,15 +132,20 @@ describe('Community post pages', () => {
       await user.click(screen.getByRole('button', { name: '수정하기' }));
 
       await waitFor(() => {
-        expect(mockedCommunityPostAPI.updatePost).toHaveBeenCalledWith('post-1', {
-          title: '수정된 제목',
-          content: '수정된 내용',
-          category: 'question',
-          tags: ['태그1', '태그2']
-        });
+        expect(mockedCommunityPostAPI.updatePost).toHaveBeenCalledWith(
+          'post-1',
+          {
+            title: '수정된 제목',
+            content: '수정된 내용',
+            category: 'question',
+            tags: ['태그1', '태그2'],
+          },
+        );
       });
 
-      expect(window.alert).toHaveBeenCalledWith('"수정된 제목" 게시글이 성공적으로 수정되었습니다.');
+      expect(window.alert).toHaveBeenCalledWith(
+        '"수정된 제목" 게시글이 성공적으로 수정되었습니다.',
+      );
       expect(mockNavigate).toHaveBeenCalledWith('/community/post-1');
     });
 
@@ -153,9 +164,10 @@ describe('Community post pages', () => {
         expect(mockedCommunityPostAPI.updatePost).toHaveBeenCalled();
       });
 
-      expect(window.alert).toHaveBeenCalledWith('게시글 수정에 실패했습니다: 알 수 없는 오류');
+      expect(window.alert).toHaveBeenCalledWith(
+        '게시글 수정에 실패했습니다: 알 수 없는 오류',
+      );
       expect(mockNavigate).not.toHaveBeenCalledWith('/community/post-1');
     });
   });
 });
-

@@ -27,8 +27,6 @@ export const CommunityMain: React.FC<CommunityMainProps> = ({ onBack }) => {
     sessionStorage.setItem('currentPage', currentPage);
   }, []);
 
-
-
   const handleCancelForm = () => {
     setShowForm(false);
   };
@@ -70,30 +68,29 @@ export const CommunityMain: React.FC<CommunityMainProps> = ({ onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4">
+    <div className='min-h-screen bg-gray-50 py-8'>
+      <div className='mx-auto max-w-7xl px-4'>
         {/* 헤더 */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
+        <div className='mb-8 flex items-center justify-between'>
+          <div className='flex items-center gap-4'>
             <Button
-              variant="ghost"
-              size="sm"
+              variant='ghost'
+              size='sm'
               onClick={handleBack}
-              className="text-gray-600 hover:text-gray-900"
+              className='text-gray-600 hover:text-gray-900'
             >
-              <ArrowLeft className="w-5 h-5 mr-2" />
+              <ArrowLeft className='mr-2 h-5 w-5' />
               뒤로가기
             </Button>
-            <h1 className="text-3xl font-bold text-gray-900">커뮤니티</h1>
+            <h1 className='text-3xl font-bold text-gray-900'>커뮤니티</h1>
           </div>
 
           {!showForm && (
             <Button
               onClick={() => navigate('/community/create')}
-              className="bg-blue-600 hover:bg-blue-700"
+              className='bg-blue-600 hover:bg-blue-700'
             >
-              <Plus className="w-5 h-5 mr-2" />
-              새 글 작성
+              <Plus className='mr-2 h-5 w-5' />새 글 작성
             </Button>
           )}
         </div>
@@ -105,10 +102,8 @@ export const CommunityMain: React.FC<CommunityMainProps> = ({ onBack }) => {
             onBack={handleBackToList}
           />
         ) : showForm ? (
-          <div className="mb-8">
-            <CommunityPostForm
-              onBack={handleCancelForm}
-            />
+          <div className='mb-8'>
+            <CommunityPostForm onBack={handleCancelForm} />
           </div>
         ) : (
           <CommunityPostList

@@ -104,7 +104,8 @@ function classifyApiError(error: ApiError): ErrorClassification {
         type: ErrorType.SERVER,
         level: ErrorLevel.HIGH,
         retryable: true,
-        userMessage: '서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        userMessage:
+          '서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
         technicalMessage: error.message,
       };
     default:
@@ -233,7 +234,10 @@ export function getUserFriendlyMessage(error: unknown): string {
 }
 
 // 에러 경계용 에러 생성
-export function createErrorBoundaryError(error: Error, errorInfo: any): AppError {
+export function createErrorBoundaryError(
+  error: Error,
+  errorInfo: any,
+): AppError {
   return {
     success: false,
     status: 500,
@@ -249,7 +253,10 @@ export function createErrorBoundaryError(error: Error, errorInfo: any): AppError
 }
 
 // 에러 메트릭 수집
-export function collectErrorMetrics(error: unknown, context?: Record<string, any>): void {
+export function collectErrorMetrics(
+  error: unknown,
+  context?: Record<string, any>,
+): void {
   const classification = classifyError(error);
 
   // 에러 메트릭 데이터 수집
@@ -270,11 +277,17 @@ export function collectErrorMetrics(error: unknown, context?: Record<string, any
 }
 
 // 에러 알림 전송
-export function sendErrorNotification(error: unknown, context?: Record<string, any>): void {
+export function sendErrorNotification(
+  error: unknown,
+  context?: Record<string, any>,
+): void {
   const classification = classifyError(error);
 
   // 중요한 에러인 경우 알림 전송
-  if (classification.level === ErrorLevel.CRITICAL || classification.level === ErrorLevel.HIGH) {
+  if (
+    classification.level === ErrorLevel.CRITICAL ||
+    classification.level === ErrorLevel.HIGH
+  ) {
     const notification = {
       title: '시스템 오류 발생',
       message: classification.userMessage,

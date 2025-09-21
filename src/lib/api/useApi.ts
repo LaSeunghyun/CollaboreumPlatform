@@ -8,7 +8,11 @@ import {
     type UseMutationOptions,
     type UseInfiniteQueryOptions,
 } from '@tanstack/react-query';
-import { api, type QueryParamsInput } from '@/lib/api/api';
+import {
+    api,
+    type QueryParamsInput,
+    type RequestBodyInput,
+} from '@/lib/api/api';
 import type { ApiResponse } from '@/shared/types';
 import type { SearchParams } from '../../types/api';
 
@@ -29,11 +33,18 @@ const defaultMutationOptions = {
 };
 
 // 제네릭 API 쿼리 훅
-export function useApiQuery<TData = unknown, TParams extends QueryParamsInput | undefined = QueryParamsInput | undefined, TError = Error>(
+export function useApiQuery<
+    TData = unknown,
+    TParams extends QueryParamsInput | undefined = QueryParamsInput | undefined,
+    TError = Error,
+>(
     queryKey: QueryKey,
     endpoint: string,
     params?: TParams,
-    options?: Omit<UseQueryOptions<ApiResponse<TData>, TError, ApiResponse<TData>, QueryKey>, 'queryKey' | 'queryFn'>,
+    options?: Omit<
+        UseQueryOptions<ApiResponse<TData>, TError, ApiResponse<TData>, QueryKey>,
+        'queryKey' | 'queryFn'
+    >,
 ) {
     return useQuery<ApiResponse<TData>, TError>({
         queryKey,
@@ -44,24 +55,31 @@ export function useApiQuery<TData = unknown, TParams extends QueryParamsInput | 
 }
 
 // 제네릭 API 뮤테이션 훅
-export function useApiMutation<TData = unknown, TVariables = void, TError = Error>(
+export function useApiMutation<
+    TData = unknown,
+    TVariables extends RequestBodyInput = RequestBodyInput,
+    TError = Error,
+>(
     endpoint: string,
     method: MutationMethod = 'POST',
-    options?: Omit<UseMutationOptions<ApiResponse<TData>, TError, TVariables | void>, 'mutationFn'>,
+    options?: Omit<
+        UseMutationOptions<ApiResponse<TData>, TError, TVariables | void>,
+        'mutationFn'
+    >,
 ) {
     return useMutation<ApiResponse<TData>, TError, TVariables | void>({
         mutationFn: (variables?: TVariables | void) => {
             switch (method) {
                 case 'POST':
-                    return api.post<TData>(endpoint, variables as TVariables);
+                    return api.post<TData>(endpoint, variables as RequestBodyInput);
                 case 'PUT':
-                    return api.put<TData>(endpoint, variables as TVariables);
+                    return api.put<TData>(endpoint, variables as RequestBodyInput);
                 case 'DELETE':
                     return api.delete<TData>(endpoint);
                 case 'PATCH':
-                    return api.patch<TData>(endpoint, variables as TVariables);
+                    return api.patch<TData>(endpoint, variables as RequestBodyInput);
                 default:
-                    return api.post<TData>(endpoint, variables as TVariables);
+                    return api.post<TData>(endpoint, variables as RequestBodyInput);
             }
         },
         ...defaultMutationOptions,
@@ -74,16 +92,20 @@ export function usePaginatedQuery<TData = unknown, TError = Error>(
     queryKey: QueryKey,
     endpoint: string,
     params: SearchParams = {},
-    options?: Omit<UseQueryOptions<ApiResponse<TData>, TError, ApiResponse<TData>, QueryKey>, 'queryKey' | 'queryFn'>,
+    options?: Omit<
+        UseQueryOptions<ApiResponse<TData>, TError, ApiResponse<TData>, QueryKey>,
+        'queryKey' | 'queryFn'
+    >,
 ) {
-    return useApiQuery<TData, SearchParams, TError>(
+    return useApiQuery<TData, QueryParamsInput, TError>(
         queryKey,
         endpoint,
-        params,
+        params as QueryParamsInput,
         {
             ...options,
-            placeholderData: (previousData: ApiResponse<TData> | undefined) => previousData, // 페이지네이션 시 이전 데이터 유지
-        }
+            placeholderData: (previousData: ApiResponse<TData> | undefined) =>
+                previousData, // 페이지네이션 시 이전 데이터 유지
+        },
     );
 }
 
@@ -92,12 +114,15 @@ export function useInfiniteQuery<TData = unknown, TError = Error>(
     queryKey: QueryKey,
     endpoint: string,
     params: Omit<SearchParams, 'page'> = {},
-    options?: Partial<UseInfiniteQueryOptions<ApiResponse<TData>, TError, ApiResponse<TData>, ApiResponse<TData>, QueryKey>>,
+    options?: any,
 ) {
-    return useInfiniteQueryHook<ApiResponse<TData>, TError, ApiResponse<TData>, QueryKey>({
+    return useInfiniteQueryHook({
         queryKey,
         queryFn: ({ pageParam = 1 }: { pageParam?: number }) =>
-            api.get<TData>(endpoint, { ...params, page: pageParam }),
+            api.get<TData>(endpoint, {
+                ...params,
+                page: pageParam,
+            } as QueryParamsInput),
         getNextPageParam: (lastPage: ApiResponse<TData>) => {
             if (!lastPage?.pagination) return undefined;
             const { page, totalPages, hasNext } = lastPage.pagination;
@@ -136,10 +161,10 @@ export function useInvalidateQueries() {
             queryClient.invalidateQueries({ queryKey }),
         invalidateByPattern: (pattern: string) =>
             queryClient.invalidateQueries({
-                predicate: (query) =>
-                    query.queryKey.some(key =>
-                        typeof key === 'string' && key.includes(pattern)
-                    )
+                predicate: query =>
+                    query.queryKey.some(
+                        key => typeof key === 'string' && key.includes(pattern),
+                    ),
             }),
     };
 }
@@ -172,7 +197,11 @@ interface OptimisticMutationOptions<TData, TVariables, TError = Error>
     ) => ApiResponse<TData> | undefined;
 }
 
-export function useOptimisticMutation<TData = unknown, TVariables = void, TError = Error>(
+export function useOptimisticMutation<
+    TData = unknown,
+    TVariables extends RequestBodyInput = RequestBodyInput,
+    TError = Error,
+>(
     endpoint: string,
     method: MutationMethod = 'POST',
     options?: OptimisticMutationOptions<TData, TVariables, TError>,
@@ -197,18 +226,18 @@ export function useOptimisticMutation<TData = unknown, TVariables = void, TError
         mutationFn: (variables?: TVariables | void) => {
             switch (method) {
                 case 'POST':
-                    return api.post<TData>(endpoint, variables as TVariables);
+                    return api.post<TData>(endpoint, variables as RequestBodyInput);
                 case 'PUT':
-                    return api.put<TData>(endpoint, variables as TVariables);
+                    return api.put<TData>(endpoint, variables as RequestBodyInput);
                 case 'DELETE':
                     return api.delete<TData>(endpoint);
                 case 'PATCH':
-                    return api.patch<TData>(endpoint, variables as TVariables);
+                    return api.patch<TData>(endpoint, variables as RequestBodyInput);
                 default:
-                    return api.post<TData>(endpoint, variables as TVariables);
+                    return api.post<TData>(endpoint, variables as RequestBodyInput);
             }
         },
-        onMutate: async variables => {
+        onMutate: async (variables, context) => {
             if (!queryKey || !updateFn) {
                 return undefined;
             }
@@ -217,7 +246,8 @@ export function useOptimisticMutation<TData = unknown, TVariables = void, TError
             await queryClient.cancelQueries({ queryKey });
 
             // 이전 데이터 백업
-            const previousData = queryClient.getQueryData<ApiResponse<TData>>(queryKey);
+            const previousData =
+                queryClient.getQueryData<ApiResponse<TData>>(queryKey);
 
             // 옵티미스틱 업데이트
             const nextData = updateFn(previousData, variables as TVariables);
@@ -225,7 +255,7 @@ export function useOptimisticMutation<TData = unknown, TVariables = void, TError
                 queryClient.setQueryData<ApiResponse<TData>>(queryKey, nextData);
             }
 
-            const userContext = await onMutate?.(variables);
+            const userContext = await onMutate?.(variables, context);
             if (userContext && typeof userContext === 'object') {
                 return {
                     previousData,
@@ -235,24 +265,30 @@ export function useOptimisticMutation<TData = unknown, TVariables = void, TError
 
             return { previousData };
         },
-        onError: (error, variables, context) => {
+        onError: (error, variables, context, mutationContext) => {
             if (queryKey && rollbackFn && context?.previousData) {
-                const rollbackData = rollbackFn(context.previousData, variables as TVariables);
+                const rollbackData = rollbackFn(
+                    context.previousData,
+                    variables as TVariables,
+                );
                 if (rollbackData !== undefined) {
                     queryClient.setQueryData<ApiResponse<TData>>(queryKey, rollbackData);
                 }
             } else if (queryKey && context?.previousData) {
-                queryClient.setQueryData<ApiResponse<TData>>(queryKey, context.previousData);
+                queryClient.setQueryData<ApiResponse<TData>>(
+                    queryKey,
+                    context.previousData,
+                );
             }
 
-            onError?.(error, variables, context);
+            onError?.(error, variables, context, mutationContext);
         },
-        onSettled: (data, error, variables, context) => {
+        onSettled: (data, error, variables, context, mutationContext) => {
             if (queryKey) {
                 void queryClient.invalidateQueries({ queryKey });
             }
 
-            onSettled?.(data, error, variables, context);
+            onSettled?.(data, error, variables, context, mutationContext);
         },
         ...defaultMutationOptions,
         ...restOptions,

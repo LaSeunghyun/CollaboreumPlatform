@@ -13,21 +13,25 @@ class UploadService {
   constructor() {
     this.allowedMimeTypes = {
       image: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-      document: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+      document: [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      ],
       audio: ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp4'],
       video: ['video/mp4', 'video/webm', 'video/ogg'],
     };
-    
+
     this.maxFileSizes = {
       image: 10 * 1024 * 1024, // 10MB
       document: 50 * 1024 * 1024, // 50MB
       audio: 100 * 1024 * 1024, // 100MB
       video: 500 * 1024 * 1024, // 500MB
     };
-    
+
     this.uploadDir = process.env.UPLOAD_DIR || './uploads';
     this.tempDir = path.join(this.uploadDir, 'temp');
-    
+
     this.initializeDirectories();
   }
 
@@ -39,7 +43,9 @@ class UploadService {
       await fs.mkdir(this.uploadDir, { recursive: true });
       await fs.mkdir(this.tempDir, { recursive: true });
       await fs.mkdir(path.join(this.uploadDir, 'images'), { recursive: true });
-      await fs.mkdir(path.join(this.uploadDir, 'documents'), { recursive: true });
+      await fs.mkdir(path.join(this.uploadDir, 'documents'), {
+        recursive: true,
+      });
       await fs.mkdir(path.join(this.uploadDir, 'audio'), { recursive: true });
       await fs.mkdir(path.join(this.uploadDir, 'video'), { recursive: true });
     } catch (error) {
@@ -66,7 +72,11 @@ class UploadService {
       if (this.isAllowedFileType(file, fileType)) {
         cb(null, true);
       } else {
-        cb(new FileUploadError(`허용되지 않는 파일 형식입니다: ${file.mimetype}`));
+        cb(
+          new FileUploadError(
+            `허용되지 않는 파일 형식입니다: ${file.mimetype}`,
+          ),
+        );
       }
     };
 
@@ -105,7 +115,7 @@ class UploadService {
       } = options;
 
       const processedImage = await sharp(filePath)
-        .resize(width, height, { 
+        .resize(width, height, {
           fit: 'inside',
           withoutEnlargement: true,
         })
@@ -116,7 +126,7 @@ class UploadService {
       let thumbnail = null;
       if (generateThumbnail) {
         thumbnail = await sharp(filePath)
-          .resize(300, 300, { 
+          .resize(300, 300, {
             fit: 'cover',
             position: 'center',
           })
@@ -148,7 +158,7 @@ class UploadService {
       // 파일 헤더 검사 (매직 넘버)
       const buffer = await fs.readFile(filePath, { start: 0, end: 1023 });
       const fileType = this.detectFileType(buffer);
-      
+
       if (!fileType) {
         throw new FileUploadError('알 수 없는 파일 형식입니다');
       }
@@ -162,7 +172,11 @@ class UploadService {
         /onerror=/i,
       ];
 
-      const content = buffer.toString('utf8', 0, Math.min(buffer.length, 10000));
+      const content = buffer.toString(
+        'utf8',
+        0,
+        Math.min(buffer.length, 10000),
+      );
       for (const pattern of suspiciousPatterns) {
         if (pattern.test(content)) {
           throw new FileUploadError('보안상 위험한 파일입니다');
@@ -187,12 +201,12 @@ class UploadService {
    */
   detectFileType(buffer) {
     const signatures = {
-      'image/jpeg': [0xFF, 0xD8, 0xFF],
-      'image/png': [0x89, 0x50, 0x4E, 0x47],
+      'image/jpeg': [0xff, 0xd8, 0xff],
+      'image/png': [0x89, 0x50, 0x4e, 0x47],
       'image/gif': [0x47, 0x49, 0x46],
       'image/webp': [0x52, 0x49, 0x46, 0x46],
       'application/pdf': [0x25, 0x50, 0x44, 0x46],
-      'audio/mpeg': [0xFF, 0xFB],
+      'audio/mpeg': [0xff, 0xfb],
       'video/mp4': [0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70],
     };
 
@@ -228,10 +242,10 @@ class UploadService {
   async saveFile(file, fileType, userId) {
     try {
       const tempPath = file.path;
-      
+
       // 파일 보안 검사
       const scanResult = await this.scanFile(tempPath);
-      
+
       // 파일 타입별 처리
       let finalPath;
       let processedData = null;
@@ -240,15 +254,20 @@ class UploadService {
         // 이미지 처리
         const imageData = await this.processImage(tempPath);
         processedData = imageData;
-        
+
         // 처리된 이미지 저장
         const filename = this.generateFilename(file.originalname, 'jpg');
         finalPath = path.join(this.uploadDir, 'images', filename);
         await fs.writeFile(finalPath, imageData.processed);
-        
+
         // 썸네일 저장
         if (imageData.thumbnail) {
-          const thumbnailPath = path.join(this.uploadDir, 'images', 'thumbnails', filename);
+          const thumbnailPath = path.join(
+            this.uploadDir,
+            'images',
+            'thumbnails',
+            filename,
+          );
           await fs.mkdir(path.dirname(thumbnailPath), { recursive: true });
           await fs.writeFile(thumbnailPath, imageData.thumbnail);
         }
@@ -296,7 +315,7 @@ class UploadService {
       } catch (cleanupError) {
         console.error('임시 파일 정리 실패:', cleanupError);
       }
-      
+
       throw error;
     }
   }
@@ -321,7 +340,7 @@ class UploadService {
       audio: 'audio',
       video: 'video',
     };
-    
+
     return directories[fileType] || 'others';
   }
 
@@ -330,7 +349,8 @@ class UploadService {
    */
   generateFileUrl(filePath) {
     const relativePath = path.relative(this.uploadDir, filePath);
-    const baseUrl = process.env.FILE_BASE_URL || 'http://localhost:5000/uploads';
+    const baseUrl =
+      process.env.FILE_BASE_URL || 'http://localhost:5000/uploads';
     return `${baseUrl}/${relativePath.replace(/\\/g, '/')}`;
   }
 
@@ -340,17 +360,20 @@ class UploadService {
   async deleteFile(filePath) {
     try {
       await fs.unlink(filePath);
-      
+
       // 썸네일도 삭제 (이미지인 경우)
       if (filePath.includes('/images/')) {
-        const thumbnailPath = filePath.replace('/images/', '/images/thumbnails/');
+        const thumbnailPath = filePath.replace(
+          '/images/',
+          '/images/thumbnails/',
+        );
         try {
           await fs.unlink(thumbnailPath);
         } catch {
           // 썸네일이 없어도 에러가 아님
         }
       }
-      
+
       return true;
     } catch (error) {
       throw new FileUploadError(`파일 삭제 실패: ${error.message}`);
@@ -402,10 +425,10 @@ class UploadService {
 
     try {
       const items = await fs.readdir(dirPath, { withFileTypes: true });
-      
+
       for (const item of items) {
         const itemPath = path.join(dirPath, item.name);
-        
+
         if (item.isDirectory()) {
           const subStats = await this.getDirectorySize(itemPath);
           totalSize += subStats.size;

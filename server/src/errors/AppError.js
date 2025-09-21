@@ -4,14 +4,14 @@
 class AppError extends Error {
   constructor(message, statusCode, code = null, details = null) {
     super(message);
-    
+
     this.name = this.constructor.name;
     this.statusCode = statusCode;
     this.code = code;
     this.details = details;
     this.isOperational = true;
     this.timestamp = new Date().toISOString();
-    
+
     // 스택 트레이스 캡처
     Error.captureStackTrace(this, this.constructor);
   }

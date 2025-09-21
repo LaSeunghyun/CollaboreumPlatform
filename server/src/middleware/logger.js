@@ -3,37 +3,40 @@ const pino = require('pino');
 // 로거 설정
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
-  transport: process.env.NODE_ENV === 'development' ? {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-      translateTime: 'SYS:standard',
-      ignore: 'pid,hostname',
-    },
-  } : undefined,
+  transport:
+    process.env.NODE_ENV === 'development'
+      ? {
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
+            translateTime: 'SYS:standard',
+            ignore: 'pid,hostname',
+          },
+        }
+      : undefined,
   formatters: {
-    level: (label) => {
+    level: label => {
       return { level: label };
     },
   },
   timestamp: pino.stdTimeFunctions.isoTime,
   serializers: {
-    req: (req) => ({
+    req: req => ({
       method: req.method,
       url: req.url,
       headers: {
         'user-agent': req.headers['user-agent'],
         'content-type': req.headers['content-type'],
-        'authorization': req.headers['authorization'] ? '[REDACTED]' : undefined,
+        authorization: req.headers['authorization'] ? '[REDACTED]' : undefined,
       },
       remoteAddress: req.remoteAddress,
       remotePort: req.remotePort,
     }),
-    res: (res) => ({
+    res: res => ({
       statusCode: res.statusCode,
       headers: res.getHeaders(),
     }),
-    err: (err) => ({
+    err: err => ({
       type: err.constructor.name,
       message: err.message,
       stack: err.stack,
@@ -48,14 +51,14 @@ const logger = pino({
  */
 const requestLogger = (req, res, next) => {
   const start = Date.now();
-  
+
   // 요청 ID 생성
   req.id = req.headers['x-request-id'] || require('uuid').v4();
-  
+
   // 응답 완료 시 로깅
   res.on('finish', () => {
     const duration = Date.now() - start;
-    
+
     const logData = {
       requestId: req.id,
       method: req.method,
@@ -64,11 +67,13 @@ const requestLogger = (req, res, next) => {
       duration,
       userAgent: req.headers['user-agent'],
       ip: req.ip || req.connection.remoteAddress,
-      user: req.user ? {
-        id: req.user.id,
-        email: req.user.email,
-        role: req.user.role,
-      } : null,
+      user: req.user
+        ? {
+            id: req.user.id,
+            email: req.user.email,
+            role: req.user.role,
+          }
+        : null,
     };
 
     // 로그 레벨 결정
@@ -96,21 +101,24 @@ const securityLogger = (req, res, next) => {
     /javascript:/i, // JavaScript 프로토콜
   ];
 
-  const isSuspicious = suspiciousPatterns.some(pattern => 
-    pattern.test(req.url) || pattern.test(JSON.stringify(req.body))
+  const isSuspicious = suspiciousPatterns.some(
+    pattern => pattern.test(req.url) || pattern.test(JSON.stringify(req.body)),
   );
 
   if (isSuspicious) {
-    logger.warn({
-      requestId: req.id,
-      type: 'SUSPICIOUS_REQUEST',
-      method: req.method,
-      url: req.url,
-      body: req.body,
-      headers: req.headers,
-      ip: req.ip,
-      userAgent: req.headers['user-agent'],
-    }, 'Suspicious request detected');
+    logger.warn(
+      {
+        requestId: req.id,
+        type: 'SUSPICIOUS_REQUEST',
+        method: req.method,
+        url: req.url,
+        body: req.body,
+        headers: req.headers,
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
+      },
+      'Suspicious request detected',
+    );
   }
 
   next();
@@ -122,89 +130,113 @@ const securityLogger = (req, res, next) => {
 const businessLogger = {
   funding: {
     projectCreated: (projectId, userId, data) => {
-      logger.info({
-        type: 'BUSINESS_EVENT',
-        event: 'FUNDING_PROJECT_CREATED',
-        projectId,
-        userId,
-        data,
-      }, 'Funding project created');
+      logger.info(
+        {
+          type: 'BUSINESS_EVENT',
+          event: 'FUNDING_PROJECT_CREATED',
+          projectId,
+          userId,
+          data,
+        },
+        'Funding project created',
+      );
     },
-    
+
     pledgeCreated: (pledgeId, projectId, userId, amount) => {
-      logger.info({
-        type: 'BUSINESS_EVENT',
-        event: 'PLEDGE_CREATED',
-        pledgeId,
-        projectId,
-        userId,
-        amount,
-      }, 'Pledge created');
+      logger.info(
+        {
+          type: 'BUSINESS_EVENT',
+          event: 'PLEDGE_CREATED',
+          pledgeId,
+          projectId,
+          userId,
+          amount,
+        },
+        'Pledge created',
+      );
     },
-    
+
     projectStatusChanged: (projectId, oldStatus, newStatus, userId) => {
-      logger.info({
-        type: 'BUSINESS_EVENT',
-        event: 'PROJECT_STATUS_CHANGED',
-        projectId,
-        oldStatus,
-        newStatus,
-        userId,
-      }, 'Project status changed');
+      logger.info(
+        {
+          type: 'BUSINESS_EVENT',
+          event: 'PROJECT_STATUS_CHANGED',
+          projectId,
+          oldStatus,
+          newStatus,
+          userId,
+        },
+        'Project status changed',
+      );
     },
   },
-  
+
   auth: {
     login: (userId, email, success) => {
-      logger.info({
-        type: 'AUTH_EVENT',
-        event: 'LOGIN',
-        userId,
-        email,
-        success,
-      }, 'User login attempt');
+      logger.info(
+        {
+          type: 'AUTH_EVENT',
+          event: 'LOGIN',
+          userId,
+          email,
+          success,
+        },
+        'User login attempt',
+      );
     },
-    
+
     logout: (userId, email) => {
-      logger.info({
-        type: 'AUTH_EVENT',
-        event: 'LOGOUT',
-        userId,
-        email,
-      }, 'User logout');
+      logger.info(
+        {
+          type: 'AUTH_EVENT',
+          event: 'LOGOUT',
+          userId,
+          email,
+        },
+        'User logout',
+      );
     },
-    
+
     tokenRefresh: (userId, success) => {
-      logger.info({
-        type: 'AUTH_EVENT',
-        event: 'TOKEN_REFRESH',
-        userId,
-        success,
-      }, 'Token refresh attempt');
+      logger.info(
+        {
+          type: 'AUTH_EVENT',
+          event: 'TOKEN_REFRESH',
+          userId,
+          success,
+        },
+        'Token refresh attempt',
+      );
     },
   },
-  
+
   payment: {
     paymentProcessed: (paymentId, amount, userId, success) => {
-      logger.info({
-        type: 'PAYMENT_EVENT',
-        event: 'PAYMENT_PROCESSED',
-        paymentId,
-        amount,
-        userId,
-        success,
-      }, 'Payment processed');
+      logger.info(
+        {
+          type: 'PAYMENT_EVENT',
+          event: 'PAYMENT_PROCESSED',
+          paymentId,
+          amount,
+          userId,
+          success,
+        },
+        'Payment processed',
+      );
     },
-    
+
     refundProcessed: (refundId, amount, userId, reason) => {
-      logger.info({
-        type: 'PAYMENT_EVENT',
-        event: 'REFUND_PROCESSED',
-        refundId,
-        amount,
-        userId,
-        reason,
-      }, 'Refund processed');
+      logger.info(
+        {
+          type: 'PAYMENT_EVENT',
+          event: 'REFUND_PROCESSED',
+          refundId,
+          amount,
+          userId,
+          reason,
+        },
+        'Refund processed',
+      );
     },
   },
 };
@@ -215,27 +247,33 @@ const businessLogger = {
 const performanceLogger = {
   database: {
     query: (operation, collection, duration, success) => {
-      logger.info({
-        type: 'PERFORMANCE',
-        category: 'DATABASE',
-        operation,
-        collection,
-        duration,
-        success,
-      }, 'Database query executed');
+      logger.info(
+        {
+          type: 'PERFORMANCE',
+          category: 'DATABASE',
+          operation,
+          collection,
+          duration,
+          success,
+        },
+        'Database query executed',
+      );
     },
   },
-  
+
   external: {
     api: (service, endpoint, duration, statusCode) => {
-      logger.info({
-        type: 'PERFORMANCE',
-        category: 'EXTERNAL_API',
-        service,
-        endpoint,
-        duration,
-        statusCode,
-      }, 'External API call');
+      logger.info(
+        {
+          type: 'PERFORMANCE',
+          category: 'EXTERNAL_API',
+          service,
+          endpoint,
+          duration,
+          statusCode,
+        },
+        'External API call',
+      );
     },
   },
 };

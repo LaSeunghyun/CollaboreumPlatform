@@ -14,10 +14,16 @@ export const FundingProjectList: React.FC<FundingProjectListProps> = ({
   onProjectClick,
   initialFilters,
 }) => {
-  const [filters, setFilters] = React.useState<FundingFilters>(initialFilters || {});
+  const [filters, setFilters] = React.useState<FundingFilters>(
+    initialFilters || {},
+  );
   const [currentPage, setCurrentPage] = React.useState(1);
 
-  const { data: projects, isLoading, error } = useFundingProjects({
+  const {
+    data: projects,
+    isLoading,
+    error,
+  } = useFundingProjects({
     ...filters,
     page: currentPage,
   });
@@ -35,13 +41,13 @@ export const FundingProjectList: React.FC<FundingProjectListProps> = ({
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <div className="text-red-600 mb-4">
+      <div className='py-12 text-center'>
+        <div className='mb-4 text-red-600'>
           프로젝트를 불러오는 중 오류가 발생했습니다.
         </div>
         <button
           onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+          className='hover:bg-primary/90 rounded-md bg-primary px-4 py-2 text-white'
         >
           다시 시도
         </button>
@@ -50,11 +56,8 @@ export const FundingProjectList: React.FC<FundingProjectListProps> = ({
   }
 
   return (
-    <div className="space-y-6">
-      <ProjectFilters
-        filters={filters}
-        onFiltersChange={handleFilterChange}
-      />
+    <div className='space-y-6'>
+      <ProjectFilters filters={filters} onFiltersChange={handleFilterChange} />
 
       <ProjectGrid
         projects={projects || []}

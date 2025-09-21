@@ -9,8 +9,11 @@ import type { RouteConfig } from './types';
 
 type LayoutKey = NonNullable<RouteConfig['layout']>;
 
-const layoutRenderers: Record<LayoutKey, (children: React.ReactNode) => React.ReactElement> = {
-  app: (children) => <AppLayout>{children}</AppLayout>,
+const layoutRenderers: Record<
+  LayoutKey,
+  (children: React.ReactNode) => React.ReactElement
+> = {
+  app: children => <AppLayout>{children}</AppLayout>,
 };
 
 const buildElement = (route: RouteConfig): React.ReactElement => {
@@ -39,9 +42,15 @@ const buildElement = (route: RouteConfig): React.ReactElement => {
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {routeGroups.flatMap(group => group.routes).map(route => (
-        <Route key={route.path} path={route.path} element={buildElement(route)} />
-      ))}
+      {routeGroups
+        .flatMap(group => group.routes)
+        .map(route => (
+          <Route
+            key={route.path}
+            path={route.path}
+            element={buildElement(route)}
+          />
+        ))}
     </Routes>
   );
 };

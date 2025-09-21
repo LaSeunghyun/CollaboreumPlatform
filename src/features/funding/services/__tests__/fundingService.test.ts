@@ -70,6 +70,8 @@ describe('fundingService.getProjects', () => {
       message: '프로젝트를 불러오지 못했습니다.',
     });
 
-    await expect(fundingService.getProjects()).rejects.toThrow('프로젝트를 불러오지 못했습니다.');
+    await expect(fundingService.getProjects()).rejects.toThrow(
+      '프로젝트를 불러오지 못했습니다.',
+    );
   });
 });

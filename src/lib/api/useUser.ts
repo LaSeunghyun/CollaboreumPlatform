@@ -4,261 +4,308 @@ import { userAPI, userProfileAPI, interactionAPI } from '../../services/api';
 
 // TODO: 사용자 프로필 편집 API 스펙이 확정되면 정식 DTO 타입으로 대체한다.
 interface UserProfileUpdateInput {
-    name?: string;
-    bio?: string;
-    avatar?: string;
-    socialLinks?: Record<string, string>;
-    preferences?: Record<string, unknown>;
-    [key: string]: unknown;
+  name?: string;
+  bio?: string;
+  avatar?: string;
+  socialLinks?: Record<string, string>;
+  preferences?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 // 사용자 프로필 조회
 export const useUserProfile = (userId: string) => {
-    return useQuery({
-        queryKey: ['user', 'profile', userId],
-        queryFn: () => userProfileAPI.getUserProfile(userId),
-        enabled: !!userId,
-        staleTime: 5 * 60 * 1000, // 5분
-    });
+  return useQuery({
+    queryKey: ['user', 'profile', userId],
+    queryFn: () => userProfileAPI.getUserProfile(userId),
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000, // 5분
+  });
 };
 
 // 사용자 프로필 업데이트
 export const useUpdateUserProfile = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: ({ userId, data }: { userId: string; data: UserProfileUpdateInput }) =>
-            userProfileAPI.updateUserProfile(userId, data),
-        onSuccess: (_, { userId }) => {
-            queryClient.invalidateQueries({ queryKey: ['user', 'profile', userId] });
-        },
-    });
+  return useMutation({
+    mutationFn: ({
+      userId,
+      data,
+    }: {
+      userId: string;
+      data: UserProfileUpdateInput;
+    }) => userProfileAPI.updateUserProfile(userId, data),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({ queryKey: ['user', 'profile', userId] });
+    },
+  });
 };
 
 // 사용자 프로젝트 목록 조회
-export const useUserProjects = (userId: string, params?: {
+export const useUserProjects = (
+  userId: string,
+  params?: {
     status?: string;
     category?: string;
     page?: number;
     limit?: number;
-}) => {
-    return useQuery({
-        queryKey: ['user', 'projects', userId, params],
-        queryFn: () => userProfileAPI.getUserProjects(userId, params),
-        enabled: !!userId,
-        staleTime: 5 * 60 * 1000,
-    });
+  },
+) => {
+  return useQuery({
+    queryKey: ['user', 'projects', userId, params],
+    queryFn: () => userProfileAPI.getUserProjects(userId, params),
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+  });
 };
 
 // 사용자 수익 내역 조회
-export const useUserRevenues = (userId: string, params?: {
+export const useUserRevenues = (
+  userId: string,
+  params?: {
     status?: string;
     startDate?: string;
     endDate?: string;
     page?: number;
     limit?: number;
-}) => {
-    return useQuery({
-        queryKey: ['user', 'revenues', userId, params],
-        queryFn: () => userProfileAPI.getUserRevenues(userId, params),
-        enabled: !!userId,
-        staleTime: 5 * 60 * 1000,
-    });
+  },
+) => {
+  return useQuery({
+    queryKey: ['user', 'revenues', userId, params],
+    queryFn: () => userProfileAPI.getUserRevenues(userId, params),
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+  });
 };
 
 // 사용자 백킹 내역 조회
-export const useUserBackings = (userId: string, params?: {
+export const useUserBackings = (
+  userId: string,
+  params?: {
     status?: string;
     projectId?: string;
     page?: number;
     limit?: number;
-}) => {
-    return useQuery({
-        queryKey: ['user', 'backings', userId, params],
-        queryFn: () => userProfileAPI.getUserBackings(userId, params),
-        enabled: !!userId,
-        staleTime: 5 * 60 * 1000,
-    });
+  },
+) => {
+  return useQuery({
+    queryKey: ['user', 'backings', userId, params],
+    queryFn: () => userProfileAPI.getUserBackings(userId, params),
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+  });
 };
 
 // 팔로우하는 아티스트 목록 조회
 export const useFollowingArtists = (userId: string) => {
-    return useQuery({
-        queryKey: ['user', 'following', userId],
-        queryFn: () => userAPI.getFollowingArtists(userId),
-        enabled: !!userId,
-        staleTime: 5 * 60 * 1000,
-    });
+  return useQuery({
+    queryKey: ['user', 'following', userId],
+    queryFn: () => userAPI.getFollowingArtists(userId),
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+  });
 };
 
 // 팔로우하는 아티스트의 펀딩 프로젝트 히스토리 조회
-export const useFollowingArtistsFundingHistory = (userId: string, params?: {
+export const useFollowingArtistsFundingHistory = (
+  userId: string,
+  params?: {
     page?: number;
     limit?: number;
     status?: 'success' | 'failed' | 'ongoing';
     category?: string;
     sortBy?: 'date' | 'amount' | 'status';
     order?: 'asc' | 'desc';
-}) => {
-    return useQuery({
-        queryKey: ['user', 'following', 'funding-history', userId, params],
-        queryFn: () => userAPI.getFollowingArtistsFundingHistory(userId, params),
-        enabled: !!userId,
-        staleTime: 5 * 60 * 1000,
-    });
+  },
+) => {
+  return useQuery({
+    queryKey: ['user', 'following', 'funding-history', userId, params],
+    queryFn: () => userAPI.getFollowingArtistsFundingHistory(userId, params),
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+  });
 };
 
 // 특정 아티스트의 펀딩 프로젝트 히스토리 조회
-export const useArtistFundingHistory = (userId: string, artistId: string, params?: {
+export const useArtistFundingHistory = (
+  userId: string,
+  artistId: string,
+  params?: {
     page?: number;
     limit?: number;
     status?: 'success' | 'failed' | 'ongoing';
-}) => {
-    return useQuery({
-        queryKey: ['user', 'artist', 'funding-history', userId, artistId, params],
-        queryFn: () => userAPI.getArtistFundingHistory(userId, artistId, params),
-        enabled: !!userId && !!artistId,
-        staleTime: 5 * 60 * 1000,
-    });
+  },
+) => {
+  return useQuery({
+    queryKey: ['user', 'artist', 'funding-history', userId, artistId, params],
+    queryFn: () => userAPI.getArtistFundingHistory(userId, artistId, params),
+    enabled: !!userId && !!artistId,
+    staleTime: 5 * 60 * 1000,
+  });
 };
 
 // 알림 목록 조회
 type NotificationQueryParams = {
-    page?: number;
-    limit?: number;
-    type?: string;
-    read?: boolean;
+  page?: number;
+  limit?: number;
+  type?: string;
+  read?: boolean;
 };
 
 type UseNotificationsOptions = {
-    enabled?: boolean;
+  enabled?: boolean;
 };
 
-const isUnauthorizedError = (error: unknown): error is Error & { status?: number } => {
-    return error instanceof Error && (error as Error & { status?: number }).status === 401;
+const isUnauthorizedError = (
+  error: unknown,
+): error is Error & { status?: number } => {
+  return (
+    error instanceof Error &&
+    (error as Error & { status?: number }).status === 401
+  );
 };
 
 export const useNotifications = (
-    params?: NotificationQueryParams,
-    options?: UseNotificationsOptions,
+  params?: NotificationQueryParams,
+  options?: UseNotificationsOptions,
 ) => {
-    const shouldEnableQuery = options?.enabled ?? authService.isTokenValid();
+  const shouldEnableQuery = options?.enabled ?? authService.isTokenValid();
 
-    return useQuery({
-        queryKey: ['notifications', params],
-        queryFn: () => interactionAPI.getNotifications(params),
-        staleTime: 1 * 60 * 1000, // 1분
-        enabled: shouldEnableQuery,
-        retry: (failureCount, error) => {
-            if (isUnauthorizedError(error)) {
-                return false;
-            }
+  return useQuery({
+    queryKey: ['notifications', params],
+    queryFn: () => interactionAPI.getNotifications(params),
+    staleTime: 1 * 60 * 1000, // 1분
+    enabled: shouldEnableQuery,
+    retry: (failureCount, error) => {
+      if (isUnauthorizedError(error)) {
+        return false;
+      }
 
-            return failureCount < 3;
-        },
-    });
+      return failureCount < 3;
+    },
+  });
 };
 
 // 알림 읽음 처리
 export const useMarkNotificationAsRead = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: (notificationId: string) =>
-            interactionAPI.markNotificationAsRead(notificationId),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['notifications'] });
-        },
-    });
+  return useMutation({
+    mutationFn: (notificationId: string) =>
+      interactionAPI.markNotificationAsRead(notificationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
 };
 
 // 모든 알림 읽음 처리
 export const useMarkAllNotificationsAsRead = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: () => interactionAPI.markAllNotificationsAsRead(),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['notifications'] });
-        },
-    });
+  return useMutation({
+    mutationFn: () => interactionAPI.markAllNotificationsAsRead(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
 };
 
 // 알림 삭제
 export const useDeleteNotification = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: (notificationId: string) =>
-            interactionAPI.deleteNotification(notificationId),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['notifications'] });
-        },
-    });
+  return useMutation({
+    mutationFn: (notificationId: string) =>
+      interactionAPI.deleteNotification(notificationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
 };
 
 // 검색
-export const useSearch = (query: string, type?: 'artists' | 'projects' | 'events' | 'posts') => {
-    return useQuery({
-        queryKey: ['search', query, type],
-        queryFn: async () => {
-            try {
-                return await interactionAPI.search(query, type);
-            } catch (error) {
-                // 네트워크 연결 상태 확인
-                if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-                    throw new Error('네트워크 연결을 확인해주세요.');
-                }
-                throw error;
-            }
-        },
-        enabled: !!query && query.length > 0,
-        staleTime: 2 * 60 * 1000, // 2분
-        retry: (failureCount, error) => {
-            // 네트워크 에러인 경우 3회까지 재시도
-            if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-                return failureCount < 3;
-            }
-            return false;
-        },
-        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    });
+export const useSearch = (
+  query: string,
+  type?: 'artists' | 'projects' | 'events' | 'posts',
+) => {
+  return useQuery({
+    queryKey: ['search', query, type],
+    queryFn: async () => {
+      try {
+        return await interactionAPI.search(query, type);
+      } catch (error) {
+        // 네트워크 연결 상태 확인
+        if (
+          error instanceof TypeError &&
+          error.message.includes('Failed to fetch')
+        ) {
+          throw new Error('네트워크 연결을 확인해주세요.');
+        }
+        throw error;
+      }
+    },
+    enabled: !!query && query.length > 0,
+    staleTime: 2 * 60 * 1000, // 2분
+    retry: (failureCount, error) => {
+      // 네트워크 에러인 경우 3회까지 재시도
+      if (
+        error instanceof TypeError &&
+        error.message.includes('Failed to fetch')
+      ) {
+        return failureCount < 3;
+      }
+      return false;
+    },
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
 };
 
 // 포인트 조회
 export const useUserPoints = (userId: string) => {
-    return useQuery({
-        queryKey: ['user', 'points', userId],
-        queryFn: () => userAPI.getPoints(userId),
-        enabled: !!userId,
-        staleTime: 5 * 60 * 1000, // 5분
-    });
+  return useQuery({
+    queryKey: ['user', 'points', userId],
+    queryFn: () => userAPI.getPoints(userId),
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000, // 5분
+  });
 };
 
 // 포인트 사용 내역 조회
-export const useUserPointsHistory = (userId: string, params?: {
+export const useUserPointsHistory = (
+  userId: string,
+  params?: {
     page?: number;
     limit?: number;
     type?: string;
-}) => {
-    return useQuery({
-        queryKey: ['user', 'points', 'history', userId, params],
-        queryFn: () => userAPI.getPointsHistory(userId, params),
-        enabled: !!userId,
-        staleTime: 2 * 60 * 1000, // 2분
-    });
+  },
+) => {
+  return useQuery({
+    queryKey: ['user', 'points', 'history', userId, params],
+    queryFn: () => userAPI.getPointsHistory(userId, params),
+    enabled: !!userId,
+    staleTime: 2 * 60 * 1000, // 2분
+  });
 };
 
 // 포인트로 투자하기
 export const useInvestWithPoints = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: ({ userId, data }: { userId: string; data: { projectId: string; amount: number } }) =>
-            userAPI.investWithPoints(userId, data),
-        onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['user', 'points', variables.userId] });
-            queryClient.invalidateQueries({ queryKey: ['user', 'backings', variables.userId] });
-        },
-    });
+  return useMutation({
+    mutationFn: ({
+      userId,
+      data,
+    }: {
+      userId: string;
+      data: { projectId: string; amount: number };
+    }) => userAPI.investWithPoints(userId, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['user', 'points', variables.userId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['user', 'backings', variables.userId],
+      });
+    },
+  });
 };

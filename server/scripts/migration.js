@@ -28,7 +28,8 @@ class MigrationManager {
    */
   async connect() {
     try {
-      const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/collaboreum';
+      const mongoUri =
+        process.env.MONGODB_URI || 'mongodb://localhost:27017/collaboreum';
       this.connection = await mongoose.connect(mongoUri);
       console.log('✅ 데이터베이스 연결 성공');
     } catch (error) {
@@ -65,13 +66,13 @@ class MigrationManager {
    */
   async runMigrations() {
     const startTime = Date.now();
-    
+
     try {
       await this.connect();
-      
+
       const appliedVersions = await this.getAppliedMigrations();
       const pendingMigrations = this.migrations.filter(
-        m => !appliedVersions.includes(m.version)
+        m => !appliedVersions.includes(m.version),
       );
 
       if (pendingMigrations.length === 0) {
@@ -79,7 +80,9 @@ class MigrationManager {
         return;
       }
 
-      console.log(`📦 ${pendingMigrations.length}개의 마이그레이션을 실행합니다...`);
+      console.log(
+        `📦 ${pendingMigrations.length}개의 마이그레이션을 실행합니다...`,
+      );
 
       for (const migration of pendingMigrations) {
         await this.runMigration(migration);
@@ -87,7 +90,6 @@ class MigrationManager {
 
       const totalTime = Date.now() - startTime;
       console.log(`✅ 모든 마이그레이션 완료 (${totalTime}ms)`);
-      
     } catch (error) {
       console.error('❌ 마이그레이션 실행 실패:', error);
       throw error;
@@ -103,14 +105,16 @@ class MigrationManager {
    */
   async runMigration(migration) {
     const startTime = Date.now();
-    
+
     try {
-      console.log(`🔄 마이그레이션 실행: ${migration.version} - ${migration.name}`);
-      
+      console.log(
+        `🔄 마이그레이션 실행: ${migration.version} - ${migration.name}`,
+      );
+
       await migration.up();
-      
+
       const executionTime = Date.now() - startTime;
-      
+
       // 마이그레이션 기록 저장
       const Migration = await this.createMigrationsTable();
       await Migration.create({
@@ -119,8 +123,9 @@ class MigrationManager {
         executionTime,
       });
 
-      console.log(`✅ 마이그레이션 완료: ${migration.version} (${executionTime}ms)`);
-      
+      console.log(
+        `✅ 마이그레이션 완료: ${migration.version} (${executionTime}ms)`,
+      );
     } catch (error) {
       console.error(`❌ 마이그레이션 실패: ${migration.version}`, error);
       throw error;
@@ -133,22 +138,21 @@ class MigrationManager {
   async rollback(version) {
     try {
       await this.connect();
-      
+
       const Migration = await this.createMigrationsTable();
       const migration = this.migrations.find(m => m.version === version);
-      
+
       if (!migration) {
         throw new Error(`마이그레이션을 찾을 수 없습니다: ${version}`);
       }
 
       console.log(`🔄 마이그레이션 롤백: ${version} - ${migration.name}`);
-      
+
       await migration.down();
-      
+
       await Migration.deleteOne({ version });
-      
+
       console.log(`✅ 마이그레이션 롤백 완료: ${version}`);
-      
     } catch (error) {
       console.error(`❌ 마이그레이션 롤백 실패: ${version}`, error);
       throw error;
@@ -165,17 +169,18 @@ class MigrationManager {
   async status() {
     try {
       await this.connect();
-      
+
       const appliedVersions = await this.getAppliedMigrations();
-      
+
       console.log('📊 마이그레이션 상태:');
       console.log('='.repeat(50));
-      
+
       for (const migration of this.migrations) {
-        const status = appliedVersions.includes(migration.version) ? '✅ 적용됨' : '⏳ 대기중';
+        const status = appliedVersions.includes(migration.version)
+          ? '✅ 적용됨'
+          : '⏳ 대기중';
         console.log(`${migration.version} - ${migration.name} [${status}]`);
       }
-      
     } catch (error) {
       console.error('❌ 마이그레이션 상태 조회 실패:', error);
       throw error;
@@ -199,18 +204,18 @@ migrationManager.registerMigration(
     const { User } = require('../src/models/User');
     const { Category } = require('../src/models/Category');
     const { FundingProject } = require('../src/models/FundingProject');
-    
+
     // 인덱스 생성
     await User.createIndexes();
     await Category.createIndexes();
     await FundingProject.createIndexes();
-    
+
     console.log('✅ 초기 컬렉션 및 인덱스 생성 완료');
   },
   async () => {
     // 롤백 로직
     console.log('🔄 초기 컬렉션 롤백');
-  }
+  },
 );
 
 migrationManager.registerMigration(
@@ -218,23 +223,23 @@ migrationManager.registerMigration(
   'Add funding project indexes',
   async () => {
     const { FundingProject } = require('../src/models/FundingProject');
-    
+
     // 추가 인덱스 생성
     await FundingProject.collection.createIndex({ 'rewards.amount': 1 });
-    await FundingProject.collection.createIndex({ 'tags': 1, 'status': 1 });
-    await FundingProject.collection.createIndex({ 'createdAt': -1, 'isActive': 1 });
-    
+    await FundingProject.collection.createIndex({ tags: 1, status: 1 });
+    await FundingProject.collection.createIndex({ createdAt: -1, isActive: 1 });
+
     console.log('✅ 펀딩 프로젝트 추가 인덱스 생성 완료');
   },
   async () => {
     const { FundingProject } = require('../src/models/FundingProject');
-    
+
     await FundingProject.collection.dropIndex({ 'rewards.amount': 1 });
-    await FundingProject.collection.dropIndex({ 'tags': 1, 'status': 1 });
-    await FundingProject.collection.dropIndex({ 'createdAt': -1, 'isActive': 1 });
-    
+    await FundingProject.collection.dropIndex({ tags: 1, status: 1 });
+    await FundingProject.collection.dropIndex({ createdAt: -1, isActive: 1 });
+
     console.log('🔄 펀딩 프로젝트 추가 인덱스 롤백 완료');
-  }
+  },
 );
 
 migrationManager.registerMigration(
@@ -242,25 +247,22 @@ migrationManager.registerMigration(
   'Add user permissions field',
   async () => {
     const { User } = require('../src/models/User');
-    
+
     // 기존 사용자에 permissions 필드 추가
     await User.updateMany(
       { permissions: { $exists: false } },
-      { $set: { permissions: [] } }
+      { $set: { permissions: [] } },
     );
-    
+
     console.log('✅ 사용자 권한 필드 추가 완료');
   },
   async () => {
     const { User } = require('../src/models/User');
-    
-    await User.updateMany(
-      {},
-      { $unset: { permissions: 1 } }
-    );
-    
+
+    await User.updateMany({}, { $unset: { permissions: 1 } });
+
     console.log('🔄 사용자 권한 필드 롤백 완료');
-  }
+  },
 );
 
 migrationManager.registerMigration(
@@ -268,18 +270,18 @@ migrationManager.registerMigration(
   'Create event log collection',
   async () => {
     const { EventLog } = require('../src/models/EventLog');
-    
+
     await EventLog.createIndexes();
-    
+
     console.log('✅ 이벤트 로그 컬렉션 생성 완료');
   },
   async () => {
     const { EventLog } = require('../src/models/EventLog');
-    
+
     await EventLog.collection.drop();
-    
+
     console.log('🔄 이벤트 로그 컬렉션 롤백 완료');
-  }
+  },
 );
 
 // CLI 인터페이스

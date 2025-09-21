@@ -5,7 +5,9 @@ const User = require('../models/User');
 // 데이터베이스 연결
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/collaboreum');
+    await mongoose.connect(
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/collaboreum',
+    );
     console.log('✅ MongoDB 연결 성공');
   } catch (error) {
     console.error('❌ MongoDB 연결 실패:', error);
@@ -21,15 +23,19 @@ const createNotifications = async () => {
     console.log('🗑️ 기존 알림 삭제 완료');
 
     // 사용자 조회
-    const users = await User.find({ role: { $in: ['artist', 'fan'] } }).limit(5);
-    
+    const users = await User.find({ role: { $in: ['artist', 'fan'] } }).limit(
+      5,
+    );
+
     if (users.length === 0) {
-      console.log('⚠️ 알림을 생성할 사용자가 없습니다. 먼저 사용자를 생성해주세요.');
+      console.log(
+        '⚠️ 알림을 생성할 사용자가 없습니다. 먼저 사용자를 생성해주세요.',
+      );
       return;
     }
 
     const notifications = [];
-    
+
     // 각 사용자별로 다양한 알림 생성
     users.forEach((user, userIndex) => {
       const userNotifications = [
@@ -37,11 +43,12 @@ const createNotifications = async () => {
           user: user._id,
           type: 'funding',
           title: '새로운 펀딩 프로젝트가 시작되었습니다',
-          message: '새로운 아티스트의 프로젝트가 시작되었습니다. 지금 확인해보세요!',
+          message:
+            '새로운 아티스트의 프로젝트가 시작되었습니다. 지금 확인해보세요!',
           read: false,
           url: '/funding/projects',
           data: { projectId: 'sample-project-1' },
-          createdAt: new Date(Date.now() - 1000 * 60 * 30) // 30분 전
+          createdAt: new Date(Date.now() - 1000 * 60 * 30), // 30분 전
         },
         {
           user: user._id,
@@ -51,7 +58,7 @@ const createNotifications = async () => {
           read: false,
           url: '/events',
           data: { eventId: 'sample-event-1' },
-          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2) // 2시간 전
+          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2시간 전
         },
         {
           user: user._id,
@@ -61,7 +68,7 @@ const createNotifications = async () => {
           read: true,
           url: '/mypage',
           data: { points: 100, reason: 'funding_participation' },
-          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24) // 1일 전
+          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1일 전
         },
         {
           user: user._id,
@@ -71,7 +78,7 @@ const createNotifications = async () => {
           read: false,
           url: '/mypage',
           data: { followerId: 'sample-follower-1' },
-          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6) // 6시간 전
+          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6), // 6시간 전
         },
         {
           user: user._id,
@@ -81,18 +88,20 @@ const createNotifications = async () => {
           read: true,
           url: '/projects',
           data: { projectId: 'sample-project-2' },
-          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 12) // 12시간 전
-        }
+          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 12), // 12시간 전
+        },
       ];
-      
+
       notifications.push(...userNotifications);
     });
 
     const createdNotifications = await Notification.insertMany(notifications);
     console.log('🔔 알림 생성 완료');
     console.log(`생성된 알림: ${createdNotifications.length}개`);
-    console.log(`사용자별 알림: ${Math.floor(createdNotifications.length / users.length)}개`);
-    
+    console.log(
+      `사용자별 알림: ${Math.floor(createdNotifications.length / users.length)}개`,
+    );
+
     return createdNotifications;
   } catch (error) {
     console.error('❌ 알림 생성 실패:', error);
@@ -105,7 +114,7 @@ const seedNotifications = async () => {
   try {
     await connectDB();
     await createNotifications();
-    
+
     console.log('🎉 알림 시드 완료!');
     process.exit(0);
   } catch (error) {

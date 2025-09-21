@@ -12,7 +12,7 @@ class RedisService {
     this.defaultTTL = 3600; // 1시간
     this.retryDelay = 1000;
     this.maxRetries = 3;
-    
+
     this.initializeConnection();
   }
 
@@ -41,7 +41,7 @@ class RedisService {
         this.isConnected = true;
       });
 
-      this.client.on('error', (error) => {
+      this.client.on('error', error => {
         console.error('❌ Redis 연결 오류:', error);
         this.isConnected = false;
       });
@@ -54,7 +54,6 @@ class RedisService {
       this.client.on('reconnecting', () => {
         console.log('🔄 Redis 재연결 시도 중...');
       });
-
     } catch (error) {
       console.error('❌ Redis 초기화 실패:', error);
       this.isConnected = false;
@@ -86,18 +85,28 @@ class RedisService {
    */
   async set(key, value, ttl = this.defaultTTL) {
     const startTime = Date.now();
-    
+
     try {
       await this.ensureConnection();
-      
+
       const serializedValue = JSON.stringify(value);
       const result = await this.client.setex(key, ttl, serializedValue);
-      
-      performanceLogger.database.query('SET', 'redis', Date.now() - startTime, true);
-      
+
+      performanceLogger.database.query(
+        'SET',
+        'redis',
+        Date.now() - startTime,
+        true,
+      );
+
       return result === 'OK';
     } catch (error) {
-      performanceLogger.database.query('SET', 'redis', Date.now() - startTime, false);
+      performanceLogger.database.query(
+        'SET',
+        'redis',
+        Date.now() - startTime,
+        false,
+      );
       console.error(`Redis SET 오류 (${key}):`, error);
       return false;
     }
@@ -108,21 +117,31 @@ class RedisService {
    */
   async get(key) {
     const startTime = Date.now();
-    
+
     try {
       await this.ensureConnection();
-      
+
       const value = await this.client.get(key);
-      
-      performanceLogger.database.query('GET', 'redis', Date.now() - startTime, true);
-      
+
+      performanceLogger.database.query(
+        'GET',
+        'redis',
+        Date.now() - startTime,
+        true,
+      );
+
       if (value === null) {
         return null;
       }
-      
+
       return JSON.parse(value);
     } catch (error) {
-      performanceLogger.database.query('GET', 'redis', Date.now() - startTime, false);
+      performanceLogger.database.query(
+        'GET',
+        'redis',
+        Date.now() - startTime,
+        false,
+      );
       console.error(`Redis GET 오류 (${key}):`, error);
       return null;
     }
@@ -133,17 +152,27 @@ class RedisService {
    */
   async del(key) {
     const startTime = Date.now();
-    
+
     try {
       await this.ensureConnection();
-      
+
       const result = await this.client.del(key);
-      
-      performanceLogger.database.query('DEL', 'redis', Date.now() - startTime, true);
-      
+
+      performanceLogger.database.query(
+        'DEL',
+        'redis',
+        Date.now() - startTime,
+        true,
+      );
+
       return result > 0;
     } catch (error) {
-      performanceLogger.database.query('DEL', 'redis', Date.now() - startTime, false);
+      performanceLogger.database.query(
+        'DEL',
+        'redis',
+        Date.now() - startTime,
+        false,
+      );
       console.error(`Redis DEL 오류 (${key}):`, error);
       return false;
     }
@@ -154,22 +183,32 @@ class RedisService {
    */
   async delPattern(pattern) {
     const startTime = Date.now();
-    
+
     try {
       await this.ensureConnection();
-      
+
       const keys = await this.client.keys(pattern);
       if (keys.length === 0) {
         return 0;
       }
-      
+
       const result = await this.client.del(...keys);
-      
-      performanceLogger.database.query('DEL_PATTERN', 'redis', Date.now() - startTime, true);
-      
+
+      performanceLogger.database.query(
+        'DEL_PATTERN',
+        'redis',
+        Date.now() - startTime,
+        true,
+      );
+
       return result;
     } catch (error) {
-      performanceLogger.database.query('DEL_PATTERN', 'redis', Date.now() - startTime, false);
+      performanceLogger.database.query(
+        'DEL_PATTERN',
+        'redis',
+        Date.now() - startTime,
+        false,
+      );
       console.error(`Redis DEL_PATTERN 오류 (${pattern}):`, error);
       return 0;
     }
@@ -206,18 +245,28 @@ class RedisService {
    */
   async hset(key, field, value) {
     const startTime = Date.now();
-    
+
     try {
       await this.ensureConnection();
-      
+
       const serializedValue = JSON.stringify(value);
       const result = await this.client.hset(key, field, serializedValue);
-      
-      performanceLogger.database.query('HSET', 'redis', Date.now() - startTime, true);
-      
+
+      performanceLogger.database.query(
+        'HSET',
+        'redis',
+        Date.now() - startTime,
+        true,
+      );
+
       return result;
     } catch (error) {
-      performanceLogger.database.query('HSET', 'redis', Date.now() - startTime, false);
+      performanceLogger.database.query(
+        'HSET',
+        'redis',
+        Date.now() - startTime,
+        false,
+      );
       console.error(`Redis HSET 오류 (${key}:${field}):`, error);
       return false;
     }
@@ -228,21 +277,31 @@ class RedisService {
    */
   async hget(key, field) {
     const startTime = Date.now();
-    
+
     try {
       await this.ensureConnection();
-      
+
       const value = await this.client.hget(key, field);
-      
-      performanceLogger.database.query('HGET', 'redis', Date.now() - startTime, true);
-      
+
+      performanceLogger.database.query(
+        'HGET',
+        'redis',
+        Date.now() - startTime,
+        true,
+      );
+
       if (value === null) {
         return null;
       }
-      
+
       return JSON.parse(value);
     } catch (error) {
-      performanceLogger.database.query('HGET', 'redis', Date.now() - startTime, false);
+      performanceLogger.database.query(
+        'HGET',
+        'redis',
+        Date.now() - startTime,
+        false,
+      );
       console.error(`Redis HGET 오류 (${key}:${field}):`, error);
       return null;
     }
@@ -253,14 +312,19 @@ class RedisService {
    */
   async hgetall(key) {
     const startTime = Date.now();
-    
+
     try {
       await this.ensureConnection();
-      
+
       const hash = await this.client.hgetall(key);
-      
-      performanceLogger.database.query('HGETALL', 'redis', Date.now() - startTime, true);
-      
+
+      performanceLogger.database.query(
+        'HGETALL',
+        'redis',
+        Date.now() - startTime,
+        true,
+      );
+
       const result = {};
       for (const [field, value] of Object.entries(hash)) {
         try {
@@ -269,10 +333,15 @@ class RedisService {
           result[field] = value;
         }
       }
-      
+
       return result;
     } catch (error) {
-      performanceLogger.database.query('HGETALL', 'redis', Date.now() - startTime, false);
+      performanceLogger.database.query(
+        'HGETALL',
+        'redis',
+        Date.now() - startTime,
+        false,
+      );
       console.error(`Redis HGETALL 오류 (${key}):`, error);
       return {};
     }
@@ -297,7 +366,7 @@ class RedisService {
   async lpush(key, ...values) {
     try {
       await this.ensureConnection();
-      
+
       const serializedValues = values.map(v => JSON.stringify(v));
       return await this.client.lpush(key, ...serializedValues);
     } catch (error) {
@@ -312,7 +381,7 @@ class RedisService {
   async lrange(key, start = 0, stop = -1) {
     try {
       await this.ensureConnection();
-      
+
       const values = await this.client.lrange(key, start, stop);
       return values.map(v => {
         try {
@@ -334,19 +403,19 @@ class RedisService {
     try {
       // 캐시에서 조회
       let value = await this.get(key);
-      
+
       if (value !== null) {
         return value;
       }
-      
+
       // 캐시에 없으면 데이터베이스에서 조회
       value = await fetchFunction();
-      
+
       if (value !== null) {
         // 캐시에 저장
         await this.set(key, value, ttl);
       }
-      
+
       return value;
     } catch (error) {
       console.error(`Redis getOrSet 오류 (${key}):`, error);
@@ -373,10 +442,10 @@ class RedisService {
   async getStats() {
     try {
       await this.ensureConnection();
-      
+
       const info = await this.client.info('memory');
       const keyspace = await this.client.info('keyspace');
-      
+
       return {
         connected: this.isConnected,
         memory: this.parseInfo(info),
@@ -398,14 +467,14 @@ class RedisService {
   parseInfo(info) {
     const result = {};
     const lines = info.split('\r\n');
-    
+
     for (const line of lines) {
       if (line.includes(':')) {
         const [key, value] = line.split(':');
         result[key] = value;
       }
     }
-    
+
     return result;
   }
 

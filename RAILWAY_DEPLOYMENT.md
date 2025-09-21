@@ -7,6 +7,7 @@
 Railway 대시보드에서 다음 환경 변수들을 설정해야 합니다:
 
 #### 필수 환경 변수
+
 ```
 MONGODB_URI=mongodb+srv://rmwl2356_db_user:실제비밀번호@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster
 JWT_SECRET=your-super-secret-jwt-key-here
@@ -14,6 +15,7 @@ NODE_ENV=production
 ```
 
 #### 선택적 환경 변수
+
 ```
 CLIENT_URL=https://your-frontend-domain.com
 JWT_EXPIRES_IN=7d
@@ -38,6 +40,7 @@ UPLOAD_PATH=./uploads
 ### 4. 배포 확인
 
 배포가 완료되면 다음 엔드포인트로 확인:
+
 - Health Check: `https://your-app.railway.app/api/health`
 - API Base URL: `https://your-app.railway.app/api/`
 

@@ -19,8 +19,5 @@
     "npm-run-all",
     "husky"
   ],
-  "ignoreExports": [
-    "src/index.tsx",
-    "src/App.tsx"
-  ]
+  "ignoreExports": ["src/index.tsx", "src/App.tsx"]
 }

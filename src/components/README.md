@@ -11,21 +11,22 @@
 ## 마이그레이션 가이드
 
 기존 컴포넌트를 사용할 때는:
+
 ```tsx
 // ❌ 금지 - 기존 방식
-import { Button } from 'src/components/Button'
+import { Button } from 'src/components/Button';
 
-// ✅ 권장 - 새로운 방식  
-import { Button } from '@/shared/ui/Button'
+// ✅ 권장 - 새로운 방식
+import { Button } from '@/shared/ui/Button';
 ```
 
 ## 컴포넌트 매핑표
 
-| 기존 (src/components) | 신규 (src/shared/ui) | 상태 |
-|----------------------|---------------------|------|
-| Button* | @/shared/ui/Button | 마이그레이션 예정 |
-| Modal* | @/shared/ui/Modal | 마이그레이션 예정 |
-| Input*, TextField* | @/shared/ui/Input | 마이그레이션 예정 |
-| Tag*, Chip* | @/shared/ui/Badge | 마이그레이션 예정 |
-| Panel*, Card* | @/shared/ui/Card | 마이그레이션 예정 |
-| Select*, Dropdown* | @/shared/ui/Select | 마이그레이션 예정 |
+| 기존 (src/components) | 신규 (src/shared/ui) | 상태              |
+| --------------------- | -------------------- | ----------------- |
+| Button\*              | @/shared/ui/Button   | 마이그레이션 예정 |
+| Modal\*               | @/shared/ui/Modal    | 마이그레이션 예정 |
+| Input*, TextField*    | @/shared/ui/Input    | 마이그레이션 예정 |
+| Tag*, Chip*           | @/shared/ui/Badge    | 마이그레이션 예정 |
+| Panel*, Card*         | @/shared/ui/Card     | 마이그레이션 예정 |
+| Select*, Dropdown*    | @/shared/ui/Select   | 마이그레이션 예정 |

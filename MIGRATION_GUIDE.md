@@ -15,16 +15,16 @@
 
 ## 컴포넌트 매핑표
 
-| 기존 컴포넌트 | 새로운 컴포넌트 | 상태 | 마이그레이션 우선순위 |
-|--------------|----------------|------|-------------------|
-| `src/components/Button*` | `@/shared/ui/Button` | ✅ 완료 | 높음 |
-| `src/components/Modal*` | `@/shared/ui/Modal` | ✅ 완료 | 높음 |
-| `src/components/Input*`, `TextField*` | `@/shared/ui/Input` | ✅ 완료 | 높음 |
-| `src/components/Textarea*` | `@/shared/ui/Textarea` | ✅ 완료 | 높음 |
-| `src/components/Select*`, `Dropdown*` | `@/shared/ui/Select` | ✅ 완료 | 높음 |
-| `src/components/Checkbox*` | `@/shared/ui/Checkbox` | ✅ 완료 | 높음 |
-| `src/components/Card*`, `Panel*` | `@/shared/ui/Card` | ✅ 완료 | 높음 |
-| `src/components/Badge*`, `Tag*`, `Chip*` | `@/shared/ui/Badge` | ✅ 완료 | 높음 |
+| 기존 컴포넌트                            | 새로운 컴포넌트        | 상태    | 마이그레이션 우선순위 |
+| ---------------------------------------- | ---------------------- | ------- | --------------------- |
+| `src/components/Button*`                 | `@/shared/ui/Button`   | ✅ 완료 | 높음                  |
+| `src/components/Modal*`                  | `@/shared/ui/Modal`    | ✅ 완료 | 높음                  |
+| `src/components/Input*`, `TextField*`    | `@/shared/ui/Input`    | ✅ 완료 | 높음                  |
+| `src/components/Textarea*`               | `@/shared/ui/Textarea` | ✅ 완료 | 높음                  |
+| `src/components/Select*`, `Dropdown*`    | `@/shared/ui/Select`   | ✅ 완료 | 높음                  |
+| `src/components/Checkbox*`               | `@/shared/ui/Checkbox` | ✅ 완료 | 높음                  |
+| `src/components/Card*`, `Panel*`         | `@/shared/ui/Card`     | ✅ 완료 | 높음                  |
+| `src/components/Badge*`, `Tag*`, `Chip*` | `@/shared/ui/Badge`    | ✅ 완료 | 높음                  |
 
 ## 마이그레이션 단계
 
@@ -32,12 +32,12 @@
 
 ```tsx
 // ❌ 기존 방식
-import { Button } from 'src/components/Button'
-import { Modal } from 'src/components/Modal'
+import { Button } from 'src/components/Button';
+import { Modal } from 'src/components/Modal';
 
 // ✅ 새로운 방식
-import { Button } from '@/shared/ui/Button'
-import { Modal } from '@/shared/ui/Modal'
+import { Button } from '@/shared/ui/Button';
+import { Modal } from '@/shared/ui/Modal';
 ```
 
 ### 2단계: Props 업데이트
@@ -109,7 +109,7 @@ npm run migrate:components
 - [x] Import 경로를 `@/shared/ui/*`로 변경
 - [x] 하드코딩된 색상 클래스를 디자인 토큰으로 변경
 - [x] 컴포넌트 props를 새로운 API에 맞게 업데이트
-- [x] 접근성 속성 확인 (aria-*, role, tabIndex 등)
+- [x] 접근성 속성 확인 (aria-\*, role, tabIndex 등)
 - [x] 테스트 코드 업데이트
 - [ ] 스토리북 스토리 업데이트
 

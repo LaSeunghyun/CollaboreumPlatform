@@ -6,12 +6,12 @@ import { CurrencyFormat } from '../types';
  * @returns 포맷된 통화 문자열 (예: "1,000,000원")
  */
 export function formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('ko-KR', {
-        style: 'currency',
-        currency: 'KRW',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    }).format(amount);
+  return new Intl.NumberFormat('ko-KR', {
+    style: 'currency',
+    currency: 'KRW',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
 }
 
 /**
@@ -20,11 +20,11 @@ export function formatCurrency(amount: number): string {
  * @returns CurrencyFormat 객체
  */
 export function createCurrencyFormat(amount: number): CurrencyFormat {
-    return {
-        amount,
-        formatted: formatCurrency(amount),
-        currency: 'KRW',
-    };
+  return {
+    amount,
+    formatted: formatCurrency(amount),
+    currency: 'KRW',
+  };
 }
 
 /**
@@ -33,8 +33,8 @@ export function createCurrencyFormat(amount: number): CurrencyFormat {
  * @returns 원 단위 정수
  */
 export function parseCurrency(value: string): number {
-    const numericValue = value.replace(/[^\d]/g, '');
-    return parseInt(numericValue, 10) || 0;
+  const numericValue = value.replace(/[^\d]/g, '');
+  return parseInt(numericValue, 10) || 0;
 }
 
 /**
@@ -44,6 +44,6 @@ export function parseCurrency(value: string): number {
  * @returns 백분율 (0-100)
  */
 export function calculatePercentage(current: number, target: number): number {
-    if (target === 0) return 0;
-    return Math.min(Math.round((current / target) * 100), 100);
+  if (target === 0) return 0;
+  return Math.min(Math.round((current / target) * 100), 100);
 }

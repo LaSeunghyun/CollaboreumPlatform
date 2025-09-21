@@ -44,11 +44,16 @@ export function useFormValidation<T extends Record<string, unknown>>(
 ): FormValidationState<T> & FormValidationActions<T> {
   const [values, setValues] = useState<T>(initialValues);
   const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
-  const [touched, setTouchedState] = useState<Partial<Record<keyof T, boolean>>>({});
+  const [touched, setTouchedState] = useState<
+    Partial<Record<keyof T, boolean>>
+  >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const applyRule = useCallback(
-    <K extends keyof T>(field: K, rule: ValidationRule<T[K]> | undefined): string | null => {
+    <K extends keyof T>(
+      field: K,
+      rule: ValidationRule<T[K]> | undefined,
+    ): string | null => {
       if (!rule) {
         return null;
       }
@@ -63,15 +68,33 @@ export function useFormValidation<T extends Record<string, unknown>>(
         return null;
       }
 
-      if (rule.minLength && typeof value === 'string' && value.length < rule.minLength) {
-        return rule.message ?? `${String(field)}은(는) 최소 ${rule.minLength}자 이상이어야 합니다.`;
+      if (
+        rule.minLength &&
+        typeof value === 'string' &&
+        value.length < rule.minLength
+      ) {
+        return (
+          rule.message ??
+          `${String(field)}은(는) 최소 ${rule.minLength}자 이상이어야 합니다.`
+        );
       }
 
-      if (rule.maxLength && typeof value === 'string' && value.length > rule.maxLength) {
-        return rule.message ?? `${String(field)}은(는) 최대 ${rule.maxLength}자까지 허용됩니다.`;
+      if (
+        rule.maxLength &&
+        typeof value === 'string' &&
+        value.length > rule.maxLength
+      ) {
+        return (
+          rule.message ??
+          `${String(field)}은(는) 최대 ${rule.maxLength}자까지 허용됩니다.`
+        );
       }
 
-      if (rule.pattern && typeof value === 'string' && !rule.pattern.test(value)) {
+      if (
+        rule.pattern &&
+        typeof value === 'string' &&
+        !rule.pattern.test(value)
+      ) {
         return rule.message ?? `${String(field)} 형식이 올바르지 않습니다.`;
       }
 
@@ -93,7 +116,9 @@ export function useFormValidation<T extends Record<string, unknown>>(
           if (!(field in prev)) {
             return prev;
           }
-          const { [field]: _omitted, ...rest } = prev as Partial<Record<keyof T, string>>;
+          const { [field]: _omitted, ...rest } = prev as Partial<
+            Record<keyof T, string>
+          >;
           return rest as Partial<Record<keyof T, string>>;
         }
 
@@ -130,14 +155,19 @@ export function useFormValidation<T extends Record<string, unknown>>(
       if (!(field in prev)) {
         return prev;
       }
-      const { [field]: _omitted, ...rest } = prev as Partial<Record<keyof T, string>>;
+      const { [field]: _omitted, ...rest } = prev as Partial<
+        Record<keyof T, string>
+      >;
       return rest as Partial<Record<keyof T, string>>;
     });
   }, []);
 
-  const setTouched = useCallback(<K extends keyof T>(field: K, next: boolean) => {
-    setTouchedState(prev => ({ ...prev, [field]: next }));
-  }, []);
+  const setTouched = useCallback(
+    <K extends keyof T>(field: K, next: boolean) => {
+      setTouchedState(prev => ({ ...prev, [field]: next }));
+    },
+    [],
+  );
 
   const reset = useCallback(() => {
     setValues(initialValues);

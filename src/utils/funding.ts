@@ -83,22 +83,25 @@ export interface RevenueDistribution {
   status: 'pending' | 'distributed';
 }
 
-export const calculateFundingProgress = (current: number, target: number): number => {
+export const calculateFundingProgress = (
+  current: number,
+  target: number,
+): number => {
   return Math.min((current / target) * 100, 100);
 };
 
 export const getFundingStatus = (
   currentAmount: number,
   targetAmount: number,
-  endDate: string
+  endDate: string,
 ): 'active' | 'success' | 'failed' => {
   const now = new Date();
   const end = new Date(endDate);
-  
+
   if (now > end) {
     return currentAmount >= targetAmount ? 'success' : 'failed';
   }
-  
+
   return 'active';
 };
 
@@ -112,23 +115,23 @@ export const calculateDaysLeft = (endDate: string): number => {
 
 export const mockPaymentProcess = async (
   amount: number,
-  paymentMethod: string
+  paymentMethod: string,
 ): Promise<{ success: boolean; transactionId?: string; error?: string }> => {
   // 모의 결제 처리
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     setTimeout(() => {
       // 95% 성공률로 모의 결제
       const success = Math.random() > 0.05;
-      
+
       if (success) {
         resolve({
           success: true,
-          transactionId: `TXN_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+          transactionId: `TXN_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         });
       } else {
         resolve({
           success: false,
-          error: '결제 처리 중 오류가 발생했습니다. 다시 시도해주세요.'
+          error: '결제 처리 중 오류가 발생했습니다. 다시 시도해주세요.',
         });
       }
     }, 2000); // 2초 대기로 실제 결제 과정 시뮬레이션
@@ -137,14 +140,14 @@ export const mockPaymentProcess = async (
 
 export const mockRefundProcess = async (
   transactionId: string,
-  amount: number
+  amount: number,
 ): Promise<{ success: boolean; refundId?: string; error?: string }> => {
   // 모의 환불 처리
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     setTimeout(() => {
       resolve({
         success: true,
-        refundId: `REF_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        refundId: `REF_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       });
     }, 1500);
   });

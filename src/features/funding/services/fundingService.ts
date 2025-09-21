@@ -120,9 +120,9 @@ const mapFundingProjectFromApi = (
       ? Math.min(Math.max(Math.round(project.progress), 0), 100)
       : targetAmount > 0
         ? Math.min(
-            Math.max(Math.round((currentAmount / targetAmount) * 100), 0),
-            100,
-          )
+          Math.max(Math.round((currentAmount / targetAmount) * 100), 0),
+          100,
+        )
         : 0;
 
   return {
@@ -248,7 +248,7 @@ class FundingService {
   ): Promise<FundingProject> {
     const response = await api.post<FundingProjectApi>(
       '/funding/projects',
-      data,
+      data as any,
     );
     const project = requireData(response, '펀딩 프로젝트 생성에 실패했습니다.');
     const normalized = mapFundingProjectFromApi(project);
@@ -296,7 +296,7 @@ class FundingService {
   ): Promise<{ paymentId: number; message: string }> {
     const response = await api.post<{ paymentId: number; message: string }>(
       `/funding/projects/${data.projectId}/back`,
-      data,
+      data as any,
     );
 
     return requireData(response, '후원 처리에 실패했습니다.');

@@ -13,34 +13,34 @@ export function FundingStatsCards({ filteredHistory }: FundingStatsCardsProps) {
     {
       label: '성공한 프로젝트',
       value: stats.success,
-      color: 'text-green-600'
+      color: 'text-green-600',
     },
     {
       label: '진행중인 프로젝트',
       value: stats.ongoing,
-      color: 'text-blue-600'
+      color: 'text-blue-600',
     },
     {
       label: '실패한 프로젝트',
       value: stats.failed,
-      color: 'text-red-600'
+      color: 'text-red-600',
     },
     {
       label: '전체 프로젝트',
       value: stats.total,
-      color: 'text-purple-600'
-    }
+      color: 'text-purple-600',
+    },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div className='mb-6 grid grid-cols-2 gap-4 md:grid-cols-4'>
       {statItems.map((item, index) => (
         <Card key={index}>
-          <CardContent className="p-4 text-center">
+          <CardContent className='p-4 text-center'>
             <div className={`text-2xl font-bold ${item.color} mb-1`}>
               {item.value}
             </div>
-            <p className="text-sm text-gray-600">{item.label}</p>
+            <p className='text-sm text-gray-600'>{item.label}</p>
           </CardContent>
         </Card>
       ))}

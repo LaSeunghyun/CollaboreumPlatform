@@ -18,15 +18,20 @@ jest.mock('../../contexts/AuthContext', () => ({
 }));
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-const mockGetUserProfile = userProfileAPI.getUserProfile as jest.MockedFunction<UserProfileAPI['getUserProfile']>;
-const mockGetUserBackings = userProfileAPI.getUserBackings as jest.MockedFunction<UserProfileAPI['getUserBackings']>;
+const mockGetUserProfile = userProfileAPI.getUserProfile as jest.MockedFunction<
+  UserProfileAPI['getUserProfile']
+>;
+const mockGetUserBackings =
+  userProfileAPI.getUserBackings as jest.MockedFunction<
+    UserProfileAPI['getUserBackings']
+  >;
 
 const renderComponent = () => {
   const queryClient = new QueryClient();
   return render(
     <QueryClientProvider client={queryClient}>
       <FanMyPage />
-    </QueryClientProvider>
+    </QueryClientProvider>,
   );
 };
 
@@ -58,9 +63,7 @@ describe('FanMyPage', () => {
         totalPledges: 3,
         totalAmount: 150000,
         followingCount: 2,
-        following: [
-          { id: 'artist-1', name: '아티스트 A', followers: 1234 },
-        ],
+        following: [{ id: 'artist-1', name: '아티스트 A', followers: 1234 }],
       },
     } as any);
 
@@ -90,7 +93,10 @@ describe('FanMyPage', () => {
     expect(screen.getByText('fan@example.com')).toBeInTheDocument();
     expect(screen.getByText('₩150,000')).toBeInTheDocument();
     expect(
-      screen.getByText((content, element) => element?.textContent === '3' && element.tagName === 'DIV')
+      screen.getByText(
+        (content, element) =>
+          element?.textContent === '3' && element.tagName === 'DIV',
+      ),
     ).toBeInTheDocument();
     expect(screen.getByText('팔로잉')).toBeInTheDocument();
     expect(await screen.findByText('새로운 앨범 프로젝트')).toBeInTheDocument();

@@ -1,6 +1,8 @@
 import { ComponentType, LazyExoticComponent } from 'react';
 
-export type RouteComponent = ComponentType<any> | LazyExoticComponent<ComponentType<any>>;
+export type RouteComponent =
+  | ComponentType<any>
+  | LazyExoticComponent<ComponentType<any>>;
 
 export interface RouteConfig {
   path: string;

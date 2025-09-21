@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { AuthenticationError, BusinessLogicError } = require('../../errors/AppError');
+const {
+  AuthenticationError,
+  BusinessLogicError,
+} = require('../../errors/AppError');
 const { businessLogger } = require('../../middleware/logger');
 
 /**
@@ -8,14 +11,16 @@ const { businessLogger } = require('../../middleware/logger');
  */
 class JWTService {
   constructor() {
-    this.accessTokenSecret = process.env.JWT_ACCESS_SECRET || 'default-access-secret';
-    this.refreshTokenSecret = process.env.JWT_REFRESH_SECRET || 'default-refresh-secret';
+    this.accessTokenSecret =
+      process.env.JWT_ACCESS_SECRET || 'default-access-secret';
+    this.refreshTokenSecret =
+      process.env.JWT_REFRESH_SECRET || 'default-refresh-secret';
     this.accessTokenExpiry = process.env.JWT_ACCESS_EXPIRY || '15m';
     this.refreshTokenExpiry = process.env.JWT_REFRESH_EXPIRY || '7d';
-    
+
     // 토큰 블랙리스트 (Redis 사용 권장)
     this.tokenBlacklist = new Set();
-    
+
     // 키 롤링을 위한 키 버전
     this.keyVersion = process.env.JWT_KEY_VERSION || '1';
   }
@@ -150,7 +155,7 @@ class JWTService {
    */
   refreshTokens(refreshToken) {
     const decoded = this.verifyRefreshToken(refreshToken);
-    
+
     // 리프레시 토큰을 블랙리스트에 추가
     this.revokeToken(refreshToken);
 
@@ -170,11 +175,14 @@ class JWTService {
    */
   revokeToken(token) {
     this.tokenBlacklist.add(token);
-    
+
     // 메모리 정리 (실제로는 Redis TTL 사용 권장)
-    setTimeout(() => {
-      this.tokenBlacklist.delete(token);
-    }, this.parseExpiry(this.refreshTokenExpiry) * 1000);
+    setTimeout(
+      () => {
+        this.tokenBlacklist.delete(token);
+      },
+      this.parseExpiry(this.refreshTokenExpiry) * 1000,
+    );
   }
 
   /**
@@ -191,7 +199,7 @@ class JWTService {
    */
   extractUserFromToken(token) {
     const decoded = this.verifyAccessToken(token);
-    
+
     return {
       userId: decoded.userId,
       email: decoded.email,
@@ -206,7 +214,7 @@ class JWTService {
   hasPermission(token, requiredPermission) {
     try {
       const user = this.extractUserFromToken(token);
-      
+
       // 관리자는 모든 권한을 가짐
       if (user.role === 'admin') {
         return true;

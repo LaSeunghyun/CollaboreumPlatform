@@ -18,14 +18,14 @@ router.post('/calculate/:projectId', auth, async (req, res) => {
     if (!project) {
       return res.status(404).json({
         success: false,
-        message: '프로젝트를 찾을 수 없습니다.'
+        message: '프로젝트를 찾을 수 없습니다.',
       });
     }
 
     if (project.creatorId.toString() !== userId) {
       return res.status(403).json({
         success: false,
-        message: '수익 분배 권한이 없습니다.'
+        message: '수익 분배 권한이 없습니다.',
       });
     }
 
@@ -36,7 +36,7 @@ router.post('/calculate/:projectId', auth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: '수익 분배 계산에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -53,14 +53,14 @@ router.post('/distribute/:projectId', auth, async (req, res) => {
     if (!project) {
       return res.status(404).json({
         success: false,
-        message: '프로젝트를 찾을 수 없습니다.'
+        message: '프로젝트를 찾을 수 없습니다.',
       });
     }
 
     if (project.creatorId.toString() !== userId) {
       return res.status(403).json({
         success: false,
-        message: '수익 분배 권한이 없습니다.'
+        message: '수익 분배 권한이 없습니다.',
       });
     }
 
@@ -71,7 +71,7 @@ router.post('/distribute/:projectId', auth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: '수익 분배 실행에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -84,13 +84,13 @@ router.post('/payouts/:payoutId/process', auth, async (req, res) => {
 
     const payout = await CreatorPayout.findOne({
       payoutId,
-      creatorId: userId
+      creatorId: userId,
     });
 
     if (!payout) {
       return res.status(404).json({
         success: false,
-        message: '지급 정보를 찾을 수 없습니다.'
+        message: '지급 정보를 찾을 수 없습니다.',
       });
     }
 
@@ -98,7 +98,7 @@ router.post('/payouts/:payoutId/process', auth, async (req, res) => {
       creatorId: payout.creatorId,
       projectId: payout.projectId,
       amount: payout.amount,
-      bankAccount: payout.bankAccount
+      bankAccount: payout.bankAccount,
     });
 
     res.json(result);
@@ -107,7 +107,7 @@ router.post('/payouts/:payoutId/process', auth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: '크리에이터 지급 처리에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -123,7 +123,7 @@ router.get('/payouts/creator/:creatorId', auth, async (req, res) => {
     if (creatorId !== userId) {
       return res.status(403).json({
         success: false,
-        message: '지급 내역 조회 권한이 없습니다.'
+        message: '지급 내역 조회 권한이 없습니다.',
       });
     }
 
@@ -145,15 +145,15 @@ router.get('/payouts/creator/:creatorId', auth, async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     console.error('크리에이터 지급 내역 조회 실패:', error);
     res.status(500).json({
       success: false,
       message: '크리에이터 지급 내역 조회에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -171,25 +171,29 @@ router.post('/reports/:projectId', auth, async (req, res) => {
     if (!project) {
       return res.status(404).json({
         success: false,
-        message: '프로젝트를 찾을 수 없습니다.'
+        message: '프로젝트를 찾을 수 없습니다.',
       });
     }
 
     if (project.creatorId.toString() !== userId) {
       return res.status(403).json({
         success: false,
-        message: '수익 리포트 조회 권한이 없습니다.'
+        message: '수익 리포트 조회 권한이 없습니다.',
       });
     }
 
-    const result = await revenueService.generateRevenueReport(projectId, startDate, endDate);
+    const result = await revenueService.generateRevenueReport(
+      projectId,
+      startDate,
+      endDate,
+    );
     res.json(result);
   } catch (error) {
     console.error('수익 리포트 생성 실패:', error);
     res.status(500).json({
       success: false,
       message: '수익 리포트 생성에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -204,7 +208,7 @@ router.get('/dashboard/creator/:creatorId', auth, async (req, res) => {
     if (creatorId !== userId) {
       return res.status(403).json({
         success: false,
-        message: '수익 대시보드 조회 권한이 없습니다.'
+        message: '수익 대시보드 조회 권한이 없습니다.',
       });
     }
 
@@ -215,9 +219,9 @@ router.get('/dashboard/creator/:creatorId', auth, async (req, res) => {
         $group: {
           _id: null,
           totalEarnings: { $sum: '$amount' },
-          completedPayouts: { $sum: 1 }
-        }
-      }
+          completedPayouts: { $sum: 1 },
+        },
+      },
     ]);
 
     // 대기 중인 지급 조회
@@ -226,13 +230,16 @@ router.get('/dashboard/creator/:creatorId', auth, async (req, res) => {
       {
         $group: {
           _id: null,
-          pendingPayouts: { $sum: '$amount' }
-        }
-      }
+          pendingPayouts: { $sum: '$amount' },
+        },
+      },
     ]);
 
     // 월별 수익 조회 (최근 12개월)
-    const monthlyStats = await CreatorPayout.getMonthlyPayoutStats(creatorId, new Date().getFullYear());
+    const monthlyStats = await CreatorPayout.getMonthlyPayoutStats(
+      creatorId,
+      new Date().getFullYear(),
+    );
 
     // 상위 프로젝트 조회
     const topProjects = await CreatorPayout.aggregate([
@@ -240,8 +247,8 @@ router.get('/dashboard/creator/:creatorId', auth, async (req, res) => {
       {
         $group: {
           _id: '$projectId',
-          earnings: { $sum: '$amount' }
-        }
+          earnings: { $sum: '$amount' },
+        },
       },
       { $sort: { earnings: -1 } },
       { $limit: 5 },
@@ -250,23 +257,25 @@ router.get('/dashboard/creator/:creatorId', auth, async (req, res) => {
           from: 'fundingprojects',
           localField: '_id',
           foreignField: '_id',
-          as: 'project'
-        }
+          as: 'project',
+        },
       },
       {
-        $unwind: '$project'
+        $unwind: '$project',
       },
       {
         $project: {
           projectId: '$_id',
           title: '$project.title',
-          earnings: '$earnings'
-        }
-      }
+          earnings: '$earnings',
+        },
+      },
     ]);
 
     // 프로젝트 수 조회
-    const projectCount = await CreatorPayout.distinct('projectId', { creatorId: creatorId });
+    const projectCount = await CreatorPayout.distinct('projectId', {
+      creatorId: creatorId,
+    });
 
     res.json({
       success: true,
@@ -277,17 +286,17 @@ router.get('/dashboard/creator/:creatorId', auth, async (req, res) => {
         projectCount: projectCount.length,
         monthlyEarnings: monthlyStats.map(stat => ({
           month: stat._id.month,
-          earnings: stat.totalAmount
+          earnings: stat.totalAmount,
         })),
-        topProjects: topProjects
-      }
+        topProjects: topProjects,
+      },
     });
   } catch (error) {
     console.error('크리에이터 수익 대시보드 조회 실패:', error);
     res.status(500).json({
       success: false,
       message: '크리에이터 수익 대시보드 조회에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -298,9 +307,10 @@ router.get('/stats/platform', admin, async (req, res) => {
     const { startDate, endDate, groupBy } = req.query;
 
     const result = await revenueService.getPlatformRevenueStats(
-      startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+      startDate ||
+        new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
       endDate || new Date().toISOString(),
-      groupBy || 'day'
+      groupBy || 'day',
     );
 
     res.json(result);
@@ -309,7 +319,7 @@ router.get('/stats/platform', admin, async (req, res) => {
     res.status(500).json({
       success: false,
       message: '플랫폼 수익 통계 조회에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -323,14 +333,14 @@ router.post('/distributions/:distributionId/retry', admin, async (req, res) => {
     if (!distribution) {
       return res.status(404).json({
         success: false,
-        message: '수익 분배 정보를 찾을 수 없습니다.'
+        message: '수익 분배 정보를 찾을 수 없습니다.',
       });
     }
 
     if (!distribution.canRetry) {
       return res.status(400).json({
         success: false,
-        message: '재시도 횟수를 초과했습니다.'
+        message: '재시도 횟수를 초과했습니다.',
       });
     }
 
@@ -338,14 +348,14 @@ router.post('/distributions/:distributionId/retry', admin, async (req, res) => {
 
     res.json({
       success: true,
-      message: '수익 분배 재시도가 요청되었습니다.'
+      message: '수익 분배 재시도가 요청되었습니다.',
     });
   } catch (error) {
     console.error('수익 분배 재시도 실패:', error);
     res.status(500).json({
       success: false,
       message: '수익 분배 재시도에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -375,15 +385,15 @@ router.get('/distributions', admin, async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     console.error('수익 분배 내역 조회 실패:', error);
     res.status(500).json({
       success: false,
       message: '수익 분배 내역 조회에 실패했습니다.',
-      error: error.message
+      error: error.message,
     });
   }
 });

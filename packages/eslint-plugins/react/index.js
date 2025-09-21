@@ -4,25 +4,25 @@ function createNoopRule(name) {
       type: 'suggestion',
       docs: {
         description: `Stub implementation for react/${name}.`,
-        recommended: false
+        recommended: false,
       },
-      schema: []
+      schema: [],
     },
     create() {
       return {};
-    }
+    },
   };
 }
 
 module.exports = {
   configs: {
     recommended: {
-      rules: {}
-    }
+      rules: {},
+    },
   },
   rules: {
     'display-name': createNoopRule('display-name'),
     'prop-types': createNoopRule('prop-types'),
-    'react-in-jsx-scope': createNoopRule('react-in-jsx-scope')
-  }
+    'react-in-jsx-scope': createNoopRule('react-in-jsx-scope'),
+  },
 };

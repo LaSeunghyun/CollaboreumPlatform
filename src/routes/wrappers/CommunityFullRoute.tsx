@@ -9,7 +9,7 @@ export const CommunityFullRoute: React.FC = () => {
   return (
     <CommunityFull
       onBack={() => navigate(-1)}
-      onSelectArtist={(artistId) => navigate(`/artists/${artistId}`)}
+      onSelectArtist={artistId => navigate(`/artists/${artistId}`)}
     />
   );
 };

@@ -34,8 +34,9 @@ interface ProjectActionVariables {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
-const isFundingProjectSummary = (value: unknown): value is FundingProjectSummary =>
-  isRecord(value) && 'id' in value;
+const isFundingProjectSummary = (
+  value: unknown,
+): value is FundingProjectSummary => isRecord(value) && 'id' in value;
 
 const updateFundingProjects = (
   previous: FundingProjectsQueryResult | undefined,

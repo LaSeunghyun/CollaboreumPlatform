@@ -8,13 +8,13 @@ router.get('/', async (req, res) => {
     const categories = await Category.find({ isActive: true }).sort('order');
     res.json({
       success: true,
-      data: categories
+      data: categories,
     });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: '카테고리 조회 중 오류가 발생했습니다.', 
-      error: error.message 
+      message: '카테고리 조회 중 오류가 발생했습니다.',
+      error: error.message,
     });
   }
 });
@@ -22,13 +22,19 @@ router.get('/', async (req, res) => {
 // 특정 카테고리 조회
 router.get('/:id', async (req, res) => {
   try {
-    const category = await Category.findOne({ id: req.params.id, isActive: true });
+    const category = await Category.findOne({
+      id: req.params.id,
+      isActive: true,
+    });
     if (!category) {
       return res.status(404).json({ message: '카테고리를 찾을 수 없습니다.' });
     }
     res.json(category);
   } catch (error) {
-    res.status(500).json({ message: '카테고리 조회 중 오류가 발생했습니다.', error: error.message });
+    res.status(500).json({
+      message: '카테고리 조회 중 오류가 발생했습니다.',
+      error: error.message,
+    });
   }
 });
 
@@ -36,27 +42,32 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { id, label, icon, order } = req.body;
-    
+
     if (!id || !label) {
       return res.status(400).json({ message: 'ID와 라벨은 필수입니다.' });
     }
 
     const existingCategory = await Category.findOne({ id });
     if (existingCategory) {
-      return res.status(400).json({ message: '이미 존재하는 카테고리 ID입니다.' });
+      return res
+        .status(400)
+        .json({ message: '이미 존재하는 카테고리 ID입니다.' });
     }
 
     const category = new Category({
       id,
       label,
       icon,
-      order: order || 0
+      order: order || 0,
     });
 
     const savedCategory = await category.save();
     res.status(201).json(savedCategory);
   } catch (error) {
-    res.status(500).json({ message: '카테고리 생성 중 오류가 발생했습니다.', error: error.message });
+    res.status(500).json({
+      message: '카테고리 생성 중 오류가 발생했습니다.',
+      error: error.message,
+    });
   }
 });
 
@@ -64,7 +75,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { label, icon, order, isActive } = req.body;
-    
+
     const category = await Category.findOne({ id: req.params.id });
     if (!category) {
       return res.status(404).json({ message: '카테고리를 찾을 수 없습니다.' });
@@ -78,7 +89,10 @@ router.put('/:id', async (req, res) => {
     const updatedCategory = await category.save();
     res.json(updatedCategory);
   } catch (error) {
-    res.status(500).json({ message: '카테고리 수정 중 오류가 발생했습니다.', error: error.message });
+    res.status(500).json({
+      message: '카테고리 수정 중 오류가 발생했습니다.',
+      error: error.message,
+    });
   }
 });
 
@@ -93,10 +107,13 @@ router.delete('/:id', async (req, res) => {
     // 실제 삭제 대신 비활성화
     category.isActive = false;
     await category.save();
-    
+
     res.json({ message: '카테고리가 비활성화되었습니다.' });
   } catch (error) {
-    res.status(500).json({ message: '카테고리 삭제 중 오류가 발생했습니다.', error: error.message });
+    res.status(500).json({
+      message: '카테고리 삭제 중 오류가 발생했습니다.',
+      error: error.message,
+    });
   }
 });
 

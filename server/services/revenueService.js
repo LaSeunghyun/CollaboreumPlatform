@@ -28,17 +28,23 @@ class RevenueService {
       // 성공한 결제 내역 조회
       const payments = await Payment.find({
         projectId,
-        status: 'completed'
+        status: 'completed',
       });
 
-      const totalRevenue = payments.reduce((sum, payment) => sum + payment.amount, 0);
+      const totalRevenue = payments.reduce(
+        (sum, payment) => sum + payment.amount,
+        0,
+      );
       const platformFee = Math.floor(totalRevenue * this.platformFeeRate);
       const creatorRevenue = totalRevenue - platformFee;
 
       // 크리에이터 정보 조회
       const creator = await User.findById(project.creatorId);
       if (!creator) {
-        return { success: false, message: '크리에이터 정보를 찾을 수 없습니다.' };
+        return {
+          success: false,
+          message: '크리에이터 정보를 찾을 수 없습니다.',
+        };
       }
 
       const distribution = {
@@ -50,19 +56,19 @@ class RevenueService {
         status: 'pending',
         creatorId: creator._id,
         creatorName: creator.name,
-        backerCount: payments.length
+        backerCount: payments.length,
       };
 
       return {
         success: true,
-        data: distribution
+        data: distribution,
       };
     } catch (error) {
       console.error('수익 분배 계산 실패:', error);
       return {
         success: false,
         message: '수익 분배 계산에 실패했습니다.',
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -92,7 +98,7 @@ class RevenueService {
         creatorId: distributionData.creatorId,
         status: 'processing',
         distributionDate: new Date(),
-        backerCount: distributionData.backerCount
+        backerCount: distributionData.backerCount,
       });
 
       await distribution.save();
@@ -102,7 +108,7 @@ class RevenueService {
       if (!creator.bankAccount) {
         return {
           success: false,
-          message: '크리에이터의 계좌 정보가 등록되지 않았습니다.'
+          message: '크리에이터의 계좌 정보가 등록되지 않았습니다.',
         };
       }
 
@@ -111,7 +117,7 @@ class RevenueService {
         creatorId: creator._id,
         projectId: projectId,
         amount: distributionData.creatorRevenue,
-        bankAccount: creator.bankAccount
+        bankAccount: creator.bankAccount,
       });
 
       if (payoutResult.success) {
@@ -131,8 +137,8 @@ class RevenueService {
             ...distributionData,
             status: 'completed',
             processedAt: distribution.processedAt,
-            payoutId: payoutResult.data.payoutId
-          }
+            payoutId: payoutResult.data.payoutId,
+          },
         };
       } else {
         // 지급 실패 시 상태 업데이트
@@ -143,7 +149,7 @@ class RevenueService {
         return {
           success: false,
           message: '크리에이터 지급 처리에 실패했습니다.',
-          error: payoutResult.message
+          error: payoutResult.message,
         };
       }
     } catch (error) {
@@ -151,7 +157,7 @@ class RevenueService {
       return {
         success: false,
         message: '수익 분배 실행에 실패했습니다.',
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -160,11 +166,11 @@ class RevenueService {
   async processCreatorPayout(payoutData) {
     try {
       const { creatorId, projectId, amount, bankAccount } = payoutData;
-      
+
       // 실제 은행 API 연동 (예: 토스뱅크, 카카오뱅크 등)
       // 여기서는 모의 처리
       const payoutId = `payout_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
+
       // 지급 내역 저장
       const CreatorPayout = require('../models/CreatorPayout');
       const payout = new CreatorPayout({
@@ -173,14 +179,14 @@ class RevenueService {
         amount,
         bankAccount,
         status: 'processing',
-        payoutId
+        payoutId,
       });
 
       await payout.save();
 
       // 실제 지급 처리 (은행 API 호출)
       // const bankResult = await this.callBankAPI(bankAccount, amount);
-      
+
       // 모의 성공 처리
       payout.status = 'completed';
       payout.processedAt = new Date();
@@ -192,15 +198,15 @@ class RevenueService {
           payoutId: payoutId,
           amount: amount,
           status: 'completed',
-          processedAt: payout.processedAt
-        }
+          processedAt: payout.processedAt,
+        },
       };
     } catch (error) {
       console.error('크리에이터 지급 처리 실패:', error);
       return {
         success: false,
         message: '크리에이터 지급 처리에 실패했습니다.',
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -223,11 +229,14 @@ class RevenueService {
         status: 'completed',
         createdAt: {
           $gte: new Date(startDate),
-          $lte: new Date(endDate)
-        }
+          $lte: new Date(endDate),
+        },
       });
 
-      const totalRevenue = payments.reduce((sum, payment) => sum + payment.amount, 0);
+      const totalRevenue = payments.reduce(
+        (sum, payment) => sum + payment.amount,
+        0,
+      );
       const platformFee = Math.floor(totalRevenue * this.platformFeeRate);
       const creatorRevenue = totalRevenue - platformFee;
 
@@ -239,34 +248,34 @@ class RevenueService {
             status: 'completed',
             createdAt: {
               $gte: new Date(startDate),
-              $lte: new Date(endDate)
-            }
-          }
+              $lte: new Date(endDate),
+            },
+          },
         },
         {
           $group: {
             _id: '$rewardId',
             count: { $sum: 1 },
-            totalAmount: { $sum: '$amount' }
-          }
+            totalAmount: { $sum: '$amount' },
+          },
         },
         {
           $lookup: {
             from: 'rewards',
             localField: '_id',
             foreignField: '_id',
-            as: 'reward'
-          }
+            as: 'reward',
+          },
         },
         {
-          $unwind: { path: '$reward', preserveNullAndEmptyArrays: true }
+          $unwind: { path: '$reward', preserveNullAndEmptyArrays: true },
         },
         {
-          $sort: { totalAmount: -1 }
+          $sort: { totalAmount: -1 },
         },
         {
-          $limit: 10
-        }
+          $limit: 10,
+        },
       ]);
 
       const report = {
@@ -276,25 +285,26 @@ class RevenueService {
         platformFee,
         creatorRevenue,
         backerCount: payments.length,
-        averageBackAmount: payments.length > 0 ? Math.floor(totalRevenue / payments.length) : 0,
+        averageBackAmount:
+          payments.length > 0 ? Math.floor(totalRevenue / payments.length) : 0,
         topRewards: rewardStats.map(stat => ({
           rewardId: stat._id,
           name: stat.reward?.name || '기본 후원',
           amount: stat.totalAmount,
-          backerCount: stat.count
-        }))
+          backerCount: stat.count,
+        })),
       };
 
       return {
         success: true,
-        data: report
+        data: report,
       };
     } catch (error) {
       console.error('수익 리포트 생성 실패:', error);
       return {
         success: false,
         message: '수익 리포트 생성에 실패했습니다.',
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -309,12 +319,12 @@ class RevenueService {
         status: 'completed',
         createdAt: {
           $gte: new Date(startDate),
-          $lte: new Date(endDate)
-        }
+          $lte: new Date(endDate),
+        },
       };
 
-      const groupFormat = groupBy === 'day' ? '%Y-%m-%d' : 
-                         groupBy === 'week' ? '%Y-%U' : '%Y-%m';
+      const groupFormat =
+        groupBy === 'day' ? '%Y-%m-%d' : groupBy === 'week' ? '%Y-%U' : '%Y-%m';
 
       const stats = await Payment.aggregate([
         { $match: matchStage },
@@ -323,14 +333,14 @@ class RevenueService {
             _id: {
               $dateToString: {
                 format: groupFormat,
-                date: '$createdAt'
-              }
+                date: '$createdAt',
+              },
             },
             revenue: { $sum: '$amount' },
-            count: { $sum: 1 }
-          }
+            count: { $sum: 1 },
+          },
         },
-        { $sort: { _id: 1 } }
+        { $sort: { _id: 1 } },
       ]);
 
       const totalRevenue = stats.reduce((sum, stat) => sum + stat.revenue, 0);
@@ -341,8 +351,8 @@ class RevenueService {
         status: 'completed',
         createdAt: {
           $gte: new Date(startDate),
-          $lte: new Date(endDate)
-        }
+          $lte: new Date(endDate),
+        },
       });
 
       return {
@@ -356,16 +366,17 @@ class RevenueService {
             date: stat._id,
             revenue: stat.revenue,
             platformFee: Math.floor(stat.revenue * this.platformFeeRate),
-            creatorRevenue: stat.revenue - Math.floor(stat.revenue * this.platformFeeRate)
-          }))
-        }
+            creatorRevenue:
+              stat.revenue - Math.floor(stat.revenue * this.platformFeeRate),
+          })),
+        },
       };
     } catch (error) {
       console.error('플랫폼 수익 통계 조회 실패:', error);
       return {
         success: false,
         message: '플랫폼 수익 통계 조회에 실패했습니다.',
-        error: error.message
+        error: error.message,
       };
     }
   }

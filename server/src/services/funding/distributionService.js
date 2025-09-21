@@ -1,4 +1,7 @@
-const { BusinessLogicError, _ValidationError } = require('../../errors/AppError');
+const {
+  BusinessLogicError,
+  _ValidationError,
+} = require('../../errors/AppError');
 const { FundingProject } = require('../../models/FundingProject');
 const { Distribution } = require('../../models/Distribution');
 const { eventStore } = require('./eventStore');
@@ -45,7 +48,7 @@ class DistributionService {
       // 최소 분배 금액 체크
       if (amount < this.minimumDistributionAmount) {
         throw new BusinessLogicError(
-          `분배 금액이 최소 금액(${this.minimumDistributionAmount}원)보다 작습니다: ${amount}원`
+          `분배 금액이 최소 금액(${this.minimumDistributionAmount}원)보다 작습니다: ${amount}원`,
         );
       }
 
@@ -63,11 +66,14 @@ class DistributionService {
     }
 
     // 총 분배 금액 검증
-    const totalDistributed = distributionItems.reduce((sum, item) => sum + item.amount, 0);
-    
+    const totalDistributed = distributionItems.reduce(
+      (sum, item) => sum + item.amount,
+      0,
+    );
+
     if (totalDistributed > totalAmount) {
       throw new BusinessLogicError(
-        `분배 금액이 총 모금액을 초과합니다: ${totalDistributed}원 > ${totalAmount}원`
+        `분배 금액이 총 모금액을 초과합니다: ${totalDistributed}원 > ${totalAmount}원`,
       );
     }
 
@@ -76,9 +82,9 @@ class DistributionService {
     if (remainder > 0) {
       // 가장 큰 금액을 받는 항목에 잔액 추가
       const maxAmountIndex = distributionItems.reduce(
-        (maxIndex, item, index) => 
+        (maxIndex, item, index) =>
           item.amount > distributionItems[maxIndex].amount ? index : maxIndex,
-        0
+        0,
       );
       distributionItems[maxAmountIndex].amount += remainder;
     }
@@ -129,7 +135,7 @@ class DistributionService {
       distribution._id,
       projectId,
       calculation.totalAmount,
-      rules
+      rules,
     );
 
     businessLogger.funding.projectCreated(projectId, userId, {
@@ -145,8 +151,8 @@ class DistributionService {
    * 분배 실행
    */
   async executeDistribution(distributionId, userId) {
-    const distribution = await Distribution.findById(distributionId)
-      .populate('items.recipientId');
+    const distribution =
+      await Distribution.findById(distributionId).populate('items.recipientId');
 
     if (!distribution) {
       throw new BusinessLogicError('분배를 찾을 수 없습니다');
@@ -157,7 +163,7 @@ class DistributionService {
     }
 
     const session = await Distribution.startSession();
-    
+
     try {
       await session.withTransaction(async () => {
         // 각 분배 항목 처리
@@ -165,7 +171,7 @@ class DistributionService {
           try {
             // 실제 결제/이체 로직 (여기서는 시뮬레이션)
             await this.processDistributionItem(item, userId);
-            
+
             item.status = 'completed';
             item.executedAt = new Date();
             item.transactionId = this.generateTransactionId();
@@ -180,8 +186,12 @@ class DistributionService {
         }
 
         // 분배 상태 업데이트
-        const completedItems = distribution.items.filter(item => item.status === 'completed');
-        const failedItems = distribution.items.filter(item => item.status === 'failed');
+        const completedItems = distribution.items.filter(
+          item => item.status === 'completed',
+        );
+        const failedItems = distribution.items.filter(
+          item => item.status === 'failed',
+        );
 
         if (failedItems.length === 0) {
           distribution.status = 'executed';
@@ -201,15 +211,18 @@ class DistributionService {
           distributionId,
           distribution.projectId,
           userId,
-          distribution.totalAmount
+          distribution.totalAmount,
         );
       });
 
       businessLogger.funding.projectCreated(distribution.projectId, userId, {
         distributionId,
         totalAmount: distribution.totalAmount,
-        completedItems: distribution.items.filter(item => item.status === 'completed').length,
-        failedItems: distribution.items.filter(item => item.status === 'failed').length,
+        completedItems: distribution.items.filter(
+          item => item.status === 'completed',
+        ).length,
+        failedItems: distribution.items.filter(item => item.status === 'failed')
+          .length,
       });
 
       return distribution;
@@ -226,10 +239,10 @@ class DistributionService {
   async processDistributionItem(_item, _executedBy) {
     // 실제 구현에서는 여기서 결제 게이트웨이 API 호출
     // 예: 토스페이먼츠, 카카오페이, 네이버페이 등
-    
+
     // 시뮬레이션: 90% 성공률
     const success = Math.random() > 0.1;
-    
+
     if (!success) {
       throw new Error('결제 처리 실패 (시뮬레이션)');
     }
@@ -327,13 +340,18 @@ class DistributionService {
       throw new BusinessLogicError('분배를 찾을 수 없습니다');
     }
 
-    if (distribution.status !== 'failed' && distribution.status !== 'partially_executed') {
+    if (
+      distribution.status !== 'failed' &&
+      distribution.status !== 'partially_executed'
+    ) {
       throw new BusinessLogicError('실패한 분배만 재시도할 수 있습니다');
     }
 
     // 실패한 항목들만 재시도
-    const failedItems = distribution.items.filter(item => item.status === 'failed');
-    
+    const failedItems = distribution.items.filter(
+      item => item.status === 'failed',
+    );
+
     for (const item of failedItems) {
       try {
         await this.processDistributionItem(item, userId);
@@ -351,8 +369,12 @@ class DistributionService {
     }
 
     // 분배 상태 재계산
-    const completedItems = distribution.items.filter(item => item.status === 'completed');
-    const stillFailedItems = distribution.items.filter(item => item.status === 'failed');
+    const completedItems = distribution.items.filter(
+      item => item.status === 'completed',
+    );
+    const stillFailedItems = distribution.items.filter(
+      item => item.status === 'failed',
+    );
 
     if (stillFailedItems.length === 0) {
       distribution.status = 'executed';

@@ -42,32 +42,50 @@ export interface RefundResponse {
 // 결제 서비스 클래스
 class PaymentService {
   // 결제 요청 생성
-  async createPayment(data: PaymentRequest): Promise<ApiResponse<PaymentResponse>> {
-    return api.post<PaymentResponse>('/payments', data);
+  async createPayment(
+    data: PaymentRequest,
+  ): Promise<ApiResponse<PaymentResponse>> {
+    return api.post<PaymentResponse>('/payments', data as any);
   }
 
   // 결제 상태 확인
-  async getPaymentStatus(paymentId: string): Promise<ApiResponse<PaymentResponse>> {
+  async getPaymentStatus(
+    paymentId: string,
+  ): Promise<ApiResponse<PaymentResponse>> {
     return api.get<PaymentResponse>(`/payments/${paymentId}`);
   }
 
   // 결제 승인 (웹훅에서 호출)
-  async confirmPayment(paymentId: string, transactionId: string): Promise<ApiResponse<PaymentResponse>> {
-    return api.post<PaymentResponse>(`/payments/${paymentId}/confirm`, { transactionId });
+  async confirmPayment(
+    paymentId: string,
+    transactionId: string,
+  ): Promise<ApiResponse<PaymentResponse>> {
+    return api.post<PaymentResponse>(`/payments/${paymentId}/confirm`, {
+      transactionId,
+    });
   }
 
   // 결제 취소
-  async cancelPayment(paymentId: string, reason: string): Promise<ApiResponse<PaymentResponse>> {
-    return api.post<PaymentResponse>(`/payments/${paymentId}/cancel`, { reason });
+  async cancelPayment(
+    paymentId: string,
+    reason: string,
+  ): Promise<ApiResponse<PaymentResponse>> {
+    return api.post<PaymentResponse>(`/payments/${paymentId}/cancel`, {
+      reason,
+    });
   }
 
   // 환불 요청
-  async requestRefund(data: RefundRequest): Promise<ApiResponse<RefundResponse>> {
-    return api.post<RefundResponse>('/refunds', data);
+  async requestRefund(
+    data: RefundRequest,
+  ): Promise<ApiResponse<RefundResponse>> {
+    return api.post<RefundResponse>('/refunds', data as any);
   }
 
   // 환불 상태 확인
-  async getRefundStatus(refundId: string): Promise<ApiResponse<RefundResponse>> {
+  async getRefundStatus(
+    refundId: string,
+  ): Promise<ApiResponse<RefundResponse>> {
     return api.get<RefundResponse>(`/refunds/${refundId}`);
   }
 
@@ -82,12 +100,14 @@ class PaymentService {
   }
 
   // 프로젝트별 결제 통계
-  async getProjectPaymentStats(projectId: string): Promise<ApiResponse<{
-    totalAmount: number;
-    totalBackers: number;
-    dailyAmount: number[];
-    paymentMethodStats: Record<string, number>;
-  }>> {
+  async getProjectPaymentStats(projectId: string): Promise<
+    ApiResponse<{
+      totalAmount: number;
+      totalBackers: number;
+      dailyAmount: number[];
+      paymentMethodStats: Record<string, number>;
+    }>
+  > {
     return api.get<{
       totalAmount: number;
       totalBackers: number;

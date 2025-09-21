@@ -4,7 +4,9 @@ const errorHandler = (err, req, res, _next) => {
 
   // Mongoose validation error
   if (err.name === 'ValidationError') {
-    const message = Object.values(err.errors).map(val => val.message).join(', ');
+    const message = Object.values(err.errors)
+      .map(val => val.message)
+      .join(', ');
     error.message = message;
     error.statusCode = 400;
   }
@@ -52,21 +54,24 @@ const errorHandler = (err, req, res, _next) => {
   const response = {
     success: false,
     message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   };
 
   // Pino 로거로 에러 기록
   const { logger } = require('../src/logger');
-  logger.error({
-    err,
-    reqId: req.reqId,
-    userId: req.userId,
-    statusCode,
-    url: req.url,
-    method: req.method,
-    ip: req.ip,
-    userAgent: req.get('User-Agent')
-  }, 'Unhandled error');
+  logger.error(
+    {
+      err,
+      reqId: req.reqId,
+      userId: req.userId,
+      statusCode,
+      url: req.url,
+      method: req.method,
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+    },
+    'Unhandled error',
+  );
 
   res.status(statusCode).json(response);
 };

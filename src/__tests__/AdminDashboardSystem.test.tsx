@@ -14,7 +14,7 @@ describe('Admin Dashboard System', () => {
     role: 'fan',
     status: 'active',
     createdAt: '2024-01-01T00:00:00Z',
-    lastLoginAt: '2024-01-15T00:00:00Z'
+    lastLoginAt: '2024-01-15T00:00:00Z',
   };
 
   const mockProject = {
@@ -22,14 +22,14 @@ describe('Admin Dashboard System', () => {
     title: '테스트 프로젝트',
     artist: {
       id: 'artist1',
-      username: '테스트아티스트'
+      username: '테스트아티스트',
     },
     category: 'music',
     goalAmount: 1000000,
     currentAmount: 500000,
     status: 'pending',
     createdAt: '2024-01-01T00:00:00Z',
-    submittedAt: '2024-01-10T00:00:00Z'
+    submittedAt: '2024-01-10T00:00:00Z',
   };
 
   const mockStatistics = {
@@ -38,7 +38,7 @@ describe('Admin Dashboard System', () => {
     totalFunding: 45000000,
     activeUsers: 1200,
     pendingProjects: 12,
-    completedProjects: 67
+    completedProjects: 67,
   };
 
   // 1. Admin Authentication Tests
@@ -48,14 +48,14 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="admin-dashboard">
+          <div data-testid='admin-dashboard'>
             {nonAdminUser.role === 'admin' ? (
-              <div data-testid="dashboard-content">관리자 대시보드</div>
+              <div data-testid='dashboard-content'>관리자 대시보드</div>
             ) : (
-              <div data-testid="access-denied">접근 권한이 없습니다</div>
+              <div data-testid='access-denied'>접근 권한이 없습니다</div>
             )}
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       expect(screen.getByTestId('access-denied')).toBeInTheDocument();
@@ -67,14 +67,14 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="admin-dashboard">
+          <div data-testid='admin-dashboard'>
             {adminUser.role === 'admin' ? (
-              <div data-testid="dashboard-content">관리자 대시보드</div>
+              <div data-testid='dashboard-content'>관리자 대시보드</div>
             ) : (
-              <div data-testid="access-denied">접근 권한이 없습니다</div>
+              <div data-testid='access-denied'>접근 권한이 없습니다</div>
             )}
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       expect(screen.getByTestId('dashboard-content')).toBeInTheDocument();
@@ -88,14 +88,14 @@ describe('Admin Dashboard System', () => {
       const mockUsers = [
         mockUser,
         { ...mockUser, id: 'user2', username: '두번째유저', role: 'artist' },
-        { ...mockUser, id: 'user3', username: '세번째유저', role: 'admin' }
+        { ...mockUser, id: 'user3', username: '세번째유저', role: 'admin' },
       ];
 
       render(
         <BrowserRouter>
-          <div data-testid="user-management">
+          <div data-testid='user-management'>
             <h2>사용자 관리</h2>
-            <table data-testid="user-table">
+            <table data-testid='user-table'>
               <thead>
                 <tr>
                   <th>사용자명</th>
@@ -114,14 +114,16 @@ describe('Admin Dashboard System', () => {
                     <td>{user.status}</td>
                     <td>
                       <button data-testid={`edit-user-${user.id}`}>수정</button>
-                      <button data-testid={`delete-user-${user.id}`}>삭제</button>
+                      <button data-testid={`delete-user-${user.id}`}>
+                        삭제
+                      </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       expect(screen.getByTestId('user-management')).toBeInTheDocument();
@@ -136,12 +138,12 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="user-search">
-            <input data-testid="search-input" placeholder="사용자 검색" />
-            <button data-testid="search-button">검색</button>
-            <div data-testid="search-results"></div>
+          <div data-testid='user-search'>
+            <input data-testid='search-input' placeholder='사용자 검색' />
+            <button data-testid='search-button'>검색</button>
+            <div data-testid='search-results'></div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const searchInput = screen.getByTestId('search-input');
@@ -158,16 +160,16 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="user-edit">
-            <select data-testid="role-select" defaultValue={mockUser.role}>
-              <option value="fan">팬</option>
-              <option value="artist">아티스트</option>
-              <option value="admin">관리자</option>
+          <div data-testid='user-edit'>
+            <select data-testid='role-select' defaultValue={mockUser.role}>
+              <option value='fan'>팬</option>
+              <option value='artist'>아티스트</option>
+              <option value='admin'>관리자</option>
             </select>
-            <button data-testid="save-role">권한 저장</button>
-            <div data-testid="role-status">현재 권한: {mockUser.role}</div>
+            <button data-testid='save-role'>권한 저장</button>
+            <div data-testid='role-status'>현재 권한: {mockUser.role}</div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const roleSelect = screen.getByTestId('role-select');
@@ -184,18 +186,21 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="user-status">
-            <select data-testid="status-select" defaultValue={mockUser.status}>
-              <option value="active">활성</option>
-              <option value="suspended">정지</option>
-              <option value="banned">차단</option>
+          <div data-testid='user-status'>
+            <select data-testid='status-select' defaultValue={mockUser.status}>
+              <option value='active'>활성</option>
+              <option value='suspended'>정지</option>
+              <option value='banned'>차단</option>
             </select>
-            <button data-testid="save-status">상태 저장</button>
-            <div data-testid="status-reason" style={{ display: 'none' }}>
-              <textarea data-testid="reason-input" placeholder="상태 변경 사유" />
+            <button data-testid='save-status'>상태 저장</button>
+            <div data-testid='status-reason' style={{ display: 'none' }}>
+              <textarea
+                data-testid='reason-input'
+                placeholder='상태 변경 사유'
+              />
             </div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const statusSelect = screen.getByTestId('status-select');
@@ -216,15 +221,15 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="user-delete">
-            <button data-testid="delete-button">사용자 삭제</button>
-            <div data-testid="delete-confirm" style={{ display: 'none' }}>
+          <div data-testid='user-delete'>
+            <button data-testid='delete-button'>사용자 삭제</button>
+            <div data-testid='delete-confirm' style={{ display: 'none' }}>
               <p>정말로 이 사용자를 삭제하시겠습니까?</p>
-              <button data-testid="confirm-delete">확인</button>
-              <button data-testid="cancel-delete">취소</button>
+              <button data-testid='confirm-delete'>확인</button>
+              <button data-testid='cancel-delete'>취소</button>
             </div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const deleteButton = screen.getByTestId('delete-button');
@@ -244,14 +249,14 @@ describe('Admin Dashboard System', () => {
       const pendingProjects = [
         mockProject,
         { ...mockProject, id: 'project2', title: '두 번째 프로젝트' },
-        { ...mockProject, id: 'project3', title: '세 번째 프로젝트' }
+        { ...mockProject, id: 'project3', title: '세 번째 프로젝트' },
       ];
 
       render(
         <BrowserRouter>
-          <div data-testid="project-approval">
+          <div data-testid='project-approval'>
             <h2>프로젝트 승인</h2>
-            <div data-testid="pending-projects">
+            <div data-testid='pending-projects'>
               {pendingProjects.map(project => (
                 <div key={project.id} data-testid={`project-${project.id}`}>
                   <h3>{project.title}</h3>
@@ -267,7 +272,7 @@ describe('Admin Dashboard System', () => {
               ))}
             </div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       expect(screen.getByTestId('project-approval')).toBeInTheDocument();
@@ -282,15 +287,18 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="project-actions">
-            <div data-testid="project-status">상태: pending</div>
-            <button data-testid="approve-button">승인</button>
-            <button data-testid="reject-button">거절</button>
-            <div data-testid="approval-reason" style={{ display: 'none' }}>
-              <textarea data-testid="reason-input" placeholder="승인/거절 사유" />
+          <div data-testid='project-actions'>
+            <div data-testid='project-status'>상태: pending</div>
+            <button data-testid='approve-button'>승인</button>
+            <button data-testid='reject-button'>거절</button>
+            <div data-testid='approval-reason' style={{ display: 'none' }}>
+              <textarea
+                data-testid='reason-input'
+                placeholder='승인/거절 사유'
+              />
             </div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const approveButton = screen.getByTestId('approve-button');
@@ -308,20 +316,23 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="project-rejection">
-            <button data-testid="reject-button">거절</button>
-            <div data-testid="rejection-form" style={{ display: 'none' }}>
-              <select data-testid="rejection-reason">
-                <option value="inappropriate">부적절한 내용</option>
-                <option value="incomplete">불완전한 정보</option>
-                <option value="policy">정책 위반</option>
-                <option value="other">기타</option>
+          <div data-testid='project-rejection'>
+            <button data-testid='reject-button'>거절</button>
+            <div data-testid='rejection-form' style={{ display: 'none' }}>
+              <select data-testid='rejection-reason'>
+                <option value='inappropriate'>부적절한 내용</option>
+                <option value='incomplete'>불완전한 정보</option>
+                <option value='policy'>정책 위반</option>
+                <option value='other'>기타</option>
               </select>
-              <textarea data-testid="rejection-detail" placeholder="상세 사유" />
-              <button data-testid="submit-rejection">거절 제출</button>
+              <textarea
+                data-testid='rejection-detail'
+                placeholder='상세 사유'
+              />
+              <button data-testid='submit-rejection'>거절 제출</button>
             </div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const rejectButton = screen.getByTestId('reject-button');
@@ -340,27 +351,29 @@ describe('Admin Dashboard System', () => {
     test('플랫폼 통계가 올바르게 표시되어야 한다', () => {
       render(
         <BrowserRouter>
-          <div data-testid="platform-stats">
+          <div data-testid='platform-stats'>
             <h2>플랫폼 통계</h2>
-            <div data-testid="stats-grid">
-              <div data-testid="stat-users">
+            <div data-testid='stats-grid'>
+              <div data-testid='stat-users'>
                 <h3>사용자</h3>
                 <p>총 사용자: {mockStatistics.totalUsers}</p>
                 <p>활성 사용자: {mockStatistics.activeUsers}</p>
               </div>
-              <div data-testid="stat-projects">
+              <div data-testid='stat-projects'>
                 <h3>프로젝트</h3>
                 <p>총 프로젝트: {mockStatistics.totalProjects}</p>
                 <p>승인 대기: {mockStatistics.pendingProjects}</p>
                 <p>완료: {mockStatistics.completedProjects}</p>
               </div>
-              <div data-testid="stat-funding">
+              <div data-testid='stat-funding'>
                 <h3>펀딩</h3>
-                <p>총 펀딩 금액: {mockStatistics.totalFunding.toLocaleString()}원</p>
+                <p>
+                  총 펀딩 금액: {mockStatistics.totalFunding.toLocaleString()}원
+                </p>
               </div>
             </div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       expect(screen.getByTestId('platform-stats')).toBeInTheDocument();
@@ -373,21 +386,21 @@ describe('Admin Dashboard System', () => {
     test('통계 차트가 올바르게 렌더링되어야 한다', () => {
       render(
         <BrowserRouter>
-          <div data-testid="statistics-charts">
-            <div data-testid="user-growth-chart">
+          <div data-testid='statistics-charts'>
+            <div data-testid='user-growth-chart'>
               <h3>사용자 성장 추이</h3>
-              <canvas data-testid="user-chart-canvas"></canvas>
+              <canvas data-testid='user-chart-canvas'></canvas>
             </div>
-            <div data-testid="project-category-chart">
+            <div data-testid='project-category-chart'>
               <h3>프로젝트 카테고리별 분포</h3>
-              <canvas data-testid="category-chart-canvas"></canvas>
+              <canvas data-testid='category-chart-canvas'></canvas>
             </div>
-            <div data-testid="funding-trend-chart">
+            <div data-testid='funding-trend-chart'>
               <h3>펀딩 성과 추이</h3>
-              <canvas data-testid="funding-chart-canvas"></canvas>
+              <canvas data-testid='funding-chart-canvas'></canvas>
             </div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       expect(screen.getByTestId('statistics-charts')).toBeInTheDocument();
@@ -408,7 +421,7 @@ describe('Admin Dashboard System', () => {
           reason: '부적절한 내용',
           reporter: 'user1',
           reportedAt: '2024-01-15T00:00:00Z',
-          status: 'pending'
+          status: 'pending',
         },
         {
           id: 'report2',
@@ -417,15 +430,15 @@ describe('Admin Dashboard System', () => {
           reason: '스팸',
           reporter: 'user2',
           reportedAt: '2024-01-14T00:00:00Z',
-          status: 'reviewed'
-        }
+          status: 'reviewed',
+        },
       ];
 
       render(
         <BrowserRouter>
-          <div data-testid="content-moderation">
+          <div data-testid='content-moderation'>
             <h2>콘텐츠 검토</h2>
-            <div data-testid="reported-content">
+            <div data-testid='reported-content'>
               {reportedContent.map(content => (
                 <div key={content.id} data-testid={`report-${content.id}`}>
                   <h3>{content.title}</h3>
@@ -442,7 +455,7 @@ describe('Admin Dashboard System', () => {
               ))}
             </div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       expect(screen.getByTestId('content-moderation')).toBeInTheDocument();
@@ -456,19 +469,19 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="moderation-action">
-            <button data-testid="remove-content">콘텐츠 삭제</button>
-            <div data-testid="action-form" style={{ display: 'none' }}>
-              <select data-testid="action-type">
-                <option value="remove">삭제</option>
-                <option value="warn">경고</option>
-                <option value="suspend">사용자 정지</option>
+          <div data-testid='moderation-action'>
+            <button data-testid='remove-content'>콘텐츠 삭제</button>
+            <div data-testid='action-form' style={{ display: 'none' }}>
+              <select data-testid='action-type'>
+                <option value='remove'>삭제</option>
+                <option value='warn'>경고</option>
+                <option value='suspend'>사용자 정지</option>
               </select>
-              <textarea data-testid="action-reason" placeholder="조치 사유" />
-              <button data-testid="submit-action">조치 실행</button>
+              <textarea data-testid='action-reason' placeholder='조치 사유' />
+              <button data-testid='submit-action'>조치 실행</button>
             </div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const removeButton = screen.getByTestId('remove-content');
@@ -487,25 +500,29 @@ describe('Admin Dashboard System', () => {
     test('시스템 설정이 올바르게 표시되어야 한다', () => {
       render(
         <BrowserRouter>
-          <div data-testid="system-settings">
+          <div data-testid='system-settings'>
             <h2>시스템 설정</h2>
-            <div data-testid="settings-form">
-              <div data-testid="setting-group">
+            <div data-testid='settings-form'>
+              <div data-testid='setting-group'>
                 <label>최대 프로젝트 금액</label>
-                <input data-testid="max-project-amount" type="number" defaultValue="10000000" />
+                <input
+                  data-testid='max-project-amount'
+                  type='number'
+                  defaultValue='10000000'
+                />
               </div>
-              <div data-testid="setting-group">
+              <div data-testid='setting-group'>
                 <label>프로젝트 승인 자동화</label>
-                <input data-testid="auto-approval" type="checkbox" />
+                <input data-testid='auto-approval' type='checkbox' />
               </div>
-              <div data-testid="setting-group">
+              <div data-testid='setting-group'>
                 <label>사용자 가입 승인 필요</label>
-                <input data-testid="user-approval-required" type="checkbox" />
+                <input data-testid='user-approval-required' type='checkbox' />
               </div>
-              <button data-testid="save-settings">설정 저장</button>
+              <button data-testid='save-settings'>설정 저장</button>
             </div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       expect(screen.getByTestId('system-settings')).toBeInTheDocument();
@@ -520,12 +537,16 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="settings-save">
-            <input data-testid="setting-input" type="number" defaultValue="10000000" />
-            <button data-testid="save-button">저장</button>
-            <div data-testid="save-status"></div>
+          <div data-testid='settings-save'>
+            <input
+              data-testid='setting-input'
+              type='number'
+              defaultValue='10000000'
+            />
+            <button data-testid='save-button'>저장</button>
+            <div data-testid='save-status'></div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const settingInput = screen.getByTestId('setting-input');
@@ -546,13 +567,13 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="admin-dashboard">
-            <div data-testid="user-management">사용자 관리</div>
-            <div data-testid="project-approval">프로젝트 승인</div>
-            <div data-testid="platform-stats">플랫폼 통계</div>
-            <div data-testid="content-moderation">콘텐츠 검토</div>
+          <div data-testid='admin-dashboard'>
+            <div data-testid='user-management'>사용자 관리</div>
+            <div data-testid='project-approval'>프로젝트 승인</div>
+            <div data-testid='platform-stats'>플랫폼 통계</div>
+            <div data-testid='content-moderation'>콘텐츠 검토</div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       await waitFor(() => {
@@ -570,21 +591,21 @@ describe('Admin Dashboard System', () => {
       const largeUserList = Array.from({ length: 1000 }, (_, i) => ({
         ...mockUser,
         id: `user${i}`,
-        username: `사용자${i}`
+        username: `사용자${i}`,
       }));
 
       const startTime = performance.now();
 
       render(
         <BrowserRouter>
-          <div data-testid="large-user-list">
+          <div data-testid='large-user-list'>
             {largeUserList.map(user => (
               <div key={user.id} data-testid={`user-${user.id}`}>
                 {user.username}
               </div>
             ))}
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const endTime = performance.now();
@@ -602,14 +623,14 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="admin-access">
+          <div data-testid='admin-access'>
             {unauthorizedUser.role === 'admin' ? (
-              <div data-testid="admin-content">관리자 전용 콘텐츠</div>
+              <div data-testid='admin-content'>관리자 전용 콘텐츠</div>
             ) : (
-              <div data-testid="access-denied">접근 권한이 없습니다</div>
+              <div data-testid='access-denied'>접근 권한이 없습니다</div>
             )}
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       // 권한이 없는 사용자는 관리자 콘텐츠에 접근할 수 없어야 함
@@ -622,11 +643,11 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="admin-action">
-            <button data-testid="delete-user">사용자 삭제</button>
-            <div data-testid="action-log"></div>
+          <div data-testid='admin-action'>
+            <button data-testid='delete-user'>사용자 삭제</button>
+            <div data-testid='action-log'></div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const deleteButton = screen.getByTestId('delete-user');
@@ -635,7 +656,9 @@ describe('Admin Dashboard System', () => {
       // 관리 작업 로그가 기록되어야 함
       await waitFor(() => {
         const actionLog = screen.getByTestId('action-log');
-        expect(actionLog).toHaveTextContent('사용자 삭제 작업이 기록되었습니다');
+        expect(actionLog).toHaveTextContent(
+          '사용자 삭제 작업이 기록되었습니다',
+        );
       });
     });
   });
@@ -658,8 +681,8 @@ describe('Admin Dashboard System', () => {
           action: 'approved',
           adminId: 'admin1',
           timestamp: new Date().toISOString(),
-          reason: '프로젝트 요구사항 충족'
-        }
+          reason: '프로젝트 요구사항 충족',
+        },
       ];
 
       expect(approvalHistory).toHaveLength(1);
@@ -675,11 +698,13 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="real-time-stats">
-            <div data-testid="user-count">총 사용자: {mockStatistics.totalUsers}</div>
-            <button data-testid="add-user">사용자 추가</button>
+          <div data-testid='real-time-stats'>
+            <div data-testid='user-count'>
+              총 사용자: {mockStatistics.totalUsers}
+            </div>
+            <button data-testid='add-user'>사용자 추가</button>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const addUserButton = screen.getByTestId('add-user');
@@ -697,11 +722,13 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="real-time-projects">
-            <div data-testid="pending-count">승인 대기: {mockStatistics.pendingProjects}</div>
-            <button data-testid="approve-project">프로젝트 승인</button>
+          <div data-testid='real-time-projects'>
+            <div data-testid='pending-count'>
+              승인 대기: {mockStatistics.pendingProjects}
+            </div>
+            <button data-testid='approve-project'>프로젝트 승인</button>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const approveButton = screen.getByTestId('approve-project');
@@ -722,11 +749,11 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="admin-notifications">
-            <button data-testid="critical-action">중요 작업 실행</button>
-            <div data-testid="notification-status"></div>
+          <div data-testid='admin-notifications'>
+            <button data-testid='critical-action'>중요 작업 실행</button>
+            <div data-testid='notification-status'></div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const criticalButton = screen.getByTestId('critical-action');
@@ -747,11 +774,11 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="data-export">
-            <button data-testid="export-users">사용자 데이터 내보내기</button>
-            <div data-testid="export-status"></div>
+          <div data-testid='data-export'>
+            <button data-testid='export-users'>사용자 데이터 내보내기</button>
+            <div data-testid='export-status'></div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const exportButton = screen.getByTestId('export-users');
@@ -769,16 +796,16 @@ describe('Admin Dashboard System', () => {
 
       render(
         <BrowserRouter>
-          <div data-testid="report-generation">
-            <select data-testid="report-type">
-              <option value="daily">일일 보고서</option>
-              <option value="weekly">주간 보고서</option>
-              <option value="monthly">월간 보고서</option>
+          <div data-testid='report-generation'>
+            <select data-testid='report-type'>
+              <option value='daily'>일일 보고서</option>
+              <option value='weekly'>주간 보고서</option>
+              <option value='monthly'>월간 보고서</option>
             </select>
-            <button data-testid="generate-report">보고서 생성</button>
-            <div data-testid="report-status"></div>
+            <button data-testid='generate-report'>보고서 생성</button>
+            <div data-testid='report-status'></div>
           </div>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const reportType = screen.getByTestId('report-type');

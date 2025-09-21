@@ -7,14 +7,16 @@ import type {
 } from '@/features/community/types';
 import type { ApiResponse } from '@/shared/types';
 
-type NoticeResponse = ApiResponse<{
-    posts: CommunityPost[];
-}> | {
-    posts?: CommunityPost[];
-    data?: {
+type NoticeResponse =
+    | ApiResponse<{
+        posts: CommunityPost[];
+    }>
+    | {
         posts?: CommunityPost[];
+        data?: {
+            posts?: CommunityPost[];
+        };
     };
-};
 
 interface NoticeMutationPayload extends CreateCommunityPostData {
     isPinned?: boolean;
@@ -27,7 +29,9 @@ interface NoticeUpdatePayload extends UpdateCommunityPostData {
 }
 
 const extractNoticePosts = (response: NoticeResponse): CommunityPost[] => {
-    const directPosts = Array.isArray(response.posts) ? response.posts : undefined;
+    const directPosts = Array.isArray((response as any).posts)
+        ? (response as any).posts
+        : undefined;
     if (directPosts) {
         return directPosts;
     }
@@ -49,16 +53,17 @@ export const useNotices = (params?: {
 }) => {
     return useQuery({
         queryKey: ['notices', params],
-        queryFn: () => communityAPI.getForumPosts('notice', {
-            sort: params?.sortBy || 'createdAt',
-            order: params?.order || 'desc',
-            page: params?.page,
-            limit: params?.limit,
-        }),
+        queryFn: () =>
+            communityAPI.getForumPosts('notice', {
+                sort: params?.sortBy || 'createdAt',
+                order: params?.order || 'desc',
+                page: params?.page,
+                limit: params?.limit,
+            }),
         staleTime: 10 * 60 * 1000, // 10분
         gcTime: 30 * 60 * 1000, // 30분
         retry: 1, // 재시도 1회만
-        retryDelay: 1000
+        retryDelay: 1000,
     });
 };
 
@@ -66,13 +71,18 @@ export const useNotices = (params?: {
 export const useNotice = (noticeId: string) => {
     return useQuery<CommunityPost | undefined>({
         queryKey: ['notice', noticeId],
-        queryFn: () => communityAPI.getForumPosts('notice', {
-            search: noticeId,
-            limit: 1
-        }).then((response: NoticeResponse) => {
-            const notices = extractNoticePosts(response);
-            return notices.find(notice => String(notice.id) === noticeId) ?? notices[0];
-        }),
+        queryFn: () =>
+            communityAPI
+                .getForumPosts('notice', {
+                    search: noticeId,
+                    limit: 1,
+                })
+                .then((response: any) => {
+                    const notices = extractNoticePosts(response);
+                    return (
+                        notices.find(notice => String(notice.id) === noticeId) ?? notices[0]
+                    );
+                }),
         enabled: !!noticeId,
         staleTime: 10 * 60 * 1000,
     });
@@ -101,7 +111,13 @@ export const useUpdateNotice = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ noticeId, data }: { noticeId: string; data: NoticeUpdatePayload }) =>
+        mutationFn: ({
+            noticeId,
+            data,
+        }: {
+            noticeId: string;
+            data: NoticeUpdatePayload;
+        }) =>
             communityAPI.createPost({
                 ...data,
                 id: noticeId,
@@ -121,7 +137,8 @@ export const useIncrementNoticeViews = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (noticeId: string) => communityAPI.incrementNoticeViews(noticeId),
+        mutationFn: (noticeId: string) =>
+            communityAPI.incrementNoticeViews(noticeId),
         onSuccess: (_, noticeId) => {
             // 공지사항 상세 조회 캐시 무효화하여 조회수 업데이트 반영
             queryClient.invalidateQueries({ queryKey: ['notice', noticeId] });

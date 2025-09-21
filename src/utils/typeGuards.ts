@@ -14,52 +14,92 @@ export const isArray = (value: unknown): value is unknown[] => {
 
 export const hasProperty = <T extends object, K extends PropertyKey>(
   obj: T,
-  prop: K
+  prop: K,
 ): obj is T & Record<K, unknown> => {
   return prop in obj;
 };
 
 // 사용자 객체 타입 가드
-export const isUserObject = (value: unknown): value is { username: string; id: string; role?: string; avatar?: string } => {
-  return isObject(value) &&
+export const isUserObject = (
+  value: unknown,
+): value is {
+  username: string;
+  id: string;
+  role?: string;
+  avatar?: string;
+} => {
+  return (
+    isObject(value) &&
     hasProperty(value, 'username') &&
     isString(value.username) &&
     hasProperty(value, 'id') &&
-    isString(value.id);
+    isString(value.id)
+  );
 };
 
 // 게시글 작성자 타입 가드
-export const isPostAuthor = (value: unknown): value is { username: string; id: string; role?: string; avatar?: string } => {
+export const isPostAuthor = (
+  value: unknown,
+): value is {
+  username: string;
+  id: string;
+  role?: string;
+  avatar?: string;
+} => {
   return isUserObject(value);
 };
 
 // 댓글 작성자 타입 가드
-export const isCommentAuthor = (value: unknown): value is { username: string; id: string; role?: string; avatar?: string } => {
+export const isCommentAuthor = (
+  value: unknown,
+): value is {
+  username: string;
+  id: string;
+  role?: string;
+  avatar?: string;
+} => {
   return isUserObject(value);
 };
 
 // API 응답 타입 가드
-export const isApiResponse = (value: unknown): value is { data: unknown; success?: boolean; message?: string } => {
+export const isApiResponse = (
+  value: unknown,
+): value is { data: unknown; success?: boolean; message?: string } => {
   return isObject(value) && hasProperty(value, 'data');
 };
 
 // 안전한 문자열 첫 글자 추출
-export const getFirstChar = (value: unknown, fallback: string = 'A'): string => {
+export const getFirstChar = (
+  value: unknown,
+  fallback: string = 'A',
+): string => {
   if (isString(value) && value.length > 0) {
     return value.charAt(0).toUpperCase();
   }
-  if (isObject(value) && hasProperty(value, 'username') && isString(value.username) && value.username.length > 0) {
+  if (
+    isObject(value) &&
+    hasProperty(value, 'username') &&
+    isString(value.username) &&
+    value.username.length > 0
+  ) {
     return value.username.charAt(0).toUpperCase();
   }
   return fallback;
 };
 
 // 안전한 사용자명 추출
-export const getUsername = (value: unknown, fallback: string = 'Unknown'): string => {
+export const getUsername = (
+  value: unknown,
+  fallback: string = 'Unknown',
+): string => {
   if (isString(value)) {
     return value;
   }
-  if (isObject(value) && hasProperty(value, 'username') && isString(value.username)) {
+  if (
+    isObject(value) &&
+    hasProperty(value, 'username') &&
+    isString(value.username)
+  ) {
     return value.username;
   }
   return fallback;
@@ -67,7 +107,11 @@ export const getUsername = (value: unknown, fallback: string = 'Unknown'): strin
 
 // 안전한 아바타 URL 추출
 export const getAvatarUrl = (value: unknown): string | undefined => {
-  if (isObject(value) && hasProperty(value, 'avatar') && isString(value.avatar)) {
+  if (
+    isObject(value) &&
+    hasProperty(value, 'avatar') &&
+    isString(value.avatar)
+  ) {
     return value.avatar;
   }
   return undefined;

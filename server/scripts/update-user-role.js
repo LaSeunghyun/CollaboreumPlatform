@@ -5,7 +5,9 @@ require('dotenv').config();
 const updateUserRole = async () => {
   try {
     // MongoDB 연결
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/collaboreum');
+    await mongoose.connect(
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/collaboreum',
+    );
     console.log('MongoDB에 연결되었습니다.');
 
     // 이메일로 사용자 찾기
@@ -28,7 +30,6 @@ const updateUserRole = async () => {
 
     console.log(`✅ 사용자 역할이 성공적으로 'admin'으로 변경되었습니다.`);
     console.log(`- 새로운 역할: ${user.role}`);
-
   } catch (error) {
     console.error('오류가 발생했습니다:', error);
   } finally {

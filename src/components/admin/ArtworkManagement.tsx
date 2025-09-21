@@ -6,7 +6,10 @@ export const ArtworkManagement = () => (
       <CardTitle>Artwork management legacy view</CardTitle>
     </CardHeader>
     <CardContent>
-      <p className='text-sm text-muted-foreground'>This legacy component has been deprecated. Please use the admin dashboard artwork section instead.</p>
+      <p className='text-sm text-muted-foreground'>
+        This legacy component has been deprecated. Please use the admin
+        dashboard artwork section instead.
+      </p>
     </CardContent>
   </Card>
 );

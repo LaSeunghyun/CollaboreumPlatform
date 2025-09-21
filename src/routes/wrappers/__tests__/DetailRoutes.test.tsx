@@ -18,7 +18,9 @@ jest.mock('@/contexts/AuthContext', () => ({
 describe('Detail route wrappers', () => {
   beforeEach(() => {
     jest.spyOn(window, 'alert').mockImplementation(() => undefined);
-    jest.spyOn(window.history, 'back').mockImplementation(() => undefined as never);
+    jest
+      .spyOn(window.history, 'back')
+      .mockImplementation(() => undefined as never);
     jest.spyOn(window, 'open').mockImplementation(() => null);
     Object.assign(navigator, {
       share: jest.fn(),
@@ -56,9 +58,9 @@ describe('Detail route wrappers', () => {
     render(
       <MemoryRouter initialEntries={['/artists/42']}>
         <Routes>
-          <Route path="/artists/:handle" element={<ArtistProfileRoute />} />
+          <Route path='/artists/:handle' element={<ArtistProfileRoute />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -67,40 +69,50 @@ describe('Detail route wrappers', () => {
   });
 
   it('calls project API with slug from params', async () => {
-    jest.spyOn(api.fundingAPI, 'backProject').mockResolvedValue({ success: true } as any);
-    jest.spyOn(api.fundingAPI, 'likeProject').mockResolvedValue({ success: true } as any);
-    jest.spyOn(api.fundingAPI, 'bookmarkProject').mockResolvedValue({ success: true } as any);
-    jest.spyOn(api.interactionAPI, 'followArtist').mockResolvedValue({ success: true } as any);
+    jest
+      .spyOn(api.fundingAPI, 'backProject')
+      .mockResolvedValue({ success: true } as any);
+    jest
+      .spyOn(api.fundingAPI, 'likeProject')
+      .mockResolvedValue({ success: true } as any);
+    jest
+      .spyOn(api.fundingAPI, 'bookmarkProject')
+      .mockResolvedValue({ success: true } as any);
+    jest
+      .spyOn(api.interactionAPI, 'followArtist')
+      .mockResolvedValue({ success: true } as any);
 
-    const getProjectSpy = jest.spyOn(api.fundingAPI, 'getProject').mockResolvedValue({
-      success: true,
-      data: {
-        image: '',
-        title: '테스트 프로젝트',
-        featured: false,
-        category: '예술',
-        artistAvatar: '',
-        artist: '테스트 아티스트',
-        artistRating: 4.5,
-        artistId: 1,
-        description: '설명',
-        currentAmount: 0,
-        targetAmount: 100,
-        backers: 0,
-        daysLeft: 10,
-        story: '스토리',
-        rewards: [],
-        updates: [],
-        comments: [],
-      },
-    } as any);
+    const getProjectSpy = jest
+      .spyOn(api.fundingAPI, 'getProject')
+      .mockResolvedValue({
+        success: true,
+        data: {
+          image: '',
+          title: '테스트 프로젝트',
+          featured: false,
+          category: '예술',
+          artistAvatar: '',
+          artist: '테스트 아티스트',
+          artistRating: 4.5,
+          artistId: 1,
+          description: '설명',
+          currentAmount: 0,
+          targetAmount: 100,
+          backers: 0,
+          daysLeft: 10,
+          story: '스토리',
+          rewards: [],
+          updates: [],
+          comments: [],
+        },
+      } as any);
 
     render(
       <MemoryRouter initialEntries={['/projects/123']}>
         <Routes>
-          <Route path="/projects/:slug" element={<ProjectDetailRoute />} />
+          <Route path='/projects/:slug' element={<ProjectDetailRoute />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -109,40 +121,50 @@ describe('Detail route wrappers', () => {
   });
 
   it('calls event API with id from params', async () => {
-    jest.spyOn(api.eventManagementAPI, 'joinEvent').mockResolvedValue({ success: true } as any);
-    jest.spyOn(api.eventManagementAPI, 'leaveEvent').mockResolvedValue({ success: true } as any);
-    jest.spyOn(api.eventManagementAPI, 'likeEvent').mockResolvedValue({ success: true } as any);
-    jest.spyOn(api.eventManagementAPI, 'bookmarkEvent').mockResolvedValue({ success: true } as any);
+    jest
+      .spyOn(api.eventManagementAPI, 'joinEvent')
+      .mockResolvedValue({ success: true } as any);
+    jest
+      .spyOn(api.eventManagementAPI, 'leaveEvent')
+      .mockResolvedValue({ success: true } as any);
+    jest
+      .spyOn(api.eventManagementAPI, 'likeEvent')
+      .mockResolvedValue({ success: true } as any);
+    jest
+      .spyOn(api.eventManagementAPI, 'bookmarkEvent')
+      .mockResolvedValue({ success: true } as any);
 
-    const getEventSpy = jest.spyOn(api.eventManagementAPI, 'getEvent').mockResolvedValue({
-      success: true,
-      data: {
-        title: '테스트 이벤트',
-        coverImage: '',
-        status: 'upcoming',
-        startDate: '2024-01-01',
-        endDate: '2024-01-02',
-        location: '서울',
-        time: '18:00',
-        capacity: 100,
-        participants: [],
-        description: '이벤트 설명',
-        agenda: [],
-        speaker: {
-          name: '연사',
-          role: '주최자',
-          avatar: '',
+    const getEventSpy = jest
+      .spyOn(api.eventManagementAPI, 'getEvent')
+      .mockResolvedValue({
+        success: true,
+        data: {
+          title: '테스트 이벤트',
+          coverImage: '',
+          status: 'upcoming',
+          startDate: '2024-01-01',
+          endDate: '2024-01-02',
+          location: '서울',
+          time: '18:00',
+          capacity: 100,
+          participants: [],
+          description: '이벤트 설명',
+          agenda: [],
+          speaker: {
+            name: '연사',
+            role: '주최자',
+            avatar: '',
+          },
+          tags: [],
         },
-        tags: [],
-      },
-    } as any);
+      } as any);
 
     render(
       <MemoryRouter initialEntries={['/events/alpha']}>
         <Routes>
-          <Route path="/events/:id" element={<EventDetailRoute />} />
+          <Route path='/events/:id' element={<EventDetailRoute />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
