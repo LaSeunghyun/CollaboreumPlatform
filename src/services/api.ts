@@ -720,15 +720,16 @@ export const communityAPI = {
     return apiCall(`/community/posts${queryString ? `?${queryString}` : ''}`);
   },
   getEvents: () => apiCall('/events'), // 올바른 경로로 수정
-  getCategories: () => apiCall('/categories'), // 카테고리 API 추가
+  getCategories: () => apiCall('/community/categories'), // 카테고리 API 추가
   createPost: (data: any) =>
     apiCall('/community/posts', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
   likePost: (postId: number) =>
-    apiCall(`/community/posts/${postId}/like`, {
+    apiCall(`/community/posts/${postId}/reactions`, {
       method: 'POST',
+      body: JSON.stringify({ reaction: 'like' }),
     }),
   commentOnPost: (postId: number, content: string) =>
     apiCall(`/community/posts/${postId}/comments`, {
@@ -737,9 +738,9 @@ export const communityAPI = {
     }),
   // 대댓글 작성 API 추가
   replyToComment: (postId: string, commentId: string, content: string) =>
-    apiCall(`/community/posts/${postId}/comments/${commentId}/replies`, {
+    apiCall(`/community/posts/${postId}/comments`, {
       method: 'POST',
-      body: JSON.stringify({ content }),
+      body: JSON.stringify({ content, parentId: commentId }),
     }),
   // 공지사항 조회수 증가
   incrementNoticeViews: (noticeId: string) =>
@@ -1271,9 +1272,9 @@ export const communityPostAPI = {
 
   // 게시글 좋아요
   likePost: (postId: string, action: 'like' | 'unlike') =>
-    apiCall(`/community/posts/${postId}/like`, {
+    apiCall(`/community/posts/${postId}/reactions`, {
       method: 'POST',
-      body: JSON.stringify({ action }),
+      body: JSON.stringify({ reaction: action }),
     }),
 
   // 게시글 북마크

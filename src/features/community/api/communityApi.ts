@@ -102,7 +102,12 @@ const normalizeAuthor = (post: any) => {
         post.author.name ||
         post.author.email ||
         'anonymous',
-      role: post.author.role || 'user',
+      role:
+        post.author.role === 'admin' ||
+        post.author.role === 'artist' ||
+        post.author.role === 'fan'
+          ? post.author.role
+          : 'fan',
       avatar: post.author.avatar || post.author.profileImage || undefined,
       isVerified: Boolean(post.author.isVerified),
     };
@@ -113,7 +118,7 @@ const normalizeAuthor = (post: any) => {
       id: String(post.author),
       name: post.authorName || post.authorNickname || '익명',
       username: post.authorName || post.authorNickname || 'anonymous',
-      role: 'user' as const,
+      role: 'fan' as const,
     };
   }
 
@@ -121,7 +126,7 @@ const normalizeAuthor = (post: any) => {
     id: post?.authorId ? String(post.authorId) : 'unknown-author',
     name: post?.authorName || '익명',
     username: post?.authorName || 'anonymous',
-    role: 'user' as const,
+    role: 'fan' as const,
   };
 };
 

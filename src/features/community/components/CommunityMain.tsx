@@ -201,11 +201,8 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
     error: statsError,
     refetch: refetchStats,
   } = useCommunityStats();
-  const {
-    mutateAsync: createCommunityPost,
-    isPending: isCreatePending,
-    isLoading: isCreateLoading,
-  } = useCreateCommunityPost();
+  const { mutateAsync: createCommunityPost, isPending: isCreatePending } =
+    useCreateCommunityPost();
 
   const posts = useMemo<CommunityPost[]>(() => {
     if (!data) {
@@ -332,8 +329,7 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
     [createCommunityPost, onCreatePost, refetch, refetchStats],
   );
 
-  const isCreatingPost =
-    (isCreatePending ?? false) || (isCreateLoading ?? false);
+  const isCreatingPost = isCreatePending ?? false;
 
   const handlePostClick = (post: CommunityPost) => {
     if (onPostClick) {
