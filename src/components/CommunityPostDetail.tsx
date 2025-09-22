@@ -6,7 +6,6 @@ import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useAuth } from '../contexts/AuthContext';
 import { communityPostAPI, apiCall } from '../services/api';
-import { ApiResponse } from '../types';
 import { useDeleteCommunityPost } from '../features/community/hooks/useCommunityPosts';
 import {
   usePostReaction,
@@ -621,27 +620,36 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
     if (user && post?.id) {
       communityPostAPI
         .getPostReactions(post.id)
-        .then((reactionsResponse: unknown) => {
-          const response = reactionsResponse as ApiResponse<any>;
-          if (response?.success && response?.data) {
-            const data = response.data;
-            setPost((prev: any) =>
-              prev
-                ? {
-                    ...prev,
-                    isLiked: data?.isLiked || false,
-                    isDisliked: data?.isDisliked || false,
-                    likes: data?.likes || prev.likes,
-                    dislikes: data?.dislikes || prev.dislikes,
-                  }
-                : null,
-            );
-          }
+        .then(reactionPayload => {
+          const payload = (reactionPayload ?? {}) as Partial<{
+            isLiked: boolean;
+            isDisliked: boolean;
+            likes: number;
+            dislikes: number;
+          }>;
+
+          setPost(prev =>
+            prev
+              ? {
+                  ...prev,
+                  isLiked: Boolean(payload.isLiked),
+                  isDisliked: Boolean(payload.isDisliked),
+                  likes:
+                    typeof payload.likes === 'number'
+                      ? payload.likes
+                      : prev.likes ?? 0,
+                  dislikes:
+                    typeof payload.dislikes === 'number'
+                      ? payload.dislikes
+                      : prev.dislikes ?? 0,
+                }
+              : null,
+          );
         })
         .catch(err => {
           console.error('반응 상태 확인 실패:', err);
           // 반응 상태 확인 실패 시에도 기본값으로 설정
-          setPost((prev: any) =>
+          setPost(prev =>
             prev
               ? {
                   ...prev,
