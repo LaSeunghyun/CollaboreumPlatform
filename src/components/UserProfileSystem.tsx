@@ -314,7 +314,7 @@ export const ArtistMyPage: React.FC = () => {
         });
 
         // API에서 프로젝트 정보 가져오기
-        const projectsResponse = await artistAPI.getProjects(parseInt(user.id));
+        const projectsResponse = await artistAPI.getProjects(user.id);
         if (projectsResponse && Array.isArray(projectsResponse)) {
           setProjects(projectsResponse);
         }
@@ -660,27 +660,75 @@ export const FanMyPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
-    // API에서 백킹 정보 가져오기
+    if (!user) {
+      setProfile(prev => ({
+        ...prev,
+        id: '',
+        username: '',
+        email: '',
+        avatar: undefined,
+        bio: '',
+      }));
+      return;
+    }
+
+    setProfile(prev => ({
+      ...prev,
+      id: user.id,
+      username: user.name || prev.username,
+      email: user.email || prev.email,
+      avatar: user.avatar ?? prev.avatar,
+      bio: user.bio ?? prev.bio ?? '',
+      role: user.role,
+      createdAt: user.createdAt ? new Date(user.createdAt) : prev.createdAt,
+    }));
+  }, [user]);
+
+  useEffect(() => {
+    const userId = user?.id;
+    if (!userId) {
+      setBackings([]);
+      return;
+    }
+
+    let cancelled = false;
+
     const fetchBackingInfo = async () => {
       try {
-        const response = (await userAPI.getInvestments(user?.id || '')) as any;
-        if (response.success) {
-          setBackings(response.data || []);
+        const response = (await userAPI.getInvestments(userId)) as any;
+        if (!cancelled) {
+          if (response.success) {
+            setBackings(response.data || []);
+          } else {
+            setBackings([]);
+          }
         }
       } catch (error) {
-        console.error('백킹 정보 로드 실패:', error);
-        setBackings([]);
+        if (!cancelled) {
+          console.error('백킹 정보 로드 실패:', error);
+          setBackings([]);
+        }
       }
     };
 
     fetchBackingInfo();
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   const handleProfileSave = async (data: Partial<UserProfile>) => {
     setProfile(prev => ({ ...prev, ...data }));
     // API 호출하여 프로필 업데이트
     try {
-      const response = (await userAPI.updateProfile(profile.id, data)) as any;
+      const targetId = user?.id || profile.id;
+      if (!targetId) {
+        alert('사용자 정보를 확인할 수 없습니다. 다시 로그인해주세요.');
+        return;
+      }
+
+      const response = (await userAPI.updateProfile(targetId, data)) as any;
 
       if (response.success) {
         alert('프로필이 성공적으로 업데이트되었습니다.');

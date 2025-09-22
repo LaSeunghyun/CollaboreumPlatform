@@ -3,7 +3,6 @@ import React from 'react';
 import {
   useCommunityPosts,
   useLikeCommunityPost,
-  useViewCommunityPost,
   type CommunityPostListQuery,
 } from '../index';
 import {
@@ -36,7 +35,6 @@ export function CommunityPostList({
   const { data, isLoading, error, refetch } = useCommunityPosts(query);
 
   const likePostMutation = useLikeCommunityPost();
-  const viewPostMutation = useViewCommunityPost();
 
   // 로딩 상태
   if (isLoading) {
@@ -67,8 +65,6 @@ export function CommunityPostList({
   }
 
   const handlePostClick = (postId: string) => {
-    // 조회수 증가
-    viewPostMutation.mutate(postId);
     onPostClick?.(postId);
   };
 

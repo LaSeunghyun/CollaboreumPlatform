@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '../shared/ui/Card';
 import { Badge } from '../shared/ui/Badge';
 import { Button } from '../shared/ui/Button';
@@ -38,14 +38,10 @@ import {
 
 interface ArtistGalleryProps {
   onBack?: () => void;
-  onSelectArtwork?: (artworkId: number) => void;
-  _onSelectArtwork?: (artworkId: number) => void;
+  onSelectArtwork?: (artworkId: string) => void;
 }
 
-export function ArtistGallery({
-  onBack,
-  _onSelectArtwork,
-}: ArtistGalleryProps) {
+export function ArtistGallery({ onBack, onSelectArtwork }: ArtistGalleryProps) {
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [sortBy, setSortBy] = useState('최신순');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -145,6 +141,10 @@ export function ArtistGallery({
       .length;
   };
 
+  const handleSelectArtwork = (artworkId: string) => {
+    onSelectArtwork?.(artworkId);
+  };
+
   if (loading) {
     return (
       <div className='flex min-h-screen items-center justify-center bg-gray-50'>
@@ -175,6 +175,7 @@ export function ArtistGallery({
     <Card
       key={artwork.id}
       className='group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg'
+      onClick={() => handleSelectArtwork(artwork.id)}
     >
       <div className='relative aspect-square'>
         <ImageWithFallback
@@ -187,6 +188,7 @@ export function ArtistGallery({
             <Button
               size='sm'
               className='bg-white/90 text-gray-900 hover:bg-white'
+              onClick={event => event.stopPropagation()}
             >
               {getMetricIcon(artwork.type)}
             </Button>
@@ -194,6 +196,7 @@ export function ArtistGallery({
               size='sm'
               variant='outline'
               className='border-white/90 bg-white/90 hover:bg-white'
+              onClick={event => event.stopPropagation()}
             >
               <Heart className='h-4 w-4' />
             </Button>
@@ -248,6 +251,7 @@ export function ArtistGallery({
     <Card
       key={artwork.id}
       className='cursor-pointer transition-shadow hover:shadow-lg'
+      onClick={() => handleSelectArtwork(artwork.id)}
     >
       <CardContent className='p-6'>
         <div className='flex gap-6'>
@@ -297,10 +301,19 @@ export function ArtistGallery({
                 </div>
               </div>
               <div className='flex gap-2'>
-                <Button size='sm' variant='outline'>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={event => event.stopPropagation()}
+                >
                   <Share className='h-4 w-4' />
                 </Button>
-                <Button size='sm'>{getMetricIcon(artwork.type)}</Button>
+                <Button
+                  size='sm'
+                  onClick={event => event.stopPropagation()}
+                >
+                  {getMetricIcon(artwork.type)}
+                </Button>
               </div>
             </div>
           </div>

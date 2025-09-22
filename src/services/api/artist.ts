@@ -50,7 +50,8 @@ export const artistAPI = {
   // 기존 함수들 (하위 호환성)
   getArtistData: (artistId: number) =>
     apiCall(`/artists/${artistId}/dashboard`),
-  getProjects: (artistId: number) => apiCall(`/artists/${artistId}/projects`),
+  getProjects: (artistId: string | number) =>
+    apiCall(`/artists/${artistId}/projects`),
   getWbsItems: (projectId: number) => apiCall(`/projects/${projectId}/wbs`),
   updateProject: (projectId: number, data: any) =>
     apiCall(`/projects/${projectId}`, {
