@@ -151,7 +151,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
 
     // 링크 복사 기능
     const handleCopyLink = async () => {
-        const link = `${window.location.origin}/community/post/${postId}`;
+        const link = `${window.location.origin}/community/${postId}`;
         try {
             await navigator.clipboard.writeText(link);
             setCopiedLink(true);
@@ -163,7 +163,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
 
     // 소셜 공유 기능
     const handleSocialShare = (platform: 'twitter' | 'facebook' | 'kakao') => {
-        const link = `${window.location.origin}/community/post/${postId}`;
+        const link = `${window.location.origin}/community/${postId}`;
         const title = post?.title || '게시글';
 
         switch (platform) {

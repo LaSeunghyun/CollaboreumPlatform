@@ -44,6 +44,7 @@ const routeGroups: RouteGroup[] = [
       { path: '/community', component: CommunityPage, layout: 'app' },
       { path: '/community/create', component: CreatePostPage, layout: 'app' },
       { path: '/community/edit/:postId', component: EditPostPage, layout: 'app' },
+      { path: '/community/:id', component: CommunityPostDetailRoute, layout: 'app', suspense: false },
       { path: '/community/post/:id', component: CommunityPostDetailRoute, layout: 'app', suspense: false },
       { path: '/notices', component: NoticesPage, layout: 'app' },
       { path: '/notices/:id', component: CommunityPostDetailRoute, layout: 'app', suspense: false },
