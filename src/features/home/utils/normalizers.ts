@@ -1,6 +1,7 @@
 import { DYNAMIC_CONSTANTS } from '@/constants/dynamic';
 import type {
   ArtistSummary,
+  CommunityAuthor,
   CommunityPostSummary,
   NoticeSummary,
   PlatformStats,
@@ -126,7 +127,9 @@ export const normalizePlatformStats = (
   fallback: PlatformStats,
 ): PlatformStats => {
   if (isRecord(value)) {
-    const source = isRecord(value.data) ? (value.data as Record<string, unknown>) : value;
+    const source = isRecord(value.data)
+      ? (value.data as Record<string, unknown>)
+      : value;
     return {
       totalArtists: toNumber(source.totalArtists, fallback.totalArtists),
       totalProjects: toNumber(source.totalProjects, fallback.totalProjects),
@@ -148,7 +151,10 @@ export const normalizeArtists = (value: unknown): ArtistSummary[] => {
       }
 
       const idValue = item.id;
-      const id = toString(idValue, typeof idValue === 'number' ? String(idValue) : '');
+      const id = toString(
+        idValue,
+        typeof idValue === 'number' ? String(idValue) : '',
+      );
       if (!id) {
         return null;
       }
@@ -158,19 +164,28 @@ export const normalizeArtists = (value: unknown): ArtistSummary[] => {
         ? tagsValue.filter((tag): tag is string => typeof tag === 'string')
         : [];
 
-      return {
+      const artist: ArtistSummary = {
         id,
         name: toString(item.name, '이름 미정'),
         avatar: toString(item.avatar, DEFAULT_IMAGES.AVATAR),
-        coverImage: toString(item.coverImage, undefined),
         category: toString(item.category, '카테고리 미정'),
         tags,
-        featuredWork: toString(item.featuredWork, undefined),
         followers: toNumber(item.followers),
         isFollowing: toBoolean(item.isFollowing),
         isVerified: toBoolean(item.isVerified),
-        bio: toString(item.bio, undefined),
-      } satisfies ArtistSummary;
+      };
+
+      if (item.coverImage) {
+        artist.coverImage = toString(item.coverImage);
+      }
+      if (item.featuredWork) {
+        artist.featuredWork = toString(item.featuredWork);
+      }
+      if (item.bio) {
+        artist.bio = toString(item.bio);
+      }
+
+      return artist;
     })
     .filter((artist): artist is ArtistSummary => artist !== null);
 };
@@ -185,7 +200,10 @@ export const normalizeProjects = (value: unknown): ProjectSummary[] => {
       }
 
       const idValue = item.id;
-      const id = toString(idValue, typeof idValue === 'number' ? String(idValue) : '');
+      const id = toString(
+        idValue,
+        typeof idValue === 'number' ? String(idValue) : '',
+      );
       if (!id) {
         return null;
       }
@@ -215,25 +233,37 @@ export const normalizeNotices = (value: unknown): NoticeSummary[] => {
       }
 
       const idValue = item.id;
-      const id = toString(idValue, typeof idValue === 'number' ? String(idValue) : '');
+      const id = toString(
+        idValue,
+        typeof idValue === 'number' ? String(idValue) : '',
+      );
       if (!id) {
         return null;
       }
 
-      return {
+      const notice: NoticeSummary = {
         id,
         title: toString(item.title, '공지사항'),
         content: toString(item.content, ''),
         createdAt: toString(item.createdAt, new Date().toISOString()),
         views: toNumber(item.views),
-        isImportant: toBoolean(item.isImportant),
-        isPinned: toBoolean(item.isPinned),
-      } satisfies NoticeSummary;
+      };
+
+      if (item.isImportant !== undefined) {
+        notice.isImportant = toBoolean(item.isImportant);
+      }
+      if (item.isPinned !== undefined) {
+        notice.isPinned = toBoolean(item.isPinned);
+      }
+
+      return notice;
     })
     .filter((notice): notice is NoticeSummary => notice !== null);
 };
 
-export const normalizeCommunityPosts = (value: unknown): CommunityPostSummary[] => {
+export const normalizeCommunityPosts = (
+  value: unknown,
+): CommunityPostSummary[] => {
   const list = pickList(value, 'posts');
 
   return list
@@ -243,37 +273,49 @@ export const normalizeCommunityPosts = (value: unknown): CommunityPostSummary[] 
       }
 
       const idValue = item.id;
-      const id = toString(idValue, typeof idValue === 'number' ? String(idValue) : '');
+      const id = toString(
+        idValue,
+        typeof idValue === 'number' ? String(idValue) : '',
+      );
       if (!id) {
         return null;
       }
 
       const authorValue = item.author;
-      const author = isRecord(authorValue)
+      const author: CommunityAuthor = isRecord(authorValue)
         ? {
             name: toString(authorValue.name, '익명'),
-            isVerified: toBoolean(authorValue.isVerified),
           }
         : {
             name: toString(authorValue, '익명'),
-            isVerified: false,
           };
+
+      if (isRecord(authorValue) && authorValue.isVerified !== undefined) {
+        author.isVerified = toBoolean(authorValue.isVerified);
+      }
 
       const likeValue = item.likes;
       const commentValue = item.comments;
 
-      return {
+      const post: CommunityPostSummary = {
         id,
         title: toString(item.title, '제목 없음'),
         content: toString(item.content, ''),
         category: toString(item.category, 'general'),
-        likes: Array.isArray(likeValue) ? likeValue.length : toNumber(likeValue),
+        likes: Array.isArray(likeValue)
+          ? likeValue.length
+          : toNumber(likeValue),
         comments: Array.isArray(commentValue)
           ? commentValue.length
           : toNumber(commentValue),
         author,
-        isHot: toBoolean(item.isHot),
-      } satisfies CommunityPostSummary;
+      };
+
+      if (item.isHot !== undefined) {
+        post.isHot = toBoolean(item.isHot);
+      }
+
+      return post;
     })
     .filter((post): post is CommunityPostSummary => post !== null);
 };
