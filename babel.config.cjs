@@ -4,7 +4,5 @@ module.exports = {
     ['@babel/preset-react', { runtime: 'automatic' }],
     ['@babel/preset-typescript', { allowDeclareFields: true }],
   ],
-  plugins: [
-    ['@babel/plugin-syntax-import-meta'],
-  ],
+  plugins: [['@babel/plugin-syntax-import-meta']],
 };
