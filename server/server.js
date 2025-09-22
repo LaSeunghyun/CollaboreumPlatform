@@ -229,23 +229,26 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-// Start server
-const server = app.listen(PORT, '0.0.0.0', () => {
-  logger.info({ 
-    port: PORT, 
-    environment: process.env.NODE_ENV || 'development',
-    healthCheck: `http://localhost:${PORT}/api/health`
-  }, 'Server started successfully');
-});
+const isTestEnv = process.env.NODE_ENV === 'test';
+let server = null;
 
-// Handle server errors
-server.on('error', (error) => {
-  logger.error({ error, port: PORT }, 'Server error');
-  if (error.code === 'EADDRINUSE') {
-    logger.error({ port: PORT }, 'Port is already in use');
-  }
-  process.exit(1);
-});
+if (!isTestEnv) {
+  server = app.listen(PORT, '0.0.0.0', () => {
+    logger.info({
+      port: PORT,
+      environment: process.env.NODE_ENV || 'development',
+      healthCheck: `http://localhost:${PORT}/api/health`
+    }, 'Server started successfully');
+  });
+
+  server.on('error', (error) => {
+    logger.error({ error, port: PORT }, 'Server error');
+    if (error.code === 'EADDRINUSE') {
+      logger.error({ port: PORT }, 'Port is already in use');
+    }
+    process.exit(1);
+  });
+}
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
@@ -257,3 +260,6 @@ process.on('unhandledRejection', (reason, promise) => {
   logger.error({ reason, promise }, 'Unhandled Rejection');
   process.exit(1);
 });
+
+module.exports = app;
+module.exports.server = server;

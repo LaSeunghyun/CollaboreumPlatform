@@ -6,6 +6,8 @@ import { Card, CardContent } from './ui/card';
 interface Props {
     children: ReactNode;
     fallback?: ReactNode;
+    fallbackRender?: (args: { error?: Error; resetErrorBoundary: () => void }) => ReactNode;
+    onReset?: () => void;
 }
 
 interface State {
@@ -29,12 +31,26 @@ export class ErrorBoundary extends Component<Props, State> {
         this.setState({ error, errorInfo });
     }
 
+    private resetErrorBoundary = () => {
+        if (this.state.hasError) {
+            this.props.onReset?.();
+            this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+        }
+    };
+
     handleRetry = () => {
-        this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+        this.resetErrorBoundary();
     };
 
     override render() {
         if (this.state.hasError) {
+            if (this.props.fallbackRender) {
+                return this.props.fallbackRender({
+                    error: this.state.error,
+                    resetErrorBoundary: this.resetErrorBoundary,
+                });
+            }
+
             if (this.props.fallback) {
                 return this.props.fallback;
             }
@@ -89,9 +105,9 @@ export class ErrorBoundary extends Component<Props, State> {
 }
 
 // 함수형 컴포넌트용 에러 경계 (React 18+)
-export const ErrorBoundaryFunction: React.FC<Props> = ({ children, fallback }) => {
+export const ErrorBoundaryFunction: React.FC<Props> = ({ children, fallback, fallbackRender, onReset }) => {
     const [hasError, setHasError] = React.useState(false);
-    const [, setError] = React.useState<Error | null>(null);
+    const [error, setError] = React.useState<Error | null>(null);
 
     React.useEffect(() => {
         const handleError = (event: any) => {
@@ -115,7 +131,17 @@ export const ErrorBoundaryFunction: React.FC<Props> = ({ children, fallback }) =
         };
     }, []);
 
+    const reset = React.useCallback(() => {
+        setHasError(false);
+        setError(null);
+        onReset?.();
+    }, [onReset]);
+
     if (hasError) {
+        if (fallbackRender) {
+            return <>{fallbackRender({ error: error ?? undefined, resetErrorBoundary: reset })}</>;
+        }
+
         if (fallback) {
             return <>{fallback}</>;
         }
@@ -135,7 +161,7 @@ export const ErrorBoundaryFunction: React.FC<Props> = ({ children, fallback }) =
                         </div>
                         <div className="flex gap-2">
                             <Button
-                                onClick={() => setHasError(false)}
+                                onClick={reset}
                                 variant="outline"
                                 className="border-red-300 text-red-700 hover:bg-red-100"
                             >
