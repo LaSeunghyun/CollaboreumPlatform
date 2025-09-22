@@ -1,7 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader } from '@/shared/ui/Card';
+
+import { useCreateCommunityPost } from '@/features/community/hooks/useCommunityPosts';
+import { useCommunityStats } from '@/features/community/hooks/useCommunity';
+import { useCommunityPosts } from '@/lib/api/useCommunityPosts';
+import { useCategories } from '@/lib/api/useCategories';
 import { Button } from '@/shared/ui/Button';
+import { Card, CardContent } from '@/shared/ui/Card';
+import { ErrorMessage, ProjectListSkeleton } from '@/shared/ui';
 import { Input } from '@/shared/ui/Input';
 import {
   Select,
@@ -10,21 +16,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/Select';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/Tabs';
-import { ErrorMessage, ProjectListSkeleton } from '@/shared/ui';
-import { useCommunityPosts } from '@/lib/api/useCommunityPosts';
-import { useCategories } from '@/lib/api/useCategories';
-import { useCreateCommunityPost } from '@/features/community/hooks/useCommunityPosts';
-import { useCommunityStats } from '@/features/community/hooks/useCommunity';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/Tabs';
+import { Search, Plus, Filter, TrendingUp, Clock, Star } from 'lucide-react';
+import { toast } from 'sonner';
+
 import type {
   CommunityPost,
   CommunityPostListQuery,
   CreateCommunityPostData,
 } from '../types';
-import PostCard from './PostCard';
 import PostForm from './PostForm';
-import { Search, Plus, Filter, TrendingUp, Clock, Star } from 'lucide-react';
-import { toast } from 'sonner';
+import PostTable from './PostTable';
 
 interface CommunityMainProps {
   onPostClick?: (post: CommunityPost) => void;
@@ -195,12 +197,13 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
     error: categoriesError,
     refetch: refetchCategories,
   } = useCategories();
+  const shouldShowStats = showStats ?? false;
   const {
     data: stats,
     isLoading: statsLoading,
     error: statsError,
     refetch: refetchStats,
-  } = useCommunityStats();
+  } = useCommunityStats({ enabled: shouldShowStats });
   const { mutateAsync: createCommunityPost, isPending: isCreatePending } =
     useCreateCommunityPost();
 
@@ -316,7 +319,9 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
         setShowCreateForm(false);
         onCreatePost?.();
         refetch();
-        refetchStats();
+        if (shouldShowStats) {
+          refetchStats();
+        }
       } catch (mutationError) {
         console.error('게시글 생성 실패:', mutationError);
         const message =
@@ -326,7 +331,13 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
         toast.error(message);
       }
     },
-    [createCommunityPost, onCreatePost, refetch, refetchStats],
+    [
+      createCommunityPost,
+      onCreatePost,
+      refetch,
+      refetchStats,
+      shouldShowStats,
+    ],
   );
 
   const isCreatingPost = isCreatePending ?? false;
@@ -534,13 +545,7 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
                       onRetry={() => refetch()}
                     />
                   ) : posts.length > 0 ? (
-                    posts.map(post => (
-                      <PostCard
-                        key={post.id}
-                        post={post}
-                        onPostClick={handlePostClick}
-                      />
-                    ))
+                    <PostTable posts={posts} onPostClick={handlePostClick} />
                   ) : (
                     <Card>
                       <CardContent className='p-8 text-center'>
