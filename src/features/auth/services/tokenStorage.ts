@@ -2,6 +2,9 @@ const AUTH_TOKEN_KEY = 'authToken';
 const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 
+const ACCESS_COOKIE_NAME = 'collab_access_token';
+const REFRESH_COOKIE_NAME = 'collab_refresh_token';
+
 type ObjectRecord = Record<string, unknown>;
 
 const COLLECTABLE_KEYS = new Set(['data', 'result', 'payload', 'tokens']);
@@ -95,6 +98,55 @@ const getStorage = (): Storage | null => {
   }
 
   return window.localStorage;
+};
+
+const getCookieSource = (): string | null => {
+  if (typeof document === 'undefined') {
+    return null;
+  }
+
+  return document.cookie || null;
+};
+
+const parseCookieString = (cookieString: string | null): Record<string, string> => {
+  if (!cookieString) {
+    return {};
+  }
+
+  return cookieString.split(';').reduce<Record<string, string>>((acc, part) => {
+    const [rawKey, ...rawValue] = part.split('=');
+    if (!rawKey) {
+      return acc;
+    }
+
+    const key = rawKey.trim();
+    if (!key) {
+      return acc;
+    }
+
+    const joinedValue = rawValue.join('=').trim();
+    try {
+      acc[key] = decodeURIComponent(joinedValue);
+    } catch {
+      acc[key] = joinedValue;
+    }
+    return acc;
+  }, {});
+};
+
+const getCookieToken = (name: string): string | null => {
+  const cookies = parseCookieString(getCookieSource());
+  return cookies[name] ?? null;
+};
+
+const expireCookie = (name: string): void => {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  const isHttps = typeof window !== 'undefined' && window.location?.protocol === 'https:';
+  const secureFlag = isHttps ? ' Secure;' : '';
+  document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax;${secureFlag}`;
 };
 
 const stripLeadingNoise = (value: string): string => {
@@ -196,12 +248,16 @@ export const previewToken = (token?: string | null): string => {
 export const clearTokens = (): void => {
   const storage = getStorage();
   if (!storage) {
+    expireCookie(ACCESS_COOKIE_NAME);
+    expireCookie(REFRESH_COOKIE_NAME);
     return;
   }
 
   storage.removeItem(AUTH_TOKEN_KEY);
   storage.removeItem(ACCESS_TOKEN_KEY);
   storage.removeItem(REFRESH_TOKEN_KEY);
+  expireCookie(ACCESS_COOKIE_NAME);
+  expireCookie(REFRESH_COOKIE_NAME);
 };
 
 export const cleanInvalidTokens = (): void => {
@@ -262,23 +318,35 @@ export const persistTokens = ({
 
 export const getStoredAccessToken = (): string | null => {
   const storage = getStorage();
+  const cookieToken = pickValidToken(
+    getCookieToken(ACCESS_COOKIE_NAME),
+    getCookieToken(ACCESS_TOKEN_KEY),
+    getCookieToken(AUTH_TOKEN_KEY),
+  );
+
   if (!storage) {
-    return null;
+    return cookieToken;
   }
 
   return pickValidToken(
     storage.getItem(AUTH_TOKEN_KEY),
     storage.getItem(ACCESS_TOKEN_KEY),
+    cookieToken,
   );
 };
 
 export const getStoredRefreshToken = (): string | null => {
   const storage = getStorage();
+  const cookieToken = pickValidToken(
+    getCookieToken(REFRESH_COOKIE_NAME),
+    getCookieToken(REFRESH_TOKEN_KEY),
+  );
+
   if (!storage) {
-    return null;
+    return cookieToken;
   }
 
-  return pickValidToken(storage.getItem(REFRESH_TOKEN_KEY));
+  return pickValidToken(storage.getItem(REFRESH_TOKEN_KEY), cookieToken);
 };
 
 export const getTokenSnapshot = (): {
@@ -286,14 +354,17 @@ export const getTokenSnapshot = (): {
   authToken: string | null;
   accessToken: string | null;
   refreshToken: string | null;
+  cookies: string[];
 } => {
   const storage = getStorage();
+  const cookieSource = getCookieSource();
   if (!storage) {
     return {
       keys: [],
       authToken: null,
       accessToken: null,
       refreshToken: null,
+      cookies: cookieSource ? cookieSource.split(';').map(entry => entry.trim()).filter(Boolean) : [],
     };
   }
 
@@ -310,7 +381,14 @@ export const getTokenSnapshot = (): {
     authToken: storage.getItem(AUTH_TOKEN_KEY),
     accessToken: storage.getItem(ACCESS_TOKEN_KEY),
     refreshToken: storage.getItem(REFRESH_TOKEN_KEY),
+    cookies: cookieSource ? cookieSource.split(';').map(entry => entry.trim()).filter(Boolean) : [],
   };
 };
 
-export { AUTH_TOKEN_KEY, ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY };
+export {
+  AUTH_TOKEN_KEY,
+  ACCESS_TOKEN_KEY,
+  REFRESH_TOKEN_KEY,
+  ACCESS_COOKIE_NAME,
+  REFRESH_COOKIE_NAME,
+};

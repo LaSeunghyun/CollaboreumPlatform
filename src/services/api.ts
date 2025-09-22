@@ -1627,6 +1627,10 @@ export const constantsAPI = {
   // 결제 방법 조회
   getPaymentMethods: () => apiCall('/constants/payment-methods'),
 
+  // 정렬 옵션 조회
+  getSortOptions: (type?: string) =>
+    apiCall(`/constants/sort-options${type ? `/${type}` : ''}`),
+
   // 상태 설정 조회
   getStatusConfig: (type: 'project' | 'funding' | 'event') =>
     apiCall(`/constants/status-config/${type}`),

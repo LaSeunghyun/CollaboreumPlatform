@@ -2,6 +2,12 @@ import { constantsService } from './constants';
 import { Enums, StatusColors, StatusIcons } from '../types/constants';
 import { constantsAPI } from './api';
 
+type SortOption = {
+    value: string;
+    label: string;
+    icon?: string;
+};
+
 // 하드코딩된 상수값들을 API에서 가져오는 서비스
 export class DynamicConstantsService {
     private enumsCache: Enums | null = null;
@@ -237,25 +243,45 @@ export class DynamicConstantsService {
     }
 
     // 정렬 옵션 가져오기
-    async getSortOptions() {
+    async getSortOptions(type: 'project' | 'funding' | 'community' = 'project'): Promise<SortOption[]> {
         try {
-            const enums = await this.getEnums();
+            const response = await constantsAPI.getSortOptions(type);
+            const rawOptions = (response as any)?.data ?? response;
 
-            // API에서 정렬 옵션을 가져오거나 기본값 사용
-            return [
-                { value: 'popular', label: '인기순' },
-                { value: 'latest', label: '최신순' },
-                { value: 'deadline', label: '마감임박' },
-                { value: 'progress', label: '달성률' }
-            ];
+            if (!Array.isArray(rawOptions)) {
+                throw new Error('정렬 옵션 데이터가 배열이 아닙니다.');
+            }
+
+            return rawOptions
+                .map(option => {
+                    if (!option || typeof option !== 'object') {
+                        return null;
+                    }
+
+                    const record = option as Record<string, unknown>;
+                    const value = record.value ?? record.id;
+                    const label = record.label ?? record.name ?? record.value;
+
+                    if (typeof value !== 'string' && typeof value !== 'number') {
+                        return null;
+                    }
+
+                    if (typeof label !== 'string' && typeof label !== 'number') {
+                        return null;
+                    }
+
+                    return {
+                        value: String(value),
+                        label: String(label),
+                        icon: typeof record.icon === 'string' ? record.icon : undefined,
+                    };
+                })
+                .filter((option): option is SortOption => Boolean(option));
         } catch (error) {
             console.error('정렬 옵션을 가져오는 중 오류 발생:', error);
-            return [
-                { value: 'popular', label: '인기순' },
-                { value: 'latest', label: '최신순' },
-                { value: 'deadline', label: '마감임박' },
-                { value: 'progress', label: '달성률' }
-            ];
+            throw error instanceof Error
+                ? error
+                : new Error('정렬 옵션을 가져오는데 실패했습니다.');
         }
     }
 
