@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { adminAPI } from '../../services/api';
+import { adminAPI } from '../../services/api/admin';
 import { RealTimeAlert } from '@/types/admin';
 
 export const useAdminAlerts = () => {

@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from '../../components/ui/select';
 import { ArrowLeft, MessageSquare, Upload } from 'lucide-react';
-import { communityPostAPI } from '../../services/api';
+import { communityPostAPI } from '../../services/api/community';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCategories } from '../../lib/api/useCategories';
 

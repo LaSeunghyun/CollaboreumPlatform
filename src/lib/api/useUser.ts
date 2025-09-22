@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService } from '@/features/auth/services/authService';
-import { userAPI, userProfileAPI, interactionAPI } from '../../services/api';
+import { userAPI, userProfileAPI } from '../../services/api/user';
+import { interactionAPI } from '../../services/api/interaction';
 
 // TODO: 사용자 프로필 편집 API 스펙이 확정되면 정식 DTO 타입으로 대체한다.
 interface UserProfileUpdateInput {

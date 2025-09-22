@@ -25,7 +25,7 @@ import {
   Users,
   Upload,
 } from 'lucide-react';
-import { eventManagementAPI } from '../../services/api';
+import { eventManagementAPI } from '../../services/api/events';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const CreateEventPage: React.FC = () => {

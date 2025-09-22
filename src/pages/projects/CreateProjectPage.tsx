@@ -17,7 +17,7 @@ import {
 } from '@/shared/ui';
 import { ArrowLeft, Upload, DollarSign, Target } from 'lucide-react';
 import { FundingModeSelector } from '@/features/funding/components';
-import { fundingAPI } from '@/services/api';
+import { fundingAPI } from '@/services/api/funding';
 import { useAuth } from '@/contexts/AuthContext';
 
 // 타입 정의

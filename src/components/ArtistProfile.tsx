@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { ImageWithFallback } from './atoms/ImageWithFallback';
 import { useEffect, useState } from 'react';
-import { artistAPI } from '../services/api';
+import { artistAPI } from '../services/api/artist';
 import { getFirstChar } from '../utils/typeGuards';
 import { ApiResponse } from '../types';
 

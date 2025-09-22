@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { adminUserAPI } from '../../services/api';
+import { adminUserAPI } from '../../services/api/admin';
 import type { ApiResponse } from '@/shared/types';
 
 type AdminUserRole = 'admin' | 'artist' | 'fan';

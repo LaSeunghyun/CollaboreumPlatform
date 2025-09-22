@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { apiCall } from '../../services/api';
+import { apiCall } from '../../services/api/base';
 
 export interface PlatformStats {
   totalArtists: number;

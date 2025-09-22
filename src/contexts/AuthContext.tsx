@@ -12,7 +12,7 @@ import {
   getStoredAccessToken,
   persistTokens,
 } from '@/features/auth/services/tokenStorage';
-import { authAPI } from '../services/api';
+import { authAPI } from '../services/api/auth';
 
 interface User {
   id: string;

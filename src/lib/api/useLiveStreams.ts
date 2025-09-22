@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { liveStreamAPI } from '../../services/api';
+import { liveStreamAPI } from '../../services/api/livestream';
 
 export interface LiveStream {
   id: string;

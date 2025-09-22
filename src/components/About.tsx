@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { StatCard } from './ui/StatCard';
 import { useQuery } from '@tanstack/react-query';
-import { statsAPI } from '../services/api';
+import { statsAPI } from '../services/api/stats';
 
 interface AboutProps {
   onBack?: () => void;

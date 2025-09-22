@@ -14,7 +14,7 @@ import {
   Calendar,
   PlayCircle,
 } from 'lucide-react';
-import { fundingAPI } from '../services/api';
+import { fundingAPI } from '../services/api/funding';
 import { constantsService } from '../services/constants';
 
 interface RevenueDistribution {

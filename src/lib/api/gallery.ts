@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { galleryAPI } from '../../services/api';
+import { galleryAPI } from '../../services/api/gallery';
 
 export interface Artwork {
   id: string;

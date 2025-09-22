@@ -17,7 +17,7 @@ import {
   Trash2,
   AlertCircle,
 } from 'lucide-react';
-import { artistAPI } from '../services/api';
+import { artistAPI } from '../services/api/artist';
 import { useAuth } from '../contexts/AuthContext';
 
 export function ArtistDashboard() {

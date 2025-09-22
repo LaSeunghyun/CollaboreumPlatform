@@ -1,5 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { communityPostAPI, communityCommentAPI } from '../../services/api';
+import {
+  communityPostAPI,
+  communityCommentAPI,
+} from '../../services/api/community';
 
 interface PostReactionResponse {
   likes?: number;

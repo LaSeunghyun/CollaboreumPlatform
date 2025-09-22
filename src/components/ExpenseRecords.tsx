@@ -24,7 +24,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { dynamicConstantsService } from '../services/constantsService';
-import { fundingAPI } from '../services/api';
+import { fundingAPI } from '../services/api/funding';
 
 interface ExpenseRecord {
   id: string;

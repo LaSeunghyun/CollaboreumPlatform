@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from '../../components/ui/select';
 import { ArrowLeft, Upload, Palette, Tag, DollarSign } from 'lucide-react';
-import { galleryAPI } from '../../services/api';
+import { galleryAPI } from '../../services/api/gallery';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const CreateArtworkPage: React.FC = () => {

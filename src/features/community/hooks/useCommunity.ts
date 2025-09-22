@@ -1,5 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { communityPostAPI, communityCommentAPI } from '../../../services/api';
+import {
+  communityPostAPI,
+  communityCommentAPI,
+} from '../../../services/api/community';
 import {
   PostListParams,
   CommentListParams,

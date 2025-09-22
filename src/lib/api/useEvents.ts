@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { eventManagementAPI } from '../../services/api';
+import { eventManagementAPI } from '../../services/api/events';
 
 // 이벤트 목록 조회
 export const useEvents = (params?: {

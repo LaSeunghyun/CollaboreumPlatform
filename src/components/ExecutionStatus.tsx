@@ -23,7 +23,7 @@ import {
   Save,
   X,
 } from 'lucide-react';
-import { fundingAPI } from '../services/api';
+import { fundingAPI } from '../services/api/funding';
 
 interface ExecutionStage {
   id: string;

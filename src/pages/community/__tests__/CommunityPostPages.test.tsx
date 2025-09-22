@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CreatePostPage } from '../CreatePostPage';
 import { EditPostPage } from '../EditPostPage';
-import { communityPostAPI } from '../../services/api';
+import { communityPostAPI } from '../../services/api/community';
 
 jest.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({

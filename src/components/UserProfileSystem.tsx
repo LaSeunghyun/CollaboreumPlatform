@@ -7,7 +7,8 @@ import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { useAuth } from '../contexts/AuthContext';
-import { artistAPI, userAPI } from '../services/api';
+import { artistAPI } from '../services/api/artist';
+import { userAPI } from '../services/api/user';
 import { LoadingState, ErrorState } from './organisms/States';
 import { ApiResponse } from '../types';
 import {

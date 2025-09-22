@@ -1,6 +1,6 @@
 import { constantsService } from './constants';
 import { Enums, StatusColors, StatusIcons } from '../types/constants';
-import { constantsAPI } from './api';
+import { constantsAPI } from './api/constants';
 
 // 하드코딩된 상수값들을 API에서 가져오는 서비스
 export class DynamicConstantsService {

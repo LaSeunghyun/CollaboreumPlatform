@@ -6,7 +6,7 @@ import { Button } from '@/shared/ui/Button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/Tabs';
 import { ErrorMessage, ProjectListSkeleton, Skeleton } from '@/shared/ui';
 import { useAuth } from '@/contexts/AuthContext';
-import { userProfileAPI } from '@/services/api';
+import { userProfileAPI } from '@/services/api/user';
 import {
   User as UserIcon,
   Bookmark,

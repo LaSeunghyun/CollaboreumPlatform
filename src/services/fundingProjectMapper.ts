@@ -162,7 +162,9 @@ export const mapBackers = (
       ? String(backer.userId)
       : backer.user
         ? String(
-            typeof backer.user === 'object' && backer.user && '_id' in backer.user
+            typeof backer.user === 'object' &&
+              backer.user &&
+              '_id' in backer.user
               ? (backer.user as { _id?: unknown })._id
               : backer.user,
           )
@@ -222,9 +224,18 @@ export const mapRevenueDistribution = (
 ): RevenueDistribution => {
   return {
     totalRevenue,
-    platformFee: mapRevenueShare(revenueDistribution?.platformFee, totalRevenue),
-    artistShare: mapRevenueShare(revenueDistribution?.artistShare, totalRevenue),
-    backerShare: mapRevenueShare(revenueDistribution?.backerShare, totalRevenue),
+    platformFee: mapRevenueShare(
+      revenueDistribution?.platformFee,
+      totalRevenue,
+    ),
+    artistShare: mapRevenueShare(
+      revenueDistribution?.artistShare,
+      totalRevenue,
+    ),
+    backerShare: mapRevenueShare(
+      revenueDistribution?.backerShare,
+      totalRevenue,
+    ),
     distributions: toArray<FundingProjectDistributionPayload>(
       revenueDistribution?.distributions,
     ).map(distribution => ({
@@ -235,8 +246,8 @@ export const mapRevenueDistribution = (
       backer: distribution.backer
         ? String(
             typeof distribution.backer === 'object' &&
-            distribution.backer &&
-            '_id' in distribution.backer
+              distribution.backer &&
+              '_id' in distribution.backer
               ? (distribution.backer as { _id?: unknown })._id
               : distribution.backer,
           )
@@ -250,9 +261,7 @@ export const mapRevenueDistribution = (
       amount: toNumber(distribution.amount ?? distribution.totalReturn),
       date: toIsoString(distribution.date ?? distribution.distributedAt),
       status:
-        typeof distribution.status === 'string'
-          ? distribution.status
-          : '대기',
+        typeof distribution.status === 'string' ? distribution.status : '대기',
     })),
   };
 };
@@ -264,7 +273,10 @@ export const mapFundingProjectDetail = (
     return null;
   }
 
-  const goalAmount = toNumber(project.goalAmount, toNumber(project.targetAmount));
+  const goalAmount = toNumber(
+    project.goalAmount,
+    toNumber(project.targetAmount),
+  );
   const targetAmount = toNumber(project.targetAmount, goalAmount);
   const currentAmount = toNumber(project.currentAmount);
   const totalRevenue = toNumber(
@@ -278,8 +290,9 @@ export const mapFundingProjectDetail = (
       : Array.isArray(project.backers)
         ? project.backers.length
         : Array.isArray(project.backersList)
-          ? project.backersList.filter((item): item is unknown => item != null)
-              .length
+          ? project.backersList.filter(
+              (item): item is NonNullable<typeof item> => item != null,
+            ).length
           : 0;
 
   const artistName =
@@ -322,9 +335,13 @@ export const mapFundingProjectDetail = (
           ? project.description
           : undefined,
     artistAvatar:
-      typeof project.artistAvatar === 'string' ? project.artistAvatar : undefined,
+      typeof project.artistAvatar === 'string'
+        ? project.artistAvatar
+        : undefined,
     artistRating:
-      typeof project.artistRating === 'number' ? project.artistRating : undefined,
+      typeof project.artistRating === 'number'
+        ? project.artistRating
+        : undefined,
     artistId: project.artistId
       ? String(project.artistId)
       : project.artist &&

@@ -16,7 +16,8 @@ import {
   XCircle,
   Clock,
 } from 'lucide-react';
-import { statsAPI, adminAPI } from '@/services/api';
+import { statsAPI } from '@/services/api/stats';
+import { adminAPI } from '@/services/api/admin';
 import { adminService } from '@/features/admin/services/adminService';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';

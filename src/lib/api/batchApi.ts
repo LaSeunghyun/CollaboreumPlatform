@@ -1,6 +1,6 @@
 // 배치 API 호출을 위한 유틸리티
 import type { ApiResponse } from '@/shared/types';
-import { apiCall } from '../../services/api';
+import { apiCall } from '../../services/api/base';
 
 type SupportedMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 

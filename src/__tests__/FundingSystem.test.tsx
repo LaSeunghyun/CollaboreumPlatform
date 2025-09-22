@@ -11,7 +11,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { FundingProjectDetail } from '@/features/funding/components/FundingProjectDetail';
 import { PaymentModal } from '@/features/funding/components/PaymentModal';
 import { FundingProjects } from '@/features/funding/components/FundingProjects';
-import { fundingAPI } from '@/services/api';
+import { fundingAPI } from '@/services/api/funding';
 
 // Mock useParams
 jest.mock('react-router-dom', () => ({

@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import FanMyPage from '../FanMyPage';
-import { userProfileAPI } from '../../services/api';
+import { userProfileAPI } from '../../services/api/user';
 import { useAuth } from '../../contexts/AuthContext';
 
 type UserProfileAPI = typeof userProfileAPI;

@@ -15,7 +15,7 @@ import { Calendar } from './ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 // import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { eventManagementAPI } from '../services/api';
+import { eventManagementAPI } from '../services/api/events';
 import { useAuth } from '../contexts/AuthContext';
 import { dynamicConstantsService } from '../services/constantsService';
 import {

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { artistAPI } from '../../services/api';
+import { artistAPI } from '../../services/api/artist';
 
 // TODO: Artist 관리 API 스키마가 확정되면 전용 DTO 타입으로 교체한다.
 interface ArtistProfileUpdateInput {

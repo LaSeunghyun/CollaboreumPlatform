@@ -15,7 +15,7 @@ import {
   Bookmark,
 } from 'lucide-react';
 import { ImageWithFallback } from './atoms/ImageWithFallback';
-import { eventManagementAPI } from '../services/api';
+import { eventManagementAPI } from '../services/api/events';
 import { useAuth } from '../contexts/AuthContext';
 import { getFirstChar } from '../utils/typeGuards';
 import { ApiResponse } from '../types';
