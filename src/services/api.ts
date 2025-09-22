@@ -708,6 +708,7 @@ export const communityAPI = {
     category?: string,
     options?: {
       sort?: string;
+      sortBy?: string;
       order?: string;
       page?: number;
       limit?: number;
@@ -716,7 +717,11 @@ export const communityAPI = {
   ) => {
     const params = new URLSearchParams();
     if (category && category !== '전체') params.append('category', category);
-    if (options?.sort) params.append('sort', options.sort);
+    if (options?.sortBy) {
+      params.append('sortBy', options.sortBy);
+    } else if (options?.sort) {
+      params.append('sortBy', options.sort);
+    }
     if (options?.order) params.append('order', options.order);
     if (options?.page) params.append('page', options.page.toString());
     if (options?.limit) params.append('limit', options.limit.toString());
@@ -1621,6 +1626,10 @@ export const constantsAPI = {
 
   // 결제 방법 조회
   getPaymentMethods: () => apiCall('/constants/payment-methods'),
+
+  // 정렬 옵션 조회
+  getSortOptions: (type?: string) =>
+    apiCall(`/constants/sort-options${type ? `/${type}` : ''}`),
 
   // 상태 설정 조회
   getStatusConfig: (type: 'project' | 'funding' | 'event') =>

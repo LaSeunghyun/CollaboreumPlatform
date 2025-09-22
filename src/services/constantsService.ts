@@ -2,6 +2,12 @@ import { constantsService } from './constants';
 import { Enums, StatusColors, StatusIcons } from '../types/constants';
 import { constantsAPI } from './api';
 
+type SortOption = {
+    value: string;
+    label: string;
+    icon?: string;
+};
+
 // 하드코딩된 상수값들을 API에서 가져오는 서비스
 export class DynamicConstantsService {
     private enumsCache: Enums | null = null;
@@ -23,13 +29,19 @@ export class DynamicConstantsService {
 
         try {
             const response = await constantsAPI.getEnums() as any;
-            this.enumsCache = response.data || this.getDefaultEnums();
+            if (!response || !response.data) {
+                throw new Error('상수 API에서 enum 데이터를 반환하지 않았습니다.');
+            }
+
+            this.enumsCache = response.data;
             this.lastFetch = Date.now();
-            return this.enumsCache!;
+            return this.enumsCache;
         } catch (error) {
             console.error('Enum 값들을 가져오는 중 오류 발생:', error);
-            // API 실패 시 기본값 반환
-            return this.getDefaultEnums();
+            this.enumsCache = null;
+            throw error instanceof Error
+                ? error
+                : new Error('Enum 값들을 가져오는데 실패했습니다.');
         }
     }
 
@@ -40,12 +52,20 @@ export class DynamicConstantsService {
         }
 
         try {
-            this.statusColorsCache = await constantsService.getStatusColors();
+            const colors = await constantsService.getStatusColors();
+            if (!colors) {
+                throw new Error('상태 색상 데이터를 가져오지 못했습니다.');
+            }
+
+            this.statusColorsCache = colors;
             this.lastFetch = Date.now();
             return this.statusColorsCache;
         } catch (error) {
             console.error('상태 색상을 가져오는 중 오류 발생:', error);
-            return this.getDefaultStatusColors();
+            this.statusColorsCache = null;
+            throw error instanceof Error
+                ? error
+                : new Error('상태 색상을 가져오는데 실패했습니다.');
         }
     }
 
@@ -57,12 +77,19 @@ export class DynamicConstantsService {
 
         try {
             const response = await constantsAPI.getStatusIcons() as any;
-            this.statusIconsCache = response.data || this.getDefaultStatusIcons();
+            if (!response || !response.data) {
+                throw new Error('상태 아이콘 데이터가 비어 있습니다.');
+            }
+
+            this.statusIconsCache = response.data;
             this.lastFetch = Date.now();
-            return this.statusIconsCache!;
+            return this.statusIconsCache;
         } catch (error) {
             console.error('상태 아이콘을 가져오는 중 오류 발생:', error);
-            return this.getDefaultStatusIcons();
+            this.statusIconsCache = null;
+            throw error instanceof Error
+                ? error
+                : new Error('상태 아이콘을 가져오는데 실패했습니다.');
         }
     }
 
@@ -70,16 +97,16 @@ export class DynamicConstantsService {
     async getArtworkCategories() {
         try {
             const response = await constantsAPI.getArtworkCategories() as any;
+            if (!response || !Array.isArray(response.data)) {
+                throw new Error('아트워크 카테고리 데이터가 비어 있습니다.');
+            }
+
             return response.data;
         } catch (error) {
             console.error('아트워크 카테고리를 가져오는 중 오류 발생:', error);
-            return [
-                { id: 'painting', label: '회화', icon: '🎨' },
-                { id: 'sculpture', label: '조각', icon: '🗿' },
-                { id: 'photography', label: '사진', icon: '📸' },
-                { id: 'digital', label: '디지털아트', icon: '💻' },
-                { id: 'craft', label: '공예', icon: '🛠️' }
-            ];
+            throw error instanceof Error
+                ? error
+                : new Error('아트워크 카테고리를 가져오는데 실패했습니다.');
         }
     }
 
@@ -87,16 +114,16 @@ export class DynamicConstantsService {
     async getExpenseCategories() {
         try {
             const response = await constantsAPI.getExpenseCategories() as any;
+            if (!response || !Array.isArray(response.data)) {
+                throw new Error('비용 카테고리 데이터가 비어 있습니다.');
+            }
+
             return response.data;
         } catch (error) {
             console.error('비용 카테고리를 가져오는 중 오류 발생:', error);
-            return [
-                { id: 'labor', label: '인건비', icon: '👥' },
-                { id: 'material', label: '재료비', icon: '🧱' },
-                { id: 'equipment', label: '장비비', icon: '⚙️' },
-                { id: 'marketing', label: '마케팅비', icon: '📢' },
-                { id: 'other', label: '기타', icon: '📋' }
-            ];
+            throw error instanceof Error
+                ? error
+                : new Error('비용 카테고리를 가져오는데 실패했습니다.');
         }
     }
 
@@ -104,14 +131,16 @@ export class DynamicConstantsService {
     async getPaymentMethods() {
         try {
             const response = await constantsAPI.getPaymentMethods() as any;
+            if (!response || !Array.isArray(response.data)) {
+                throw new Error('결제 방법 데이터가 비어 있습니다.');
+            }
+
             return response.data;
         } catch (error) {
             console.error('결제 방법을 가져오는 중 오류 발생:', error);
-            return [
-                { id: 'card', label: '신용카드', icon: '💳' },
-                { id: 'phone', label: '휴대폰 결제', icon: '📱' },
-                { id: 'bank', label: '계좌이체', icon: '🏦' }
-            ];
+            throw error instanceof Error
+                ? error
+                : new Error('결제 방법을 가져오는데 실패했습니다.');
         }
     }
 
@@ -119,10 +148,16 @@ export class DynamicConstantsService {
     async getStatusConfig(type: 'project' | 'funding' | 'event') {
         try {
             const response = await constantsAPI.getStatusConfig(type) as any;
+            if (!response || !response.data) {
+                throw new Error(`${type} 상태 설정 응답이 비어 있습니다.`);
+            }
+
             return response.data;
         } catch (error) {
             console.error(`${type} 상태 설정을 가져오는 중 오류 발생:`, error);
-            return this.getDefaultStatusConfig(type);
+            throw error instanceof Error
+                ? error
+                : new Error(`${type} 상태 설정을 가져오는데 실패했습니다.`);
         }
     }
 
@@ -147,7 +182,9 @@ export class DynamicConstantsService {
             return statusConfig;
         } catch (error) {
             console.error('프로젝트 상태 설정을 가져오는 중 오류 발생:', error);
-            return this.getDefaultProjectStatusConfig();
+            throw error instanceof Error
+                ? error
+                : new Error('프로젝트 상태 설정을 가져오는데 실패했습니다.');
         }
     }
 
@@ -172,7 +209,9 @@ export class DynamicConstantsService {
             return statusConfig;
         } catch (error) {
             console.error('펀딩 프로젝트 상태 설정을 가져오는 중 오류 발생:', error);
-            return this.getDefaultFundingProjectStatusConfig();
+            throw error instanceof Error
+                ? error
+                : new Error('펀딩 프로젝트 상태 설정을 가져오는데 실패했습니다.');
         }
     }
 
@@ -197,30 +236,52 @@ export class DynamicConstantsService {
             return statusConfig;
         } catch (error) {
             console.error('이벤트 상태 설정을 가져오는 중 오류 발생:', error);
-            return this.getDefaultEventStatusConfig();
+            throw error instanceof Error
+                ? error
+                : new Error('이벤트 상태 설정을 가져오는데 실패했습니다.');
         }
     }
 
     // 정렬 옵션 가져오기
-    async getSortOptions() {
+    async getSortOptions(type: 'project' | 'funding' | 'community' = 'project'): Promise<SortOption[]> {
         try {
-            const enums = await this.getEnums();
+            const response = await constantsAPI.getSortOptions(type);
+            const rawOptions = (response as any)?.data ?? response;
 
-            // API에서 정렬 옵션을 가져오거나 기본값 사용
-            return [
-                { value: 'popular', label: '인기순' },
-                { value: 'latest', label: '최신순' },
-                { value: 'deadline', label: '마감임박' },
-                { value: 'progress', label: '달성률' }
-            ];
+            if (!Array.isArray(rawOptions)) {
+                throw new Error('정렬 옵션 데이터가 배열이 아닙니다.');
+            }
+
+            return rawOptions
+                .map(option => {
+                    if (!option || typeof option !== 'object') {
+                        return null;
+                    }
+
+                    const record = option as Record<string, unknown>;
+                    const value = record.value ?? record.id;
+                    const label = record.label ?? record.name ?? record.value;
+
+                    if (typeof value !== 'string' && typeof value !== 'number') {
+                        return null;
+                    }
+
+                    if (typeof label !== 'string' && typeof label !== 'number') {
+                        return null;
+                    }
+
+                    return {
+                        value: String(value),
+                        label: String(label),
+                        icon: typeof record.icon === 'string' ? record.icon : undefined,
+                    };
+                })
+                .filter((option): option is SortOption => Boolean(option));
         } catch (error) {
             console.error('정렬 옵션을 가져오는 중 오류 발생:', error);
-            return [
-                { value: 'popular', label: '인기순' },
-                { value: 'latest', label: '최신순' },
-                { value: 'deadline', label: '마감임박' },
-                { value: 'progress', label: '달성률' }
-            ];
+            throw error instanceof Error
+                ? error
+                : new Error('정렬 옵션을 가져오는데 실패했습니다.');
         }
     }
 
@@ -243,7 +304,9 @@ export class DynamicConstantsService {
             }
         } catch (error) {
             console.error('카테고리를 가져오는 중 오류 발생:', error);
-            return this.getDefaultCategories(type);
+            throw error instanceof Error
+                ? error
+                : new Error('카테고리를 가져오는데 실패했습니다.');
         }
     }
 
@@ -255,152 +318,7 @@ export class DynamicConstantsService {
         this.lastFetch = 0;
     }
 
-    // 기본값들
-    private getDefaultEnums(): Enums {
-        return {
-            USER_ROLES: { ARTIST: 'artist', ADMIN: 'admin', FAN: 'fan' },
-            ARTIST_CATEGORIES: { MUSIC: '음악', ART: '미술', VIDEO: '영상', LITERATURE: '문학', CRAFT: '공예', DESIGN: '디자인', OTHER: '기타' },
-            ARTIST_GENRES: { POP: '팝', ROCK: '록', RNB: 'R&B', JAZZ: '재즈', CLASSICAL: '클래식', HIPHOP: '힙합', ELECTRONIC: '일렉트로닉', INDIE: '인디', ALTERNATIVE: '얼터너티브', COUNTRY: '컨트리', REGGAE: '레게', BLUES: '블루스', SOUL: '소울', PUNK: '펑크', METAL: '메탈', OTHER: '기타' },
-            PROJECT_CATEGORIES: { MUSIC: '음악', VIDEO: '영상', PERFORMANCE: '공연', BOOK: '도서', GAME: '게임', OTHER: '기타' },
-            PROJECT_STATUSES: { PLANNING: 'planning', IN_PROGRESS: 'in_progress', COMPLETED: 'completed', PENDING: 'pending', CANCELLED: 'cancelled' },
-            TASK_STATUSES: { WAITING: '대기', IN_PROGRESS: '진행중', COMPLETED: '완료', PENDING: '보류' },
-            EVENT_CATEGORIES: { FESTIVAL: '축제', PERFORMANCE: '공연', COMPETITION: '경연', WORKSHOP: '워크샵', SEMINAR: '세미나', OTHER: '기타' },
-            EVENT_STATUSES: { SCHEDULED: 'scheduled', IN_PROGRESS: 'in_progress', COMPLETED: 'completed', CANCELLED: 'cancelled' },
-            LIVESTREAM_CATEGORIES: { MUSIC: '음악', PERFORMANCE: '공연', TALK: '토크', WORKSHOP: '워크샵', OTHER: '기타' },
-            LIVESTREAM_STATUSES: { SCHEDULED: '예정', LIVE: '라이브', ENDED: '종료', CANCELLED: '취소' },
-            FUNDING_PROJECT_STATUSES: { PREPARING: 'preparing', IN_PROGRESS: 'in_progress', SUCCESS: 'success', FAILED: 'failed', CANCELLED: 'cancelled', EXECUTING: 'executing', COMPLETED: 'completed' },
-            DISTRIBUTION_STATUSES: { WAITING: '대기', DISTRIBUTED: '분배완료', PAID: '지급완료' },
-            EXPENSE_CATEGORIES: { LABOR: '인건비', MATERIAL: '재료비', EQUIPMENT: '장비비', MARKETING: '마케팅비', OTHER: '기타' },
-            TRACK_GENRES: { INDIE_POP: '인디팝', ROCK: '록', ACOUSTIC: '어쿠스틱', JAZZ: '재즈', CLASSICAL: '클래식', ELECTRONIC: '일렉트로닉', HIPHOP: '힙합', RNB: 'R&B', OTHER: '기타' },
-            MUSIC_KEYS: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
-            MUSIC_MOODS: { EXCITING: '신나는', EMOTIONAL: '감성적인', CALM: '잔잔한', INTENSE: '강렬한', MELANCHOLY: '우울한', HOPEFUL: '희망적인', ROMANTIC: '로맨틱한', MYSTERIOUS: '신비로운' },
-            LICENSES: { ALL_RIGHTS_RESERVED: 'All Rights Reserved', CREATIVE_COMMONS: 'Creative Commons', PUBLIC_DOMAIN: 'Public Domain' },
-            ARTWORK_TYPES: { AUDIO: 'audio', IMAGE: 'image', VIDEO: 'video', TEXT: 'text' },
-            ARTWORK_STATUSES: { DRAFT: 'draft', PUBLISHED: 'published', ARCHIVED: 'archived' },
-            EVENT_TICKET_TYPES: { REGULAR: '일반', VIP: 'VIP', EARLY_BIRD: '얼리버드', STUDENT: '학생' },
-            MILESTONE_STATUSES: { SCHEDULED: '예정', IN_PROGRESS: '진행중', COMPLETED: '완료', DELAYED: '지연' },
-            PRIORITIES: { LOW: '낮음', MEDIUM: '보통', HIGH: '높음', URGENT: '긴급' },
-            FUNDING_PROJECT_TYPES: { REGULAR: '일반', EXECUTION_IN_PROGRESS: '집행진행', EXPENSE_PUBLIC: '비용공개', REVENUE_DISTRIBUTION: '수익분배' },
-            STATUS_COMPLETED: [],
-            STATUS_IN_PROGRESS: [],
-            STATUS_WAITING: [],
-            STATUS_FAILED: [],
-            STATUS_PRIORITIES: {},
-            STATUS_DESCRIPTIONS: {}
-        } as Enums;
-    }
-
-    private getDefaultStatusColors(): StatusColors {
-        return {
-            'pending': 'bg-yellow-100 text-yellow-800',
-            'active': 'bg-green-100 text-green-800',
-            'completed': 'bg-blue-100 text-blue-800',
-            'failed': 'bg-red-100 text-red-800',
-            'cancelled': 'bg-gray-100 text-gray-800',
-            'in_progress': 'bg-blue-100 text-blue-800',
-            'success': 'bg-green-100 text-green-800',
-            'preparing': 'bg-yellow-100 text-yellow-800',
-            'executing': 'bg-purple-100 text-purple-800',
-            'scheduled': 'bg-blue-100 text-blue-800',
-            'ongoing': 'bg-green-100 text-green-800',
-            'ended': 'bg-gray-100 text-gray-800'
-        };
-    }
-
-    private getDefaultStatusIcons(): StatusIcons {
-        return {
-            'pending': 'clock',
-            'active': 'play',
-            'completed': 'check',
-            'failed': 'x',
-            'cancelled': 'x-circle',
-            'in_progress': 'play-circle',
-            'success': 'check-circle',
-            'preparing': 'settings',
-            'executing': 'zap',
-            'scheduled': 'calendar',
-            'ongoing': 'radio',
-            'ended': 'stop-circle'
-        };
-    }
-
-    private getDefaultProjectStatusConfig() {
-        return {
-            pending: { label: '승인 대기', variant: 'secondary' },
-            active: { label: '진행중', variant: 'default' },
-            completed: { label: '완료', variant: 'outline' },
-            failed: { label: '실패', variant: 'destructive' },
-            cancelled: { label: '취소', variant: 'secondary' }
-        };
-    }
-
-    private getDefaultFundingProjectStatusConfig() {
-        return {
-            preparing: { label: '준비중', variant: 'secondary' },
-            in_progress: { label: '진행중', variant: 'default' },
-            success: { label: '성공', variant: 'outline' },
-            failed: { label: '실패', variant: 'destructive' },
-            cancelled: { label: '취소', variant: 'secondary' },
-            executing: { label: '실행중', variant: 'default' },
-            completed: { label: '완료', variant: 'outline' }
-        };
-    }
-
-    private getDefaultEventStatusConfig() {
-        return {
-            scheduled: { label: '예정', variant: 'default' },
-            in_progress: { label: '진행중', variant: 'secondary' },
-            completed: { label: '완료', variant: 'outline' },
-            cancelled: { label: '취소', variant: 'destructive' }
-        };
-    }
-
-    private getDefaultCategories(type: string) {
-        switch (type) {
-            case 'artist':
-                return ['음악', '미술', '영상', '문학', '공예', '디자인', '기타'];
-            case 'project':
-                return ['음악', '영상', '공연', '도서', '게임', '기타'];
-            case 'event':
-                return ['페스티벌', '공연', '대회', '워크샵', '세미나', '기타'];
-            case 'community':
-                return ['음악', '미술', '영상', '문학', '공예', '디자인', '기타'];
-            default:
-                return ['음악', '영상', '공연', '도서', '게임', '기타'];
-        }
-    }
-
-    private getDefaultStatusConfig(type: 'project' | 'funding' | 'event') {
-        switch (type) {
-            case 'project':
-                return {
-                    planning: { label: '계획중', variant: 'secondary', color: 'bg-yellow-100 text-yellow-800' },
-                    in_progress: { label: '진행중', variant: 'default', color: 'bg-blue-100 text-blue-800' },
-                    completed: { label: '완료', variant: 'success', color: 'bg-green-100 text-green-800' },
-                    pending: { label: '보류', variant: 'warning', color: 'bg-orange-100 text-orange-800' },
-                    cancelled: { label: '취소', variant: 'destructive', color: 'bg-red-100 text-red-800' }
-                };
-            case 'funding':
-                return {
-                    preparing: { label: '준비중', variant: 'secondary', color: 'bg-gray-100 text-gray-800' },
-                    in_progress: { label: '진행중', variant: 'default', color: 'bg-blue-100 text-blue-800' },
-                    success: { label: '성공', variant: 'success', color: 'bg-green-100 text-green-800' },
-                    failed: { label: '실패', variant: 'destructive', color: 'bg-red-100 text-red-800' },
-                    cancelled: { label: '취소', variant: 'destructive', color: 'bg-red-100 text-red-800' },
-                    executing: { label: '집행중', variant: 'warning', color: 'bg-orange-100 text-orange-800' },
-                    completed: { label: '완료', variant: 'success', color: 'bg-green-100 text-green-800' }
-                };
-            case 'event':
-                return {
-                    scheduled: { label: '예정', variant: 'default', color: 'bg-blue-100 text-blue-800' },
-                    in_progress: { label: '진행중', variant: 'success', color: 'bg-green-100 text-green-800' },
-                    completed: { label: '완료', variant: 'secondary', color: 'bg-gray-100 text-gray-800' },
-                    cancelled: { label: '취소', variant: 'destructive', color: 'bg-red-100 text-red-800' }
-                };
-            default:
-                return {};
-        }
-    }
+    // 기본값들을 제거하고 모든 데이터는 API 기반으로 처리합니다.
 
     // 상태 라벨 변환
     private getStatusLabel(status: string): string {

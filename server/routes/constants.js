@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { ENUMS, CSV_HEADERS, STATUS_COLORS, STATUS_ICONS } = require('../constants/enums');
+const { resolveSortOptions } = require('../constants/sortOptions');
 
 // 모든 enum 값들을 조회하는 엔드포인트
 router.get('/enums', async (req, res) => {
@@ -153,10 +154,27 @@ router.get('/payment-methods', async (req, res) => {
       data: paymentMethods
     });
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: '결제 방법 조회 중 오류가 발생했습니다.', 
-      error: error.message 
+    res.status(500).json({
+      success: false,
+      message: '결제 방법 조회 중 오류가 발생했습니다.',
+      error: error.message
+    });
+  }
+});
+
+// 정렬 옵션 조회
+router.get('/sort-options/:type?', async (req, res) => {
+  try {
+    const sortOptions = resolveSortOptions(req.params.type);
+    res.json({
+      success: true,
+      data: sortOptions,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: '정렬 옵션 조회 중 오류가 발생했습니다.',
+      error: error.message,
     });
   }
 });

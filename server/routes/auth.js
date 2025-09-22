@@ -6,6 +6,7 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const { logger } = require('../src/logger');
 const { userEvents } = require('../src/logger/event');
+const { setAuthCookies, clearAuthCookies } = require('../utils/authCookies');
 
 // 회원가입
 router.post('/signup', async (req, res) => {
@@ -121,6 +122,8 @@ router.post('/signup', async (req, res) => {
       tokenPreview: token.substring(0, 20) + '...'
     }, 'JWT token issued');
 
+    setAuthCookies(res, { accessToken: token });
+
     res.status(201).json({
       success: true,
       message: '회원가입이 완료되었습니다.',
@@ -223,6 +226,8 @@ router.post('/login', async (req, res) => {
       role: user.role
     }, 'Login successful');
 
+    setAuthCookies(res, { accessToken: token });
+
     res.json({
       success: true,
       message: '로그인되었습니다.',
@@ -253,6 +258,8 @@ router.post('/login', async (req, res) => {
 router.post('/logout', async (req, res) => {
   try {
     // 클라이언트에서 토큰을 제거하도록 안내
+    clearAuthCookies(res);
+
     res.json({
       success: true,
       message: '로그아웃되었습니다.'
