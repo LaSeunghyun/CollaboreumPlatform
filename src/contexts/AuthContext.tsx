@@ -41,6 +41,149 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+const parseRole = (value: unknown): User['role'] => {
+  if (value === 'artist' || value === 'admin' || value === 'fan') {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const normalized = value.toLowerCase();
+    if (normalized === 'artist' || normalized === 'admin') {
+      return normalized as User['role'];
+    }
+  }
+
+  return 'fan';
+};
+
+const pickFirstString = (...values: unknown[]): string | undefined => {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value;
+    }
+  }
+
+  return undefined;
+};
+
+const normalizeUserCandidate = (
+  candidate: Record<string, unknown>,
+): User | null => {
+  const idSource =
+    candidate.id ??
+    candidate._id ??
+    candidate.userId ??
+    candidate.user_id ??
+    candidate.uuid ??
+    candidate.sub;
+  const emailSource =
+    candidate.email ??
+    candidate.mail ??
+    candidate.userEmail ??
+    candidate.user_email ??
+    candidate.username;
+
+  if (
+    (typeof idSource !== 'string' && typeof idSource !== 'number') ||
+    typeof emailSource !== 'string'
+  ) {
+    return null;
+  }
+
+  const nameSource = pickFirstString(
+    candidate.name,
+    candidate.displayName,
+    candidate.nickname,
+    candidate.username,
+    candidate.fullName,
+    candidate.handle,
+  );
+  const avatarSource = pickFirstString(
+    candidate.avatar,
+    candidate.profileImage,
+    candidate.profile_image,
+    candidate.photoURL,
+    candidate.photoUrl,
+    candidate.picture,
+  );
+  const bioSource = pickFirstString(
+    candidate.bio,
+    candidate.introduction,
+    candidate.about,
+    candidate.description,
+  );
+  const createdAtSource = pickFirstString(
+    candidate.createdAt,
+    candidate.created_at,
+  );
+  const updatedAtSource = pickFirstString(
+    candidate.updatedAt,
+    candidate.updated_at,
+  );
+  const verificationSource =
+    candidate.isVerified ?? candidate.emailVerified ?? candidate.verified;
+
+  return {
+    id: String(idSource),
+    email: String(emailSource),
+    name: nameSource ?? '',
+    role: parseRole(
+      candidate.role ?? candidate.userRole ?? candidate.type ?? candidate.roleType,
+    ),
+    avatar: avatarSource,
+    bio: bioSource,
+    isVerified:
+      typeof verificationSource === 'boolean'
+        ? verificationSource
+        : undefined,
+    createdAt: createdAtSource,
+    updatedAt: updatedAtSource,
+  };
+};
+
+const resolveUserFromVerificationPayload = (payload: unknown): User | null => {
+  if (!payload) {
+    return null;
+  }
+
+  const visited = new Set<unknown>();
+  const queue: unknown[] = Array.isArray(payload) ? [...payload] : [payload];
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    if (!current || typeof current !== 'object') {
+      continue;
+    }
+
+    if (visited.has(current)) {
+      continue;
+    }
+
+    visited.add(current);
+
+    const candidate = normalizeUserCandidate(current as Record<string, unknown>);
+    if (candidate) {
+      return candidate;
+    }
+
+    Object.values(current as Record<string, unknown>).forEach(value => {
+      if (value && typeof value === 'object') {
+        if (Array.isArray(value)) {
+          value.forEach(item => {
+            if (!visited.has(item)) {
+              queue.push(item);
+            }
+          });
+        } else if (!visited.has(value)) {
+          queue.push(value);
+        }
+      }
+    });
+  }
+
+  return null;
+};
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -56,50 +199,144 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // 컴포넌트 마운트 시 로컬 스토리지에서 토큰과 사용자 정보 복원
   useEffect(() => {
+    let isMounted = true;
+
     const initializeAuth = async () => {
       try {
         cleanInvalidTokens();
 
         const storedToken = getStoredAccessToken();
-        const storedUser = localStorage.getItem('authUser');
+        const storedUserRaw = localStorage.getItem('authUser');
 
-        if (storedToken && storedUser) {
-          const isValid = await validateToken(storedToken);
-
-          if (isValid) {
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser));
-          } else {
-            logout();
-          }
-        } else if (!storedToken) {
+        if (!storedToken) {
           logout();
+          return;
+        }
+
+        if (!isMounted) {
+          return;
+        }
+
+        setToken(storedToken);
+
+        if (storedUserRaw) {
+          try {
+            const parsedUser = JSON.parse(storedUserRaw) as User;
+            if (isMounted) {
+              setUser(parsedUser);
+            }
+          } catch (parseError) {
+            console.warn(
+              '저장된 사용자 정보를 복원하지 못했습니다. 검증 응답을 통해 다시 불러옵니다.',
+              parseError,
+            );
+            localStorage.removeItem('authUser');
+          }
+        }
+
+        try {
+          const verification = (await authAPI.verify()) as any;
+
+          if (!isMounted) {
+            return;
+          }
+
+          const verificationFailed =
+            typeof verification === 'object' &&
+            verification !== null &&
+            'success' in verification &&
+            verification.success === false;
+
+          if (verificationFailed) {
+            logout();
+            return;
+          }
+
+          const resolvedUser = resolveUserFromVerificationPayload(verification);
+          if (resolvedUser) {
+            setUser(resolvedUser);
+            localStorage.setItem('authUser', JSON.stringify(resolvedUser));
+          } else if (!storedUserRaw) {
+            console.warn(
+              '토큰은 확인되었지만 검증 응답에서 사용자 정보를 찾을 수 없습니다.',
+            );
+          }
+        } catch (verificationError) {
+          if (!isMounted) {
+            return;
+          }
+
+          const status =
+            (verificationError as { status?: number }).status ??
+            (verificationError as { response?: { status?: number } }).response
+              ?.status;
+
+          if (status === 401) {
+            logout();
+            return;
+          }
+
+          console.warn(
+            '토큰 검증 중 일시적인 문제가 발생했습니다. 기존 세션을 유지합니다.',
+            verificationError,
+          );
         }
       } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
         console.error('토큰 복원 중 오류:', error);
-        // 오류 발생 시 저장된 데이터 제거
         logout();
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     initializeAuth();
 
     return () => {
-      // cleanup function
+      isMounted = false;
     };
   }, [logout]);
 
   // 토큰 유효성 검증 함수
-  const validateToken = async (token: string): Promise<boolean> => {
+  const validateToken = useCallback(async (): Promise<boolean> => {
     try {
       const response = (await authAPI.verify()) as any;
-      return response.success;
+
+      const verificationFailed =
+        typeof response === 'object' &&
+        response !== null &&
+        'success' in response &&
+        response.success === false;
+
+      if (verificationFailed) {
+        return false;
+      }
+
+      const resolvedUser = resolveUserFromVerificationPayload(response);
+      if (resolvedUser) {
+        setUser(resolvedUser);
+        localStorage.setItem('authUser', JSON.stringify(resolvedUser));
+      }
+
+      return true;
     } catch (error) {
-      return false;
+      const status =
+        (error as { status?: number }).status ??
+        (error as { response?: { status?: number } }).response?.status;
+
+      if (status === 401) {
+        return false;
+      }
+
+      console.warn('토큰 검증 실패 - 기존 세션을 유지합니다.', error);
+      return true;
     }
-  };
+  }, []);
 
   // 로그인 함수
   const login = (newToken: string, newUser: User) => {
@@ -158,7 +395,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const tokenRefreshInterval = setInterval(
         async () => {
           try {
-            const isValid = await validateToken(token);
+            const isValid = await validateToken();
             if (!isValid) {
               logout();
             }
@@ -172,7 +409,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return () => clearInterval(tokenRefreshInterval);
     }
     return undefined;
-  }, [token, logout]);
+  }, [token, logout, validateToken]);
 
   const value: AuthContextType = {
     user,

@@ -82,7 +82,7 @@ export const SearchPage: React.FC = () => {
             case 'artist': return `/artists/${result.id}`;
             case 'project': return `/projects/${result.id}`;
             case 'event': return `/events/${result.id}`;
-            case 'post': return `/community/post/${result.id}`;
+            case 'post': return `/community/${result.id}`;
             default: return '#';
         }
     };

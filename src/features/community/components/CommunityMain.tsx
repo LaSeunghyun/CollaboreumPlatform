@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader } from '@/shared/ui/Card';
+
+import { useCreateCommunityPost } from '@/features/community/hooks/useCommunityPosts';
+import { useCommunityPosts } from '@/lib/api/useCommunityPosts';
+import { useCategories } from '@/lib/api/useCategories';
 import { Button } from '@/shared/ui/Button';
+import { Card, CardContent } from '@/shared/ui/Card';
+import { ErrorMessage, ProjectListSkeleton } from '@/shared/ui';
 import { Input } from '@/shared/ui/Input';
 import {
   Select,
@@ -10,33 +15,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/Select';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/Tabs';
-import { ErrorMessage, ProjectListSkeleton } from '@/shared/ui';
-import { useCommunityPosts } from '@/lib/api/useCommunityPosts';
-import { useCategories } from '@/lib/api/useCategories';
-import { useCreateCommunityPost } from '@/features/community/hooks/useCommunityPosts';
-import { useCommunityStats } from '@/features/community/hooks/useCommunity';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/Tabs';
+import { Search, Plus, Clock, Flame, MessageCircle } from 'lucide-react';
+import { toast } from 'sonner';
+
 import type {
   CommunityPost,
   CommunityPostListQuery,
   CreateCommunityPostData,
 } from '../types';
-import PostCard from './PostCard';
 import PostForm from './PostForm';
-import { Search, Plus, Filter, TrendingUp, Clock, Star } from 'lucide-react';
-import { toast } from 'sonner';
+import PostTable from './PostTable';
 
 interface CommunityMainProps {
   onPostClick?: (post: CommunityPost) => void;
   onCreatePost?: () => void;
-  showStats?: boolean;
 }
 
-const CommunityMain: React.FC<CommunityMainProps> = ({
-  onPostClick,
-  onCreatePost,
-  showStats = true,
-}) => {
+const CommunityMain: React.FC<CommunityMainProps> = ({ onPostClick, onCreatePost }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchInput, setSearchInput] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -187,20 +183,13 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
     statusParam,
   ]);
 
-  const { data, isLoading, isFetching, error, refetch } =
-    useCommunityPosts(query);
+  const { data, isLoading, isFetching, error, refetch } = useCommunityPosts(query);
 
   const {
     data: categoriesData = [],
     error: categoriesError,
     refetch: refetchCategories,
   } = useCategories();
-  const {
-    data: stats,
-    isLoading: statsLoading,
-    error: statsError,
-    refetch: refetchStats,
-  } = useCommunityStats();
   const { mutateAsync: createCommunityPost, isPending: isCreatePending } =
     useCreateCommunityPost();
 
@@ -286,28 +275,6 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
   )
     ? sortParam
     : 'latest';
-  const normalizedStats = useMemo(
-    () => ({
-      totalPosts: stats?.totalPosts ?? 0,
-      activeUsers: stats?.activeUsers ?? 0,
-      totalComments: stats?.totalComments ?? 0,
-      avgLikes: stats?.avgLikes ?? 0,
-      postsGrowthRate: stats?.postsGrowthRate ?? 0,
-      usersGrowthRate: stats?.usersGrowthRate ?? 0,
-    }),
-    [stats],
-  );
-
-  const formatGrowth = useCallback((value: number) => {
-    if (value > 0) {
-      return `▲ ${value}%`;
-    }
-    if (value < 0) {
-      return `▼ ${Math.abs(value)}%`;
-    }
-    return '변동 없음';
-  }, []);
-
   const handleCreatePost = useCallback(
     async (data: CreateCommunityPostData) => {
       try {
@@ -316,7 +283,6 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
         setShowCreateForm(false);
         onCreatePost?.();
         refetch();
-        refetchStats();
       } catch (mutationError) {
         console.error('게시글 생성 실패:', mutationError);
         const message =
@@ -326,7 +292,11 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
         toast.error(message);
       }
     },
-    [createCommunityPost, onCreatePost, refetch, refetchStats],
+    [
+      createCommunityPost,
+      onCreatePost,
+      refetch,
+    ],
   );
 
   const isCreatingPost = isCreatePending ?? false;
@@ -336,6 +306,37 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
       onPostClick(post);
     }
   };
+
+  const quickFilterOptions = useMemo(
+    () => [
+      {
+        key: 'latest',
+        label: '최신 글',
+        description: '방금 등록된 글부터 확인해보세요.',
+        icon: Clock,
+      },
+      {
+        key: 'popular',
+        label: '인기 글',
+        description: '좋아요가 많은 글로 영감을 받아보세요.',
+        icon: Flame,
+      },
+      {
+        key: 'trending',
+        label: '활발한 글',
+        description: '지금 대화가 활발한 글을 모았어요.',
+        icon: MessageCircle,
+      },
+    ],
+    [],
+  );
+
+  const handleQuickFilter = useCallback(
+    (value: string) => {
+      handleSortChange(value);
+    },
+    [handleSortChange],
+  );
 
   return (
     <div className='min-h-screen bg-gray-50'>
@@ -384,110 +385,38 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
           </div>
         </div>
 
-        {/* 통계 */}
-        {showStats && (
-          <div className='mb-8 space-y-4'>
-            {statsError ? (
-              <Card>
-                <CardContent className='space-y-3 p-6 text-center'>
-                  <p className='text-sm text-gray-600'>
-                    커뮤니티 통계를 불러오지 못했습니다.
-                  </p>
-                  <Button
-                    size='sm'
-                    variant='outline'
-                    onClick={() => refetchStats()}
-                  >
-                    다시 시도
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className='grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4'>
-                <Card>
-                  <CardContent className='p-4'>
-                    <div className='flex items-center justify-between'>
-                      <div>
-                        <p className='text-sm text-gray-600'>총 게시글</p>
-                        <p className='text-2xl font-bold text-gray-900'>
-                          {statsLoading
-                            ? '...'
-                            : normalizedStats.totalPosts.toLocaleString()}
-                        </p>
-                      </div>
-                      <TrendingUp className='h-5 w-5 text-primary-600' />
-                    </div>
-                    <p className='mt-2 text-xs text-gray-500'>
-                      주간 증감:{' '}
-                      {statsLoading
-                        ? '...'
-                        : formatGrowth(normalizedStats.postsGrowthRate)}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className='p-4'>
-                    <div className='flex items-center justify-between'>
-                      <div>
-                        <p className='text-sm text-gray-600'>
-                          최근 30일 활성 사용자
-                        </p>
-                        <p className='text-2xl font-bold text-gray-900'>
-                          {statsLoading
-                            ? '...'
-                            : normalizedStats.activeUsers.toLocaleString()}
-                        </p>
-                      </div>
-                      <Clock className='h-5 w-5 text-blue-600' />
-                    </div>
-                    <p className='mt-2 text-xs text-gray-500'>
-                      주간 증감:{' '}
-                      {statsLoading
-                        ? '...'
-                        : formatGrowth(normalizedStats.usersGrowthRate)}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className='p-4'>
-                    <div className='flex items-center justify-between'>
-                      <div>
-                        <p className='text-sm text-gray-600'>총 댓글</p>
-                        <p className='text-2xl font-bold text-gray-900'>
-                          {statsLoading
-                            ? '...'
-                            : normalizedStats.totalComments.toLocaleString()}
-                        </p>
-                      </div>
-                      <Filter className='h-5 w-5 text-green-600' />
-                    </div>
-                    <p className='mt-2 text-xs text-gray-500'>
-                      커뮤니티 참여 지표
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className='p-4'>
-                    <div className='flex items-center justify-between'>
-                      <div>
-                        <p className='text-sm text-gray-600'>평균 좋아요</p>
-                        <p className='text-2xl font-bold text-gray-900'>
-                          {statsLoading
-                            ? '...'
-                            : normalizedStats.avgLikes.toLocaleString()}
-                        </p>
-                      </div>
-                      <Star className='h-5 w-5 text-yellow-600' />
-                    </div>
-                    <p className='mt-2 text-xs text-gray-500'>
-                      게시글당 평균 반응 수
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-          </div>
-        )}
+        <div className='mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
+          {quickFilterOptions.map(option => {
+            const Icon = option.icon;
+            const isActive = normalizedSort === option.key;
+            return (
+              <button
+                key={option.key}
+                type='button'
+                onClick={() => handleQuickFilter(option.key)}
+                className='group flex h-full items-start gap-3 rounded-lg border border-gray-200 bg-white p-4 text-left transition hover:border-primary-200 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500'
+              >
+                <span
+                  className='flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 text-primary-600 transition group-hover:bg-primary-100'
+                  aria-hidden='true'
+                >
+                  <Icon className='h-5 w-5' />
+                </span>
+                <span className='flex flex-col gap-1'>
+                  <span className='flex items-center gap-2 text-sm font-semibold text-gray-900'>
+                    {option.label}
+                    {isActive && (
+                      <span className='rounded-full bg-primary-100 px-2 py-0.5 text-xs text-primary-700'>
+                        적용됨
+                      </span>
+                    )}
+                  </span>
+                  <span className='text-xs text-gray-500'>{option.description}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
         {/* 탭 및 게시글 목록 */}
         <div className='space-y-6'>
@@ -534,13 +463,7 @@ const CommunityMain: React.FC<CommunityMainProps> = ({
                       onRetry={() => refetch()}
                     />
                   ) : posts.length > 0 ? (
-                    posts.map(post => (
-                      <PostCard
-                        key={post.id}
-                        post={post}
-                        onPostClick={handlePostClick}
-                      />
-                    ))
+                    <PostTable posts={posts} onPostClick={handlePostClick} />
                   ) : (
                     <Card>
                       <CardContent className='p-8 text-center'>
