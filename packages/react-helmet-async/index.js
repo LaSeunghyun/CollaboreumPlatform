@@ -1,4 +1,4 @@
-import React from 'react';
+const React = require('react');
 
 const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
 const useIsomorphicEffect = isBrowser ? React.useLayoutEffect : React.useEffect;
@@ -19,11 +19,11 @@ const toText = value => {
   return String(value);
 };
 
-export const HelmetProvider = ({ children }) => {
+function HelmetProvider({ children }) {
   return React.createElement(React.Fragment, null, children);
-};
+}
 
-export const Helmet = ({ children }) => {
+function Helmet({ children }) {
   useIsomorphicEffect(() => {
     if (!isBrowser) {
       return undefined;
@@ -107,11 +107,14 @@ export const Helmet = ({ children }) => {
   }, [children]);
 
   return null;
-};
+}
 
 const helmetExports = {
   HelmetProvider,
   Helmet,
 };
 
-export default helmetExports;
+module.exports = helmetExports;
+module.exports.HelmetProvider = HelmetProvider;
+module.exports.Helmet = Helmet;
+module.exports.default = helmetExports;
