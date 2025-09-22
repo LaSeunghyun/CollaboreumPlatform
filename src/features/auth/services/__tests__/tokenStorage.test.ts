@@ -3,8 +3,11 @@ import {
   persistTokens,
   clearTokens,
   getStoredAccessToken,
+  getStoredRefreshToken,
   resolveAuthTokenCandidates,
   AUTH_TOKEN_KEY,
+  ACCESS_COOKIE_NAME,
+  REFRESH_COOKIE_NAME,
 } from '../tokenStorage';
 
 const SAMPLE_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
@@ -13,6 +16,8 @@ describe('tokenStorage helpers', () => {
   beforeEach(() => {
     clearTokens();
     localStorage.clear();
+    document.cookie = `${ACCESS_COOKIE_NAME}=; Max-Age=0; path=/`;
+    document.cookie = `${REFRESH_COOKIE_NAME}=; Max-Age=0; path=/`;
   });
 
   describe('sanitizeToken', () => {
@@ -63,6 +68,18 @@ describe('tokenStorage helpers', () => {
     it('returns sanitized token from storage', () => {
       localStorage.setItem(AUTH_TOKEN_KEY, `Bearer undefined${SAMPLE_JWT}`);
       expect(getStoredAccessToken()).toBe(SAMPLE_JWT);
+    });
+
+    it('reads token from auth cookies when storage is empty', () => {
+      document.cookie = `${ACCESS_COOKIE_NAME}=${SAMPLE_JWT}; path=/`;
+      expect(getStoredAccessToken()).toBe(SAMPLE_JWT);
+    });
+  });
+
+  describe('getStoredRefreshToken', () => {
+    it('returns refresh token from cookies when storage has none', () => {
+      document.cookie = `${REFRESH_COOKIE_NAME}=${SAMPLE_JWT}.refresh; path=/`;
+      expect(getStoredRefreshToken()).toBe(`${SAMPLE_JWT}.refresh`);
     });
   });
 

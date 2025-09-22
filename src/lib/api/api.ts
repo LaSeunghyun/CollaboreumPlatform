@@ -67,6 +67,7 @@ export class ApiClient {
       headers: {
         'Content-Type': 'application/json',
       },
+      withCredentials: true,
     });
 
     cleanInvalidTokens();
@@ -94,14 +95,15 @@ export class ApiClient {
           authToken: previewToken(snapshot.authToken),
           accessToken: previewToken(snapshot.accessToken),
           refreshToken: previewToken(snapshot.refreshToken),
+          cookies: snapshot.cookies,
         });
 
         if (token) {
           config.headers = config.headers ?? {};
           config.headers.Authorization = `Bearer ${token}`;
-        } else {
-          console.warn('⚠️ No auth token found in localStorage');
         }
+
+        config.withCredentials = true;
         return config;
       },
       error => Promise.reject(this.handleError(error)),
@@ -123,6 +125,7 @@ export class ApiClient {
                   headers: {
                     'Content-Type': 'application/json',
                   },
+                  credentials: 'include',
                   body: JSON.stringify({ refreshToken }),
                 },
               );

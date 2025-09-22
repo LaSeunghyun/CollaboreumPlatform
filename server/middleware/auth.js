@@ -1,14 +1,15 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { resolveRequestToken } = require('../utils/authCookies');
 
 const auth = async (req, res, next) => {
   try {
     // 토큰 추출
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+    const token = resolveRequestToken(req);
+
     if (!token) {
-      return res.status(401).json({ 
-        message: '인증 토큰이 필요합니다' 
+      return res.status(401).json({
+        message: '인증 토큰이 필요합니다'
       });
     }
 

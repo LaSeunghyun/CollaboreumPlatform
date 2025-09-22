@@ -50,7 +50,7 @@ export const useNotices = (params?: {
     return useQuery({
         queryKey: ['notices', params],
         queryFn: () => communityAPI.getForumPosts('notice', {
-            sort: params?.sortBy || 'createdAt',
+            sortBy: params?.sortBy || 'latest',
             order: params?.order || 'desc',
             page: params?.page,
             limit: params?.limit,

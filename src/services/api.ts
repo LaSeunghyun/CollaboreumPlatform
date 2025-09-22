@@ -683,31 +683,13 @@ export const galleryAPI = {
   },
 };
 
-// Artist Profile APIs
-export const profileAPI = {
-  getArtistProfile: (artistId: number) =>
-    apiCall(`/artists/${artistId}/profile`),
-  updateProfile: (artistId: number, data: any) =>
-    apiCall(`/artists/${artistId}/profile`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    }),
-  followArtist: (artistId: number) =>
-    apiCall(`/artists/${artistId}/follow`, {
-      method: 'POST',
-    }),
-  unfollowArtist: (artistId: number) =>
-    apiCall(`/artists/${artistId}/unfollow`, {
-      method: 'DELETE',
-    }),
-};
-
 // Community APIs
 export const communityAPI = {
   getForumPosts: (
     category?: string,
     options?: {
       sort?: string;
+      sortBy?: string;
       order?: string;
       page?: number;
       limit?: number;
@@ -716,7 +698,11 @@ export const communityAPI = {
   ) => {
     const params = new URLSearchParams();
     if (category && category !== '전체') params.append('category', category);
-    if (options?.sort) params.append('sort', options.sort);
+    if (options?.sortBy) {
+      params.append('sortBy', options.sortBy);
+    } else if (options?.sort) {
+      params.append('sortBy', options.sort);
+    }
     if (options?.order) params.append('order', options.order);
     if (options?.page) params.append('page', options.page.toString());
     if (options?.limit) params.append('limit', options.limit.toString());
@@ -954,17 +940,13 @@ export const interactionAPI = {
       method: 'DELETE',
     }),
 
-  // 아티스트 팔로우/언팔로우
+  // 아티스트 팔로우
   followArtist: (artistId: string) =>
-    apiCall(`/artists/${artistId}/follow`, {
-      method: 'POST',
-    }),
+    artistAPI.followArtist(artistId, 'follow'),
 
   // 아티스트 언팔로우
   unfollowArtist: (artistId: string) =>
-    apiCall(`/artists/${artistId}/unfollow`, {
-      method: 'DELETE',
-    }),
+    artistAPI.followArtist(artistId, 'unfollow'),
 
   // 검색
   search: (
@@ -1621,6 +1603,10 @@ export const constantsAPI = {
 
   // 결제 방법 조회
   getPaymentMethods: () => apiCall('/constants/payment-methods'),
+
+  // 정렬 옵션 조회
+  getSortOptions: (type?: string) =>
+    apiCall(`/constants/sort-options${type ? `/${type}` : ''}`),
 
   // 상태 설정 조회
   getStatusConfig: (type: 'project' | 'funding' | 'event') =>
