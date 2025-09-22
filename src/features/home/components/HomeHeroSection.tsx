@@ -16,7 +16,7 @@ export const HomeHeroSection: React.FC<HomeHeroSectionProps> = ({
 }) => {
   return (
     <section className='relative flex min-h-screen items-center justify-center space-y-8 overflow-hidden py-8 text-center md:space-y-12 md:py-12'>
-      <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-background via-secondary/20 to-muted/30' />
+      <div className='via-secondary/20 to-muted/30 pointer-events-none absolute inset-0 bg-gradient-to-br from-background' />
       <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(79,70,229,0.1),transparent_50%)]' />
       <div className='pointer-events-none absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 transform'>
         <div className='bg-gradient-top-to-center-strong h-full w-full rounded-full opacity-60 blur-3xl' />

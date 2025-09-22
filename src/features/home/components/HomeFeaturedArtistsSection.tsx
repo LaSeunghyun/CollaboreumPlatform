@@ -16,7 +16,9 @@ interface HomeFeaturedArtistsSectionProps {
   onViewAll?: () => void;
 }
 
-export const HomeFeaturedArtistsSection: React.FC<HomeFeaturedArtistsSectionProps> = ({
+export const HomeFeaturedArtistsSection: React.FC<
+  HomeFeaturedArtistsSectionProps
+> = ({
   artists,
   isLoading,
   hasError,
@@ -43,8 +45,12 @@ export const HomeFeaturedArtistsSection: React.FC<HomeFeaturedArtistsSectionProp
               <Users2 className='h-8 w-8 text-indigo' />
             </div>
             <div>
-              <h3 className='mb-2 text-xl font-semibold'>아티스트 정보를 불러올 수 없습니다</h3>
-              <p className='mb-6 text-muted-foreground'>서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.</p>
+              <h3 className='mb-2 text-xl font-semibold'>
+                아티스트 정보를 불러올 수 없습니다
+              </h3>
+              <p className='mb-6 text-muted-foreground'>
+                서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.
+              </p>
             </div>
             <Button variant='indigo' onClick={onReload}>
               <Users2 className='mr-2 h-4 w-4' />
@@ -59,8 +65,13 @@ export const HomeFeaturedArtistsSection: React.FC<HomeFeaturedArtistsSectionProp
               <Users2 className='h-8 w-8 text-indigo' />
             </div>
             <div>
-              <h3 className='mb-2 text-xl font-semibold'>아직 등록된 아티스트가 없습니다</h3>
-              <p className='mb-6 text-muted-foreground'>첫 번째 아티스트가 되어보세요! 창의적인 작품을 세상에 알려보세요.</p>
+              <h3 className='mb-2 text-xl font-semibold'>
+                아직 등록된 아티스트가 없습니다
+              </h3>
+              <p className='mb-6 text-muted-foreground'>
+                첫 번째 아티스트가 되어보세요! 창의적인 작품을 세상에
+                알려보세요.
+              </p>
             </div>
             <Button variant='indigo' onClick={onRegisterArtist}>
               <Users2 className='mr-2 h-4 w-4' />
@@ -71,7 +82,11 @@ export const HomeFeaturedArtistsSection: React.FC<HomeFeaturedArtistsSectionProp
       ) : (
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3'>
           {artists.slice(0, 3).map(artist => (
-            <ArtistCard key={artist.id} {...artist} onClick={() => onArtistSelect(artist.id)} />
+            <ArtistCard
+              key={artist.id}
+              {...artist}
+              onClick={() => onArtistSelect(artist.id)}
+            />
           ))}
         </div>
       )}

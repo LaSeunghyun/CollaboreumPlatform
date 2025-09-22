@@ -33,11 +33,14 @@ const META_DEFINITIONS = [
 export const HomePageMeta: React.FC = () => {
   useEffect(() => {
     const previousTitle = document.title;
-    document.title = '콜라보리움 - 아티스트와 팬이 함께 만드는 크리에이티브 생태계';
+    document.title =
+      '콜라보리움 - 아티스트와 팬이 함께 만드는 크리에이티브 생태계';
 
     const appliedMeta = META_DEFINITIONS.map(definition => {
       const selector = `meta[${definition.type}="${definition.key}"]`;
-      const existing = document.head.querySelector(selector) as HTMLMetaElement | null;
+      const existing = document.head.querySelector(
+        selector,
+      ) as HTMLMetaElement | null;
 
       if (existing) {
         const previousContent = existing.getAttribute('content');
@@ -60,7 +63,10 @@ export const HomePageMeta: React.FC = () => {
           return;
         }
 
-        if (meta.previousContent !== null && meta.previousContent !== undefined) {
+        if (
+          meta.previousContent !== null &&
+          meta.previousContent !== undefined
+        ) {
           meta.element.setAttribute('content', meta.previousContent);
         }
       });

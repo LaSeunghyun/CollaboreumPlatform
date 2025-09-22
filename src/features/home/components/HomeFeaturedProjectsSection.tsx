@@ -16,7 +16,9 @@ interface HomeFeaturedProjectsSectionProps {
   onCreateProject: () => void;
 }
 
-export const HomeFeaturedProjectsSection: React.FC<HomeFeaturedProjectsSectionProps> = ({
+export const HomeFeaturedProjectsSection: React.FC<
+  HomeFeaturedProjectsSectionProps
+> = ({
   projects,
   isLoading,
   hasError,
@@ -49,8 +51,12 @@ export const HomeFeaturedProjectsSection: React.FC<HomeFeaturedProjectsSectionPr
               <TrendingUp className='h-8 w-8 text-sky' />
             </div>
             <div>
-              <h3 className='mb-2 text-xl font-semibold'>프로젝트 정보를 불러올 수 없습니다</h3>
-              <p className='mb-6 text-muted-foreground'>서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.</p>
+              <h3 className='mb-2 text-xl font-semibold'>
+                프로젝트 정보를 불러올 수 없습니다
+              </h3>
+              <p className='mb-6 text-muted-foreground'>
+                서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.
+              </p>
             </div>
             <Button className='hover:bg-sky/90 bg-sky' onClick={onReload}>
               <TrendingUp className='mr-2 h-4 w-4' />
@@ -65,10 +71,18 @@ export const HomeFeaturedProjectsSection: React.FC<HomeFeaturedProjectsSectionPr
               <TrendingUp className='h-8 w-8 text-sky' />
             </div>
             <div>
-              <h3 className='mb-2 text-xl font-semibold'>아직 진행 중인 프로젝트가 없습니다</h3>
-              <p className='mb-6 text-muted-foreground'>첫 번째 프로젝트를 시작해보세요! 창의적인 아이디어를 현실로 만들어보세요.</p>
+              <h3 className='mb-2 text-xl font-semibold'>
+                아직 진행 중인 프로젝트가 없습니다
+              </h3>
+              <p className='mb-6 text-muted-foreground'>
+                첫 번째 프로젝트를 시작해보세요! 창의적인 아이디어를 현실로
+                만들어보세요.
+              </p>
             </div>
-            <Button className='hover:bg-sky/90 bg-sky' onClick={onCreateProject}>
+            <Button
+              className='hover:bg-sky/90 bg-sky'
+              onClick={onCreateProject}
+            >
               <TrendingUp className='mr-2 h-4 w-4' />
               프로젝트 시작하기
             </Button>
@@ -77,7 +91,11 @@ export const HomeFeaturedProjectsSection: React.FC<HomeFeaturedProjectsSectionPr
       ) : (
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3'>
           {projects.slice(0, 3).map(project => (
-            <FundingProjectCard key={project.id} {...project} onClick={() => onProjectSelect(project.id)} />
+            <FundingProjectCard
+              key={project.id}
+              {...project}
+              onClick={() => onProjectSelect(project.id)}
+            />
           ))}
         </div>
       )}

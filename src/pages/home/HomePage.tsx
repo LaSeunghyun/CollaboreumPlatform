@@ -73,35 +73,35 @@ export const HomePage: React.FC = () => {
     retryDelay: 1000,
   });
 
-  const stats = useMemo(
-    (): HomeStatItem[] => {
-      const normalized = normalizePlatformStats(platformStats, DEFAULT_PLATFORM_STATS);
+  const stats = useMemo((): HomeStatItem[] => {
+    const normalized = normalizePlatformStats(
+      platformStats,
+      DEFAULT_PLATFORM_STATS,
+    );
 
-      return [
-        {
-          label: '아티스트',
-          value: statsLoading ? '...' : normalized.totalArtists.toLocaleString(),
-          icon: Users2,
-          iconColor: 'text-indigo',
-        },
-        {
-          label: '진행 프로젝트',
-          value: statsLoading ? '...' : normalized.totalProjects.toLocaleString(),
-          icon: TrendingUp,
-          iconColor: 'text-sky',
-        },
-        {
-          label: '총 후원금액',
-          value: statsLoading
-            ? '...'
-            : `₩${normalized.totalFunding.toLocaleString()}`,
-          icon: Heart,
-          iconColor: 'text-red-500',
-        },
-      ];
-    },
-    [platformStats, statsLoading],
-  );
+    return [
+      {
+        label: '아티스트',
+        value: statsLoading ? '...' : normalized.totalArtists.toLocaleString(),
+        icon: Users2,
+        iconColor: 'text-indigo',
+      },
+      {
+        label: '진행 프로젝트',
+        value: statsLoading ? '...' : normalized.totalProjects.toLocaleString(),
+        icon: TrendingUp,
+        iconColor: 'text-sky',
+      },
+      {
+        label: '총 후원금액',
+        value: statsLoading
+          ? '...'
+          : `₩${normalized.totalFunding.toLocaleString()}`,
+        icon: Heart,
+        iconColor: 'text-red-500',
+      },
+    ];
+  }, [platformStats, statsLoading]);
 
   const artistSummaries = useMemo(
     () => normalizeArtists(popularArtists),
@@ -113,10 +113,7 @@ export const HomePage: React.FC = () => {
     [projects],
   );
 
-  const noticeSummaries = useMemo(
-    () => normalizeNotices(notices),
-    [notices],
-  );
+  const noticeSummaries = useMemo(() => normalizeNotices(notices), [notices]);
 
   const communitySummaries = useMemo(
     () => normalizeCommunityPosts(communityPosts),

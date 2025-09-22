@@ -3,7 +3,7 @@ import { Children, isValidElement, useEffect } from 'react';
 function extractTitle(children) {
   let resolvedTitle;
 
-  Children.forEach(children, (child) => {
+  Children.forEach(children, child => {
     if (resolvedTitle || !isValidElement(child)) {
       return;
     }
@@ -13,7 +13,9 @@ function extractTitle(children) {
       if (typeof value === 'string') {
         resolvedTitle = value;
       } else if (Array.isArray(value)) {
-        resolvedTitle = value.filter((segment) => typeof segment === 'string').join('');
+        resolvedTitle = value
+          .filter(segment => typeof segment === 'string')
+          .join('');
       }
     }
   });
@@ -31,7 +33,8 @@ export function Helmet({ children, title } = {}) {
       return;
     }
 
-    const nextTitle = typeof title === 'string' ? title : extractTitle(children);
+    const nextTitle =
+      typeof title === 'string' ? title : extractTitle(children);
 
     if (typeof nextTitle === 'string') {
       document.title = nextTitle;

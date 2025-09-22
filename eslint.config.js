@@ -128,19 +128,19 @@ module.exports = [
         ecmaVersion: 2022,
         sourceType: 'module',
         ecmaFeatures: {
-          jsx: true
-        }
-      }
+          jsx: true,
+        },
+      },
     },
     plugins: {
-      '@typescript-eslint': require('@typescript-eslint/eslint-plugin')
+      '@typescript-eslint': require('@typescript-eslint/eslint-plugin'),
     },
     rules: {
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      'no-undef': 'off'
-    }
+      'no-undef': 'off',
+    },
   },
   {
     files: ['**/*.test.*', '**/*.spec.*', '**/__tests__/**/*'],

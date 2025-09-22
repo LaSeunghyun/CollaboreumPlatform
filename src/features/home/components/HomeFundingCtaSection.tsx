@@ -15,7 +15,8 @@ export const HomeFundingCtaSection: React.FC<HomeFundingCtaSectionProps> = ({
       <div className='space-y-4 text-center'>
         <h2 className='text-3xl font-bold'>투명한 펀딩 시스템</h2>
         <p className='mx-auto max-w-3xl text-lg text-muted-foreground'>
-          모든 비용 사용 내역을 공개하고, 투명한 수익 분배를 통해 신뢰할 수 있는 크리에이터 경제를 구축합니다.
+          모든 비용 사용 내역을 공개하고, 투명한 수익 분배를 통해 신뢰할 수 있는
+          크리에이터 경제를 구축합니다.
         </p>
       </div>
 
@@ -28,7 +29,8 @@ export const HomeFundingCtaSection: React.FC<HomeFundingCtaSectionProps> = ({
             <h3 className='mb-2 text-xl font-semibold'>펀딩 시스템 준비 중</h3>
             <p className='mb-6 text-muted-foreground'>
               투명한 펀딩 시스템이 곧 출시됩니다.
-              <br />프로젝트 집행 관리, 비용 공개, 수익 분배 기능을 제공할 예정입니다.
+              <br />
+              프로젝트 집행 관리, 비용 공개, 수익 분배 기능을 제공할 예정입니다.
             </p>
           </div>
           <Button variant='indigo' onClick={onExploreProjects}>

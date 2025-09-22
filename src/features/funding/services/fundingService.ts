@@ -120,9 +120,9 @@ const mapFundingProjectFromApi = (
       ? Math.min(Math.max(Math.round(project.progress), 0), 100)
       : targetAmount > 0
         ? Math.min(
-          Math.max(Math.round((currentAmount / targetAmount) * 100), 0),
-          100,
-        )
+            Math.max(Math.round((currentAmount / targetAmount) * 100), 0),
+            100,
+          )
         : 0;
 
   return {
