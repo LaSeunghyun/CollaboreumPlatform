@@ -1,8 +1,7 @@
-const React = require('react');
+import React from 'react';
 
-const HelmetProvider = ({ children }) => {
-  return React.createElement(React.Fragment, null, children);
-};
+const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+const useIsomorphicEffect = isBrowser ? React.useLayoutEffect : React.useEffect;
 
 const toText = value => {
   if (value == null) {
@@ -20,11 +19,11 @@ const toText = value => {
   return String(value);
 };
 
-const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+export const HelmetProvider = ({ children }) => {
+  return React.createElement(React.Fragment, null, children);
+};
 
-const useIsomorphicEffect = isBrowser ? React.useLayoutEffect : React.useEffect;
-
-const Helmet = ({ children }) => {
+export const Helmet = ({ children }) => {
   useIsomorphicEffect(() => {
     if (!isBrowser) {
       return undefined;
@@ -50,9 +49,7 @@ const Helmet = ({ children }) => {
           return;
         }
 
-        const selector = name
-          ? `meta[name="${name}"]`
-          : `meta[property="${property}"]`;
+        const selector = name ? `meta[name="${name}"]` : `meta[property="${property}"]`;
 
         let element = document.head.querySelector(selector);
         const created = !element;
@@ -112,9 +109,9 @@ const Helmet = ({ children }) => {
   return null;
 };
 
-exports.HelmetProvider = HelmetProvider;
-exports.Helmet = Helmet;
-exports.default = {
+const helmetExports = {
   HelmetProvider,
   Helmet,
 };
+
+export default helmetExports;
