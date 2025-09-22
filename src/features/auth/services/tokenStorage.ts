@@ -108,7 +108,7 @@ const stripLeadingNoise = (value: string): string => {
     result = result.slice('bearer'.length).trimStart();
   }
 
-  result = result.replace(/^(?:undefined|null|"|')+/gi, '').trim();
+  result = result.replace(/^(?:undefined|null|["'])+/gi, '').trim();
 
   return result;
 };

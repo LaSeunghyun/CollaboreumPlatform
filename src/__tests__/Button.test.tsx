@@ -14,10 +14,10 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toHaveClass('bg-primary-600');
 
     rerender(<Button variant='outline'>Outline</Button>);
-    expect(screen.getByRole('button')).toHaveClass('border-neutral-300');
+    expect(screen.getByRole('button')).toHaveClass('border-border');
 
     rerender(<Button variant='ghost'>Ghost</Button>);
-    expect(screen.getByRole('button')).toHaveClass('bg-transparent');
+    expect(screen.getByRole('button')).toHaveClass('hover:bg-secondary/60');
   });
 
   it('다양한 size를 올바르게 적용한다', () => {

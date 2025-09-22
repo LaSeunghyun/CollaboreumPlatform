@@ -13,72 +13,87 @@ const mockUseAdminMetrics = useAdminMetrics as jest.MockedFunction<
 
 // Mock lazy components
 jest.mock('../sections/OverviewSection', () => ({
-  OverviewSection: () =>
-    React.createElement(
+  OverviewSection: () => {
+    const React = require('react');
+    return React.createElement(
       'div',
       { 'data-testid': 'overview-section' },
       'Overview Section',
-    ),
+    );
+  },
 }));
 
 jest.mock('../sections/UserManagementSection', () => ({
-  UserManagementSection: () =>
-    React.createElement(
+  UserManagementSection: () => {
+    const React = require('react');
+    return React.createElement(
       'div',
       { 'data-testid': 'user-management-section' },
       'User Management Section',
-    ),
+    );
+  },
 }));
 
 jest.mock('../sections/FundingManagementSection', () => ({
-  FundingManagementSection: () =>
-    React.createElement(
+  FundingManagementSection: () => {
+    const React = require('react');
+    return React.createElement(
       'div',
       { 'data-testid': 'funding-management-section' },
       'Funding Management Section',
-    ),
+    );
+  },
 }));
 
 jest.mock('../sections/CommunityManagementSection', () => ({
-  CommunityManagementSection: () =>
-    React.createElement(
+  CommunityManagementSection: () => {
+    const React = require('react');
+    return React.createElement(
       'div',
       { 'data-testid': 'community-management-section' },
       'Community Management Section',
-    ),
+    );
+  },
 }));
 
 jest.mock('../sections/ArtworkManagementSection', () => ({
-  ArtworkManagementSection: () =>
-    React.createElement(
+  ArtworkManagementSection: () => {
+    const React = require('react');
+    return React.createElement(
       'div',
       { 'data-testid': 'artwork-management-section' },
       'Artwork Management Section',
-    ),
+    );
+  },
 }));
 
 jest.mock('../sections/FinanceManagementSection', () => ({
-  FinanceManagementSection: () =>
-    React.createElement(
+  FinanceManagementSection: () => {
+    const React = require('react');
+    return React.createElement(
       'div',
       { 'data-testid': 'finance-management-section' },
       'Finance Management Section',
-    ),
+    );
+  },
 }));
 
 jest.mock('../sections/AnalyticsSection', () => ({
-  AnalyticsSection: () =>
-    React.createElement(
+  AnalyticsSection: () => {
+    const React = require('react');
+    return React.createElement(
       'div',
       { 'data-testid': 'analytics-section' },
       'Analytics Section',
-    ),
+    );
+  },
 }));
 
 // Mock AdminLayout
 jest.mock('../AdminLayout', () => ({
-  AdminLayout: ({ children, title, onBack }: any) =>
-    React.createElement(
+  AdminLayout: ({ children, title, onBack }: any) => {
+    const React = require('react');
+    return React.createElement(
       'div',
       { 'data-testid': 'admin-layout' },
       React.createElement('div', { 'data-testid': 'admin-title' }, title),
@@ -88,7 +103,8 @@ jest.mock('../AdminLayout', () => ({
         '뒤로가기',
       ),
       children,
-    ),
+    );
+  },
 }));
 
 // Mock PermissionGuard

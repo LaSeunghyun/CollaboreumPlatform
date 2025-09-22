@@ -92,7 +92,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 describe('펀딩 시스템 기본 테스트', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
     // 기본 projectId 설정
     (useParams as jest.Mock).mockReturnValue({ projectId: 'test-project-1' });

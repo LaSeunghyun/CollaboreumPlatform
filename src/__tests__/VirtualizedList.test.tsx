@@ -66,7 +66,7 @@ describe('VirtualizedList', () => {
       />,
     );
 
-    const container = screen.getByRole('listbox');
+    const container = screen.getByTestId('virtualized-list');
 
     // 스크롤 이벤트 시뮬레이션
     fireEvent.scroll(container, { target: { scrollTop: 1000 } });
@@ -87,7 +87,7 @@ describe('VirtualizedList', () => {
       />,
     );
 
-    const container = screen.getByRole('listbox');
+    const container = screen.getByTestId('virtualized-list');
     expect(container).toHaveClass('custom-class');
   });
 

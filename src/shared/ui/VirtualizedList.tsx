@@ -48,6 +48,7 @@ export function VirtualizedList<T>({
       className={`overflow-auto ${className}`}
       style={{ height: containerHeight }}
       onScroll={handleScroll}
+      data-testid='virtualized-list'
     >
       <div style={{ height: totalHeight, position: 'relative' }}>
         <div

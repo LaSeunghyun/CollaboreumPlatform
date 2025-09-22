@@ -2,6 +2,11 @@ const getImportMetaEnv = ():
   | Record<string, string | boolean | undefined>
   | undefined => {
   try {
+    // Jest 환경에서는 import.meta를 사용하지 않음
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+      return undefined;
+    }
+
     if (
       typeof import.meta !== 'undefined' &&
       typeof import.meta.env !== 'undefined'
