@@ -3,11 +3,11 @@
 export interface FundingProject {
   id: string;
   title: string;
-  description?: string;
+  description: string;
   artist: string;
   category: string;
   goalAmount: number;
-  targetAmount?: number;
+  targetAmount: number;
   currentAmount: number;
   backers: number;
   daysLeft: number;
@@ -107,4 +107,139 @@ export interface RevenueDistribution {
   artistShare: RevenueShare;
   backerShare: RevenueShare;
   distributions: Distribution[];
+}
+
+export interface FundingProjectRewardPayload {
+  id?: string | number;
+  _id?: string | number;
+  title?: string;
+  description?: string;
+  amount?: number | string;
+  estimatedDelivery?: string | Date;
+  claimed?: number | string;
+  maxClaim?: number | string;
+}
+
+export interface FundingProjectUpdatePayload {
+  id?: string | number;
+  _id?: string | number;
+  title?: string;
+  content?: string;
+  date?: string | Date;
+  createdAt?: string | Date;
+  type?: string;
+}
+
+export interface FundingProjectBackerPayload {
+  id?: string | number;
+  _id?: string | number;
+  userId?: string | number;
+  user?: string | number | { _id?: string | number };
+  userName?: string;
+  isAnonymous?: boolean;
+  amount?: number | string;
+  date?: string | Date;
+  backedAt?: string | Date;
+  status?: string;
+}
+
+export interface FundingProjectExecutionStagePayload {
+  id?: string | number;
+  _id?: string | number;
+  name?: string;
+  description?: string;
+  budget?: number | string;
+  startDate?: string | Date;
+  endDate?: string | Date;
+  status?: string;
+  progress?: number | string;
+}
+
+export interface FundingProjectExecutionPlanPayload {
+  stages?: (FundingProjectExecutionStagePayload | null | undefined)[];
+  totalBudget?: number | string;
+}
+
+export interface FundingProjectExpensePayload {
+  id?: string | number;
+  _id?: string | number;
+  category?: string;
+  title?: string;
+  description?: string;
+  amount?: number | string;
+  date?: string | Date;
+  receipt?: string;
+  stage?: string | number;
+  verified?: boolean;
+}
+
+export interface FundingProjectDistributionPayload {
+  id?: string | number;
+  _id?: string | number;
+  backer?: string | number | { _id?: string | number };
+  userName?: string;
+  originalAmount?: number | string;
+  profitShare?: number | string;
+  amount?: number | string;
+  totalReturn?: number | string;
+  date?: string | Date;
+  distributedAt?: string | Date;
+  status?: string;
+}
+
+export type RevenueSharePayload =
+  | FundingProjectRevenueShareObjectPayload
+  | number
+  | string
+  | null
+  | undefined;
+
+export interface FundingProjectRevenueShareObjectPayload {
+  amount?: number | string;
+  percentage?: number | string;
+}
+
+export interface FundingProjectRevenueDistributionPayload {
+  totalRevenue?: number | string;
+  platformFee?: RevenueSharePayload;
+  artistShare?: RevenueSharePayload;
+  backerShare?: RevenueSharePayload;
+  distributions?: (FundingProjectDistributionPayload | null | undefined)[];
+}
+
+export interface FundingProjectPayload {
+  id?: string | number;
+  _id?: string | number;
+  title?: string;
+  description?: string;
+  artist?:
+    | string
+    | {
+        _id?: string | number;
+        name?: string;
+      };
+  artistName?: string;
+  category?: string;
+  goalAmount?: number | string;
+  targetAmount?: number | string;
+  currentAmount?: number | string;
+  backers?: number | FundingProjectBackerPayload[];
+  backersList?: (FundingProjectBackerPayload | null | undefined)[];
+  daysLeft?: number | string;
+  image?: string;
+  status?: string;
+  progressPercentage?: number | string;
+  progress?: number | string;
+  startDate?: string | Date;
+  endDate?: string | Date;
+  story?: string;
+  artistAvatar?: string;
+  artistRating?: number;
+  artistId?: string | number;
+  featured?: boolean;
+  rewards?: (FundingProjectRewardPayload | null | undefined)[];
+  updates?: (FundingProjectUpdatePayload | null | undefined)[];
+  executionPlan?: FundingProjectExecutionPlanPayload;
+  expenseRecords?: (FundingProjectExpensePayload | null | undefined)[];
+  revenueDistribution?: FundingProjectRevenueDistributionPayload;
 }
