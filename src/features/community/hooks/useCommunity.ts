@@ -235,11 +235,12 @@ export const useCommunityCategories = () => {
 };
 
 // 커뮤니티 통계 조회
-export const useCommunityStats = () => {
+export const useCommunityStats = (options?: { enabled?: boolean }) => {
   return useQuery<CommunityStats>({
     queryKey: ['community', 'stats'],
     queryFn: () => communityPostAPI.getStats() as Promise<CommunityStats>,
     staleTime: 10 * 60 * 1000, // 10분
+    enabled: options?.enabled ?? true,
   });
 };
 
