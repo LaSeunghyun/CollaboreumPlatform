@@ -233,7 +233,6 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
           : (response as PostDetail | null);
 
       if (postData && typeof postData === 'object') {
-
         // 댓글 데이터를 안전하게 변환
         let transformedComments: Comment[] = [];
 
@@ -626,21 +625,19 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
       communityPostAPI
         .getPostReactions(post.id)
         .then((reactionsResponse: unknown) => {
-          const response = reactionsResponse as ApiResponse<any>;
-          if (response?.success && response?.data) {
-            const data = response.data;
-            setPost((prev: any) =>
-              prev
-                ? {
-                    ...prev,
-                    isLiked: data?.isLiked || false,
-                    isDisliked: data?.isDisliked || false,
-                    likes: data?.likes || prev.likes,
-                    dislikes: data?.dislikes || prev.dislikes,
-                  }
-                : null,
-            );
-          }
+          // raw payload를 직접 처리 (response.success 체크 제거)
+          const data = reactionsResponse as any;
+          setPost((prev: any) =>
+            prev
+              ? {
+                  ...prev,
+                  isLiked: data?.isLiked || false,
+                  isDisliked: data?.isDisliked || false,
+                  likes: data?.likes || prev.likes,
+                  dislikes: data?.dislikes || prev.dislikes,
+                }
+              : null,
+          );
         })
         .catch(err => {
           console.error('반응 상태 확인 실패:', err);

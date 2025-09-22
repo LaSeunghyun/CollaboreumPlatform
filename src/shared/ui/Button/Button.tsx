@@ -9,24 +9,24 @@ const buttonStyles = cva(
     variants: {
       variant: {
         solid:
-          'bg-primary-600 text-white hover:bg-primary-700 shadow-apple hover:shadow-apple-lg active:scale-95 focus:ring-primary-300',
+          '!bg-blue-600 !text-white hover:!bg-blue-700 shadow-apple hover:shadow-apple-lg active:scale-95 focus:ring-primary-300',
         outline:
           'border border-border bg-background/80 backdrop-blur-sm text-foreground hover:bg-secondary/50 hover:border-border/80 focus:ring-primary-300',
         ghost:
           'hover:bg-secondary/60 hover:text-foreground focus:ring-primary-300',
-        link: 'text-primary-600 underline-offset-4 hover:underline focus:ring-primary-300',
+        link: 'text-primary underline-offset-4 hover:underline focus:ring-primary-300',
         // 새로운 variant들
         indigo:
-          'bg-indigo text-white hover:bg-indigo/90 shadow-sm hover:shadow-md active:scale-95 focus:ring-indigo-300',
+          '!bg-blue-600 !text-white hover:!bg-blue-700 shadow-sm hover:shadow-md active:scale-95 focus:ring-primary-300',
         gradient:
-          'bg-gradient-to-r from-primary-600 to-indigo-600 text-white hover:from-primary-700 hover:to-indigo-700 shadow-lg hover:shadow-xl active:scale-95 focus:ring-primary-300',
+          'bg-gradient-to-r from-primary to-primary/80 text-white hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl active:scale-95 focus:ring-primary-300',
         glass:
           'bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 focus:ring-white/30',
         // 추가 variant들
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm hover:shadow-md active:scale-95 focus:ring-secondary-300',
         default:
-          'bg-primary-600 text-white hover:bg-primary-700 shadow-apple hover:shadow-apple-lg active:scale-95 focus:ring-primary-300',
+          '!bg-blue-600 !text-white hover:!bg-blue-700 shadow-apple hover:shadow-apple-lg active:scale-95 focus:ring-primary-300',
       },
       size: {
         xs: 'h-6 rounded-lg gap-1 px-2 text-xs [&_svg]:size-3',
@@ -148,6 +148,17 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         aria-describedby={props['aria-describedby']}
         role={asChild ? 'button' : undefined}
         tabIndex={asChild ? 0 : undefined}
+        style={{
+          ...(variant === 'solid' ||
+          variant === 'default' ||
+          variant === 'indigo'
+            ? {
+                backgroundColor: '#2563eb',
+                color: 'white',
+              }
+            : {}),
+          ...props.style,
+        }}
         onKeyDown={
           asChild
             ? e => {

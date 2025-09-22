@@ -1,9 +1,9 @@
+/* 디자인 토큰 CSS 변수 import */
+@import '../shared/theme/vars.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* 디자인 토큰 CSS 변수 import */
-@import '../shared/theme/vars.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -17,7 +17,7 @@
   --card-foreground: #1d1d1f;
   --popover: rgba(255, 255, 255, 0.95);
   --popover-foreground: #1d1d1f;
-  --primary: #4a5568;
+  --primary: #2563eb;
   /* 차분한 그레이 블루 */
   --primary-foreground: #ffffff;
   --secondary: #f7fafc;
@@ -93,7 +93,7 @@
   --card-foreground: #f7fafc;
   --popover: rgba(26, 32, 44, 0.95);
   --popover-foreground: #f7fafc;
-  --primary: #718096;
+  --primary: #3b82f6;
   --primary-foreground: #ffffff;
   --secondary: #2d3748;
   --secondary-foreground: #f7fafc;
@@ -221,10 +221,8 @@
 
   /* Radial gradient utility */
   .bg-gradient-radial {
-    background-image: radial-gradient(
-      ellipse at center,
-      var(--tw-gradient-stops)
-    );
+    background-image: radial-gradient(ellipse at center,
+        var(--tw-gradient-stops));
   }
 
   /* Top to bottom gradient utilities */
@@ -237,85 +235,71 @@
   }
 
   .bg-gradient-top-soft {
-    background-image: linear-gradient(
-      180deg,
-      rgba(79, 70, 229, 0.15) 0%,
-      rgba(14, 165, 233, 0.1) 30%,
-      rgba(79, 70, 229, 0.05) 60%,
-      transparent 100%
-    );
+    background-image: linear-gradient(180deg,
+        rgba(79, 70, 229, 0.15) 0%,
+        rgba(14, 165, 233, 0.1) 30%,
+        rgba(79, 70, 229, 0.05) 60%,
+        transparent 100%);
   }
 
   /* 상단 흐림 → 중앙 짙음 그라데이션 */
   .bg-gradient-top-to-center {
-    background-image: linear-gradient(
-      180deg,
-      rgba(79, 70, 229, 0.05) 0%,
-      rgba(79, 70, 229, 0.1) 20%,
-      rgba(79, 70, 229, 0.2) 40%,
-      rgba(79, 70, 229, 0.3) 60%,
-      rgba(79, 70, 229, 0.15) 80%,
-      rgba(79, 70, 229, 0.05) 100%
-    );
+    background-image: linear-gradient(180deg,
+        rgba(79, 70, 229, 0.05) 0%,
+        rgba(79, 70, 229, 0.1) 20%,
+        rgba(79, 70, 229, 0.2) 40%,
+        rgba(79, 70, 229, 0.3) 60%,
+        rgba(79, 70, 229, 0.15) 80%,
+        rgba(79, 70, 229, 0.05) 100%);
   }
 
   .bg-gradient-top-to-center-strong {
-    background-image: linear-gradient(
-      180deg,
-      rgba(79, 70, 229, 0.08) 0%,
-      rgba(79, 70, 229, 0.15) 15%,
-      rgba(79, 70, 229, 0.25) 30%,
-      rgba(79, 70, 229, 0.35) 45%,
-      rgba(79, 70, 229, 0.4) 60%,
-      rgba(79, 70, 229, 0.25) 75%,
-      rgba(79, 70, 229, 0.1) 90%,
-      rgba(79, 70, 229, 0.03) 100%
-    );
+    background-image: linear-gradient(180deg,
+        rgba(79, 70, 229, 0.08) 0%,
+        rgba(79, 70, 229, 0.15) 15%,
+        rgba(79, 70, 229, 0.25) 30%,
+        rgba(79, 70, 229, 0.35) 45%,
+        rgba(79, 70, 229, 0.4) 60%,
+        rgba(79, 70, 229, 0.25) 75%,
+        rgba(79, 70, 229, 0.1) 90%,
+        rgba(79, 70, 229, 0.03) 100%);
   }
 
   .bg-gradient-top-to-center-warm {
-    background-image: linear-gradient(
-      180deg,
-      rgba(255, 193, 7, 0.05) 0%,
-      rgba(255, 152, 0, 0.1) 20%,
-      rgba(255, 87, 34, 0.2) 40%,
-      rgba(255, 87, 34, 0.3) 60%,
-      rgba(255, 152, 0, 0.15) 80%,
-      rgba(255, 193, 7, 0.05) 100%
-    );
+    background-image: linear-gradient(180deg,
+        rgba(255, 193, 7, 0.05) 0%,
+        rgba(255, 152, 0, 0.1) 20%,
+        rgba(255, 87, 34, 0.2) 40%,
+        rgba(255, 87, 34, 0.3) 60%,
+        rgba(255, 152, 0, 0.15) 80%,
+        rgba(255, 193, 7, 0.05) 100%);
   }
 
   .bg-gradient-top-warm {
-    background-image: linear-gradient(
-      180deg,
-      rgba(255, 193, 7, 0.2) 0%,
-      rgba(255, 152, 0, 0.15) 25%,
-      rgba(233, 30, 99, 0.1) 50%,
-      rgba(79, 70, 229, 0.05) 75%,
-      transparent 100%
-    );
+    background-image: linear-gradient(180deg,
+        rgba(255, 193, 7, 0.2) 0%,
+        rgba(255, 152, 0, 0.15) 25%,
+        rgba(233, 30, 99, 0.1) 50%,
+        rgba(79, 70, 229, 0.05) 75%,
+        transparent 100%);
   }
 
   .bg-gradient-top-cool {
-    background-image: linear-gradient(
-      180deg,
-      rgba(14, 165, 233, 0.2) 0%,
-      rgba(59, 130, 246, 0.15) 25%,
-      rgba(79, 70, 229, 0.1) 50%,
-      rgba(139, 92, 246, 0.05) 75%,
-      transparent 100%
-    );
+    background-image: linear-gradient(180deg,
+        rgba(14, 165, 233, 0.2) 0%,
+        rgba(59, 130, 246, 0.15) 25%,
+        rgba(79, 70, 229, 0.1) 50%,
+        rgba(139, 92, 246, 0.05) 75%,
+        transparent 100%);
   }
 
   /* Animated gradient backgrounds */
   .bg-gradient-animated {
-    background: linear-gradient(
-      -45deg,
-      rgba(79, 70, 229, 0.1),
-      rgba(14, 165, 233, 0.1),
-      rgba(139, 92, 246, 0.1),
-      rgba(79, 70, 229, 0.1)
-    );
+    background: linear-gradient(-45deg,
+        rgba(79, 70, 229, 0.1),
+        rgba(14, 165, 233, 0.1),
+        rgba(139, 92, 246, 0.1),
+        rgba(79, 70, 229, 0.1));
     background-size: 400% 400%;
     animation: gradientShift 15s ease infinite;
   }
@@ -435,6 +419,7 @@
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0px);
@@ -752,6 +737,7 @@ html {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0px);

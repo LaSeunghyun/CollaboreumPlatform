@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="218" failures="53" errors="0" time="91.27">
-  <testsuite name="이벤트 시스템 TDD 테스트" errors="0" failures="6" skipped="0" timestamp="2025-09-22T10:34:30" time="15.934" tests="13">
-    <testcase classname="이벤트 시스템 TDD 테스트 1. 이벤트 데이터 모델 테스트 이벤트 객체가 올바른 구조를 가져야 한다" name="이벤트 시스템 TDD 테스트 1. 이벤트 데이터 모델 테스트 이벤트 객체가 올바른 구조를 가져야 한다" time="0.031">
+<testsuites name="jest tests" tests="218" failures="53" errors="0" time="83.858">
+  <testsuite name="이벤트 시스템 TDD 테스트" errors="0" failures="6" skipped="0" timestamp="2025-09-22T11:30:26" time="13.128" tests="13">
+    <testcase classname="이벤트 시스템 TDD 테스트 1. 이벤트 데이터 모델 테스트 이벤트 객체가 올바른 구조를 가져야 한다" name="이벤트 시스템 TDD 테스트 1. 이벤트 데이터 모델 테스트 이벤트 객체가 올바른 구조를 가져야 한다" time="0.029">
     </testcase>
-    <testcase classname="이벤트 시스템 TDD 테스트 1. 이벤트 데이터 모델 테스트 이벤트 상태가 올바르게 관리되어야 한다" name="이벤트 시스템 TDD 테스트 1. 이벤트 데이터 모델 테스트 이벤트 상태가 올바르게 관리되어야 한다" time="0.006">
+    <testcase classname="이벤트 시스템 TDD 테스트 1. 이벤트 데이터 모델 테스트 이벤트 상태가 올바르게 관리되어야 한다" name="이벤트 시스템 TDD 테스트 1. 이벤트 데이터 모델 테스트 이벤트 상태가 올바르게 관리되어야 한다" time="0.011">
       <failure>Error: expect(received).toBe(expected) // Object.is equality
 
 Expected: &quot;예정&quot;
@@ -44,7 +44,7 @@ Received array:  [&quot;시작일은 현재 날짜 이후여야 합니다&quot;]
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="이벤트 시스템 TDD 테스트 3. 이벤트 참가자 관리 테스트 이벤트 참가 신청이 올바르게 처리되어야 한다" name="이벤트 시스템 TDD 테스트 3. 이벤트 참가자 관리 테스트 이벤트 참가 신청이 올바르게 처리되어야 한다" time="0.002">
+    <testcase classname="이벤트 시스템 TDD 테스트 3. 이벤트 참가자 관리 테스트 이벤트 참가 신청이 올바르게 처리되어야 한다" name="이벤트 시스템 TDD 테스트 3. 이벤트 참가자 관리 테스트 이벤트 참가 신청이 올바르게 처리되어야 한다" time="0.005">
     </testcase>
     <testcase classname="이벤트 시스템 TDD 테스트 3. 이벤트 참가자 관리 테스트 이벤트 참가 취소가 올바르게 처리되어야 한다" name="이벤트 시스템 TDD 테스트 3. 이벤트 참가자 관리 테스트 이벤트 참가 취소가 올바르게 처리되어야 한다" time="0.001">
       <failure>Error: 참가 취소는 24시간 이내에만 가능합니다
@@ -64,9 +64,9 @@ Received array:  [&quot;시작일은 현재 날짜 이후여야 합니다&quot;]
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="이벤트 시스템 TDD 테스트 4. 이벤트 검색 및 필터링 테스트 이벤트 검색이 올바르게 작동해야 한다" name="이벤트 시스템 TDD 테스트 4. 이벤트 검색 및 필터링 테스트 이벤트 검색이 올바르게 작동해야 한다" time="0">
+    <testcase classname="이벤트 시스템 TDD 테스트 4. 이벤트 검색 및 필터링 테스트 이벤트 검색이 올바르게 작동해야 한다" name="이벤트 시스템 TDD 테스트 4. 이벤트 검색 및 필터링 테스트 이벤트 검색이 올바르게 작동해야 한다" time="0.001">
     </testcase>
-    <testcase classname="이벤트 시스템 TDD 테스트 5. 이벤트 알림 시스템 테스트 이벤트 시작 전 알림이 올바르게 발송되어야 한다" name="이벤트 시스템 TDD 테스트 5. 이벤트 알림 시스템 테스트 이벤트 시작 전 알림이 올바르게 발송되어야 한다" time="0.001">
+    <testcase classname="이벤트 시스템 TDD 테스트 5. 이벤트 알림 시스템 테스트 이벤트 시작 전 알림이 올바르게 발송되어야 한다" name="이벤트 시스템 TDD 테스트 5. 이벤트 알림 시스템 테스트 이벤트 시작 전 알림이 올바르게 발송되어야 한다" time="0.002">
       <failure>Error: expect(received).toBe(expected) // Object.is equality
 
 Expected: true
@@ -86,9 +86,9 @@ Received: false
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="이벤트 시스템 TDD 테스트 5. 이벤트 알림 시스템 테스트 이벤트 변경사항 알림이 올바르게 발송되어야 한다" name="이벤트 시스템 TDD 테스트 5. 이벤트 알림 시스템 테스트 이벤트 변경사항 알림이 올바르게 발송되어야 한다" time="0.001">
+    <testcase classname="이벤트 시스템 TDD 테스트 5. 이벤트 알림 시스템 테스트 이벤트 변경사항 알림이 올바르게 발송되어야 한다" name="이벤트 시스템 TDD 테스트 5. 이벤트 알림 시스템 테스트 이벤트 변경사항 알림이 올바르게 발송되어야 한다" time="0.004">
     </testcase>
-    <testcase classname="이벤트 시스템 TDD 테스트 6. 이벤트 통계 및 분석 테스트 이벤트 참가율 통계가 올바르게 계산되어야 한다" name="이벤트 시스템 TDD 테스트 6. 이벤트 통계 및 분석 테스트 이벤트 참가율 통계가 올바르게 계산되어야 한다" time="0.003">
+    <testcase classname="이벤트 시스템 TDD 테스트 6. 이벤트 통계 및 분석 테스트 이벤트 참가율 통계가 올바르게 계산되어야 한다" name="이벤트 시스템 TDD 테스트 6. 이벤트 통계 및 분석 테스트 이벤트 참가율 통계가 올바르게 계산되어야 한다" time="0.001">
       <failure>Error: expect(received).toBe(expected) // Object.is equality
 
 Expected: 18000000
@@ -108,11 +108,11 @@ Received: 21000000
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="이벤트 시스템 TDD 테스트 7. 이벤트 권한 관리 테스트 이벤트 생성 권한이 올바르게 관리되어야 한다" name="이벤트 시스템 TDD 테스트 7. 이벤트 권한 관리 테스트 이벤트 생성 권한이 올바르게 관리되어야 한다" time="0.009">
+    <testcase classname="이벤트 시스템 TDD 테스트 7. 이벤트 권한 관리 테스트 이벤트 생성 권한이 올바르게 관리되어야 한다" name="이벤트 시스템 TDD 테스트 7. 이벤트 권한 관리 테스트 이벤트 생성 권한이 올바르게 관리되어야 한다" time="0.013">
     </testcase>
-    <testcase classname="이벤트 시스템 TDD 테스트 7. 이벤트 권한 관리 테스트 이벤트 수정 권한이 올바르게 관리되어야 한다" name="이벤트 시스템 TDD 테스트 7. 이벤트 권한 관리 테스트 이벤트 수정 권한이 올바르게 관리되어야 한다" time="0.001">
+    <testcase classname="이벤트 시스템 TDD 테스트 7. 이벤트 권한 관리 테스트 이벤트 수정 권한이 올바르게 관리되어야 한다" name="이벤트 시스템 TDD 테스트 7. 이벤트 권한 관리 테스트 이벤트 수정 권한이 올바르게 관리되어야 한다" time="0.005">
     </testcase>
-    <testcase classname="이벤트 시스템 TDD 테스트 8. 이벤트 데이터 검증 및 보안 테스트 이벤트 입력 데이터의 보안 검증이 올바르게 작동해야 한다" name="이벤트 시스템 TDD 테스트 8. 이벤트 데이터 검증 및 보안 테스트 이벤트 입력 데이터의 보안 검증이 올바르게 작동해야 한다" time="0.001">
+    <testcase classname="이벤트 시스템 TDD 테스트 8. 이벤트 데이터 검증 및 보안 테스트 이벤트 입력 데이터의 보안 검증이 올바르게 작동해야 한다" name="이벤트 시스템 TDD 테스트 8. 이벤트 데이터 검증 및 보안 테스트 이벤트 입력 데이터의 보안 검증이 올바르게 작동해야 한다" time="0.002">
       <failure>Error: expect(received).toThrow(expected)
 
 Expected substring: &quot;잠재적으로 위험한 입력이 감지되었습니다&quot;
@@ -133,49 +133,49 @@ Received function did not throw
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="이벤트 시스템 TDD 테스트 8. 이벤트 데이터 검증 및 보안 테스트 이벤트 파일 업로드 보안이 올바르게 검증되어야 한다" name="이벤트 시스템 TDD 테스트 8. 이벤트 데이터 검증 및 보안 테스트 이벤트 파일 업로드 보안이 올바르게 검증되어야 한다" time="11.422">
+    <testcase classname="이벤트 시스템 TDD 테스트 8. 이벤트 데이터 검증 및 보안 테스트 이벤트 파일 업로드 보안이 올바르게 검증되어야 한다" name="이벤트 시스템 TDD 테스트 8. 이벤트 데이터 검증 및 보안 테스트 이벤트 파일 업로드 보안이 올바르게 검증되어야 한다" time="8.862">
     </testcase>
   </testsuite>
-  <testsuite name="Admin Dashboard System" errors="0" failures="5" skipped="0" timestamp="2025-09-22T10:34:46" time="10.249" tests="27">
-    <testcase classname="Admin Dashboard System Admin Authentication 관리자 권한이 없는 사용자는 대시보드에 접근할 수 없어야 한다" name="Admin Dashboard System Admin Authentication 관리자 권한이 없는 사용자는 대시보드에 접근할 수 없어야 한다" time="0.238">
+  <testsuite name="Admin Dashboard System" errors="0" failures="5" skipped="0" timestamp="2025-09-22T11:30:40" time="9.829" tests="27">
+    <testcase classname="Admin Dashboard System Admin Authentication 관리자 권한이 없는 사용자는 대시보드에 접근할 수 없어야 한다" name="Admin Dashboard System Admin Authentication 관리자 권한이 없는 사용자는 대시보드에 접근할 수 없어야 한다" time="0.214">
     </testcase>
-    <testcase classname="Admin Dashboard System Admin Authentication 관리자 권한이 있는 사용자는 대시보드에 접근할 수 있어야 한다" name="Admin Dashboard System Admin Authentication 관리자 권한이 있는 사용자는 대시보드에 접근할 수 있어야 한다" time="0.023">
+    <testcase classname="Admin Dashboard System Admin Authentication 관리자 권한이 있는 사용자는 대시보드에 접근할 수 있어야 한다" name="Admin Dashboard System Admin Authentication 관리자 권한이 있는 사용자는 대시보드에 접근할 수 있어야 한다" time="0.009">
     </testcase>
-    <testcase classname="Admin Dashboard System User Management 사용자 목록이 올바르게 표시되어야 한다" name="Admin Dashboard System User Management 사용자 목록이 올바르게 표시되어야 한다" time="0.028">
+    <testcase classname="Admin Dashboard System User Management 사용자 목록이 올바르게 표시되어야 한다" name="Admin Dashboard System User Management 사용자 목록이 올바르게 표시되어야 한다" time="0.025">
     </testcase>
-    <testcase classname="Admin Dashboard System User Management 사용자 검색 기능이 올바르게 작동해야 한다" name="Admin Dashboard System User Management 사용자 검색 기능이 올바르게 작동해야 한다" time="0.243">
+    <testcase classname="Admin Dashboard System User Management 사용자 검색 기능이 올바르게 작동해야 한다" name="Admin Dashboard System User Management 사용자 검색 기능이 올바르게 작동해야 한다" time="0.222">
     </testcase>
-    <testcase classname="Admin Dashboard System User Management 사용자 권한 변경이 올바르게 작동해야 한다" name="Admin Dashboard System User Management 사용자 권한 변경이 올바르게 작동해야 한다" time="0.099">
+    <testcase classname="Admin Dashboard System User Management 사용자 권한 변경이 올바르게 작동해야 한다" name="Admin Dashboard System User Management 사용자 권한 변경이 올바르게 작동해야 한다" time="0.125">
     </testcase>
-    <testcase classname="Admin Dashboard System User Management 사용자 상태 변경이 올바르게 작동해야 한다" name="Admin Dashboard System User Management 사용자 상태 변경이 올바르게 작동해야 한다" time="0.133">
+    <testcase classname="Admin Dashboard System User Management 사용자 상태 변경이 올바르게 작동해야 한다" name="Admin Dashboard System User Management 사용자 상태 변경이 올바르게 작동해야 한다" time="0.164">
     </testcase>
-    <testcase classname="Admin Dashboard System User Management 사용자 삭제 시 확인 절차가 있어야 한다" name="Admin Dashboard System User Management 사용자 삭제 시 확인 절차가 있어야 한다" time="0.081">
+    <testcase classname="Admin Dashboard System User Management 사용자 삭제 시 확인 절차가 있어야 한다" name="Admin Dashboard System User Management 사용자 삭제 시 확인 절차가 있어야 한다" time="0.062">
     </testcase>
-    <testcase classname="Admin Dashboard System Project Approval 승인 대기 중인 프로젝트 목록이 표시되어야 한다" name="Admin Dashboard System Project Approval 승인 대기 중인 프로젝트 목록이 표시되어야 한다" time="0.105">
+    <testcase classname="Admin Dashboard System Project Approval 승인 대기 중인 프로젝트 목록이 표시되어야 한다" name="Admin Dashboard System Project Approval 승인 대기 중인 프로젝트 목록이 표시되어야 한다" time="0.102">
     </testcase>
-    <testcase classname="Admin Dashboard System Project Approval 프로젝트 승인 시 상태가 올바르게 변경되어야 한다" name="Admin Dashboard System Project Approval 프로젝트 승인 시 상태가 올바르게 변경되어야 한다" time="0.08">
+    <testcase classname="Admin Dashboard System Project Approval 프로젝트 승인 시 상태가 올바르게 변경되어야 한다" name="Admin Dashboard System Project Approval 프로젝트 승인 시 상태가 올바르게 변경되어야 한다" time="0.072">
     </testcase>
-    <testcase classname="Admin Dashboard System Project Approval 프로젝트 거절 시 사유가 기록되어야 한다" name="Admin Dashboard System Project Approval 프로젝트 거절 시 사유가 기록되어야 한다" time="0.065">
+    <testcase classname="Admin Dashboard System Project Approval 프로젝트 거절 시 사유가 기록되어야 한다" name="Admin Dashboard System Project Approval 프로젝트 거절 시 사유가 기록되어야 한다" time="0.083">
     </testcase>
-    <testcase classname="Admin Dashboard System Platform Statistics 플랫폼 통계가 올바르게 표시되어야 한다" name="Admin Dashboard System Platform Statistics 플랫폼 통계가 올바르게 표시되어야 한다" time="0.003">
+    <testcase classname="Admin Dashboard System Platform Statistics 플랫폼 통계가 올바르게 표시되어야 한다" name="Admin Dashboard System Platform Statistics 플랫폼 통계가 올바르게 표시되어야 한다" time="0.012">
     </testcase>
-    <testcase classname="Admin Dashboard System Platform Statistics 통계 차트가 올바르게 렌더링되어야 한다" name="Admin Dashboard System Platform Statistics 통계 차트가 올바르게 렌더링되어야 한다" time="0.008">
+    <testcase classname="Admin Dashboard System Platform Statistics 통계 차트가 올바르게 렌더링되어야 한다" name="Admin Dashboard System Platform Statistics 통계 차트가 올바르게 렌더링되어야 한다" time="0.012">
     </testcase>
-    <testcase classname="Admin Dashboard System Content Moderation 신고된 콘텐츠 목록이 표시되어야 한다" name="Admin Dashboard System Content Moderation 신고된 콘텐츠 목록이 표시되어야 한다" time="0.017">
+    <testcase classname="Admin Dashboard System Content Moderation 신고된 콘텐츠 목록이 표시되어야 한다" name="Admin Dashboard System Content Moderation 신고된 콘텐츠 목록이 표시되어야 한다" time="0.008">
     </testcase>
-    <testcase classname="Admin Dashboard System Content Moderation 콘텐츠 검토 시 적절한 조치가 기록되어야 한다" name="Admin Dashboard System Content Moderation 콘텐츠 검토 시 적절한 조치가 기록되어야 한다" time="0.049">
+    <testcase classname="Admin Dashboard System Content Moderation 콘텐츠 검토 시 적절한 조치가 기록되어야 한다" name="Admin Dashboard System Content Moderation 콘텐츠 검토 시 적절한 조치가 기록되어야 한다" time="0.082">
     </testcase>
-    <testcase classname="Admin Dashboard System System Settings 시스템 설정이 올바르게 표시되어야 한다" name="Admin Dashboard System System Settings 시스템 설정이 올바르게 표시되어야 한다" time="0.022">
+    <testcase classname="Admin Dashboard System System Settings 시스템 설정이 올바르게 표시되어야 한다" name="Admin Dashboard System System Settings 시스템 설정이 올바르게 표시되어야 한다" time="0.011">
     </testcase>
-    <testcase classname="Admin Dashboard System System Settings 시스템 설정 변경이 올바르게 저장되어야 한다" name="Admin Dashboard System System Settings 시스템 설정 변경이 올바르게 저장되어야 한다" time="0.269">
+    <testcase classname="Admin Dashboard System System Settings 시스템 설정 변경이 올바르게 저장되어야 한다" name="Admin Dashboard System System Settings 시스템 설정 변경이 올바르게 저장되어야 한다" time="0.23">
     </testcase>
-    <testcase classname="Admin Dashboard System Performance 대시보드 로딩 성능이 측정되어야 한다" name="Admin Dashboard System Performance 대시보드 로딩 성능이 측정되어야 한다" time="0.033">
+    <testcase classname="Admin Dashboard System Performance 대시보드 로딩 성능이 측정되어야 한다" name="Admin Dashboard System Performance 대시보드 로딩 성능이 측정되어야 한다" time="0.009">
     </testcase>
-    <testcase classname="Admin Dashboard System Performance 대량 데이터 처리 시 성능이 유지되어야 한다" name="Admin Dashboard System Performance 대량 데이터 처리 시 성능이 유지되어야 한다" time="0.224">
+    <testcase classname="Admin Dashboard System Performance 대량 데이터 처리 시 성능이 유지되어야 한다" name="Admin Dashboard System Performance 대량 데이터 처리 시 성능이 유지되어야 한다" time="0.174">
     </testcase>
-    <testcase classname="Admin Dashboard System Security 관리자 권한 검증이 엄격하게 이루어져야 한다" name="Admin Dashboard System Security 관리자 권한 검증이 엄격하게 이루어져야 한다" time="0.014">
+    <testcase classname="Admin Dashboard System Security 관리자 권한 검증이 엄격하게 이루어져야 한다" name="Admin Dashboard System Security 관리자 권한 검증이 엄격하게 이루어져야 한다" time="0.004">
     </testcase>
-    <testcase classname="Admin Dashboard System Security 중요한 관리 작업 시 로그가 기록되어야 한다" name="Admin Dashboard System Security 중요한 관리 작업 시 로그가 기록되어야 한다" time="1.082">
+    <testcase classname="Admin Dashboard System Security 중요한 관리 작업 시 로그가 기록되어야 한다" name="Admin Dashboard System Security 중요한 관리 작업 시 로그가 기록되어야 한다" time="1.078">
       <failure>Error: expect(element).toHaveTextContent()
 
 Expected element to have text content:
@@ -211,11 +211,11 @@ Ignored nodes: comments, script, style
     at listOnTimeout (node:internal/timers:588:17)
     at processTimers (node:internal/timers:523:7)</failure>
     </testcase>
-    <testcase classname="Admin Dashboard System Data Integrity 사용자 데이터 수정 시 원본 데이터가 보호되어야 한다" name="Admin Dashboard System Data Integrity 사용자 데이터 수정 시 원본 데이터가 보호되어야 한다" time="0.001">
+    <testcase classname="Admin Dashboard System Data Integrity 사용자 데이터 수정 시 원본 데이터가 보호되어야 한다" name="Admin Dashboard System Data Integrity 사용자 데이터 수정 시 원본 데이터가 보호되어야 한다" time="0.003">
     </testcase>
     <testcase classname="Admin Dashboard System Data Integrity 프로젝트 승인 상태 변경 시 이력이 기록되어야 한다" name="Admin Dashboard System Data Integrity 프로젝트 승인 상태 변경 시 이력이 기록되어야 한다" time="0.001">
     </testcase>
-    <testcase classname="Admin Dashboard System Real-time Updates 새 사용자 가입 시 실시간으로 통계가 업데이트되어야 한다" name="Admin Dashboard System Real-time Updates 새 사용자 가입 시 실시간으로 통계가 업데이트되어야 한다" time="1.066">
+    <testcase classname="Admin Dashboard System Real-time Updates 새 사용자 가입 시 실시간으로 통계가 업데이트되어야 한다" name="Admin Dashboard System Real-time Updates 새 사용자 가입 시 실시간으로 통계가 업데이트되어야 한다" time="1.089">
       <failure>Error: expect(element).toHaveTextContent()
 
 Expected element to have text content:
@@ -254,7 +254,7 @@ Ignored nodes: comments, script, style
     at listOnTimeout (node:internal/timers:588:17)
     at processTimers (node:internal/timers:523:7)</failure>
     </testcase>
-    <testcase classname="Admin Dashboard System Real-time Updates 프로젝트 승인 시 실시간으로 목록이 업데이트되어야 한다" name="Admin Dashboard System Real-time Updates 프로젝트 승인 시 실시간으로 목록이 업데이트되어야 한다" time="1.063">
+    <testcase classname="Admin Dashboard System Real-time Updates 프로젝트 승인 시 실시간으로 목록이 업데이트되어야 한다" name="Admin Dashboard System Real-time Updates 프로젝트 승인 시 실시간으로 목록이 업데이트되어야 한다" time="1.05">
       <failure>Error: expect(element).toHaveTextContent()
 
 Expected element to have text content:
@@ -293,7 +293,7 @@ Ignored nodes: comments, script, style
     at listOnTimeout (node:internal/timers:588:17)
     at processTimers (node:internal/timers:523:7)</failure>
     </testcase>
-    <testcase classname="Admin Dashboard System Notification System 중요한 관리 작업 시 알림이 전송되어야 한다" name="Admin Dashboard System Notification System 중요한 관리 작업 시 알림이 전송되어야 한다" time="1.079">
+    <testcase classname="Admin Dashboard System Notification System 중요한 관리 작업 시 알림이 전송되어야 한다" name="Admin Dashboard System Notification System 중요한 관리 작업 시 알림이 전송되어야 한다" time="1.064">
       <failure>Error: expect(element).toHaveTextContent()
 
 Expected element to have text content:
@@ -329,7 +329,7 @@ Ignored nodes: comments, script, style
     at listOnTimeout (node:internal/timers:588:17)
     at processTimers (node:internal/timers:523:7)</failure>
     </testcase>
-    <testcase classname="Admin Dashboard System Export and Reporting 사용자 데이터 내보내기가 올바르게 작동해야 한다" name="Admin Dashboard System Export and Reporting 사용자 데이터 내보내기가 올바르게 작동해야 한다" time="1.047">
+    <testcase classname="Admin Dashboard System Export and Reporting 사용자 데이터 내보내기가 올바르게 작동해야 한다" name="Admin Dashboard System Export and Reporting 사용자 데이터 내보내기가 올바르게 작동해야 한다" time="1.085">
       <failure>Error: expect(element).toHaveTextContent()
 
 Expected element to have text content:
@@ -365,11 +365,194 @@ Ignored nodes: comments, script, style
     at listOnTimeout (node:internal/timers:588:17)
     at processTimers (node:internal/timers:523:7)</failure>
     </testcase>
-    <testcase classname="Admin Dashboard System Export and Reporting 관리 보고서 생성이 올바르게 작동해야 한다" name="Admin Dashboard System Export and Reporting 관리 보고서 생성이 올바르게 작동해야 한다" time="0.16">
+    <testcase classname="Admin Dashboard System Export and Reporting 관리 보고서 생성이 올바르게 작동해야 한다" name="Admin Dashboard System Export and Reporting 관리 보고서 생성이 올바르게 작동해야 한다" time="0.116">
     </testcase>
   </testsuite>
-  <testsuite name="FanMyPage" errors="0" failures="1" skipped="0" timestamp="2025-09-22T10:34:56" time="4.276" tests="1">
-    <testcase classname="FanMyPage renders profile and backings from the API" name="FanMyPage renders profile and backings from the API" time="0.225">
+  <testsuite name="Community Board System" errors="0" failures="3" skipped="0" timestamp="2025-09-22T11:30:50" time="5.996" tests="28">
+    <testcase classname="Community Board System Community Post Data Model 게시글 데이터 구조가 올바르게 정의되어야 한다" name="Community Board System Community Post Data Model 게시글 데이터 구조가 올바르게 정의되어야 한다" time="0.003">
+    </testcase>
+    <testcase classname="Community Board System Community Post Data Model 게시글 작성자 정보가 올바르게 포함되어야 한다" name="Community Board System Community Post Data Model 게시글 작성자 정보가 올바르게 포함되어야 한다" time="0.001">
+    </testcase>
+    <testcase classname="Community Board System Community Post Data Model 게시글 통계 정보가 올바르게 계산되어야 한다" name="Community Board System Community Post Data Model 게시글 통계 정보가 올바르게 계산되어야 한다" time="0.006">
+    </testcase>
+    <testcase classname="Community Board System Community Post Creation 게시글 작성 폼이 올바르게 렌더링되어야 한다" name="Community Board System Community Post Creation 게시글 작성 폼이 올바르게 렌더링되어야 한다" time="0.031">
+    </testcase>
+    <testcase classname="Community Board System Community Post Creation 게시글 작성 시 필수 필드 검증이 작동해야 한다" name="Community Board System Community Post Creation 게시글 작성 시 필수 필드 검증이 작동해야 한다" time="0.075">
+    </testcase>
+    <testcase classname="Community Board System Community Post Creation 게시글 작성 시 태그 입력이 올바르게 처리되어야 한다" name="Community Board System Community Post Creation 게시글 작성 시 태그 입력이 올바르게 처리되어야 한다" time="0.235">
+    </testcase>
+    <testcase classname="Community Board System Community Post List 게시글 목록이 올바르게 렌더링되어야 한다" name="Community Board System Community Post List 게시글 목록이 올바르게 렌더링되어야 한다" time="0.013">
+    </testcase>
+    <testcase classname="Community Board System Community Post List 게시글 정렬 기능이 올바르게 작동해야 한다" name="Community Board System Community Post List 게시글 정렬 기능이 올바르게 작동해야 한다" time="0.078">
+    </testcase>
+    <testcase classname="Community Board System Community Post List 게시글 검색 기능이 올바르게 작동해야 한다" name="Community Board System Community Post List 게시글 검색 기능이 올바르게 작동해야 한다" time="0.142">
+    </testcase>
+    <testcase classname="Community Board System Community Post Detail 게시글 상세 내용이 올바르게 표시되어야 한다" name="Community Board System Community Post Detail 게시글 상세 내용이 올바르게 표시되어야 한다" time="0.024">
+    </testcase>
+    <testcase classname="Community Board System Community Post Detail 게시글 좋아요/싫어요 기능이 올바르게 작동해야 한다" name="Community Board System Community Post Detail 게시글 좋아요/싫어요 기능이 올바르게 작동해야 한다" time="0.122">
+    </testcase>
+    <testcase classname="Community Board System Comment System 댓글이 올바르게 표시되어야 한다" name="Community Board System Comment System 댓글이 올바르게 표시되어야 한다" time="0.005">
+    </testcase>
+    <testcase classname="Community Board System Comment System 댓글 작성 기능이 올바르게 작동해야 한다" name="Community Board System Comment System 댓글 작성 기능이 올바르게 작동해야 한다" time="0.235">
+    </testcase>
+    <testcase classname="Community Board System Comment System 댓글 답글 기능이 올바르게 작동해야 한다" name="Community Board System Comment System 댓글 답글 기능이 올바르게 작동해야 한다" time="0.077">
+    </testcase>
+    <testcase classname="Community Board System Search and Filtering 카테고리별 필터링이 올바르게 작동해야 한다" name="Community Board System Search and Filtering 카테고리별 필터링이 올바르게 작동해야 한다" time="0.079">
+    </testcase>
+    <testcase classname="Community Board System Search and Filtering 태그별 필터링이 올바르게 작동해야 한다" name="Community Board System Search and Filtering 태그별 필터링이 올바르게 작동해야 한다" time="0.062">
+    </testcase>
+    <testcase classname="Community Board System Reporting System 게시글 신고 기능이 올바르게 작동해야 한다" name="Community Board System Reporting System 게시글 신고 기능이 올바르게 작동해야 한다" time="0.076">
+    </testcase>
+    <testcase classname="Community Board System Bookmark System 게시글 북마크 기능이 올바르게 작동해야 한다" name="Community Board System Bookmark System 게시글 북마크 기능이 올바르게 작동해야 한다" time="1.075">
+      <failure>Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  북마크됨
+Received:
+  북마크되지 않음
+
+Ignored nodes: comments, script, style
+&lt;html&gt;
+  &lt;head /&gt;
+  &lt;body&gt;
+    &lt;div&gt;
+      &lt;div
+        data-testid=&quot;post-detail&quot;
+      &gt;
+        &lt;button
+          data-testid=&quot;bookmark-button&quot;
+        &gt;
+          🔖 북마크
+        &lt;/button&gt;
+        &lt;div
+          data-testid=&quot;bookmark-status&quot;
+        &gt;
+          북마크되지 않음
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+    at toHaveTextContent (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\__tests__\CommunitySystem.test.tsx:475:32)
+    at runWithExpensiveErrorDiagnosticsDisabled (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\config.js:47:12)
+    at checkCallback (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\wait-for.js:124:77)
+    at checkRealTimersCallback (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\wait-for.js:118:16)
+    at Timeout.task [as _onTimeout] (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jsdom\lib\jsdom\browser\Window.js:579:19)
+    at listOnTimeout (node:internal/timers:588:17)
+    at processTimers (node:internal/timers:523:7)</failure>
+    </testcase>
+    <testcase classname="Community Board System Performance 게시글 목록 렌더링 성능이 측정되어야 한다" name="Community Board System Performance 게시글 목록 렌더링 성능이 측정되어야 한다" time="0.056">
+    </testcase>
+    <testcase classname="Community Board System Security XSS 공격 방지가 적용되어야 한다" name="Community Board System Security XSS 공격 방지가 적용되어야 한다" time="0.043">
+    </testcase>
+    <testcase classname="Community Board System Security 권한 없는 사용자의 게시글 수정/삭제가 차단되어야 한다" name="Community Board System Security 권한 없는 사용자의 게시글 수정/삭제가 차단되어야 한다" time="0.014">
+    </testcase>
+    <testcase classname="Community Board System Data Integrity 게시글 수정 시 원본 데이터가 보호되어야 한다" name="Community Board System Data Integrity 게시글 수정 시 원본 데이터가 보호되어야 한다" time="0.236">
+    </testcase>
+    <testcase classname="Community Board System Data Integrity 댓글 작성 시 부모 게시글 ID가 올바르게 연결되어야 한다" name="Community Board System Data Integrity 댓글 작성 시 부모 게시글 ID가 올바르게 연결되어야 한다" time="0.003">
+    </testcase>
+    <testcase classname="Community Board System Real-time Updates 새 댓글 작성 시 실시간으로 목록이 업데이트되어야 한다" name="Community Board System Real-time Updates 새 댓글 작성 시 실시간으로 목록이 업데이트되어야 한다" time="1.231">
+      <failure>Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  댓글 수: 2
+Received:
+  댓글 수: 1
+
+Ignored nodes: comments, script, style
+&lt;html&gt;
+  &lt;head /&gt;
+  &lt;body&gt;
+    &lt;div&gt;
+      &lt;div
+        data-testid=&quot;comments-section&quot;
+      &gt;
+        &lt;div
+          data-testid=&quot;comment-count&quot;
+        &gt;
+          댓글 수: 1
+        &lt;/div&gt;
+        &lt;div
+          data-testid=&quot;comment-1&quot;
+        &gt;
+          &lt;p&gt;
+            테스트 댓글입니다.
+          &lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div
+          data-testid=&quot;comment-form&quot;
+        &gt;
+          &lt;textarea
+            data-testid=&quot;comment-input&quot;
+            placeholder=&quot;댓글을 입력하세요&quot;
+          /&gt;
+          &lt;button
+            data-testid=&quot;comment-submit&quot;
+          &gt;
+            댓글 작성
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+    at toHaveTextContent (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\__tests__\CommunitySystem.test.tsx:637:30)
+    at runWithExpensiveErrorDiagnosticsDisabled (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\config.js:47:12)
+    at checkCallback (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\wait-for.js:124:77)
+    at checkRealTimersCallback (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\wait-for.js:118:16)
+    at Timeout.task [as _onTimeout] (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jsdom\lib\jsdom\browser\Window.js:579:19)
+    at listOnTimeout (node:internal/timers:588:17)
+    at processTimers (node:internal/timers:523:7)</failure>
+    </testcase>
+    <testcase classname="Community Board System Notification System 댓글 작성 시 게시글 작성자에게 알림이 전송되어야 한다" name="Community Board System Notification System 댓글 작성 시 게시글 작성자에게 알림이 전송되어야 한다" time="1.25">
+      <failure>Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  알림 전송됨
+Received:
+
+
+Ignored nodes: comments, script, style
+&lt;html&gt;
+  &lt;head /&gt;
+  &lt;body&gt;
+    &lt;div&gt;
+      &lt;div
+        data-testid=&quot;comment-form&quot;
+      &gt;
+        &lt;textarea
+          data-testid=&quot;comment-input&quot;
+          placeholder=&quot;댓글을 입력하세요&quot;
+        /&gt;
+        &lt;button
+          data-testid=&quot;comment-submit&quot;
+        &gt;
+          댓글 작성
+        &lt;/button&gt;
+        &lt;div
+          data-testid=&quot;notification-status&quot;
+        /&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+    at toHaveTextContent (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\__tests__\CommunitySystem.test.tsx:669:36)
+    at runWithExpensiveErrorDiagnosticsDisabled (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\config.js:47:12)
+    at checkCallback (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\wait-for.js:124:77)
+    at checkRealTimersCallback (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\wait-for.js:118:16)
+    at Timeout.task [as _onTimeout] (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jsdom\lib\jsdom\browser\Window.js:579:19)
+    at listOnTimeout (node:internal/timers:588:17)
+    at processTimers (node:internal/timers:523:7)</failure>
+    </testcase>
+    <testcase classname="Community Board System Statistics 게시글 통계가 올바르게 계산되어야 한다" name="Community Board System Statistics 게시글 통계가 올바르게 계산되어야 한다" time="0.001">
+    </testcase>
+    <testcase classname="Community Board System Permissions 관리자는 모든 게시글을 관리할 수 있어야 한다" name="Community Board System Permissions 관리자는 모든 게시글을 관리할 수 있어야 한다" time="0.004">
+    </testcase>
+    <testcase classname="Community Board System Permissions 일반 사용자는 자신의 게시글만 수정/삭제할 수 있어야 한다" name="Community Board System Permissions 일반 사용자는 자신의 게시글만 수정/삭제할 수 있어야 한다" time="0.011">
+    </testcase>
+  </testsuite>
+  <testsuite name="FanMyPage" errors="0" failures="1" skipped="0" timestamp="2025-09-22T11:30:56" time="3.995" tests="1">
+    <testcase classname="FanMyPage renders profile and backings from the API" name="FanMyPage renders profile and backings from the API" time="0.178">
       <failure>TestingLibraryElementError: Found multiple elements with the text: 팔로잉
 
 Here are the matching elements:
@@ -540,191 +723,8 @@ Ignored nodes: comments, script, style
     at Object.getByText (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\components\__tests__\FanMyPage.test.tsx:101:19)</failure>
     </testcase>
   </testsuite>
-  <testsuite name="Community Board System" errors="0" failures="3" skipped="0" timestamp="2025-09-22T10:35:01" time="6.233" tests="28">
-    <testcase classname="Community Board System Community Post Data Model 게시글 데이터 구조가 올바르게 정의되어야 한다" name="Community Board System Community Post Data Model 게시글 데이터 구조가 올바르게 정의되어야 한다" time="0.003">
-    </testcase>
-    <testcase classname="Community Board System Community Post Data Model 게시글 작성자 정보가 올바르게 포함되어야 한다" name="Community Board System Community Post Data Model 게시글 작성자 정보가 올바르게 포함되어야 한다" time="0.001">
-    </testcase>
-    <testcase classname="Community Board System Community Post Data Model 게시글 통계 정보가 올바르게 계산되어야 한다" name="Community Board System Community Post Data Model 게시글 통계 정보가 올바르게 계산되어야 한다" time="0.003">
-    </testcase>
-    <testcase classname="Community Board System Community Post Creation 게시글 작성 폼이 올바르게 렌더링되어야 한다" name="Community Board System Community Post Creation 게시글 작성 폼이 올바르게 렌더링되어야 한다" time="0.038">
-    </testcase>
-    <testcase classname="Community Board System Community Post Creation 게시글 작성 시 필수 필드 검증이 작동해야 한다" name="Community Board System Community Post Creation 게시글 작성 시 필수 필드 검증이 작동해야 한다" time="0.094">
-    </testcase>
-    <testcase classname="Community Board System Community Post Creation 게시글 작성 시 태그 입력이 올바르게 처리되어야 한다" name="Community Board System Community Post Creation 게시글 작성 시 태그 입력이 올바르게 처리되어야 한다" time="0.218">
-    </testcase>
-    <testcase classname="Community Board System Community Post List 게시글 목록이 올바르게 렌더링되어야 한다" name="Community Board System Community Post List 게시글 목록이 올바르게 렌더링되어야 한다" time="0.002">
-    </testcase>
-    <testcase classname="Community Board System Community Post List 게시글 정렬 기능이 올바르게 작동해야 한다" name="Community Board System Community Post List 게시글 정렬 기능이 올바르게 작동해야 한다" time="0.059">
-    </testcase>
-    <testcase classname="Community Board System Community Post List 게시글 검색 기능이 올바르게 작동해야 한다" name="Community Board System Community Post List 게시글 검색 기능이 올바르게 작동해야 한다" time="0.171">
-    </testcase>
-    <testcase classname="Community Board System Community Post Detail 게시글 상세 내용이 올바르게 표시되어야 한다" name="Community Board System Community Post Detail 게시글 상세 내용이 올바르게 표시되어야 한다" time="0.013">
-    </testcase>
-    <testcase classname="Community Board System Community Post Detail 게시글 좋아요/싫어요 기능이 올바르게 작동해야 한다" name="Community Board System Community Post Detail 게시글 좋아요/싫어요 기능이 올바르게 작동해야 한다" time="0.104">
-    </testcase>
-    <testcase classname="Community Board System Comment System 댓글이 올바르게 표시되어야 한다" name="Community Board System Comment System 댓글이 올바르게 표시되어야 한다" time="0.003">
-    </testcase>
-    <testcase classname="Community Board System Comment System 댓글 작성 기능이 올바르게 작동해야 한다" name="Community Board System Comment System 댓글 작성 기능이 올바르게 작동해야 한다" time="0.283">
-    </testcase>
-    <testcase classname="Community Board System Comment System 댓글 답글 기능이 올바르게 작동해야 한다" name="Community Board System Comment System 댓글 답글 기능이 올바르게 작동해야 한다" time="0.074">
-    </testcase>
-    <testcase classname="Community Board System Search and Filtering 카테고리별 필터링이 올바르게 작동해야 한다" name="Community Board System Search and Filtering 카테고리별 필터링이 올바르게 작동해야 한다" time="0.089">
-    </testcase>
-    <testcase classname="Community Board System Search and Filtering 태그별 필터링이 올바르게 작동해야 한다" name="Community Board System Search and Filtering 태그별 필터링이 올바르게 작동해야 한다" time="0.079">
-    </testcase>
-    <testcase classname="Community Board System Reporting System 게시글 신고 기능이 올바르게 작동해야 한다" name="Community Board System Reporting System 게시글 신고 기능이 올바르게 작동해야 한다" time="0.082">
-    </testcase>
-    <testcase classname="Community Board System Bookmark System 게시글 북마크 기능이 올바르게 작동해야 한다" name="Community Board System Bookmark System 게시글 북마크 기능이 올바르게 작동해야 한다" time="1.073">
-      <failure>Error: expect(element).toHaveTextContent()
-
-Expected element to have text content:
-  북마크됨
-Received:
-  북마크되지 않음
-
-Ignored nodes: comments, script, style
-&lt;html&gt;
-  &lt;head /&gt;
-  &lt;body&gt;
-    &lt;div&gt;
-      &lt;div
-        data-testid=&quot;post-detail&quot;
-      &gt;
-        &lt;button
-          data-testid=&quot;bookmark-button&quot;
-        &gt;
-          🔖 북마크
-        &lt;/button&gt;
-        &lt;div
-          data-testid=&quot;bookmark-status&quot;
-        &gt;
-          북마크되지 않음
-        &lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-  &lt;/body&gt;
-&lt;/html&gt;
-    at toHaveTextContent (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\__tests__\CommunitySystem.test.tsx:475:32)
-    at runWithExpensiveErrorDiagnosticsDisabled (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\config.js:47:12)
-    at checkCallback (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\wait-for.js:124:77)
-    at checkRealTimersCallback (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\wait-for.js:118:16)
-    at Timeout.task [as _onTimeout] (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jsdom\lib\jsdom\browser\Window.js:579:19)
-    at listOnTimeout (node:internal/timers:588:17)
-    at processTimers (node:internal/timers:523:7)</failure>
-    </testcase>
-    <testcase classname="Community Board System Performance 게시글 목록 렌더링 성능이 측정되어야 한다" name="Community Board System Performance 게시글 목록 렌더링 성능이 측정되어야 한다" time="0.067">
-    </testcase>
-    <testcase classname="Community Board System Security XSS 공격 방지가 적용되어야 한다" name="Community Board System Security XSS 공격 방지가 적용되어야 한다" time="0.035">
-    </testcase>
-    <testcase classname="Community Board System Security 권한 없는 사용자의 게시글 수정/삭제가 차단되어야 한다" name="Community Board System Security 권한 없는 사용자의 게시글 수정/삭제가 차단되어야 한다" time="0.003">
-    </testcase>
-    <testcase classname="Community Board System Data Integrity 게시글 수정 시 원본 데이터가 보호되어야 한다" name="Community Board System Data Integrity 게시글 수정 시 원본 데이터가 보호되어야 한다" time="0.235">
-    </testcase>
-    <testcase classname="Community Board System Data Integrity 댓글 작성 시 부모 게시글 ID가 올바르게 연결되어야 한다" name="Community Board System Data Integrity 댓글 작성 시 부모 게시글 ID가 올바르게 연결되어야 한다" time="0.001">
-    </testcase>
-    <testcase classname="Community Board System Real-time Updates 새 댓글 작성 시 실시간으로 목록이 업데이트되어야 한다" name="Community Board System Real-time Updates 새 댓글 작성 시 실시간으로 목록이 업데이트되어야 한다" time="1.155">
-      <failure>Error: expect(element).toHaveTextContent()
-
-Expected element to have text content:
-  댓글 수: 2
-Received:
-  댓글 수: 1
-
-Ignored nodes: comments, script, style
-&lt;html&gt;
-  &lt;head /&gt;
-  &lt;body&gt;
-    &lt;div&gt;
-      &lt;div
-        data-testid=&quot;comments-section&quot;
-      &gt;
-        &lt;div
-          data-testid=&quot;comment-count&quot;
-        &gt;
-          댓글 수: 1
-        &lt;/div&gt;
-        &lt;div
-          data-testid=&quot;comment-1&quot;
-        &gt;
-          &lt;p&gt;
-            테스트 댓글입니다.
-          &lt;/p&gt;
-        &lt;/div&gt;
-        &lt;div
-          data-testid=&quot;comment-form&quot;
-        &gt;
-          &lt;textarea
-            data-testid=&quot;comment-input&quot;
-            placeholder=&quot;댓글을 입력하세요&quot;
-          /&gt;
-          &lt;button
-            data-testid=&quot;comment-submit&quot;
-          &gt;
-            댓글 작성
-          &lt;/button&gt;
-        &lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-  &lt;/body&gt;
-&lt;/html&gt;
-    at toHaveTextContent (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\__tests__\CommunitySystem.test.tsx:637:30)
-    at runWithExpensiveErrorDiagnosticsDisabled (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\config.js:47:12)
-    at checkCallback (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\wait-for.js:124:77)
-    at checkRealTimersCallback (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\wait-for.js:118:16)
-    at Timeout.task [as _onTimeout] (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jsdom\lib\jsdom\browser\Window.js:579:19)
-    at listOnTimeout (node:internal/timers:588:17)
-    at processTimers (node:internal/timers:523:7)</failure>
-    </testcase>
-    <testcase classname="Community Board System Notification System 댓글 작성 시 게시글 작성자에게 알림이 전송되어야 한다" name="Community Board System Notification System 댓글 작성 시 게시글 작성자에게 알림이 전송되어야 한다" time="1.236">
-      <failure>Error: expect(element).toHaveTextContent()
-
-Expected element to have text content:
-  알림 전송됨
-Received:
-
-
-Ignored nodes: comments, script, style
-&lt;html&gt;
-  &lt;head /&gt;
-  &lt;body&gt;
-    &lt;div&gt;
-      &lt;div
-        data-testid=&quot;comment-form&quot;
-      &gt;
-        &lt;textarea
-          data-testid=&quot;comment-input&quot;
-          placeholder=&quot;댓글을 입력하세요&quot;
-        /&gt;
-        &lt;button
-          data-testid=&quot;comment-submit&quot;
-        &gt;
-          댓글 작성
-        &lt;/button&gt;
-        &lt;div
-          data-testid=&quot;notification-status&quot;
-        /&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-  &lt;/body&gt;
-&lt;/html&gt;
-    at toHaveTextContent (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\__tests__\CommunitySystem.test.tsx:669:36)
-    at runWithExpensiveErrorDiagnosticsDisabled (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\config.js:47:12)
-    at checkCallback (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\wait-for.js:124:77)
-    at checkRealTimersCallback (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@testing-library\dom\dist\wait-for.js:118:16)
-    at Timeout.task [as _onTimeout] (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jsdom\lib\jsdom\browser\Window.js:579:19)
-    at listOnTimeout (node:internal/timers:588:17)
-    at processTimers (node:internal/timers:523:7)</failure>
-    </testcase>
-    <testcase classname="Community Board System Statistics 게시글 통계가 올바르게 계산되어야 한다" name="Community Board System Statistics 게시글 통계가 올바르게 계산되어야 한다" time="0.001">
-    </testcase>
-    <testcase classname="Community Board System Permissions 관리자는 모든 게시글을 관리할 수 있어야 한다" name="Community Board System Permissions 관리자는 모든 게시글을 관리할 수 있어야 한다" time="0.018">
-    </testcase>
-    <testcase classname="Community Board System Permissions 일반 사용자는 자신의 게시글만 수정/삭제할 수 있어야 한다" name="Community Board System Permissions 일반 사용자는 자신의 게시글만 수정/삭제할 수 있어야 한다" time="0.014">
-    </testcase>
-  </testsuite>
-  <testsuite name="Select Component" errors="0" failures="19" skipped="0" timestamp="2025-09-22T10:35:07" time="2.466" tests="19">
-    <testcase classname="Select Component renders with placeholder text" name="Select Component renders with placeholder text" time="0.281">
+  <testsuite name="Select Component" errors="0" failures="19" skipped="0" timestamp="2025-09-22T11:31:00" time="1.887" tests="19">
+    <testcase classname="Select Component renders with placeholder text" name="Select Component renders with placeholder text" time="0.275">
       <failure>Error: `SelectItem` must be used within `SelectContent`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1260:28
@@ -756,7 +756,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="Select Component opens dropdown when clicked" name="Select Component opens dropdown when clicked" time="0.082">
+    <testcase classname="Select Component opens dropdown when clicked" name="Select Component opens dropdown when clicked" time="0.059">
       <failure>Error: `SelectItem` must be used within `SelectContent`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1260:28
@@ -788,7 +788,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="Select Component closes dropdown when option is selected" name="Select Component closes dropdown when option is selected" time="0.06">
+    <testcase classname="Select Component closes dropdown when option is selected" name="Select Component closes dropdown when option is selected" time="0.05">
       <failure>Error: `SelectItem` must be used within `SelectContent`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1260:28
@@ -820,7 +820,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="Select Component handles keyboard navigation" name="Select Component handles keyboard navigation" time="0.053">
+    <testcase classname="Select Component handles keyboard navigation" name="Select Component handles keyboard navigation" time="0.038">
       <failure>Error: `SelectItem` must be used within `SelectContent`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1260:28
@@ -852,7 +852,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="Select Component closes dropdown with Escape key" name="Select Component closes dropdown with Escape key" time="0.051">
+    <testcase classname="Select Component closes dropdown with Escape key" name="Select Component closes dropdown with Escape key" time="0.054">
       <failure>Error: `SelectItem` must be used within `SelectContent`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1260:28
@@ -884,7 +884,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="Select Component closes dropdown when clicking outside" name="Select Component closes dropdown when clicking outside" time="0.065">
+    <testcase classname="Select Component closes dropdown when clicking outside" name="Select Component closes dropdown when clicking outside" time="0.058">
       <failure>Error: `SelectItem` must be used within `SelectContent`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1260:28
@@ -916,7 +916,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="Select Component displays selected value correctly" name="Select Component displays selected value correctly" time="0.026">
+    <testcase classname="Select Component displays selected value correctly" name="Select Component displays selected value correctly" time="0.045">
       <failure>Error: `SelectItem` must be used within `SelectContent`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1260:28
@@ -948,7 +948,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="Select Component shows checkmark for selected item" name="Select Component shows checkmark for selected item" time="0.04">
+    <testcase classname="Select Component shows checkmark for selected item" name="Select Component shows checkmark for selected item" time="0.052">
       <failure>Error: `SelectItem` must be used within `SelectContent`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1260:28
@@ -980,7 +980,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="Select Component is disabled when disabled prop is true" name="Select Component is disabled when disabled prop is true" time="0.054">
+    <testcase classname="Select Component is disabled when disabled prop is true" name="Select Component is disabled when disabled prop is true" time="0.031">
       <failure>Error: `SelectItem` must be used within `SelectContent`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1260:28
@@ -1012,7 +1012,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="Select Component applies correct size variants" name="Select Component applies correct size variants" time="0.056">
+    <testcase classname="Select Component applies correct size variants" name="Select Component applies correct size variants" time="0.037">
       <failure>Error: `SelectItem` must be used within `SelectContent`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1260:28
@@ -1044,7 +1044,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="Select Component applies correct tone variants" name="Select Component applies correct tone variants" time="0.054">
+    <testcase classname="Select Component applies correct tone variants" name="Select Component applies correct tone variants" time="0.028">
       <failure>Error: `SelectItem` must be used within `SelectContent`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1260:28
@@ -1076,7 +1076,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="Select Component has no accessibility violations" name="Select Component has no accessibility violations" time="0.052">
+    <testcase classname="Select Component has no accessibility violations" name="Select Component has no accessibility violations" time="0.027">
       <failure>Error: `SelectItem` must be used within `SelectContent`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1260:28
@@ -1108,7 +1108,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="Select Component has proper ARIA attributes" name="Select Component has proper ARIA attributes" time="0.066">
+    <testcase classname="Select Component has proper ARIA attributes" name="Select Component has proper ARIA attributes" time="0.027">
       <failure>Error: `SelectItem` must be used within `SelectContent`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1260:28
@@ -1172,7 +1172,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="SelectItem Component renders with correct props" name="SelectItem Component renders with correct props" time="0.007">
+    <testcase classname="SelectItem Component renders with correct props" name="SelectItem Component renders with correct props" time="0.015">
       <failure>Error: `SelectItem` must be used within `Select`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1259:21
@@ -1204,7 +1204,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="SelectItem Component calls onSelect when clicked" name="SelectItem Component calls onSelect when clicked" time="0.007">
+    <testcase classname="SelectItem Component calls onSelect when clicked" name="SelectItem Component calls onSelect when clicked" time="0.014">
       <failure>Error: `SelectItem` must be used within `Select`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1259:21
@@ -1236,7 +1236,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="SelectItem Component handles keyboard events" name="SelectItem Component handles keyboard events" time="0.021">
+    <testcase classname="SelectItem Component handles keyboard events" name="SelectItem Component handles keyboard events" time="0.003">
       <failure>Error: `SelectItem` must be used within `Select`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:1259:21
@@ -1268,7 +1268,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="SelectContent Component renders with correct role" name="SelectContent Component renders with correct role" time="0.058">
+    <testcase classname="SelectContent Component renders with correct role" name="SelectContent Component renders with correct role" time="0.031">
       <failure>Error: `SelectContent` must be used within `Select`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:449:21
@@ -1305,7 +1305,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="SelectContent Component applies size variants" name="SelectContent Component applies size variants" time="0.018">
+    <testcase classname="SelectContent Component applies size variants" name="SelectContent Component applies size variants" time="0.014">
       <failure>Error: `SelectContent` must be used within `Select`
     at useContext2 (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-context\src\create-context.tsx:75:13)
     at C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\@radix-ui\react-select\src\select.tsx:449:21
@@ -1343,12 +1343,12 @@ Ignored nodes: comments, script, style
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
   </testsuite>
-  <testsuite name="Modal Accessibility Tests" errors="0" failures="6" skipped="0" timestamp="2025-09-22T10:35:12" time="2.309" tests="12">
-    <testcase classname="Modal Accessibility Tests should have no accessibility violations when closed" name="Modal Accessibility Tests should have no accessibility violations when closed" time="0.048">
+  <testsuite name="Modal Accessibility Tests" errors="0" failures="6" skipped="0" timestamp="2025-09-22T11:31:04" time="2.171" tests="12">
+    <testcase classname="Modal Accessibility Tests should have no accessibility violations when closed" name="Modal Accessibility Tests should have no accessibility violations when closed" time="0.083">
     </testcase>
-    <testcase classname="Modal Accessibility Tests should have no accessibility violations when open" name="Modal Accessibility Tests should have no accessibility violations when open" time="0.065">
+    <testcase classname="Modal Accessibility Tests should have no accessibility violations when open" name="Modal Accessibility Tests should have no accessibility violations when open" time="0.063">
     </testcase>
-    <testcase classname="Modal Accessibility Tests should have proper ARIA attributes" name="Modal Accessibility Tests should have proper ARIA attributes" time="0.022">
+    <testcase classname="Modal Accessibility Tests should have proper ARIA attributes" name="Modal Accessibility Tests should have proper ARIA attributes" time="0.02">
       <failure>Error: expect(element).toHaveAttribute(&quot;aria-labelledby&quot;) // element.hasAttribute(&quot;aria-labelledby&quot;)
 
 Expected the element to have attribute:
@@ -1369,7 +1369,7 @@ Received:
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="Modal Accessibility Tests should trap focus when open" name="Modal Accessibility Tests should trap focus when open" time="0.046">
+    <testcase classname="Modal Accessibility Tests should trap focus when open" name="Modal Accessibility Tests should trap focus when open" time="0.053">
       <failure>Error: expect(element).toHaveFocus()
 
 Expected element with focus:
@@ -1390,7 +1390,7 @@ Received element with focus:
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="Modal Accessibility Tests should close on Escape key" name="Modal Accessibility Tests should close on Escape key" time="0.105">
+    <testcase classname="Modal Accessibility Tests should close on Escape key" name="Modal Accessibility Tests should close on Escape key" time="0.089">
       <failure>Error: expect(jest.fn()).toHaveBeenCalledWith(...expected)
 
 Expected: false
@@ -1398,7 +1398,7 @@ Expected: false
 Number of calls: 0
     at Object.toHaveBeenCalledWith (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\shared\ui\__tests__\Modal.a11y.test.tsx:96:26)</failure>
     </testcase>
-    <testcase classname="Modal Accessibility Tests should close on overlay click" name="Modal Accessibility Tests should close on overlay click" time="0.048">
+    <testcase classname="Modal Accessibility Tests should close on overlay click" name="Modal Accessibility Tests should close on overlay click" time="0.075">
       <failure>Error: expect(jest.fn()).toHaveBeenCalledWith(...expected)
 
 Expected: false
@@ -1406,7 +1406,7 @@ Expected: false
 Number of calls: 0
     at Object.toHaveBeenCalledWith (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\shared\ui\__tests__\Modal.a11y.test.tsx:115:26)</failure>
     </testcase>
-    <testcase classname="Modal Accessibility Tests should not close on modal content click" name="Modal Accessibility Tests should not close on modal content click" time="0.101">
+    <testcase classname="Modal Accessibility Tests should not close on modal content click" name="Modal Accessibility Tests should not close on modal content click" time="0.097">
     </testcase>
     <testcase classname="Modal Accessibility Tests should cycle focus with Tab key" name="Modal Accessibility Tests should cycle focus with Tab key" time="0.065">
       <failure>Error: expect(element).toHaveFocus()
@@ -1417,7 +1417,7 @@ Received element with focus:
   &lt;input placeholder=&quot;Test input&quot; type=&quot;text&quot; /&gt;
     at Object.toHaveFocus (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\shared\ui\__tests__\Modal.a11y.test.tsx:146:24)</failure>
     </testcase>
-    <testcase classname="Modal Accessibility Tests should cycle focus with Shift+Tab key" name="Modal Accessibility Tests should cycle focus with Shift+Tab key" time="0.265">
+    <testcase classname="Modal Accessibility Tests should cycle focus with Shift+Tab key" name="Modal Accessibility Tests should cycle focus with Shift+Tab key" time="0.283">
       <failure>Error: expect(element).toHaveFocus()
 
 Expected element with focus:
@@ -1426,19 +1426,19 @@ Received element with focus:
   &lt;input placeholder=&quot;Test input&quot; type=&quot;text&quot; /&gt;
     at Object.toHaveFocus (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\shared\ui\__tests__\Modal.a11y.test.tsx:183:27)</failure>
     </testcase>
-    <testcase classname="Modal Accessibility Tests should work with different sizes without accessibility issues" name="Modal Accessibility Tests should work with different sizes without accessibility issues" time="0.188">
+    <testcase classname="Modal Accessibility Tests should work with different sizes without accessibility issues" name="Modal Accessibility Tests should work with different sizes without accessibility issues" time="0.288">
     </testcase>
-    <testcase classname="Modal Accessibility Tests should have proper heading structure" name="Modal Accessibility Tests should have proper heading structure" time="0.05">
+    <testcase classname="Modal Accessibility Tests should have proper heading structure" name="Modal Accessibility Tests should have proper heading structure" time="0.055">
     </testcase>
-    <testcase classname="Modal Accessibility Tests should be accessible with screen readers" name="Modal Accessibility Tests should be accessible with screen readers" time="0.033">
+    <testcase classname="Modal Accessibility Tests should be accessible with screen readers" name="Modal Accessibility Tests should be accessible with screen readers" time="0.06">
     </testcase>
   </testsuite>
-  <testsuite name="Button Accessibility Tests" errors="0" failures="2" skipped="0" timestamp="2025-09-22T10:35:14" time="1.764" tests="10">
-    <testcase classname="Button Accessibility Tests should have no accessibility violations" name="Button Accessibility Tests should have no accessibility violations" time="0.095">
+  <testsuite name="Button Accessibility Tests" errors="0" failures="2" skipped="0" timestamp="2025-09-22T11:31:06" time="1.743" tests="10">
+    <testcase classname="Button Accessibility Tests should have no accessibility violations" name="Button Accessibility Tests should have no accessibility violations" time="0.082">
     </testcase>
-    <testcase classname="Button Accessibility Tests should have proper ARIA attributes when disabled" name="Button Accessibility Tests should have proper ARIA attributes when disabled" time="0.042">
+    <testcase classname="Button Accessibility Tests should have proper ARIA attributes when disabled" name="Button Accessibility Tests should have proper ARIA attributes when disabled" time="0.059">
     </testcase>
-    <testcase classname="Button Accessibility Tests should be focusable and keyboard accessible" name="Button Accessibility Tests should be focusable and keyboard accessible" time="0.039">
+    <testcase classname="Button Accessibility Tests should be focusable and keyboard accessible" name="Button Accessibility Tests should be focusable and keyboard accessible" time="0.057">
       <failure>Error: expect(element).toHaveFocus()
 
 Expected element with focus:
@@ -1447,28 +1447,28 @@ Received element with focus:
   &lt;body&gt;&lt;div&gt;&lt;button aria-busy=&quot;false&quot; class=&quot;inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*=&apos;size-&apos;])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:ring-ring/30 focus-visible:ring-4 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive cursor-pointer bg-primary-600 text-white hover:bg-primary-700 shadow-apple hover:shadow-apple-lg active:scale-95 focus:ring-primary-300 h-10 px-6 py-2 text-sm [&amp;_svg]:size-4&quot; type=&quot;button&quot;&gt;Focusable Button&lt;/button&gt;&lt;/div&gt;&lt;/body&gt;
     at Object.toHaveFocus (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\shared\ui\__tests__\Button.a11y.test.tsx:35:20)</failure>
     </testcase>
-    <testcase classname="Button Accessibility Tests should support keyboard interaction" name="Button Accessibility Tests should support keyboard interaction" time="0.084">
+    <testcase classname="Button Accessibility Tests should support keyboard interaction" name="Button Accessibility Tests should support keyboard interaction" time="0.083">
       <failure>Error: expect(jest.fn()).toHaveBeenCalledTimes(expected)
 
 Expected number of calls: 1
 Received number of calls: 2
     at Object.toHaveBeenCalledTimes (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\shared\ui\__tests__\Button.a11y.test.tsx:50:25)</failure>
     </testcase>
-    <testcase classname="Button Accessibility Tests should have proper button role" name="Button Accessibility Tests should have proper button role" time="0.036">
+    <testcase classname="Button Accessibility Tests should have proper button role" name="Button Accessibility Tests should have proper button role" time="0.04">
     </testcase>
-    <testcase classname="Button Accessibility Tests should work with different variants without accessibility issues" name="Button Accessibility Tests should work with different variants without accessibility issues" time="0.189">
+    <testcase classname="Button Accessibility Tests should work with different variants without accessibility issues" name="Button Accessibility Tests should work with different variants without accessibility issues" time="0.175">
     </testcase>
-    <testcase classname="Button Accessibility Tests should work with different sizes without accessibility issues" name="Button Accessibility Tests should work with different sizes without accessibility issues" time="0.162">
+    <testcase classname="Button Accessibility Tests should work with different sizes without accessibility issues" name="Button Accessibility Tests should work with different sizes without accessibility issues" time="0.15">
     </testcase>
-    <testcase classname="Button Accessibility Tests should work with different tones without accessibility issues" name="Button Accessibility Tests should work with different tones without accessibility issues" time="0.133">
+    <testcase classname="Button Accessibility Tests should work with different tones without accessibility issues" name="Button Accessibility Tests should work with different tones without accessibility issues" time="0.144">
     </testcase>
-    <testcase classname="Button Accessibility Tests should maintain accessibility with complex content" name="Button Accessibility Tests should maintain accessibility with complex content" time="0.031">
+    <testcase classname="Button Accessibility Tests should maintain accessibility with complex content" name="Button Accessibility Tests should maintain accessibility with complex content" time="0.057">
     </testcase>
-    <testcase classname="Button Accessibility Tests should be accessible when used in a form" name="Button Accessibility Tests should be accessible when used in a form" time="0.058">
+    <testcase classname="Button Accessibility Tests should be accessible when used in a form" name="Button Accessibility Tests should be accessible when used in a form" time="0.083">
     </testcase>
   </testsuite>
-  <testsuite name="FundingModeSelector" errors="0" failures="2" skipped="0" timestamp="2025-09-22T10:35:16" time="1.036" tests="2">
-    <testcase classname="FundingModeSelector renders both funding mode options and allows selection" name="FundingModeSelector renders both funding mode options and allows selection" time="0.065">
+  <testsuite name="FundingModeSelector" errors="0" failures="2" skipped="0" timestamp="2025-09-22T11:31:08" time="0.943" tests="2">
+    <testcase classname="FundingModeSelector renders both funding mode options and allows selection" name="FundingModeSelector renders both funding mode options and allows selection" time="0.071">
       <failure>TestingLibraryElementError: Unable to find a label with the text of: Flexible Funding
 
 Ignored nodes: comments, script, style
@@ -1597,7 +1597,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="FundingModeSelector marks the selected option as checked" name="FundingModeSelector marks the selected option as checked" time="0.018">
+    <testcase classname="FundingModeSelector marks the selected option as checked" name="FundingModeSelector marks the selected option as checked" time="0.026">
       <failure>TestingLibraryElementError: Unable to find a label with the text of: Flexible Funding
 
 Ignored nodes: comments, script, style
@@ -1727,22 +1727,22 @@ Ignored nodes: comments, script, style
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
   </testsuite>
-  <testsuite name="MetricsCard 컴포넌트 테스트" errors="0" failures="1" skipped="0" timestamp="2025-09-22T10:35:17" time="1.013" tests="9">
+  <testsuite name="MetricsCard 컴포넌트 테스트" errors="0" failures="1" skipped="0" timestamp="2025-09-22T11:31:09" time="0.899" tests="9">
     <testcase classname="MetricsCard 컴포넌트 테스트 기본 props로 렌더링된다" name="MetricsCard 컴포넌트 테스트 기본 props로 렌더링된다" time="0.034">
     </testcase>
-    <testcase classname="MetricsCard 컴포넌트 테스트 variant가 제공되면 올바른 스타일이 적용된다" name="MetricsCard 컴포넌트 테스트 variant가 제공되면 올바른 스타일이 적용된다" time="0.019">
+    <testcase classname="MetricsCard 컴포넌트 테스트 variant가 제공되면 올바른 스타일이 적용된다" name="MetricsCard 컴포넌트 테스트 variant가 제공되면 올바른 스타일이 적용된다" time="0.013">
     </testcase>
-    <testcase classname="MetricsCard 컴포넌트 테스트 trend가 제공되면 표시된다" name="MetricsCard 컴포넌트 테스트 trend가 제공되면 표시된다" time="0.013">
+    <testcase classname="MetricsCard 컴포넌트 테스트 trend가 제공되면 표시된다" name="MetricsCard 컴포넌트 테스트 trend가 제공되면 표시된다" time="0.019">
     </testcase>
-    <testcase classname="MetricsCard 컴포넌트 테스트 trend가 양수일 때 올바른 색상으로 표시된다" name="MetricsCard 컴포넌트 테스트 trend가 양수일 때 올바른 색상으로 표시된다" time="0.021">
+    <testcase classname="MetricsCard 컴포넌트 테스트 trend가 양수일 때 올바른 색상으로 표시된다" name="MetricsCard 컴포넌트 테스트 trend가 양수일 때 올바른 색상으로 표시된다" time="0.006">
     </testcase>
-    <testcase classname="MetricsCard 컴포넌트 테스트 trend가 음수일 때 올바른 색상으로 표시된다" name="MetricsCard 컴포넌트 테스트 trend가 음수일 때 올바른 색상으로 표시된다" time="0.005">
+    <testcase classname="MetricsCard 컴포넌트 테스트 trend가 음수일 때 올바른 색상으로 표시된다" name="MetricsCard 컴포넌트 테스트 trend가 음수일 때 올바른 색상으로 표시된다" time="0.006">
     </testcase>
-    <testcase classname="MetricsCard 컴포넌트 테스트 접근성 속성이 올바르게 설정되어 있다" name="MetricsCard 컴포넌트 테스트 접근성 속성이 올바르게 설정되어 있다" time="0.025">
+    <testcase classname="MetricsCard 컴포넌트 테스트 접근성 속성이 올바르게 설정되어 있다" name="MetricsCard 컴포넌트 테스트 접근성 속성이 올바르게 설정되어 있다" time="0.018">
     </testcase>
-    <testcase classname="MetricsCard 컴포넌트 테스트 숫자 값이 올바르게 포맷팅되어 표시된다" name="MetricsCard 컴포넌트 테스트 숫자 값이 올바르게 포맷팅되어 표시된다" time="0.01">
+    <testcase classname="MetricsCard 컴포넌트 테스트 숫자 값이 올바르게 포맷팅되어 표시된다" name="MetricsCard 컴포넌트 테스트 숫자 값이 올바르게 포맷팅되어 표시된다" time="0.03">
     </testcase>
-    <testcase classname="MetricsCard 컴포넌트 테스트 아이콘이 올바르게 렌더링된다" name="MetricsCard 컴포넌트 테스트 아이콘이 올바르게 렌더링된다" time="0.031">
+    <testcase classname="MetricsCard 컴포넌트 테스트 아이콘이 올바르게 렌더링된다" name="MetricsCard 컴포넌트 테스트 아이콘이 올바르게 렌더링된다" time="0.008">
       <failure>TestingLibraryElementError: Unable to find an element with the role &quot;img&quot;
 
 Here are the available roles:
@@ -1840,13 +1840,13 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="MetricsCard 컴포넌트 테스트 다양한 variant가 올바르게 적용된다" name="MetricsCard 컴포넌트 테스트 다양한 variant가 올바르게 적용된다" time="0.019">
+    <testcase classname="MetricsCard 컴포넌트 테스트 다양한 variant가 올바르게 적용된다" name="MetricsCard 컴포넌트 테스트 다양한 variant가 올바르게 적용된다" time="0.015">
     </testcase>
   </testsuite>
-  <testsuite name="useSelect Hook" errors="0" failures="3" skipped="0" timestamp="2025-09-22T10:35:18" time="1.079" tests="12">
-    <testcase classname="useSelect Hook initializes with correct default values" name="useSelect Hook initializes with correct default values" time="0.017">
+  <testsuite name="useSelect Hook" errors="0" failures="3" skipped="0" timestamp="2025-09-22T11:31:10" time="0.653" tests="12">
+    <testcase classname="useSelect Hook initializes with correct default values" name="useSelect Hook initializes with correct default values" time="0.007">
     </testcase>
-    <testcase classname="useSelect Hook updates selectedItem when value changes" name="useSelect Hook updates selectedItem when value changes" time="0.014">
+    <testcase classname="useSelect Hook updates selectedItem when value changes" name="useSelect Hook updates selectedItem when value changes" time="0.007">
       <failure>Error: expect(received).toEqual(expected) // deep equality
 
 Expected: {&quot;label&quot;: &quot;Option 1&quot;, &quot;value&quot;: &quot;option1&quot;}
@@ -1865,7 +1865,7 @@ Received: null
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="useSelect Hook handles value change correctly" name="useSelect Hook handles value change correctly" time="0.007">
+    <testcase classname="useSelect Hook handles value change correctly" name="useSelect Hook handles value change correctly" time="0.002">
       <failure>Error: expect(received).toEqual(expected) // deep equality
 
 Expected: {&quot;label&quot;: &quot;Option 2&quot;, &quot;value&quot;: &quot;option2&quot;}
@@ -1884,19 +1884,19 @@ Received: null
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="useSelect Hook toggles open state with setOpen" name="useSelect Hook toggles open state with setOpen" time="0.004">
+    <testcase classname="useSelect Hook toggles open state with setOpen" name="useSelect Hook toggles open state with setOpen" time="0.002">
     </testcase>
-    <testcase classname="useSelect Hook handles keyboard navigation for trigger" name="useSelect Hook handles keyboard navigation for trigger" time="0.005">
+    <testcase classname="useSelect Hook handles keyboard navigation for trigger" name="useSelect Hook handles keyboard navigation for trigger" time="0.008">
     </testcase>
-    <testcase classname="useSelect Hook handles Escape key to close" name="useSelect Hook handles Escape key to close" time="0.013">
+    <testcase classname="useSelect Hook handles Escape key to close" name="useSelect Hook handles Escape key to close" time="0.005">
     </testcase>
-    <testcase classname="useSelect Hook handles ArrowDown key to open and focus" name="useSelect Hook handles ArrowDown key to open and focus" time="0.01">
+    <testcase classname="useSelect Hook handles ArrowDown key to open and focus" name="useSelect Hook handles ArrowDown key to open and focus" time="0.001">
     </testcase>
-    <testcase classname="useSelect Hook handles item keyboard navigation" name="useSelect Hook handles item keyboard navigation" time="0.004">
+    <testcase classname="useSelect Hook handles item keyboard navigation" name="useSelect Hook handles item keyboard navigation" time="0.001">
     </testcase>
-    <testcase classname="useSelect Hook handles Escape key in item to close and focus trigger" name="useSelect Hook handles Escape key in item to close and focus trigger" time="0.006">
+    <testcase classname="useSelect Hook handles Escape key in item to close and focus trigger" name="useSelect Hook handles Escape key in item to close and focus trigger" time="0.002">
     </testcase>
-    <testcase classname="useSelect Hook renders children correctly" name="useSelect Hook renders children correctly" time="0.01">
+    <testcase classname="useSelect Hook renders children correctly" name="useSelect Hook renders children correctly" time="0.001">
       <failure>Error: expect(received).toBe(expected) // Object.is equality
 
 Expected: 3
@@ -1915,31 +1915,13 @@ Received: 1
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="useSelect Hook memoizes rendered children" name="useSelect Hook memoizes rendered children" time="0.005">
+    <testcase classname="useSelect Hook memoizes rendered children" name="useSelect Hook memoizes rendered children" time="0.002">
     </testcase>
     <testcase classname="useSelect Hook handles disabled state" name="useSelect Hook handles disabled state" time="0.002">
     </testcase>
   </testsuite>
-  <testsuite name="Button" errors="0" failures="0" skipped="0" timestamp="2025-09-22T10:35:19" time="1.295" tests="8">
-    <testcase classname="Button 기본 버튼을 렌더링한다" name="Button 기본 버튼을 렌더링한다" time="0.01">
-    </testcase>
-    <testcase classname="Button 다양한 variant를 올바르게 적용한다" name="Button 다양한 variant를 올바르게 적용한다" time="0.006">
-    </testcase>
-    <testcase classname="Button 다양한 size를 올바르게 적용한다" name="Button 다양한 size를 올바르게 적용한다" time="0.007">
-    </testcase>
-    <testcase classname="Button 다양한 tone을 올바르게 적용한다" name="Button 다양한 tone을 올바르게 적용한다" time="0.01">
-    </testcase>
-    <testcase classname="Button 로딩 상태를 올바르게 처리한다" name="Button 로딩 상태를 올바르게 처리한다" time="0.002">
-    </testcase>
-    <testcase classname="Button disabled 상태를 올바르게 처리한다" name="Button disabled 상태를 올바르게 처리한다" time="0.001">
-    </testcase>
-    <testcase classname="Button ARIA 속성을 올바르게 전달한다" name="Button ARIA 속성을 올바르게 전달한다" time="0.015">
-    </testcase>
-    <testcase classname="Button asChild prop을 올바르게 처리한다" name="Button asChild prop을 올바르게 처리한다" time="0.003">
-    </testcase>
-  </testsuite>
-  <testsuite name="VirtualizedList" errors="0" failures="3" skipped="0" timestamp="2025-09-22T10:35:20" time="0.941" tests="6">
-    <testcase classname="VirtualizedList 기본 렌더링이 올바르게 작동한다" name="VirtualizedList 기본 렌더링이 올바르게 작동한다" time="0.04">
+  <testsuite name="VirtualizedList" errors="0" failures="3" skipped="0" timestamp="2025-09-22T11:31:11" time="0.788" tests="6">
+    <testcase classname="VirtualizedList 기본 렌더링이 올바르게 작동한다" name="VirtualizedList 기본 렌더링이 올바르게 작동한다" time="0.018">
       <failure>Error: expect(received).toBeLessThanOrEqual(expected)
 
 Expected: &lt;= 10
@@ -1958,11 +1940,11 @@ Received:    12
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="VirtualizedList 빈 배열을 올바르게 처리한다" name="VirtualizedList 빈 배열을 올바르게 처리한다" time="0.005">
+    <testcase classname="VirtualizedList 빈 배열을 올바르게 처리한다" name="VirtualizedList 빈 배열을 올바르게 처리한다" time="0.014">
     </testcase>
-    <testcase classname="VirtualizedList undefined items를 올바르게 처리한다" name="VirtualizedList undefined items를 올바르게 처리한다" time="0.011">
+    <testcase classname="VirtualizedList undefined items를 올바르게 처리한다" name="VirtualizedList undefined items를 올바르게 처리한다" time="0.003">
     </testcase>
-    <testcase classname="VirtualizedList 스크롤 시 올바르게 아이템이 업데이트된다" name="VirtualizedList 스크롤 시 올바르게 아이템이 업데이트된다" time="0.026">
+    <testcase classname="VirtualizedList 스크롤 시 올바르게 아이템이 업데이트된다" name="VirtualizedList 스크롤 시 올바르게 아이템이 업데이트된다" time="0.013">
       <failure>TestingLibraryElementError: Unable to find an element by: [data-testid=&quot;virtualized-list&quot;]
 
 Ignored nodes: comments, script, style
@@ -2109,7 +2091,7 @@ Ignored nodes: comments, script, style
     at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
     at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="VirtualizedList 커스텀 className을 올바르게 적용한다" name="VirtualizedList 커스텀 className을 올바르게 적용한다" time="0.018">
+    <testcase classname="VirtualizedList 커스텀 className을 올바르게 적용한다" name="VirtualizedList 커스텀 className을 올바르게 적용한다" time="0.017">
       <failure>TestingLibraryElementError: Unable to find an element by: [data-testid=&quot;virtualized-list&quot;]
 
 Ignored nodes: comments, script, style
@@ -2259,32 +2241,76 @@ Ignored nodes: comments, script, style
     <testcase classname="VirtualizedList overscan이 올바르게 작동한다" name="VirtualizedList overscan이 올바르게 작동한다" time="0.014">
     </testcase>
   </testsuite>
-  <testsuite name="권한별 마이페이지 시스템 TDD 테스트" errors="0" failures="1" skipped="0" timestamp="2025-09-22T10:35:21" time="0.65" tests="14">
-    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 1. 아티스트 마이페이지 테스트 아티스트 프로필 정보가 올바르게 표시되어야 한다" name="권한별 마이페이지 시스템 TDD 테스트 1. 아티스트 마이페이지 테스트 아티스트 프로필 정보가 올바르게 표시되어야 한다" time="0.013">
+  <testsuite name="tokenStorage helpers" errors="0" failures="1" skipped="0" timestamp="2025-09-22T11:31:12" time="0.504" tests="12">
+    <testcase classname="tokenStorage helpers sanitizeToken returns null for non-string input" name="tokenStorage helpers sanitizeToken returns null for non-string input" time="0.006">
     </testcase>
-    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 1. 아티스트 마이페이지 테스트 아티스트 프로젝트 관리가 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 1. 아티스트 마이페이지 테스트 아티스트 프로젝트 관리가 올바르게 작동해야 한다" time="0.002">
+    <testcase classname="tokenStorage helpers sanitizeToken filters out bearer prefixes and undefined noise" name="tokenStorage helpers sanitizeToken filters out bearer prefixes and undefined noise" time="0.003">
     </testcase>
-    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 1. 아티스트 마이페이지 테스트 아티스트 수익 관리가 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 1. 아티스트 마이페이지 테스트 아티스트 수익 관리가 올바르게 작동해야 한다" time="0.001">
+    <testcase classname="tokenStorage helpers sanitizeToken filters quoted tokens" name="tokenStorage helpers sanitizeToken filters quoted tokens" time="0.001">
+      <failure>Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9&quot;
+Received: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\&quot;&quot;
+    at Object.toBe (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\features\auth\services\__tests__\tokenStorage.test.ts:31:37)
+    at Promise.then.completed (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\utils.js:231:10)
+    at _callCircusTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\run.js:316:40)
+    at _runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\run.js:252:3)
+    at _runTestsForDescribeBlock (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\run.js:126:9)
+    at _runTestsForDescribeBlock (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\run.js:121:9)
+    at _runTestsForDescribeBlock (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\run.js:121:9)
+    at run (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\run.js:71:3)
+    at runAndTransformResultsToJestFormat (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:122:21)
+    at jestAdapter (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:79:19)
+    at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
+    at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
+    </testcase>
+    <testcase classname="tokenStorage helpers sanitizeToken removes explicit null-like strings" name="tokenStorage helpers sanitizeToken removes explicit null-like strings" time="0.001">
+    </testcase>
+    <testcase classname="tokenStorage helpers sanitizeToken keeps already clean tokens untouched" name="tokenStorage helpers sanitizeToken keeps already clean tokens untouched" time="0.001">
+    </testcase>
+    <testcase classname="tokenStorage helpers persistTokens stores sanitized fallback tokens when access token is missing" name="tokenStorage helpers persistTokens stores sanitized fallback tokens when access token is missing" time="0.003">
+    </testcase>
+    <testcase classname="tokenStorage helpers persistTokens clears storage when sanitized token is empty" name="tokenStorage helpers persistTokens clears storage when sanitized token is empty" time="0.005">
+    </testcase>
+    <testcase classname="tokenStorage helpers getStoredAccessToken returns sanitized token from storage" name="tokenStorage helpers getStoredAccessToken returns sanitized token from storage" time="0.003">
+    </testcase>
+    <testcase classname="tokenStorage helpers resolveAuthTokenCandidates extracts tokens from nested data objects" name="tokenStorage helpers resolveAuthTokenCandidates extracts tokens from nested data objects" time="0.006">
+    </testcase>
+    <testcase classname="tokenStorage helpers resolveAuthTokenCandidates falls back to legacy token fields when accessToken is missing" name="tokenStorage helpers resolveAuthTokenCandidates falls back to legacy token fields when accessToken is missing" time="0.001">
+    </testcase>
+    <testcase classname="tokenStorage helpers resolveAuthTokenCandidates supports deeply nested payloads" name="tokenStorage helpers resolveAuthTokenCandidates supports deeply nested payloads" time="0">
+    </testcase>
+    <testcase classname="tokenStorage helpers resolveAuthTokenCandidates returns null tokens when no candidates exist" name="tokenStorage helpers resolveAuthTokenCandidates returns null tokens when no candidates exist" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="권한별 마이페이지 시스템 TDD 테스트" errors="0" failures="1" skipped="0" timestamp="2025-09-22T11:31:12" time="0.521" tests="14">
+    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 1. 아티스트 마이페이지 테스트 아티스트 프로필 정보가 올바르게 표시되어야 한다" name="권한별 마이페이지 시스템 TDD 테스트 1. 아티스트 마이페이지 테스트 아티스트 프로필 정보가 올바르게 표시되어야 한다" time="0.002">
+    </testcase>
+    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 1. 아티스트 마이페이지 테스트 아티스트 프로젝트 관리가 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 1. 아티스트 마이페이지 테스트 아티스트 프로젝트 관리가 올바르게 작동해야 한다" time="0.001">
+    </testcase>
+    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 1. 아티스트 마이페이지 테스트 아티스트 수익 관리가 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 1. 아티스트 마이페이지 테스트 아티스트 수익 관리가 올바르게 작동해야 한다" time="0.023">
     </testcase>
     <testcase classname="권한별 마이페이지 시스템 TDD 테스트 2. 팬 마이페이지 테스트 팬 프로필 정보가 올바르게 표시되어야 한다" name="권한별 마이페이지 시스템 TDD 테스트 2. 팬 마이페이지 테스트 팬 프로필 정보가 올바르게 표시되어야 한다" time="0.004">
     </testcase>
-    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 2. 팬 마이페이지 테스트 팬 후원 내역 관리가 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 2. 팬 마이페이지 테스트 팬 후원 내역 관리가 올바르게 작동해야 한다" time="0.003">
+    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 2. 팬 마이페이지 테스트 팬 후원 내역 관리가 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 2. 팬 마이페이지 테스트 팬 후원 내역 관리가 올바르게 작동해야 한다" time="0.005">
     </testcase>
-    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 2. 팬 마이페이지 테스트 팬 알림 설정이 올바르게 관리되어야 한다" name="권한별 마이페이지 시스템 TDD 테스트 2. 팬 마이페이지 테스트 팬 알림 설정이 올바르게 관리되어야 한다" time="0.002">
+    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 2. 팬 마이페이지 테스트 팬 알림 설정이 올바르게 관리되어야 한다" name="권한별 마이페이지 시스템 TDD 테스트 2. 팬 마이페이지 테스트 팬 알림 설정이 올바르게 관리되어야 한다" time="0.001">
     </testcase>
     <testcase classname="권한별 마이페이지 시스템 TDD 테스트 3. 관리자 마이페이지 테스트 관리자 프로필 정보가 올바르게 표시되어야 한다" name="권한별 마이페이지 시스템 TDD 테스트 3. 관리자 마이페이지 테스트 관리자 프로필 정보가 올바르게 표시되어야 한다" time="0.001">
     </testcase>
-    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 3. 관리자 마이페이지 테스트 관리자 사용자 관리가 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 3. 관리자 마이페이지 테스트 관리자 사용자 관리가 올바르게 작동해야 한다" time="0.011">
+    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 3. 관리자 마이페이지 테스트 관리자 사용자 관리가 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 3. 관리자 마이페이지 테스트 관리자 사용자 관리가 올바르게 작동해야 한다" time="0.001">
     </testcase>
-    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 3. 관리자 마이페이지 테스트 관리자 프로젝트 승인 관리가 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 3. 관리자 마이페이지 테스트 관리자 프로젝트 승인 관리가 올바르게 작동해야 한다" time="0.002">
+    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 3. 관리자 마이페이지 테스트 관리자 프로젝트 승인 관리가 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 3. 관리자 마이페이지 테스트 관리자 프로젝트 승인 관리가 올바르게 작동해야 한다" time="0">
     </testcase>
     <testcase classname="권한별 마이페이지 시스템 TDD 테스트 4. 공통 마이페이지 기능 테스트 프로필 수정이 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 4. 공통 마이페이지 기능 테스트 프로필 수정이 올바르게 작동해야 한다" time="0.001">
     </testcase>
-    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 4. 공통 마이페이지 기능 테스트 비밀번호 변경이 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 4. 공통 마이페이지 기능 테스트 비밀번호 변경이 올바르게 작동해야 한다" time="0.001">
+    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 4. 공통 마이페이지 기능 테스트 비밀번호 변경이 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 4. 공통 마이페이지 기능 테스트 비밀번호 변경이 올바르게 작동해야 한다" time="0.002">
     </testcase>
-    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 4. 공통 마이페이지 기능 테스트 계정 삭제가 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 4. 공통 마이페이지 기능 테스트 계정 삭제가 올바르게 작동해야 한다" time="0.018">
+    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 4. 공통 마이페이지 기능 테스트 계정 삭제가 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 4. 공통 마이페이지 기능 테스트 계정 삭제가 올바르게 작동해야 한다" time="0.002">
     </testcase>
-    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 5. 마이페이지 데이터 보안 테스트 개인정보 보호가 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 5. 마이페이지 데이터 보안 테스트 개인정보 보호가 올바르게 작동해야 한다" time="0.001">
+    <testcase classname="권한별 마이페이지 시스템 TDD 테스트 5. 마이페이지 데이터 보안 테스트 개인정보 보호가 올바르게 작동해야 한다" name="권한별 마이페이지 시스템 TDD 테스트 5. 마이페이지 데이터 보안 테스트 개인정보 보호가 올바르게 작동해야 한다" time="0.002">
       <failure>Error: expect(received).toBe(expected) // Object.is equality
 
 Expected: &quot;010-****-5678&quot;
@@ -2307,158 +2333,132 @@ Received: &quot;010-****-$3&quot;
     <testcase classname="권한별 마이페이지 시스템 TDD 테스트 5. 마이페이지 데이터 보안 테스트 데이터 접근 로그가 올바르게 기록되어야 한다" name="권한별 마이페이지 시스템 TDD 테스트 5. 마이페이지 데이터 보안 테스트 데이터 접근 로그가 올바르게 기록되어야 한다" time="0.002">
     </testcase>
   </testsuite>
-  <testsuite name="tokenStorage helpers" errors="0" failures="1" skipped="0" timestamp="2025-09-22T10:35:22" time="1.125" tests="12">
-    <testcase classname="tokenStorage helpers sanitizeToken returns null for non-string input" name="tokenStorage helpers sanitizeToken returns null for non-string input" time="0.002">
-    </testcase>
-    <testcase classname="tokenStorage helpers sanitizeToken filters out bearer prefixes and undefined noise" name="tokenStorage helpers sanitizeToken filters out bearer prefixes and undefined noise" time="0.001">
-    </testcase>
-    <testcase classname="tokenStorage helpers sanitizeToken filters quoted tokens" name="tokenStorage helpers sanitizeToken filters quoted tokens" time="0.001">
-      <failure>Error: expect(received).toBe(expected) // Object.is equality
-
-Expected: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9&quot;
-Received: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\&quot;&quot;
-    at Object.toBe (C:\Users\xx005\Downloads\Collaboreum MVP Platform\src\features\auth\services\__tests__\tokenStorage.test.ts:31:37)
-    at Promise.then.completed (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\utils.js:298:28)
-    at new Promise (&lt;anonymous&gt;)
-    at callAsyncCircusFn (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\utils.js:231:10)
-    at _callCircusTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\run.js:316:40)
-    at _runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\run.js:252:3)
-    at _runTestsForDescribeBlock (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\run.js:126:9)
-    at _runTestsForDescribeBlock (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\run.js:121:9)
-    at _runTestsForDescribeBlock (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\run.js:121:9)
-    at run (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\run.js:71:3)
-    at runAndTransformResultsToJestFormat (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:122:21)
-    at jestAdapter (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:79:19)
-    at runTestInternal (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:367:16)
-    at runTest (C:\Users\xx005\Downloads\Collaboreum MVP Platform\node_modules\jest-runner\build\runTest.js:444:34)</failure>
-    </testcase>
-    <testcase classname="tokenStorage helpers sanitizeToken removes explicit null-like strings" name="tokenStorage helpers sanitizeToken removes explicit null-like strings" time="0.004">
-    </testcase>
-    <testcase classname="tokenStorage helpers sanitizeToken keeps already clean tokens untouched" name="tokenStorage helpers sanitizeToken keeps already clean tokens untouched" time="0.002">
-    </testcase>
-    <testcase classname="tokenStorage helpers persistTokens stores sanitized fallback tokens when access token is missing" name="tokenStorage helpers persistTokens stores sanitized fallback tokens when access token is missing" time="0.002">
-    </testcase>
-    <testcase classname="tokenStorage helpers persistTokens clears storage when sanitized token is empty" name="tokenStorage helpers persistTokens clears storage when sanitized token is empty" time="0.002">
-    </testcase>
-    <testcase classname="tokenStorage helpers getStoredAccessToken returns sanitized token from storage" name="tokenStorage helpers getStoredAccessToken returns sanitized token from storage" time="0.001">
-    </testcase>
-    <testcase classname="tokenStorage helpers resolveAuthTokenCandidates extracts tokens from nested data objects" name="tokenStorage helpers resolveAuthTokenCandidates extracts tokens from nested data objects" time="0.004">
-    </testcase>
-    <testcase classname="tokenStorage helpers resolveAuthTokenCandidates falls back to legacy token fields when accessToken is missing" name="tokenStorage helpers resolveAuthTokenCandidates falls back to legacy token fields when accessToken is missing" time="0.009">
-    </testcase>
-    <testcase classname="tokenStorage helpers resolveAuthTokenCandidates supports deeply nested payloads" name="tokenStorage helpers resolveAuthTokenCandidates supports deeply nested payloads" time="0.007">
-    </testcase>
-    <testcase classname="tokenStorage helpers resolveAuthTokenCandidates returns null tokens when no candidates exist" name="tokenStorage helpers resolveAuthTokenCandidates returns null tokens when no candidates exist" time="0.001">
+  <testsuite name="ProjectGrid" errors="0" failures="0" skipped="0" timestamp="2025-09-22T11:31:13" time="3.665" tests="1">
+    <testcase classname="ProjectGrid renders projects mapped from the funding API payload" name="ProjectGrid renders projects mapped from the funding API payload" time="0.063">
     </testcase>
   </testsuite>
-  <testsuite name="ProjectGrid" errors="0" failures="0" skipped="0" timestamp="2025-09-22T10:35:23" time="4.378" tests="1">
-    <testcase classname="ProjectGrid renders projects mapped from the funding API payload" name="ProjectGrid renders projects mapped from the funding API payload" time="0.051">
-    </testcase>
-  </testsuite>
-  <testsuite name="HomePage integration" errors="0" failures="0" skipped="0" timestamp="2025-09-22T10:35:28" time="1.602" tests="1">
-    <testcase classname="HomePage integration renders popular artists and projects from API responses" name="HomePage integration renders popular artists and projects from API responses" time="0.24">
-    </testcase>
-  </testsuite>
-  <testsuite name="CommunitySection" errors="0" failures="0" skipped="0" timestamp="2025-09-22T10:35:29" time="1.885" tests="7">
-    <testcase classname="CommunitySection 로딩 상태에서 스켈레톤을 렌더링해야 한다" name="CommunitySection 로딩 상태에서 스켈레톤을 렌더링해야 한다" time="0.037">
+  <testsuite name="CommunitySection" errors="0" failures="0" skipped="0" timestamp="2025-09-22T11:31:17" time="1.644" tests="7">
+    <testcase classname="CommunitySection 로딩 상태에서 스켈레톤을 렌더링해야 한다" name="CommunitySection 로딩 상태에서 스켈레톤을 렌더링해야 한다" time="0.033">
     </testcase>
     <testcase classname="CommunitySection 에러 상태에서 에러 메시지를 표시해야 한다" name="CommunitySection 에러 상태에서 에러 메시지를 표시해야 한다" time="0.004">
     </testcase>
-    <testcase classname="CommunitySection 성공적으로 데이터를 로드하면 포럼 게시글과 이벤트를 표시해야 한다" name="CommunitySection 성공적으로 데이터를 로드하면 포럼 게시글과 이벤트를 표시해야 한다" time="0.086">
+    <testcase classname="CommunitySection 성공적으로 데이터를 로드하면 포럼 게시글과 이벤트를 표시해야 한다" name="CommunitySection 성공적으로 데이터를 로드하면 포럼 게시글과 이벤트를 표시해야 한다" time="0.088">
     </testcase>
-    <testcase classname="CommunitySection 빈 데이터 상태에서 적절한 메시지를 표시해야 한다" name="CommunitySection 빈 데이터 상태에서 적절한 메시지를 표시해야 한다" time="0.011">
+    <testcase classname="CommunitySection 빈 데이터 상태에서 적절한 메시지를 표시해야 한다" name="CommunitySection 빈 데이터 상태에서 적절한 메시지를 표시해야 한다" time="0.004">
     </testcase>
-    <testcase classname="CommunitySection onViewAllCommunity 콜백이 호출되어야 한다" name="CommunitySection onViewAllCommunity 콜백이 호출되어야 한다" time="0.046">
+    <testcase classname="CommunitySection onViewAllCommunity 콜백이 호출되어야 한다" name="CommunitySection onViewAllCommunity 콜백이 호출되어야 한다" time="0.063">
     </testcase>
-    <testcase classname="CommunitySection 카테고리별로 올바른 색상 배지를 표시해야 한다" name="CommunitySection 카테고리별로 올바른 색상 배지를 표시해야 한다" time="0.056">
+    <testcase classname="CommunitySection 카테고리별로 올바른 색상 배지를 표시해야 한다" name="CommunitySection 카테고리별로 올바른 색상 배지를 표시해야 한다" time="0.048">
     </testcase>
-    <testcase classname="CommunitySection HOT 배지가 올바르게 표시되어야 한다" name="CommunitySection HOT 배지가 올바르게 표시되어야 한다" time="0.06">
-    </testcase>
-  </testsuite>
-  <testsuite name="useEvents" errors="0" failures="0" skipped="0" timestamp="2025-09-22T10:35:31" time="1.557" tests="9">
-    <testcase classname="useEvents 이벤트 목록을 성공적으로 가져와야 한다" name="useEvents 이벤트 목록을 성공적으로 가져와야 한다" time="0.079">
-    </testcase>
-    <testcase classname="useEvents 쿼리 파라미터를 올바르게 전달해야 한다" name="useEvents 쿼리 파라미터를 올바르게 전달해야 한다" time="0.078">
-    </testcase>
-    <testcase classname="useEvents API 에러를 올바르게 처리해야 한다" name="useEvents API 에러를 올바르게 처리해야 한다" time="0.072">
-    </testcase>
-    <testcase classname="useEvent 특정 이벤트를 성공적으로 가져와야 한다" name="useEvent 특정 이벤트를 성공적으로 가져와야 한다" time="0.067">
-    </testcase>
-    <testcase classname="useEvent eventId가 없으면 쿼리를 실행하지 않아야 한다" name="useEvent eventId가 없으면 쿼리를 실행하지 않아야 한다" time="0.014">
-    </testcase>
-    <testcase classname="useEvent API 에러를 올바르게 처리해야 한다" name="useEvent API 에러를 올바르게 처리해야 한다" time="0.082">
-    </testcase>
-    <testcase classname="useUpcomingEvents 다가오는 이벤트를 성공적으로 가져와야 한다" name="useUpcomingEvents 다가오는 이벤트를 성공적으로 가져와야 한다" time="0.09">
-    </testcase>
-    <testcase classname="useUpcomingEvents 기본 limit 값이 3이어야 한다" name="useUpcomingEvents 기본 limit 값이 3이어야 한다" time="0.096">
-    </testcase>
-    <testcase classname="useUpcomingEvents API 에러를 올바르게 처리해야 한다" name="useUpcomingEvents API 에러를 올바르게 처리해야 한다" time="0.088">
+    <testcase classname="CommunitySection HOT 배지가 올바르게 표시되어야 한다" name="CommunitySection HOT 배지가 올바르게 표시되어야 한다" time="0.036">
     </testcase>
   </testsuite>
-  <testsuite name="useCommunityPosts" errors="0" failures="0" skipped="0" timestamp="2025-09-22T10:35:33" time="1.276" tests="7">
-    <testcase classname="useCommunityPosts 커뮤니티 포스트 목록을 성공적으로 가져와야 한다" name="useCommunityPosts 커뮤니티 포스트 목록을 성공적으로 가져와야 한다" time="0.083">
-    </testcase>
-    <testcase classname="useCommunityPosts 쿼리 파라미터를 올바르게 전달해야 한다" name="useCommunityPosts 쿼리 파라미터를 올바르게 전달해야 한다" time="0.076">
-    </testcase>
-    <testcase classname="useCommunityPosts API 에러를 올바르게 처리해야 한다" name="useCommunityPosts API 에러를 올바르게 처리해야 한다" time="0.083">
-    </testcase>
-    <testcase classname="usePopularPosts 인기 게시글을 성공적으로 가져와야 한다" name="usePopularPosts 인기 게시글을 성공적으로 가져와야 한다" time="0.08">
-    </testcase>
-    <testcase classname="usePopularPosts 기본 limit 값이 10이어야 한다" name="usePopularPosts 기본 limit 값이 10이어야 한다" time="0.077">
-    </testcase>
-    <testcase classname="useRecentPosts 최신 게시글을 성공적으로 가져와야 한다" name="useRecentPosts 최신 게시글을 성공적으로 가져와야 한다" time="0.092">
-    </testcase>
-    <testcase classname="useRecentPosts 기본 limit 값이 10이어야 한다" name="useRecentPosts 기본 limit 값이 10이어야 한다" time="0.069">
+  <testsuite name="HomePage integration" errors="0" failures="0" skipped="0" timestamp="2025-09-22T11:31:18" time="1.314" tests="1">
+    <testcase classname="HomePage integration renders popular artists and projects from API responses" name="HomePage integration renders popular artists and projects from API responses" time="0.145">
     </testcase>
   </testsuite>
-  <testsuite name="SecretPerksEditor" errors="0" failures="0" skipped="0" timestamp="2025-09-22T10:35:34" time="1.213" tests="2">
-    <testcase classname="SecretPerksEditor renders textarea with initial value and fires change handler" name="SecretPerksEditor renders textarea with initial value and fires change handler" time="0.215">
+  <testsuite name="useEvents" errors="0" failures="0" skipped="0" timestamp="2025-09-22T11:31:20" time="1.389" tests="9">
+    <testcase classname="useEvents 이벤트 목록을 성공적으로 가져와야 한다" name="useEvents 이벤트 목록을 성공적으로 가져와야 한다" time="0.082">
     </testcase>
-    <testcase classname="SecretPerksEditor submits the trimmed value when form is submitted" name="SecretPerksEditor submits the trimmed value when form is submitted" time="0.07">
+    <testcase classname="useEvents 쿼리 파라미터를 올바르게 전달해야 한다" name="useEvents 쿼리 파라미터를 올바르게 전달해야 한다" time="0.093">
+    </testcase>
+    <testcase classname="useEvents API 에러를 올바르게 처리해야 한다" name="useEvents API 에러를 올바르게 처리해야 한다" time="0.079">
+    </testcase>
+    <testcase classname="useEvent 특정 이벤트를 성공적으로 가져와야 한다" name="useEvent 특정 이벤트를 성공적으로 가져와야 한다" time="0.078">
+    </testcase>
+    <testcase classname="useEvent eventId가 없으면 쿼리를 실행하지 않아야 한다" name="useEvent eventId가 없으면 쿼리를 실행하지 않아야 한다" time="0.003">
+    </testcase>
+    <testcase classname="useEvent API 에러를 올바르게 처리해야 한다" name="useEvent API 에러를 올바르게 처리해야 한다" time="0.073">
+    </testcase>
+    <testcase classname="useUpcomingEvents 다가오는 이벤트를 성공적으로 가져와야 한다" name="useUpcomingEvents 다가오는 이벤트를 성공적으로 가져와야 한다" time="0.081">
+    </testcase>
+    <testcase classname="useUpcomingEvents 기본 limit 값이 3이어야 한다" name="useUpcomingEvents 기본 limit 값이 3이어야 한다" time="0.076">
+    </testcase>
+    <testcase classname="useUpcomingEvents API 에러를 올바르게 처리해야 한다" name="useUpcomingEvents API 에러를 올바르게 처리해야 한다" time="0.078">
     </testcase>
   </testsuite>
-  <testsuite name="communityService" errors="0" failures="0" skipped="0" timestamp="2025-09-22T10:35:35" time="0.51" tests="5">
-    <testcase classname="communityService getPosts builds query options and returns posts with pagination" name="communityService getPosts builds query options and returns posts with pagination" time="0.002">
+  <testsuite name="useCommunityPosts" errors="0" failures="0" skipped="0" timestamp="2025-09-22T11:31:21" time="1.149" tests="7">
+    <testcase classname="useCommunityPosts 커뮤니티 포스트 목록을 성공적으로 가져와야 한다" name="useCommunityPosts 커뮤니티 포스트 목록을 성공적으로 가져와야 한다" time="0.094">
     </testcase>
-    <testcase classname="communityService getPostById increments view count and returns post" name="communityService getPostById increments view count and returns post" time="0.001">
+    <testcase classname="useCommunityPosts 쿼리 파라미터를 올바르게 전달해야 한다" name="useCommunityPosts 쿼리 파라미터를 올바르게 전달해야 한다" time="0.081">
     </testcase>
-    <testcase classname="communityService createPost creates post with default author name when missing" name="communityService createPost creates post with default author name when missing" time="0.003">
+    <testcase classname="useCommunityPosts API 에러를 올바르게 처리해야 한다" name="useCommunityPosts API 에러를 올바르게 처리해야 한다" time="0.056">
     </testcase>
-    <testcase classname="communityService updatePostReaction toggles like reaction and updates counts" name="communityService updatePostReaction toggles like reaction and updates counts" time="0.002">
+    <testcase classname="usePopularPosts 인기 게시글을 성공적으로 가져와야 한다" name="usePopularPosts 인기 게시글을 성공적으로 가져와야 한다" time="0.096">
     </testcase>
-    <testcase classname="communityService updatePostReaction throws validation error when reaction is invalid" name="communityService updatePostReaction throws validation error when reaction is invalid" time="0">
+    <testcase classname="usePopularPosts 기본 limit 값이 10이어야 한다" name="usePopularPosts 기본 limit 값이 10이어야 한다" time="0.082">
+    </testcase>
+    <testcase classname="useRecentPosts 최신 게시글을 성공적으로 가져와야 한다" name="useRecentPosts 최신 게시글을 성공적으로 가져와야 한다" time="0.084">
+    </testcase>
+    <testcase classname="useRecentPosts 기본 limit 값이 10이어야 한다" name="useRecentPosts 기본 limit 값이 10이어야 한다" time="0.081">
     </testcase>
   </testsuite>
-  <testsuite name="communityController" errors="0" failures="0" skipped="0" timestamp="2025-09-22T10:35:36" time="0.538" tests="4">
-    <testcase classname="communityController returns categories from the service" name="communityController returns categories from the service" time="0.009">
+  <testsuite name="SecretPerksEditor" errors="0" failures="0" skipped="0" timestamp="2025-09-22T11:31:22" time="1.266" tests="2">
+    <testcase classname="SecretPerksEditor renders textarea with initial value and fires change handler" name="SecretPerksEditor renders textarea with initial value and fires change handler" time="0.269">
     </testcase>
-    <testcase classname="communityController delegates post retrieval to the service" name="communityController delegates post retrieval to the service" time="0.002">
+    <testcase classname="SecretPerksEditor submits the trimmed value when form is submitted" name="SecretPerksEditor submits the trimmed value when form is submitted" time="0.066">
+    </testcase>
+  </testsuite>
+  <testsuite name="Button" errors="0" failures="0" skipped="0" timestamp="2025-09-22T11:31:24" time="0.812" tests="8">
+    <testcase classname="Button 기본 버튼을 렌더링한다" name="Button 기본 버튼을 렌더링한다" time="0.022">
+    </testcase>
+    <testcase classname="Button 다양한 variant를 올바르게 적용한다" name="Button 다양한 variant를 올바르게 적용한다" time="0.008">
+    </testcase>
+    <testcase classname="Button 다양한 size를 올바르게 적용한다" name="Button 다양한 size를 올바르게 적용한다" time="0.024">
+    </testcase>
+    <testcase classname="Button 다양한 tone을 올바르게 적용한다" name="Button 다양한 tone을 올바르게 적용한다" time="0.016">
+    </testcase>
+    <testcase classname="Button 로딩 상태를 올바르게 처리한다" name="Button 로딩 상태를 올바르게 처리한다" time="0.013">
+    </testcase>
+    <testcase classname="Button disabled 상태를 올바르게 처리한다" name="Button disabled 상태를 올바르게 처리한다" time="0.002">
+    </testcase>
+    <testcase classname="Button ARIA 속성을 올바르게 전달한다" name="Button ARIA 속성을 올바르게 전달한다" time="0.001">
+    </testcase>
+    <testcase classname="Button asChild prop을 올바르게 처리한다" name="Button asChild prop을 올바르게 처리한다" time="0.004">
+    </testcase>
+  </testsuite>
+  <testsuite name="home normalizers" errors="0" failures="0" skipped="0" timestamp="2025-09-22T11:31:24" time="0.47" tests="6">
+    <testcase classname="home normalizers normalizes artist arrays returned directly from the API" name="home normalizers normalizes artist arrays returned directly from the API" time="0.002">
+    </testcase>
+    <testcase classname="home normalizers normalizes artists from a top-level data array" name="home normalizers normalizes artists from a top-level data array" time="0">
+    </testcase>
+    <testcase classname="home normalizers normalizes artists from nested keyed data containers" name="home normalizers normalizes artists from nested keyed data containers" time="0">
+    </testcase>
+    <testcase classname="home normalizers normalizes project arrays returned directly from the API" name="home normalizers normalizes project arrays returned directly from the API" time="0.001">
+    </testcase>
+    <testcase classname="home normalizers normalizes projects from a top-level data array" name="home normalizers normalizes projects from a top-level data array" time="0">
+    </testcase>
+    <testcase classname="home normalizers normalizes projects from nested keyed data containers" name="home normalizers normalizes projects from nested keyed data containers" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="communityController" errors="0" failures="0" skipped="0" timestamp="2025-09-22T11:31:25" time="0.434" tests="4">
+    <testcase classname="communityController returns categories from the service" name="communityController returns categories from the service" time="0.006">
+    </testcase>
+    <testcase classname="communityController delegates post retrieval to the service" name="communityController delegates post retrieval to the service" time="0.001">
     </testcase>
     <testcase classname="communityController creates post and responds with status 201" name="communityController creates post and responds with status 201" time="0.001">
     </testcase>
     <testcase classname="communityController passes errors to next middleware" name="communityController passes errors to next middleware" time="0">
     </testcase>
   </testsuite>
-  <testsuite name="fundingService.getProjects" errors="0" failures="0" skipped="0" timestamp="2025-09-22T10:35:36" time="0.674" tests="3">
-    <testcase classname="fundingService.getProjects maps API responses to FundingProject entities" name="fundingService.getProjects maps API responses to FundingProject entities" time="0.01">
+  <testsuite name="communityService" errors="0" failures="0" skipped="0" timestamp="2025-09-22T11:31:25" time="0.488" tests="5">
+    <testcase classname="communityService getPosts builds query options and returns posts with pagination" name="communityService getPosts builds query options and returns posts with pagination" time="0.006">
     </testcase>
-    <testcase classname="fundingService.getProjects filters projects without identifiers" name="fundingService.getProjects filters projects without identifiers" time="0.006">
+    <testcase classname="communityService getPostById increments view count and returns post" name="communityService getPostById increments view count and returns post" time="0.006">
     </testcase>
-    <testcase classname="fundingService.getProjects throws when the API responds with an error" name="fundingService.getProjects throws when the API responds with an error" time="0.054">
+    <testcase classname="communityService createPost creates post with default author name when missing" name="communityService createPost creates post with default author name when missing" time="0.006">
+    </testcase>
+    <testcase classname="communityService updatePostReaction toggles like reaction and updates counts" name="communityService updatePostReaction toggles like reaction and updates counts" time="0.002">
+    </testcase>
+    <testcase classname="communityService updatePostReaction throws validation error when reaction is invalid" name="communityService updatePostReaction throws validation error when reaction is invalid" time="0.001">
     </testcase>
   </testsuite>
-  <testsuite name="home normalizers" errors="0" failures="0" skipped="0" timestamp="2025-09-22T10:35:37" time="0.495" tests="6">
-    <testcase classname="home normalizers normalizes artist arrays returned directly from the API" name="home normalizers normalizes artist arrays returned directly from the API" time="0.005">
+  <testsuite name="fundingService.getProjects" errors="0" failures="0" skipped="0" timestamp="2025-09-22T11:31:26" time="0.551" tests="3">
+    <testcase classname="fundingService.getProjects maps API responses to FundingProject entities" name="fundingService.getProjects maps API responses to FundingProject entities" time="0.002">
     </testcase>
-    <testcase classname="home normalizers normalizes artists from a top-level data array" name="home normalizers normalizes artists from a top-level data array" time="0.001">
+    <testcase classname="fundingService.getProjects filters projects without identifiers" name="fundingService.getProjects filters projects without identifiers" time="0.001">
     </testcase>
-    <testcase classname="home normalizers normalizes artists from nested keyed data containers" name="home normalizers normalizes artists from nested keyed data containers" time="0.001">
-    </testcase>
-    <testcase classname="home normalizers normalizes project arrays returned directly from the API" name="home normalizers normalizes project arrays returned directly from the API" time="0">
-    </testcase>
-    <testcase classname="home normalizers normalizes projects from a top-level data array" name="home normalizers normalizes projects from a top-level data array" time="0.001">
-    </testcase>
-    <testcase classname="home normalizers normalizes projects from nested keyed data containers" name="home normalizers normalizes projects from nested keyed data containers" time="0">
+    <testcase classname="fundingService.getProjects throws when the API responds with an error" name="fundingService.getProjects throws when the API responds with an error" time="0.04">
     </testcase>
   </testsuite>
 </testsuites>

@@ -215,19 +215,6 @@ export const CreatePostPage: React.FC = () => {
             </CardHeader>
             <CardContent className='space-y-6'>
               <div>
-                <Label htmlFor='title' className='font-semibold text-red-500'>
-                  제목 <span className='text-red-500'>*</span>
-                </Label>
-                <Input
-                  id='title'
-                  value={formData.title}
-                  onChange={e => handleInputChange('title', e.target.value)}
-                  placeholder='게시글 제목을 입력하세요'
-                  required
-                />
-              </div>
-
-              <div>
                 <Label
                   htmlFor='category'
                   className='font-semibold text-red-500'
@@ -272,6 +259,19 @@ export const CreatePostPage: React.FC = () => {
                     </Button>
                   </div>
                 )}
+              </div>
+
+              <div>
+                <Label htmlFor='title' className='font-semibold text-red-500'>
+                  제목 <span className='text-red-500'>*</span>
+                </Label>
+                <Input
+                  id='title'
+                  value={formData.title}
+                  onChange={e => handleInputChange('title', e.target.value)}
+                  placeholder='게시글 제목을 입력하세요'
+                  required
+                />
               </div>
 
               <div>

@@ -2,6 +2,7 @@
 
 :root {
   /* Primary 색상 팔레트 */
+  --primary: #2563eb;
   --primary-50: 240 249 255;
   --primary-100: 219 234 254;
   --primary-200: 191 219 254;
@@ -95,6 +96,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     /* 다크 모드에서는 색상 팔레트를 반전 */
+    --primary: #3b82f6;
     --primary-50: 30 58 138;
     --primary-100: 30 64 175;
     --primary-200: 29 78 216;
