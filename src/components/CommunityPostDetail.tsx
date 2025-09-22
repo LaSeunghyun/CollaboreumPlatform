@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useAuth } from '../contexts/AuthContext';
-import { communityPostAPI, apiCall } from '../services/api';
+import { communityPostAPI } from '../services/api';
 import { ApiResponse } from '../types';
 import { useDeleteCommunityPost } from '../features/community/hooks/useCommunityPosts';
 import {
@@ -226,12 +226,13 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
 
     try {
       setIsLoading(true);
-      const response = (await apiCall(
-        `/community/posts/${postId}`,
-      )) as ApiResponse<PostDetail>;
+      const response = await communityPostAPI.getPost(postId);
+      const postData =
+        response && typeof response === 'object' && 'data' in response
+          ? (response as { data: PostDetail | null }).data
+          : (response as PostDetail | null);
 
-      if (response.success && response.data) {
-        const postData = response.data;
+      if (postData && typeof postData === 'object') {
 
         // 댓글 데이터를 안전하게 변환
         let transformedComments: Comment[] = [];
@@ -291,10 +292,12 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
           comments: transformedComments,
         };
         setPost(formattedPost);
+        setError('');
 
         // 사용자별 반응 상태 확인은 별도 useEffect에서 처리
       } else {
         setError('포스트를 불러올 수 없습니다.');
+        setPost(null);
       }
     } catch (error) {
       console.error('포스트 상세 조회 오류:', error);
@@ -314,6 +317,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         }
       }
 
+      setPost(null);
       setError(errorMessage);
     } finally {
       setIsLoading(false);
