@@ -42,22 +42,80 @@ const normalizeArray = (value: unknown): unknown[] => {
   return [];
 };
 
+const findArray = (value: unknown, key: string): unknown[] | null => {
+  const queue: unknown[] = [value];
+  const visited = new Set<unknown>();
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+
+    if (current === undefined || current === null) {
+      continue;
+    }
+
+    if (visited.has(current)) {
+      continue;
+    }
+
+    if (Array.isArray(current)) {
+      return current;
+    }
+
+    if (!isRecord(current)) {
+      continue;
+    }
+
+    visited.add(current);
+
+    const dataField = current.data;
+    if (Array.isArray(dataField)) {
+      return dataField;
+    }
+
+    const keyedField = current[key];
+    if (Array.isArray(keyedField)) {
+      return keyedField as unknown[];
+    }
+
+    const itemsField = current.items;
+    if (Array.isArray(itemsField)) {
+      return itemsField;
+    }
+
+    if (isRecord(dataField)) {
+      queue.push(dataField);
+    }
+
+    if (isRecord(keyedField)) {
+      queue.push(keyedField);
+    }
+  }
+
+  return null;
+};
+
 const pickList = (data: unknown, key: string): unknown[] => {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
   if (!isRecord(data)) {
     return [];
   }
 
-  const direct = data[key];
-  if (Array.isArray(direct)) {
-    return direct;
+  const fromData = findArray(data.data, key);
+  if (fromData) {
+    return fromData;
   }
 
-  const nested = data['data'];
-  if (isRecord(nested)) {
-    const nestedList = nested[key];
-    if (Array.isArray(nestedList)) {
-      return nestedList;
-    }
+  const fromKey = findArray(data[key], key);
+  if (fromKey) {
+    return fromKey;
+  }
+
+  const fromItems = findArray(data.items, key);
+  if (fromItems) {
+    return fromItems;
   }
 
   return [];
