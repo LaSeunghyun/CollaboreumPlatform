@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useAuth } from '../contexts/AuthContext';
-import { communityPostAPI, apiCall } from '../services/api';
+import { communityPostAPI } from '../services/api';
 import { ApiResponse } from '../types';
 import { useDeleteCommunityPost } from '../features/community/hooks/useCommunityPosts';
 import {
@@ -226,75 +226,117 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
 
     try {
       setIsLoading(true);
-      const response = (await apiCall(
-        `/community/posts/${postId}`,
-      )) as ApiResponse<PostDetail>;
+      const response = await communityPostAPI.getPost(postId);
 
-      if (response.success && response.data) {
-        const postData = response.data;
+      const unwrapDataLayer = (payload: unknown): unknown => {
+        let current = payload;
+        const seen = new Set<unknown>();
+
+        while (
+          current &&
+          typeof current === 'object' &&
+          'data' in (current as Record<string, unknown>) &&
+          !seen.has(current)
+        ) {
+          seen.add(current);
+          const next = (current as { data: unknown }).data;
+          if (next === current) {
+            break;
+          }
+          current = next;
+        }
+
+        return current;
+      };
+
+      const unwrapped = unwrapDataLayer(response);
+      const basePayload =
+        unwrapped && typeof unwrapped === 'object' && 'post' in unwrapped
+          ? (unwrapped as { post: unknown }).post
+          : unwrapped;
+
+      const rawComments = (() => {
+        if (unwrapped && typeof unwrapped === 'object' && 'comments' in unwrapped) {
+          return (unwrapped as { comments?: unknown }).comments;
+        }
+
+        if (basePayload && typeof basePayload === 'object' && 'comments' in basePayload) {
+          return (basePayload as { comments?: unknown }).comments;
+        }
+
+        return undefined;
+      })();
+
+      if (basePayload && typeof basePayload === 'object') {
+        const parseDate = (value: unknown): Date => {
+          const parsed = value ? new Date(value as string | number | Date) : new Date();
+          return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+        };
 
         // 댓글 데이터를 안전하게 변환
         let transformedComments: Comment[] = [];
 
-        if (postData.comments) {
-          if (Array.isArray(postData.comments)) {
+        if (rawComments) {
+          if (Array.isArray(rawComments)) {
             try {
-              transformedComments = transformComments(postData.comments);
+              transformedComments = transformComments(rawComments);
             } catch (error) {
               console.error('댓글 변환 오류:', error);
               transformedComments = [];
             }
           } else {
-            console.warn(
-              '댓글 데이터가 배열이 아닙니다:',
-              typeof postData.comments,
-            );
+            console.warn('댓글 데이터가 배열이 아닙니다:', typeof rawComments);
             transformedComments = [];
           }
         }
 
         const formattedPost: PostDetail = {
-          id: postData.id || (postData as any)._id || postId, // _id를 id로 매핑
-          title: postData.title || '',
-          category: postData.category || '',
+          id: (basePayload as any).id || (basePayload as any)._id || postId, // _id를 id로 매핑
+          title: (basePayload as any).title || '',
+          category: (basePayload as any).category || '',
           author:
-            typeof postData.author === 'string'
-              ? postData.author
-              : (postData.author as any)?.name || 'Unknown',
+            typeof (basePayload as any).author === 'string'
+              ? (basePayload as any).author
+              : (basePayload as any).author?.name || 'Unknown',
           authorId:
-            typeof postData.author === 'string'
-              ? postData.author
-              : (postData.author as any)?.id || postData.author,
-          content: postData.content || '',
-          images: Array.isArray(postData.images) ? postData.images : [],
-          timeAgo: formatDistanceToNow(new Date(postData.createdAt), {
+            typeof (basePayload as any).author === 'string'
+              ? (basePayload as any).author
+              : (basePayload as any).author?.id || (basePayload as any).author,
+          content: (basePayload as any).content || '',
+          images: Array.isArray((basePayload as any).images)
+            ? (basePayload as any).images
+            : [],
+          timeAgo: formatDistanceToNow(parseDate((basePayload as any).createdAt), {
             addSuffix: true,
             locale: ko,
           }),
-          replies: postData.replies || 0,
-          likes: Array.isArray(postData.likes)
-            ? postData.likes.length
-            : postData.likes || 0,
-          dislikes: Array.isArray(postData.dislikes)
-            ? postData.dislikes.length
-            : postData.dislikes || 0,
+          replies: (basePayload as any).replies || 0,
+          likes: Array.isArray((basePayload as any).likes)
+            ? (basePayload as any).likes.length
+            : (basePayload as any).likes || 0,
+          dislikes: Array.isArray((basePayload as any).dislikes)
+            ? (basePayload as any).dislikes.length
+            : (basePayload as any).dislikes || 0,
           isLiked: false,
           isDisliked: false,
           isHot:
-            (Array.isArray(postData.likes)
-              ? postData.likes.length
-              : postData.likes || 0) > 20,
-          viewCount: postData.views || postData.viewCount || 0,
-          views: postData.views || postData.viewCount || 0,
-          createdAt: new Date(postData.createdAt),
-          updatedAt: new Date(postData.updatedAt),
+            (Array.isArray((basePayload as any).likes)
+              ? (basePayload as any).likes.length
+              : (basePayload as any).likes || 0) > 20,
+          viewCount:
+            (basePayload as any).views || (basePayload as any).viewCount || 0,
+          views: (basePayload as any).views || (basePayload as any).viewCount || 0,
+          createdAt: parseDate((basePayload as any).createdAt),
+          updatedAt: parseDate((basePayload as any).updatedAt),
           comments: transformedComments,
         };
         setPost(formattedPost);
+        setError('');
 
         // 사용자별 반응 상태 확인은 별도 useEffect에서 처리
       } else {
         setError('포스트를 불러올 수 없습니다.');
+        setPost(null);
       }
     } catch (error) {
       console.error('포스트 상세 조회 오류:', error);
@@ -314,6 +356,7 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
         }
       }
 
+      setPost(null);
       setError(errorMessage);
     } finally {
       setIsLoading(false);
