@@ -112,7 +112,9 @@ const Helmet = ({ children }) => {
   return null;
 };
 
-module.exports = {
+exports.HelmetProvider = HelmetProvider;
+exports.Helmet = Helmet;
+exports.default = {
   HelmetProvider,
   Helmet,
 };

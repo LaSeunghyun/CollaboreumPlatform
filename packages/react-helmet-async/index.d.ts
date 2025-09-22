@@ -13,3 +13,8 @@ declare namespace HelmetAsync {
 
 export const HelmetProvider: React.FC<HelmetAsync.HelmetProviderProps>;
 export const Helmet: React.FC<HelmetAsync.HelmetProps>;
+declare const _default: {
+  HelmetProvider: typeof HelmetProvider;
+  Helmet: typeof Helmet;
+};
+export default _default;
