@@ -24,9 +24,12 @@ const renderWithQueryClient = (component: React.ReactElement) => {
 };
 
 describe('LiveAndPointsSection', () => {
-  const { useLiveStreams: mockUseLiveStreams } = await import(
-    '../lib/api/useLiveStreams'
-  );
+  let mockUseLiveStreams: jest.Mock;
+
+  beforeAll(async () => {
+    const module = await import('../lib/api/useLiveStreams');
+    mockUseLiveStreams = module.useLiveStreams as jest.Mock;
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();

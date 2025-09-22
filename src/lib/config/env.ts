@@ -7,6 +7,11 @@ const getImportMetaEnv = ():
       return undefined;
     }
 
+    // Jest 환경에서는 import.meta를 사용하지 않음
+    if (typeof process !== 'undefined' && process.env.JEST_WORKER_ID) {
+      return undefined;
+    }
+
     if (
       typeof import.meta !== 'undefined' &&
       typeof import.meta.env !== 'undefined'

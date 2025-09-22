@@ -1,7 +1,10 @@
-import { userAPI, fundingAPI, communityAPI } from '../services/api';
-
 // Mock fetch
 global.fetch = jest.fn();
+
+// Import API modules
+import { userAPI } from '../services/api/user';
+import { fundingAPI } from '../services/api/funding';
+import { communityAPI } from '../services/api/community';
 
 describe('API 서비스 테스트', () => {
   beforeEach(() => {
