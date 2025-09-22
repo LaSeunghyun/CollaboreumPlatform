@@ -5,7 +5,10 @@ import { render, waitFor } from '@testing-library/react';
 import { ArtistProfileRoute } from '../ArtistProfileRoute';
 import { EventDetailRoute } from '../EventDetailRoute';
 import { ProjectDetailRoute } from '../ProjectDetailRoute';
-import * as api from '@/services/api';
+import { artistAPI } from '@/services/api/artist';
+import { eventManagementAPI } from '@/services/api/events';
+import { fundingAPI } from '@/services/api/funding';
+import { interactionAPI } from '@/services/api/interaction';
 
 jest.mock('@/lib/api/useCategories', () => ({
   useCategories: () => ({ data: null }),
@@ -34,7 +37,7 @@ describe('Detail route wrappers', () => {
 
   it('calls artist API with handle from params', async () => {
     const getArtistSpy = jest
-      .spyOn(api.artistAPI, 'getArtistById')
+      .spyOn(artistAPI, 'getArtistById')
       .mockResolvedValue({
         success: true,
         data: {
@@ -70,20 +73,20 @@ describe('Detail route wrappers', () => {
 
   it('calls project API with slug from params', async () => {
     jest
-      .spyOn(api.fundingAPI, 'backProject')
+      .spyOn(fundingAPI, 'backProject')
       .mockResolvedValue({ success: true } as any);
     jest
-      .spyOn(api.fundingAPI, 'likeProject')
+      .spyOn(fundingAPI, 'likeProject')
       .mockResolvedValue({ success: true } as any);
     jest
-      .spyOn(api.fundingAPI, 'bookmarkProject')
+      .spyOn(fundingAPI, 'bookmarkProject')
       .mockResolvedValue({ success: true } as any);
     jest
-      .spyOn(api.interactionAPI, 'followArtist')
+      .spyOn(interactionAPI, 'followArtist')
       .mockResolvedValue({ success: true } as any);
 
     const getProjectSpy = jest
-      .spyOn(api.fundingAPI, 'getProject')
+      .spyOn(fundingAPI, 'getProject')
       .mockResolvedValue({
         success: true,
         data: {
@@ -122,20 +125,20 @@ describe('Detail route wrappers', () => {
 
   it('calls event API with id from params', async () => {
     jest
-      .spyOn(api.eventManagementAPI, 'joinEvent')
+      .spyOn(eventManagementAPI, 'joinEvent')
       .mockResolvedValue({ success: true } as any);
     jest
-      .spyOn(api.eventManagementAPI, 'leaveEvent')
+      .spyOn(eventManagementAPI, 'leaveEvent')
       .mockResolvedValue({ success: true } as any);
     jest
-      .spyOn(api.eventManagementAPI, 'likeEvent')
+      .spyOn(eventManagementAPI, 'likeEvent')
       .mockResolvedValue({ success: true } as any);
     jest
-      .spyOn(api.eventManagementAPI, 'bookmarkEvent')
+      .spyOn(eventManagementAPI, 'bookmarkEvent')
       .mockResolvedValue({ success: true } as any);
 
     const getEventSpy = jest
-      .spyOn(api.eventManagementAPI, 'getEvent')
+      .spyOn(eventManagementAPI, 'getEvent')
       .mockResolvedValue({
         success: true,
         data: {

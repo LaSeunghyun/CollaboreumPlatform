@@ -16,7 +16,8 @@ import {
 import { Heart, Star, MessageCircle, Share2, Bookmark } from 'lucide-react';
 import { ImageWithFallback } from './atoms/ImageWithFallback';
 import { PaymentModal, SecretPerksEditor } from '@/features/funding/components';
-import { fundingAPI, interactionAPI } from '@/services/api';
+import { fundingAPI } from '@/services/api/funding';
+import { interactionAPI } from '@/services/api/interaction';
 import { useCategories } from '@/lib/api/useCategories';
 import { getCategoryColor } from '@/constants/categories';
 import { getFirstChar } from '@/utils/typeGuards';

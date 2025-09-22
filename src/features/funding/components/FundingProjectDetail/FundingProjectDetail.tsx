@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { fundingAPI } from '@/services/api';
+import { fundingAPI } from '@/services/api/funding';
 import { useRetry } from '@/hooks/useRetry';
 import { ProjectHeader } from './ProjectHeader';
 import { ProjectTabs } from './ProjectTabs';
