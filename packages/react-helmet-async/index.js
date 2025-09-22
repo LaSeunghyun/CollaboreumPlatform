@@ -116,6 +116,10 @@ const helmetExports = {
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+exports.HelmetProvider = HelmetProvider;
+exports.Helmet = Helmet;
+exports.default = helmetExports;
+
 module.exports = helmetExports;
 module.exports.HelmetProvider = HelmetProvider;
 module.exports.Helmet = Helmet;
