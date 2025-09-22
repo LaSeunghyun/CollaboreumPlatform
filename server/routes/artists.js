@@ -36,9 +36,9 @@ async function calculateMonthlyEarnings(artistId) {
 
     for (const project of completedProjects) {
       // 아티스트 수익 계산 (플랫폼 수수료 제외)
-      const artistShare = project.revenueDistribution?.artistShare || 0.7;
+      const artistShare = project.revenueDistribution?.artistShare ?? 0.7;
       const totalRevenue =
-        project.revenueDistribution?.totalRevenue || project.currentAmount;
+        project.revenueDistribution?.totalRevenue ?? project.currentAmount;
       const artistEarnings = totalRevenue * artistShare;
 
       monthlyEarnings += artistEarnings;
@@ -905,3 +905,4 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 module.exports = router;
+module.exports.calculateMonthlyEarnings = calculateMonthlyEarnings;
