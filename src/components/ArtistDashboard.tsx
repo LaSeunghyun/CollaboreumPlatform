@@ -40,7 +40,7 @@ export function ArtistDashboard() {
         // API 서비스를 사용한 데이터 로드
         const [artistResponse, projectsResponse] = await Promise.all([
           artistAPI.getArtistById(user.id.toString()),
-          artistAPI.getProjects(parseInt(user.id)),
+          artistAPI.getProjects(user.id),
         ]);
 
         if ((artistResponse as any).success && (artistResponse as any).data) {

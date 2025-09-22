@@ -9,9 +9,7 @@ import {
   cleanInvalidTokens,
   getStoredAccessToken,
   getStoredRefreshToken,
-  getTokenSnapshot,
   persistTokens,
-  previewToken,
   resolveAuthTokenCandidates,
 } from '@/features/auth/services/tokenStorage';
 import { resolveApiBaseUrl } from '@/lib/config/env';
@@ -77,30 +75,9 @@ export class ApiClient {
     this.client.interceptors.request.use(
       config => {
         const token = getStoredAccessToken();
-        const refreshToken = getStoredRefreshToken();
-
-        // 디버깅을 위한 로그
-        console.log('🔍 API Request Debug:', {
-          url: config.url,
-          accessToken: previewToken(token),
-          refreshToken: previewToken(refreshToken),
-          headers: config.headers,
-        });
-
-        // localStorage 전체 상태 확인
-        const snapshot = getTokenSnapshot();
-        console.log('🔍 localStorage 전체 상태:', {
-          keys: snapshot.keys,
-          authToken: previewToken(snapshot.authToken),
-          accessToken: previewToken(snapshot.accessToken),
-          refreshToken: previewToken(snapshot.refreshToken),
-        });
-
         if (token) {
           config.headers = config.headers ?? {};
           config.headers.Authorization = `Bearer ${token}`;
-        } else {
-          console.warn('⚠️ No auth token found in localStorage');
         }
         return config;
       },
@@ -115,7 +92,6 @@ export class ApiClient {
           const refreshToken = getStoredRefreshToken();
           if (refreshToken) {
             try {
-              console.log('🔄 Attempting token refresh...');
               const response = await fetch(
                 `${this.client.defaults.baseURL}/auth/refresh`,
                 {
@@ -140,11 +116,6 @@ export class ApiClient {
                   });
 
                   if (storedTokens.accessToken) {
-                    console.log('✅ Token refreshed successfully', {
-                      accessToken: previewToken(storedTokens.accessToken),
-                      refreshToken: previewToken(storedTokens.refreshToken),
-                    });
-
                     const originalRequest = error.config;
                     if (originalRequest) {
                       originalRequest.headers = originalRequest.headers ?? {};

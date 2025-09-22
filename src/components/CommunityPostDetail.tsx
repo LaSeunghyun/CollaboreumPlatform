@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '../shared/ui/Button';
 import { Input } from './ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -10,7 +10,6 @@ import { ApiResponse } from '../types';
 import { useDeleteCommunityPost } from '../features/community/hooks/useCommunityPosts';
 import {
   usePostReaction,
-  useIncrementPostViews,
 } from '../lib/api/useCommunityReactions';
 import {
   useCreateComment,
@@ -157,7 +156,6 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
   const { requireAuth } = useAuthRedirect();
   const deletePostMutation = useDeleteCommunityPost();
   const postReactionMutation = usePostReaction();
-  const incrementViewsMutation = useIncrementPostViews();
   const createCommentMutation = useCreateComment();
   const deleteCommentMutation = useDeleteComment();
   const createReplyMutation = useCreateReply();
@@ -176,9 +174,6 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [copiedLink, setCopiedLink] = useState(false);
-
-  // 조회수 증가 추적을 위한 ref
-  const viewCountIncremented = useRef(false);
 
   // 링크 복사 기능
   const handleCopyLink = async () => {
@@ -322,22 +317,6 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
       setIsLoading(false);
     }
   }, [postId]); // user 의존성 제거
-
-  // 조회수 증가 함수
-  const incrementViewCount = useCallback(() => {
-    if (!postId || postId === 'undefined' || viewCountIncremented.current) {
-      return;
-    }
-
-    viewCountIncremented.current = true;
-    incrementViewsMutation.mutate(postId, {
-      onError: error => {
-        console.error('조회수 증가 실패:', error);
-        // 실패 시 다시 시도할 수 있도록 플래그 리셋
-        viewCountIncremented.current = false;
-      },
-    });
-  }, [postId]);
 
   const handleLike = () => {
     requireAuth(() => {
@@ -587,9 +566,6 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
       return;
     }
 
-    // postId가 변경되면 조회수 증가 플래그 리셋
-    viewCountIncremented.current = false;
-
     // 현재 페이지 정보를 세션 스토리지에 저장
     const currentPage = window.location.href;
     const previousPage = sessionStorage.getItem('currentPage');
@@ -601,11 +577,6 @@ export const CommunityPostDetail: React.FC<CommunityPostDetailProps> = ({
     sessionStorage.setItem('currentPage', currentPage);
 
     fetchPostDetail();
-
-    // 조회수 증가 (한 번만 실행)
-    if (!viewCountIncremented.current) {
-      incrementViewCount();
-    }
 
     // 브라우저 뒤로가기 버튼 처리
     const handlePopState = () => {

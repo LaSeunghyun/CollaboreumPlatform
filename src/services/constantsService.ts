@@ -8,23 +8,28 @@ export class DynamicConstantsService {
   private statusColorsCache: StatusColors | null = null;
   private statusIconsCache: StatusIcons | null = null;
   private cacheExpiry = 5 * 60 * 1000; // 5분
-  private lastFetch = 0;
+  private enumsLastFetch = 0;
+  private statusColorsLastFetch = 0;
+  private statusIconsLastFetch = 0;
 
   // 캐시가 유효한지 확인
-  private isCacheValid(): boolean {
-    return Date.now() - this.lastFetch < this.cacheExpiry;
+  private isCacheValid(lastFetch: number): boolean {
+    if (!lastFetch) {
+      return false;
+    }
+    return Date.now() - lastFetch < this.cacheExpiry;
   }
 
   // 모든 enum 값들을 가져오기
   async getEnums(): Promise<Enums> {
-    if (this.enumsCache && this.isCacheValid()) {
+    if (this.enumsCache && this.isCacheValid(this.enumsLastFetch)) {
       return this.enumsCache;
     }
 
     try {
       const response = (await constantsAPI.getEnums()) as any;
       this.enumsCache = response.data || this.getDefaultEnums();
-      this.lastFetch = Date.now();
+      this.enumsLastFetch = Date.now();
       return this.enumsCache!;
     } catch (error) {
       console.error('Enum 값들을 가져오는 중 오류 발생:', error);
@@ -35,13 +40,16 @@ export class DynamicConstantsService {
 
   // 상태별 색상을 가져오기
   async getStatusColors(): Promise<StatusColors> {
-    if (this.statusColorsCache && this.isCacheValid()) {
+    if (
+      this.statusColorsCache &&
+      this.isCacheValid(this.statusColorsLastFetch)
+    ) {
       return this.statusColorsCache;
     }
 
     try {
       this.statusColorsCache = await constantsService.getStatusColors();
-      this.lastFetch = Date.now();
+      this.statusColorsLastFetch = Date.now();
       return this.statusColorsCache;
     } catch (error) {
       console.error('상태 색상을 가져오는 중 오류 발생:', error);
@@ -51,14 +59,17 @@ export class DynamicConstantsService {
 
   // 상태별 아이콘을 가져오기
   async getStatusIcons(): Promise<StatusIcons> {
-    if (this.statusIconsCache && this.isCacheValid()) {
+    if (
+      this.statusIconsCache &&
+      this.isCacheValid(this.statusIconsLastFetch)
+    ) {
       return this.statusIconsCache;
     }
 
     try {
       const response = (await constantsAPI.getStatusIcons()) as any;
       this.statusIconsCache = response.data || this.getDefaultStatusIcons();
-      this.lastFetch = Date.now();
+      this.statusIconsLastFetch = Date.now();
       return this.statusIconsCache!;
     } catch (error) {
       console.error('상태 아이콘을 가져오는 중 오류 발생:', error);
@@ -263,7 +274,9 @@ export class DynamicConstantsService {
     this.enumsCache = null;
     this.statusColorsCache = null;
     this.statusIconsCache = null;
-    this.lastFetch = 0;
+    this.enumsLastFetch = 0;
+    this.statusColorsLastFetch = 0;
+    this.statusIconsLastFetch = 0;
   }
 
   // 기본값들
