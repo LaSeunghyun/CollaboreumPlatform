@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, CardContent } from './ui/card';
-import { Badge } from './ui/badge';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import { Button } from '../shared/ui/Button';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/shadcn/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/shadcn/tabs';
 import {
   ArrowLeft,
   Users,
@@ -13,7 +13,7 @@ import {
   Heart,
   TrendingUp,
 } from 'lucide-react';
-import { ImageWithFallback } from './atoms/ImageWithFallback';
+import { ImageWithFallback } from '@/shared/ui/ImageWithFallback';
 import { useEffect, useState } from 'react';
 import { artistAPI } from '../services/api/artist';
 import { getFirstChar } from '../utils/typeGuards';

@@ -6,7 +6,7 @@ import {
   mapRevenueDistribution,
   mapRewards,
   mapUpdates,
-} from '@/services/fundingProjectMapper';
+} from '@/api/mappers/fundingProjectMapper';
 import type { FundingProjectPayload } from '@/types/fundingProject';
 
 describe('fundingProjectMapper', () => {

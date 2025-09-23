@@ -8,21 +8,21 @@ import {
   Plus,
   Eye,
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@/components/ui/tabs';
+} from '@/shared/ui/shadcn/tabs';
 import { LoadingState, ErrorState } from '@/components/organisms/States';
 import { PasswordChangeForm } from '../components/PasswordChangeForm';
 import { ProfileEditForm } from '../components/ProfileEditForm';
 import type { Project, Revenue, UserProfile } from '../types/profile';
 import { useAuth } from '@/contexts/AuthContext';
-import { artistAPI } from '@/services/api/artist';
-import { dynamicConstantsService } from '@/services/constantsService';
+import { artistAPI } from '@/api/modules/artist';
+import { dynamicConstantsService } from '@/api/services/constantsService';
 import { Button } from '@/shared/ui/Button';
 import type { ApiResponse } from '@/types';
 

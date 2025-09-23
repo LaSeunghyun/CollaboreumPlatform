@@ -5,18 +5,18 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '../../components/ui/card';
+} from '@/shared/ui/shadcn/card';
 import { Button } from '../../shared/ui/Button';
-import { Input } from '../../components/ui/input';
-import { Textarea } from '../../components/ui/textarea';
-import { Label } from '../../components/ui/label';
+import { Input } from '@/shared/ui/shadcn/input';
+import { Textarea } from '@/shared/ui/shadcn/textarea';
+import { Label } from '@/shared/ui/shadcn/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../components/ui/select';
+} from '@/shared/ui/shadcn/select';
 import { ArrowLeft, Upload, Palette, Tag, DollarSign } from 'lucide-react';
 import { galleryAPI } from '../../services/api/gallery';
 import { useAuth } from '../../contexts/AuthContext';

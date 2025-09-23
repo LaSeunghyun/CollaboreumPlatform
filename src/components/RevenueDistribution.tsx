@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { Progress } from './ui/progress';
+import { Button } from '@/shared/ui/shadcn/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
+import { Progress } from '@/shared/ui/shadcn/progress';
 import {
   DollarSign,
   CheckCircle,

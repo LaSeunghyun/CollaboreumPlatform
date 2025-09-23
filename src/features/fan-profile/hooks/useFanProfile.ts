@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { differenceInCalendarDays, formatDistanceToNow } from 'date-fns';
 
-import { userProfileAPI } from '@/services/api/user';
+import { userProfileAPI } from '@/api/modules/user';
 
 const toNumber = (value: unknown): number => {
   const parsed = Number(value);

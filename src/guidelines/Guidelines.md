@@ -23,7 +23,7 @@ Collaboreum은 독립 아티스트와 팬이 협업 및 후원을 통해 지속 
 
 ### 3. UI 컴포넌트 개발
 
-- **UI 컴포넌트는 `@/shared/ui/*`만 사용**: `src/components/ui/*` 직접 import 금지
+- **UI 컴포넌트는 `@/shared/ui/*`만 사용**: `src/components/ui/*` 직접 import 금지 (Shadcn 프리미티브는 `@/shared/ui/shadcn/*`)
 - **색상 사용 규칙**: CSS 변수만 사용, Hex/RGB/HSL 직접 사용 금지
 - **CVA 패턴 사용**: class-variance-authority 패턴으로 variant, size, tone 속성 표준화
 - **접근성 규칙**: WCAG AA 기준 충족, ARIA 속성 완비, 키보드 네비게이션 지원

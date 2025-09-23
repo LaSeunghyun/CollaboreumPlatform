@@ -2,19 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { Shield, Lock, LogOut, TrendingUp, Users } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@/components/ui/tabs';
+} from '@/shared/ui/shadcn/tabs';
 import { PasswordChangeForm } from '../components/PasswordChangeForm';
 import { ProfileEditForm } from '../components/ProfileEditForm';
 import type { UserProfile } from '../types/profile';
 import { useAuth } from '@/contexts/AuthContext';
-import { userAPI } from '@/services/api/user';
+import { userAPI } from '@/api/modules/user';
 import { Button } from '@/shared/ui/Button';
 
 export const AdminMyPage: React.FC = () => {

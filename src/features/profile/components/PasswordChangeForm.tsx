@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/shared/ui/shadcn/input';
 import { Button } from '@/shared/ui/Button';
 import type { PasswordChangeFormValues } from '../types/profile';
 

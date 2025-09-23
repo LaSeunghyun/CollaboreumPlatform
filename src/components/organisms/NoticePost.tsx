@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from '../ui/badge';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import { Eye, Calendar, AlertCircle } from 'lucide-react';
 
 interface NoticePostProps {

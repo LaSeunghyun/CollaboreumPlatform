@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent } from './ui/card';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
 import { Calendar, Image, Trophy, Headphones, ArrowRight } from 'lucide-react';
 
 interface QuickLinksSectionProps {

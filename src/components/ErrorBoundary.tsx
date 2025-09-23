@@ -1,7 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '../shared/ui/Button';
-import { Card, CardContent } from './ui/card';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
 
 interface Props {
   children: ReactNode;

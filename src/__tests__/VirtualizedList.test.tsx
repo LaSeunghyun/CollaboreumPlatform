@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { VirtualizedList } from '../components/ui/VirtualizedList';
+import { VirtualizedList } from '@/shared/ui/shadcn/VirtualizedList';
 
 describe('VirtualizedList', () => {
   const mockItems = Array.from({ length: 100 }, (_, i) => ({

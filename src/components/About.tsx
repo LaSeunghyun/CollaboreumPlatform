@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '../shared/ui/Button';
-import { Card, CardContent } from './ui/card';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
 import {
   TrendingUp,
   Award,
@@ -12,7 +12,7 @@ import {
   DollarSign,
   Heart,
 } from 'lucide-react';
-import { StatCard } from './ui/StatCard';
+import { StatCard } from '@/shared/ui/shadcn/StatCard';
 import { useQuery } from '@tanstack/react-query';
 import { statsAPI } from '../services/api/stats';
 

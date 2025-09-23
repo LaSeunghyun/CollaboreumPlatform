@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent } from '../ui/card';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
 import { Button } from '../../shared/ui/Button';
 import {
   Loader2,

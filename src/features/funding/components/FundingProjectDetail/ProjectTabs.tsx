@@ -1,8 +1,8 @@
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/shadcn/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
+import { Avatar, AvatarFallback } from '@/shared/ui/shadcn/avatar';
 import { FileText, DollarSign, CheckCircle, TrendingUp } from 'lucide-react';
 import { FundingProject } from '@/types/fundingProject';
 

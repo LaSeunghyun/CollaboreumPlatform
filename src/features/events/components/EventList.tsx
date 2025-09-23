@@ -2,16 +2,16 @@ import React from 'react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { CalendarIcon, Eye, MapPin, Search, UserPlus, Users } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
+import { Input } from '@/shared/ui/shadcn/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+} from '@/shared/ui/shadcn/select';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import { Button } from '@/shared/ui/Button';
 import { Event, EventCategoryOption } from '@/features/events/types/event';
 

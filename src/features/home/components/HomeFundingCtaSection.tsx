@@ -1,7 +1,7 @@
 import React from 'react';
 import { TrendingUp } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
 
 interface HomeFundingCtaSectionProps {
   onExploreProjects: () => void;

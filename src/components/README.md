@@ -2,6 +2,9 @@
 
 ⚠️ **중요**: 이 폴더는 점진 마이그레이션 대상입니다.
 
+- `src/components/ui/*` 하위의 Shadcn UI 구현은 모두 `src/shared/ui/shadcn/*` 으로 이동했습니다.
+- 새 UI 작성 시에는 `@/shared/ui` 또는 `@/shared/ui/shadcn` 경로만 사용하세요.
+
 ## 규칙
 
 - **신규 UI 컴포넌트는 `src/shared/ui`에서만 생성하세요**
@@ -22,11 +25,12 @@ import { Button } from '@/shared/ui/Button';
 
 ## 컴포넌트 매핑표
 
-| 기존 (src/components) | 신규 (src/shared/ui) | 상태              |
-| --------------------- | -------------------- | ----------------- |
-| Button\*              | @/shared/ui/Button   | 마이그레이션 예정 |
-| Modal\*               | @/shared/ui/Modal    | 마이그레이션 예정 |
-| Input*, TextField*    | @/shared/ui/Input    | 마이그레이션 예정 |
-| Tag*, Chip*           | @/shared/ui/Badge    | 마이그레이션 예정 |
-| Panel*, Card*         | @/shared/ui/Card     | 마이그레이션 예정 |
-| Select*, Dropdown*    | @/shared/ui/Select   | 마이그레이션 예정 |
+| 기존 (src/components) | 신규 (src/shared/ui)           | 상태         |
+| --------------------- | ------------------------------ | ------------ |
+| Button\*              | @/shared/ui/Button             | ✅ 완료       |
+| Modal\*               | @/shared/ui/Modal              | ✅ 완료       |
+| Input*, TextField*    | @/shared/ui/Input              | ✅ 완료       |
+| Tag*, Chip*           | @/shared/ui/Badge              | ✅ 완료       |
+| Panel*, Card*         | @/shared/ui/Card               | ✅ 완료       |
+| Select*, Dropdown*    | @/shared/ui/Select             | ✅ 완료       |
+| Shadcn primitives     | @/shared/ui/shadcn/*           | ✅ 이동 완료 |

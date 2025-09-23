@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import { Button } from '../shared/ui/Button';
-import { Input } from './ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Input } from '@/shared/ui/shadcn/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/shadcn/avatar';
 import { Search, Filter, MessageCircle, Heart, ArrowLeft } from 'lucide-react';
 import { communityAPI } from '../services/api/community';
 import { userAPI } from '../services/api/user';

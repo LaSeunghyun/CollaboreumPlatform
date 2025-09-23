@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { ArrowLeft } from 'lucide-react';
 
 import { Button } from '@/shared/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { CommentComposer } from '@/features/community/components/CommentComposer';
 import { CommentThread } from '@/features/community/components/CommentThread';

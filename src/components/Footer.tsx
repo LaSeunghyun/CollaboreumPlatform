@@ -1,5 +1,5 @@
 import { Button } from '../shared/ui/Button';
-import { Input } from './ui/input';
+import { Input } from '@/shared/ui/shadcn/input';
 import { Instagram, Twitter, Youtube, Facebook } from 'lucide-react';
 
 export function Footer() {

@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { Button } from '../shared/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { Progress } from './ui/progress';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Textarea } from './ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
+import { Progress } from '@/shared/ui/shadcn/progress';
+import { Input } from '@/shared/ui/shadcn/input';
+import { Label } from '@/shared/ui/shadcn/label';
+import { Textarea } from '@/shared/ui/shadcn/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from './ui/select';
+} from '@/shared/ui/shadcn/select';
 import {
   TrendingUp,
   CheckCircle,

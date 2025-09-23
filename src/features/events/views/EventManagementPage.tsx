@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/shadcn/tabs';
 import { EventCreationForm } from '@/features/events/components/EventCreationForm';
 import { EventList } from '@/features/events/components/EventList';
 import { MyEventsList } from '@/features/events/components/MyEventsList';

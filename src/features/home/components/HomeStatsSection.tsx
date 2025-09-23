@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatCard } from '@/components/ui/StatCard';
+import { StatCard } from '@/shared/ui/shadcn/StatCard';
 import type { HomeStatItem } from '../types';
 
 interface HomeStatsSectionProps {

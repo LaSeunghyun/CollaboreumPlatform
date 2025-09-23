@@ -1,7 +1,7 @@
 import React from 'react';
 import { Users2 } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
 import { ArtistCard } from '@/components/molecules/ArtistCard';
 import { SkeletonGrid } from '@/components/organisms/States';
 import type { ArtistSummary } from '../types';

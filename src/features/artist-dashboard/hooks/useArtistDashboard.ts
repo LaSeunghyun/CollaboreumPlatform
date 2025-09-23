@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { artistAPI } from '@/services/api/artist';
+import { artistAPI } from '@/api/modules/artist';
 import {
   calculateProgress,
   formatCountWithUnit,

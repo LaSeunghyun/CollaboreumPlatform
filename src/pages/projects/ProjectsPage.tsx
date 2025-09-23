@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../shared/ui/Button';
-import { SegmentedTabs } from '../../components/ui/SegmentedTabs';
+import { SegmentedTabs } from '@/shared/ui/shadcn/SegmentedTabs';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../components/ui/select';
-import { Badge } from '../../components/ui/badge';
+} from '@/shared/ui/shadcn/select';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import { Plus, Clock, Star, TrendingUp } from 'lucide-react';
 import { FundingProjectCard } from '../../components/molecules/FundingProjectCard';
 import { useProjects } from '../../lib/api/useProjects';

@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { resolveApiBaseUrl } from '@/lib/config/env';
 import { getStoredAccessToken } from '@/features/auth/services/tokenStorage';
 import { Button } from '../shared/ui/Button';
-import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
+import { Input } from '@/shared/ui/shadcn/input';
+import { Textarea } from '@/shared/ui/shadcn/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from './ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Label } from './ui/label';
+} from '@/shared/ui/shadcn/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
+import { Label } from '@/shared/ui/shadcn/label';
 import { useAuth } from '../contexts/AuthContext';
 import { communityApi } from '../features/community/api/communityApi';
 import { User } from '../types';

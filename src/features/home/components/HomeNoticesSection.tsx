@@ -1,8 +1,8 @@
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
 import { LoadingState } from '@/components/organisms/States';
 import type { NoticeSummary } from '../types';
 

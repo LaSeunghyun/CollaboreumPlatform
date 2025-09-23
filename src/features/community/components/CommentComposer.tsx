@@ -1,8 +1,8 @@
 import { FC, FormEvent, ChangeEvent } from 'react';
 
 import { Button } from '@/shared/ui/Button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/shadcn/avatar';
+import { Input } from '@/shared/ui/shadcn/input';
 
 import { getFirstChar } from '@/utils/typeGuards';
 

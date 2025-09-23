@@ -1,10 +1,10 @@
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent } from '../ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/shadcn/avatar';
+import { Badge } from '@/shared/ui/shadcn/badge';
+import { Button } from '@/shared/ui/shadcn/button';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
 import { Heart, Users } from 'lucide-react';
-import { ImageWithFallback } from '../atoms/ImageWithFallback';
+import { ImageWithFallback } from '@/shared/ui/ImageWithFallback';
 import { ShareButton } from '../atoms/ShareButton';
 
 interface ArtistCardProps {

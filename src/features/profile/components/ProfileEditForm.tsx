@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/shadcn/avatar';
+import { Input } from '@/shared/ui/shadcn/input';
+import { Textarea } from '@/shared/ui/shadcn/textarea';
 import { Button } from '@/shared/ui/Button';
 import { getFirstChar } from '@/utils/typeGuards';
 import type { UserProfile } from '../types/profile';

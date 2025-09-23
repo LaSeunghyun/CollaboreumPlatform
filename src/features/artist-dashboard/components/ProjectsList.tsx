@@ -1,7 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import { Button } from '@/shared/ui/Button';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@/shared/ui/shadcn/progress';
 import { Edit, Trash2 } from 'lucide-react';
 import { ProjectCardData } from '@/features/artist-dashboard/hooks/useArtistDashboard';
 

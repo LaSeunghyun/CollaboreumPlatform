@@ -14,10 +14,10 @@ import {
   TabsTrigger,
 } from '@/shared/ui';
 import { Heart, Star, MessageCircle, Share2, Bookmark } from 'lucide-react';
-import { ImageWithFallback } from './atoms/ImageWithFallback';
+import { ImageWithFallback } from '@/shared/ui/ImageWithFallback';
 import { PaymentModal, SecretPerksEditor } from '@/features/funding/components';
-import { fundingAPI } from '@/services/api/funding';
-import { interactionAPI } from '@/services/api/interaction';
+import { fundingAPI } from '@/api/modules/funding';
+import { interactionAPI } from '@/api/modules/interaction';
 import { useCategories } from '@/lib/api/useCategories';
 import { getCategoryColor } from '@/constants/categories';
 import { getFirstChar } from '@/utils/typeGuards';

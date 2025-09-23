@@ -13,8 +13,8 @@ import {
   DollarSign,
   Heart,
 } from 'lucide-react';
-import { ImageWithFallback } from './atoms/ImageWithFallback';
-import { StatCard } from './ui/StatCard';
+import { ImageWithFallback } from '@/shared/ui/ImageWithFallback';
+import { StatCard } from '@/shared/ui/shadcn/StatCard';
 import { useState } from 'react';
 import { usePlatformStats } from '../lib/api/useStats';
 import { useArtists } from '../lib/api/useArtists';

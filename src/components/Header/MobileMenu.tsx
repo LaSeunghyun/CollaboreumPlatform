@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button } from '../ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Button } from '@/shared/ui/shadcn/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/shadcn/avatar';
 import { User, Search, Bell } from 'lucide-react';
 import { NAVIGATION_ITEMS } from './constants';
 import { getRoleBadge, getUserAvatar } from './utils';

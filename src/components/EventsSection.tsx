@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent } from './ui/card';
-import { Badge } from './ui/badge';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import { Button } from '../shared/ui/Button';
 import {
   Calendar,
@@ -12,15 +12,15 @@ import {
   Search,
   ChevronLeft,
 } from 'lucide-react';
-import { Input } from './ui/input';
+import { Input } from '@/shared/ui/shadcn/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from './ui/select';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+} from '@/shared/ui/shadcn/select';
+import { ImageWithFallback } from '@/shared/ui/ImageWithFallback';
 
 const events = [
   {

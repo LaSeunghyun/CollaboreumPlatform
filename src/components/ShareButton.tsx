@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from './ui/button';
+import { Button } from '@/shared/ui/shadcn/button';
 import { Link, Share, Check } from 'lucide-react';
 
 interface ShareButtonProps {

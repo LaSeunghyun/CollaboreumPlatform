@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/shared/ui/shadcn/button';
+import { Badge } from '@/shared/ui/shadcn/badge';
+import { Progress } from '@/shared/ui/shadcn/progress';
+import { Avatar, AvatarFallback } from '@/shared/ui/shadcn/avatar';
 import {
   ArrowLeft,
   Heart,

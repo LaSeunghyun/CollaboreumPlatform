@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { Button } from '../../shared/ui/Button';
-import { Input } from '../../components/ui/input';
+import { Input } from '@/shared/ui/shadcn/input';
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '../../components/ui/tabs';
+} from '@/shared/ui/shadcn/tabs';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../components/ui/select';
+} from '@/shared/ui/shadcn/select';
 import {
   Search,
   Palette,
@@ -42,7 +42,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '../../components/ui/card';
+} from '@/shared/ui/shadcn/card';
 import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 export const ArtistsPage: React.FC = () => {

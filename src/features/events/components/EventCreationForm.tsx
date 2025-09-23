@@ -2,18 +2,18 @@ import React from 'react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
+import { Input } from '@/shared/ui/shadcn/input';
+import { Textarea } from '@/shared/ui/shadcn/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
+} from '@/shared/ui/shadcn/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/shadcn/popover';
+import { Calendar } from '@/shared/ui/shadcn/calendar';
 import { Button } from '@/shared/ui/Button';
 import {
   EventCategoryOption,

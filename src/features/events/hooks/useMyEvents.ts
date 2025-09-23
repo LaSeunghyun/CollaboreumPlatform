@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { eventManagementAPI } from '@/services/api/events';
+import { eventManagementAPI } from '@/api/modules/events';
 import { Event } from '@/features/events/types/event';
 
 export const useMyEvents = () => {

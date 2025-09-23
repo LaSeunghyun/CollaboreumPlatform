@@ -1,5 +1,5 @@
 import React from 'react';
-import { Toaster } from '../ui/sonner';
+import { Toaster } from '@/shared/ui/shadcn/sonner';
 
 export const Toast: React.FC = () => {
   return (

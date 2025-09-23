@@ -2,14 +2,14 @@ import { FC } from 'react';
 import { Eye, MoreVertical, Share2, Trash2, Copy } from 'lucide-react';
 
 import { Button } from '@/shared/ui/Button';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { CardHeader, CardTitle } from '@/components/ui/card';
+} from '@/shared/ui/shadcn/dropdown-menu';
+import { CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
 
 import { getUsername } from '@/utils/typeGuards';
 import { CommunityPostDetailData } from '../hooks/useCommunityPostDetail';

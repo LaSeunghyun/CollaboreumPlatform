@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Badge } from '../../components/ui/badge';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import { Calendar } from 'lucide-react';
 import { EventCard } from '../../components/molecules/EventCard';
 import { useEvents } from '../../lib/api/useEvents';

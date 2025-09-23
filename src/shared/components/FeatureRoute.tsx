@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { isFeatureEnabled } from '../features/flags';
-import { EmptyState } from '../ui/EmptyState';
+import { EmptyState } from '@/shared/ui/EmptyState';
 import { Construction } from 'lucide-react';
 
 interface FeatureRouteProps {

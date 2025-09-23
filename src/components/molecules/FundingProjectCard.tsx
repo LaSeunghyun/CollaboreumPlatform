@@ -1,10 +1,10 @@
 import React from 'react';
-import { Badge } from '../ui/badge';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import { Button } from '../../shared/ui/Button';
-import { Card, CardContent } from '../ui/card';
-import { Progress } from '../ui/progress';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
+import { Progress } from '@/shared/ui/shadcn/progress';
 import { Clock, Users } from 'lucide-react';
-import { ImageWithFallback } from '../atoms/ImageWithFallback';
+import { ImageWithFallback } from '@/shared/ui/ImageWithFallback';
 import { ShareButton } from '../atoms/ShareButton';
 
 interface FundingProjectCardProps {

@@ -28,7 +28,7 @@ import {
   Camera,
   Building,
 } from 'lucide-react';
-import { ImageWithFallback } from './atoms/ImageWithFallback';
+import { ImageWithFallback } from '@/shared/ui/ImageWithFallback';
 import {
   useGalleryArtworks,
   useGalleryCategories,

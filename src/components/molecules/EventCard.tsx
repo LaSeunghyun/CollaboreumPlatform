@@ -1,9 +1,9 @@
 import React from 'react';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent } from '../ui/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
+import { Button } from '@/shared/ui/shadcn/button';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
 import { Calendar, MapPin, Users, Clock } from 'lucide-react';
-import { ImageWithFallback } from '../atoms/ImageWithFallback';
+import { ImageWithFallback } from '@/shared/ui/ImageWithFallback';
 
 interface EventCardProps {
   id: string;

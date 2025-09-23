@@ -1,8 +1,8 @@
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
+import { Card } from '@/shared/ui/shadcn/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import { Button } from '../shared/ui/Button';
 import { Star, ExternalLink, Play, Users } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { ImageWithFallback } from '@/shared/ui/ImageWithFallback';
 
 const artists = [
   {

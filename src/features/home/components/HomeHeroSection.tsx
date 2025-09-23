@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/shared/ui/shadcn/input';
 
 interface HomeHeroSectionProps {
   searchQuery: string;

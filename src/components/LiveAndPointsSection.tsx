@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, CardContent } from './ui/card';
-import { Badge } from './ui/badge';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import { Button } from '../shared/ui/Button';
 import { Play, Radio, Eye, Calendar, Users } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { ImageWithFallback } from '@/shared/ui/ImageWithFallback';
 
 const liveStreams = [
   {

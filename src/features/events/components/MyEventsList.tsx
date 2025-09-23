@@ -2,7 +2,7 @@ import React from 'react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { CalendarIcon, Edit, Eye, MapPin, Users } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
 import { Button } from '@/shared/ui/Button';
 import { Event } from '@/features/events/types/event';
 

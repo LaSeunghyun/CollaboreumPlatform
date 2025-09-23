@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { apiCall } from '../../services/api/base';
+import { apiCall } from '@/api/core/client';
 
 export interface Category {
   value: string;

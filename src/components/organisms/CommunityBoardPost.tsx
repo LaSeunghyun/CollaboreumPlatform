@@ -1,6 +1,6 @@
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Badge } from '../ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/shadcn/avatar';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import { Eye, MessageCircle, ThumbsUp } from 'lucide-react';
 import { ShareButton } from '../atoms/ShareButton';
 import { useCategories } from '../../lib/api/useCategories';

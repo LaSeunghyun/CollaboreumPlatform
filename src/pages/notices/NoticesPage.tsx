@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Input } from '../../components/ui/input';
+import { Input } from '@/shared/ui/shadcn/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../components/ui/select';
-import { Badge } from '../../components/ui/badge';
-import { Card, CardContent } from '../../components/ui/card';
+} from '@/shared/ui/shadcn/select';
+import { Badge } from '@/shared/ui/shadcn/badge';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
 import { Search, AlertCircle } from 'lucide-react';
 import { NoticePost } from '../../components/organisms/NoticePost';
 import { useNotices } from '../../lib/api/useNotices';

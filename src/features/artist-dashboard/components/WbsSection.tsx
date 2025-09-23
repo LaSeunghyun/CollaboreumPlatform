@@ -1,9 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import { Button } from '@/shared/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
-import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/shared/ui/shadcn/input';
+import { Progress } from '@/shared/ui/shadcn/progress';
+import { Textarea } from '@/shared/ui/shadcn/textarea';
 import { AlertCircle, Edit, Plus, Trash2 } from 'lucide-react';
 import { WbsSectionData } from '@/features/artist-dashboard/hooks/useArtistDashboard';
 

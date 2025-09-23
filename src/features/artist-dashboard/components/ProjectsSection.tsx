@@ -1,4 +1,4 @@
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
 import { Button } from '@/shared/ui/Button';
 import { Plus } from 'lucide-react';
 import { ProjectsSectionData } from '@/features/artist-dashboard/hooks/useArtistDashboard';

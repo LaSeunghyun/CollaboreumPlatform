@@ -1,5 +1,5 @@
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Button } from '@/shared/ui/shadcn/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
 import { CheckCircle, ArrowRight, Heart, Palette } from 'lucide-react';
 
 interface SignupSuccessPageProps {

@@ -25,6 +25,7 @@
 | `src/components/Checkbox*`               | `@/shared/ui/Checkbox` | ✅ 완료 | 높음                  |
 | `src/components/Card*`, `Panel*`         | `@/shared/ui/Card`     | ✅ 완료 | 높음                  |
 | `src/components/Badge*`, `Tag*`, `Chip*` | `@/shared/ui/Badge`    | ✅ 완료 | 높음                  |
+| `src/components/ui/*` (Shadcn 기반)      | `@/shared/ui/shadcn/*` | ✅ 완료 | 높음                  |
 
 ## 마이그레이션 단계
 

@@ -2,8 +2,8 @@ import { ChangeEvent, FC, FormEvent } from 'react';
 import { Trash2 } from 'lucide-react';
 
 import { Button } from '@/shared/ui/Button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback } from '@/shared/ui/shadcn/avatar';
+import { Input } from '@/shared/ui/shadcn/input';
 
 import { getFirstChar, getUsername } from '@/utils/typeGuards';
 import { CommunityCommentNode } from '../hooks/useCommunityPostDetail';

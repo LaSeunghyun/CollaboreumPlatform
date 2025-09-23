@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../shared/ui/Button';
-import { Input } from './ui/input';
-// import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
+import { Input } from '@/shared/ui/shadcn/input';
+// import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
+import { Badge } from '@/shared/ui/shadcn/badge';
 import { useAuth } from '../contexts/AuthContext';
 import { communityApi } from '../features/community/api/communityApi';
 import { KOREAN_CATEGORIES } from '../constants/categories';

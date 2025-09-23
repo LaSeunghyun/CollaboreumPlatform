@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
+import { Button } from '@/shared/ui/shadcn/button';
+import { Badge } from '@/shared/ui/shadcn/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/shadcn/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/shadcn/tabs';
 import {
   Calendar,
   MapPin,
@@ -14,7 +14,7 @@ import {
   Share2,
   Bookmark,
 } from 'lucide-react';
-import { ImageWithFallback } from './atoms/ImageWithFallback';
+import { ImageWithFallback } from '@/shared/ui/ImageWithFallback';
 import { eventManagementAPI } from '../services/api/events';
 import { useAuth } from '../contexts/AuthContext';
 import { getFirstChar } from '../utils/typeGuards';

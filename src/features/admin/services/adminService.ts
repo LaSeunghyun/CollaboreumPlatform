@@ -1,4 +1,4 @@
-import { apiCall } from '../../../services/api/base';
+import { apiCall } from '@/api/core/client';
 import {
   AdminDashboardMetrics,
   User,

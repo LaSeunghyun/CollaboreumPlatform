@@ -110,3 +110,4 @@ export {
 
 // 이미지 컴포넌트
 export { OptimizedImage } from './OptimizedImage';
+export { ImageWithFallback } from './ImageWithFallback';

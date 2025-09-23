@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from './ui/button';
+import { Button } from '@/shared/ui/shadcn/button';
 import { ArrowLeft } from 'lucide-react';
 
 interface PrivacyPolicyProps {

@@ -1,4 +1,4 @@
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/shared/ui/shadcn/card';
 import { Calendar, DollarSign, TrendingUp, Users } from 'lucide-react';
 import { OverviewStat, OverviewStatKey } from '@/features/artist-dashboard/hooks/useArtistDashboard';
 
