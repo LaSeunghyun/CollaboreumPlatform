@@ -97,7 +97,7 @@ jest.mock('@/features/community/hooks/useCommunityPosts', () => ({
   useCommunityPosts: () => ({ data: [], isLoading: false, error: null }),
 }));
 
-jest.mock('@/services/api', () => ({
+jest.mock('@/api', () => ({
   statsAPI: {
     getPlatformStats: jest.fn().mockResolvedValue({
       data: {

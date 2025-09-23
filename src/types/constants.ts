@@ -200,6 +200,7 @@ export type ArtistCategory =
 export type ArtistGenre = Enums['ARTIST_GENRES'][keyof Enums['ARTIST_GENRES']];
 export type ProjectCategory =
   Enums['PROJECT_CATEGORIES'][keyof Enums['PROJECT_CATEGORIES']];
+export type ProjectCategoryKey = keyof Enums['PROJECT_CATEGORIES'];
 export type ProjectStatus =
   Enums['PROJECT_STATUSES'][keyof Enums['PROJECT_STATUSES']];
 export type TaskStatus = Enums['TASK_STATUSES'][keyof Enums['TASK_STATUSES']];

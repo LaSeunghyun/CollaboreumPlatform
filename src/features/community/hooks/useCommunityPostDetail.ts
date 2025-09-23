@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import { useCreateComment, useCreateReply, useDeleteComment } from '@/lib/api/useCommunityComments';
 import { usePostReaction } from '@/lib/api/useCommunityReactions';
-import { communityPostAPI } from '@/services/api/community';
+import { communityPostAPI } from '@/api/modules/community';
 import { useDeleteCommunityPost } from '@/features/community/hooks/useCommunityPosts';
 
 export interface CommunityCommentNode {

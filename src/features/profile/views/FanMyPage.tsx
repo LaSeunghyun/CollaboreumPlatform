@@ -14,7 +14,7 @@ import { PasswordChangeForm } from '../components/PasswordChangeForm';
 import { ProfileEditForm } from '../components/ProfileEditForm';
 import type { Backing, UserProfile } from '../types/profile';
 import { useAuth } from '@/contexts/AuthContext';
-import { userAPI } from '@/services/api/user';
+import { userAPI } from '@/api/modules/user';
 import { Button } from '@/shared/ui/Button';
 
 export const FanMyPage: React.FC = () => {

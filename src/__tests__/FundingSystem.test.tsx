@@ -11,7 +11,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { FundingProjectDetail } from '@/features/funding/components/FundingProjectDetail';
 import { PaymentModal } from '@/features/funding/components/PaymentModal';
 import { FundingProjects } from '@/features/funding/components/FundingProjects';
-import { fundingAPI } from '@/services/api/funding';
+import { fundingAPI } from '@/api/modules/funding';
 
 // Mock useParams
 jest.mock('react-router-dom', () => ({
@@ -20,7 +20,7 @@ jest.mock('react-router-dom', () => ({
 }));
 
 // Mock API calls with realistic responses
-jest.mock('@/services/api', () => ({
+jest.mock('@/api', () => ({
   fundingAPI: {
     getProjectDetail: jest.fn(),
     getProjects: jest.fn(),
@@ -47,7 +47,7 @@ jest.mock('@/services/api', () => ({
 }));
 
 // Mock dynamicConstantsService
-jest.mock('@/services/constantsService', () => ({
+jest.mock('@/api/services/constantsService', () => ({
   dynamicConstantsService: {
     getPaymentMethods: jest.fn().mockResolvedValue([
       { id: 'card', label: '신용카드', icon: '💳' },

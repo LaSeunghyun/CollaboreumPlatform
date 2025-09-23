@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { eventManagementAPI } from '@/services/api/events';
-import { dynamicConstantsService } from '@/services/constantsService';
+import { eventManagementAPI } from '@/api/modules/events';
+import { dynamicConstantsService } from '@/api/services/constantsService';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   EventCategoryOption,

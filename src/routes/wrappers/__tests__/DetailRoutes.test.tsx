@@ -5,7 +5,7 @@ import { render, waitFor } from '@testing-library/react';
 import { ArtistProfileRoute } from '../ArtistProfileRoute';
 import { EventDetailRoute } from '../EventDetailRoute';
 import { ProjectDetailRoute } from '../ProjectDetailRoute';
-import * as api from '@/services/api';
+import * as api from '@/api';
 
 jest.mock('@/lib/api/useCategories', () => ({
   useCategories: () => ({ data: null }),
