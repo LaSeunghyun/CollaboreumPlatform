@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
+const cron = require('node-cron');
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -241,6 +242,31 @@ process.on('SIGINT', () => {
   logger.info('SIGINT received, shutting down gracefully');
   process.exit(0);
 });
+
+// 프로젝트 상태 업데이트 크론 작업 설정
+const { updateProjectStatuses } = require('./scripts/updateProjectStatuses');
+
+// 매 시간마다 프로젝트 상태 업데이트 (0분에 실행)
+cron.schedule('0 * * * *', async () => {
+  logger.info('프로젝트 상태 업데이트 크론 작업 시작');
+  try {
+    await updateProjectStatuses();
+    logger.info('프로젝트 상태 업데이트 크론 작업 완료');
+  } catch (error) {
+    logger.error({ error }, '프로젝트 상태 업데이트 크론 작업 실패');
+  }
+});
+
+// 서버 시작 시 한 번 실행
+setTimeout(async () => {
+  logger.info('서버 시작 시 프로젝트 상태 업데이트 실행');
+  try {
+    await updateProjectStatuses();
+    logger.info('서버 시작 시 프로젝트 상태 업데이트 완료');
+  } catch (error) {
+    logger.error({ error }, '서버 시작 시 프로젝트 상태 업데이트 실패');
+  }
+}, 5000); // 5초 후 실행
 
 // Start server
 const server = app.listen(PORT, '0.0.0.0', () => {

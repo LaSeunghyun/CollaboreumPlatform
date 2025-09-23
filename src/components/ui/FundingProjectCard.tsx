@@ -2,7 +2,14 @@ import { Card, CardContent } from './card';
 import { Badge } from './badge';
 import { Button } from './button';
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
-import { CheckCircle, XCircle, Clock, Eye } from 'lucide-react';
+import {
+  CheckCircle,
+  XCircle,
+  Clock,
+  Eye,
+  Calendar,
+  AlertCircle,
+} from 'lucide-react';
 import { FundingProject } from '../../types/funding';
 import {
   PROJECT_STATUS_COLORS,
@@ -13,6 +20,14 @@ import {
   formatDate,
   calculateSuccessRate,
 } from '../../utils/fundingUtils';
+import {
+  calculateProjectStatus,
+  getProjectStatusLabel,
+  getProjectStatusColor,
+  getDaysUntilStart,
+  getDaysUntilEnd,
+} from '../../utils/projectStatusUtils';
+import { FundingProjectStatus } from '../../features/funding/types';
 
 interface FundingProjectCardProps {
   project: FundingProject;
@@ -23,14 +38,26 @@ export function FundingProjectCard({
   project,
   onViewDetails,
 }: FundingProjectCardProps) {
-  const getProjectStatusIcon = (status: string) => {
+  // 프로젝트 상태를 자동으로 계산
+  const calculatedStatus = calculateProjectStatus(
+    project.startDate,
+    project.endDate,
+  );
+  const daysUntilStart = getDaysUntilStart(project.startDate);
+  const daysUntilEnd = getDaysUntilEnd(project.endDate);
+
+  const getProjectStatusIcon = (status: FundingProjectStatus) => {
     switch (status) {
-      case 'success':
+      case FundingProjectStatus.SUCCEEDED:
         return <CheckCircle className='h-5 w-5 text-green-500' />;
-      case 'failed':
+      case FundingProjectStatus.FAILED:
         return <XCircle className='h-5 w-5 text-red-500' />;
-      case 'ongoing':
+      case FundingProjectStatus.COLLECTING:
         return <Clock className='h-5 w-5 text-blue-500' />;
+      case FundingProjectStatus.DRAFT:
+        return <Calendar className='h-5 w-5 text-gray-500' />;
+      case FundingProjectStatus.CLOSED:
+        return <AlertCircle className='h-5 w-5 text-gray-500' />;
       default:
         return <Clock className='h-5 w-5 text-gray-500' />;
     }
@@ -41,10 +68,22 @@ export function FundingProjectCard({
       <CardContent className='p-4'>
         <div className='mb-3 flex items-start justify-between'>
           <div className='flex items-center gap-2'>
-            {getProjectStatusIcon(project.status)}
-            <Badge className={PROJECT_STATUS_COLORS[project.status]}>
-              {PROJECT_STATUS_TEXTS[project.status]}
+            {getProjectStatusIcon(calculatedStatus)}
+            <Badge className={getProjectStatusColor(calculatedStatus)}>
+              {getProjectStatusLabel(calculatedStatus)}
             </Badge>
+            {calculatedStatus === FundingProjectStatus.DRAFT &&
+              daysUntilStart > 0 && (
+                <span className='text-xs text-muted-foreground'>
+                  {daysUntilStart}일 후 시작
+                </span>
+              )}
+            {calculatedStatus === FundingProjectStatus.COLLECTING &&
+              daysUntilEnd > 0 && (
+                <span className='text-xs text-muted-foreground'>
+                  {daysUntilEnd}일 남음
+                </span>
+              )}
           </div>
           <Badge variant='outline' className='text-xs'>
             {project.category}
@@ -74,41 +113,42 @@ export function FundingProjectCard({
           </div>
         </div>
 
-        {project.status === 'success' && project.result && (
-          <div className='mb-3 rounded-lg bg-green-50 p-3'>
-            <h5 className='mb-2 font-medium text-green-800'>프로젝트 결과</h5>
-            <div className='space-y-2 text-sm'>
-              <div className='flex justify-between'>
-                <span>달성률</span>
-                <span className='font-medium text-green-600'>
-                  {project.result.successRate}%
-                </span>
+        {calculatedStatus === FundingProjectStatus.SUCCEEDED &&
+          project.result && (
+            <div className='mb-3 rounded-lg bg-green-50 p-3'>
+              <h5 className='mb-2 font-medium text-green-800'>프로젝트 성공</h5>
+              <div className='space-y-2 text-sm'>
+                <div className='flex justify-between'>
+                  <span>달성률</span>
+                  <span className='font-medium text-green-600'>
+                    {project.result.successRate}%
+                  </span>
+                </div>
+                <div className='flex justify-between'>
+                  <span>완료일</span>
+                  <span>{formatDate(project.result.completionDate!)}</span>
+                </div>
               </div>
-              <div className='flex justify-between'>
-                <span>완료일</span>
-                <span>{formatDate(project.result.completionDate!)}</span>
+              <div className='mt-2'>
+                <p className='mb-1 text-xs font-medium text-green-700'>
+                  제공된 결과물:
+                </p>
+                <div className='flex flex-wrap gap-1'>
+                  {project.result.deliverables.map((deliverable, index) => (
+                    <Badge
+                      key={index}
+                      variant='secondary'
+                      className='bg-green-100 text-xs text-green-800'
+                    >
+                      {deliverable}
+                    </Badge>
+                  ))}
+                </div>
               </div>
             </div>
-            <div className='mt-2'>
-              <p className='mb-1 text-xs font-medium text-green-700'>
-                제공된 결과물:
-              </p>
-              <div className='flex flex-wrap gap-1'>
-                {project.result.deliverables.map((deliverable, index) => (
-                  <Badge
-                    key={index}
-                    variant='secondary'
-                    className='bg-green-100 text-xs text-green-800'
-                  >
-                    {deliverable}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+          )}
 
-        {project.status === 'failed' && (
+        {calculatedStatus === FundingProjectStatus.FAILED && (
           <div className='mb-3 rounded-lg bg-red-50 p-3'>
             <h5 className='mb-2 font-medium text-red-800'>프로젝트 실패</h5>
             <div className='text-sm text-red-700'>
@@ -123,6 +163,35 @@ export function FundingProjectCard({
                 % 달성
               </p>
               <p>후원자 {project.backers}명 참여</p>
+            </div>
+          </div>
+        )}
+
+        {calculatedStatus === FundingProjectStatus.DRAFT && (
+          <div className='mb-3 rounded-lg bg-gray-50 p-3'>
+            <h5 className='mb-2 font-medium text-gray-800'>프로젝트 대기 중</h5>
+            <div className='text-sm text-gray-700'>
+              <p>시작 예정일: {formatDate(project.startDate)}</p>
+              <p>{daysUntilStart}일 후 프로젝트가 시작됩니다.</p>
+            </div>
+          </div>
+        )}
+
+        {calculatedStatus === FundingProjectStatus.CLOSED && (
+          <div className='mb-3 rounded-lg bg-gray-50 p-3'>
+            <h5 className='mb-2 font-medium text-gray-800'>프로젝트 종료</h5>
+            <div className='text-sm text-gray-700'>
+              <p>종료일: {formatDate(project.endDate)}</p>
+              <p>
+                목표 금액의{' '}
+                {Math.round(
+                  calculateSuccessRate(
+                    project.currentAmount,
+                    project.targetAmount,
+                  ),
+                )}
+                % 달성
+              </p>
             </div>
           </div>
         )}

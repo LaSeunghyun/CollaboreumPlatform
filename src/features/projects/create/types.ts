@@ -11,4 +11,5 @@ export interface CreateProjectFormState {
   image: File | null;
   fundingMode: FundingMode;
   secretPerks: string;
+  startDate: string; // 시작 예정일 (YYYY-MM-DD 형식)
 }

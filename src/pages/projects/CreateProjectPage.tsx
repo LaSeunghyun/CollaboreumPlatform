@@ -59,6 +59,7 @@ export const CreateProjectPage: React.FC = () => {
             title={formData.title}
             description={formData.description}
             tags={formData.tags}
+            startDate={formData.startDate}
             onChange={(field, value) => handleInputChange(field, value)}
           />
 

@@ -20,6 +20,8 @@ import {
 } from '../../components/organisms/States';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAuthRedirect } from '../../hooks/useAuthRedirect';
+import { ProjectStatusManager } from '../../components/ProjectStatusManager';
+import { FundingProjectStatus } from '../../features/funding/types';
 
 export const ProjectsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -84,12 +86,26 @@ export const ProjectsPage: React.FC = () => {
       );
     }
 
+    // 프로젝트 데이터를 상태 관리자에 맞는 형태로 변환
+    const projectsWithStatus = projects.map((project: any) => ({
+      id: project.id,
+      startDate: project.startDate,
+      endDate: project.endDate,
+      status: project.status as FundingProjectStatus,
+      ...project,
+    }));
+
     return (
-      <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-        {projects.map((project: any) => (
-          <FundingProjectCard key={project.id} {...project} />
-        ))}
-      </div>
+      <ProjectStatusManager
+        projects={projectsWithStatus}
+        updateInterval={60000} // 1분마다 상태 업데이트
+      >
+        <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
+          {projectsWithStatus.map((project: any) => (
+            <FundingProjectCard key={project.id} {...project} />
+          ))}
+        </div>
+      </ProjectStatusManager>
     );
   };
 
