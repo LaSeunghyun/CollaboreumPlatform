@@ -8,7 +8,7 @@ interface UseCreateProjectFormOptions {
 }
 
 // 오늘 날짜를 YYYY-MM-DD 형식으로 반환
-const getTodayString = () => {
+const getTodayString = (): string => {
   const today = new Date();
   return today.toISOString().split('T')[0];
 };
