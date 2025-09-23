@@ -17,6 +17,7 @@ interface LoginPageProps {
   onSocialLogin?: (provider: 'google' | 'kakao' | 'naver') => void;
   isLoading?: boolean;
   error?: string;
+  redirectMessage?: string;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({
@@ -27,6 +28,7 @@ const LoginPage: React.FC<LoginPageProps> = ({
   onSocialLogin,
   isLoading = false,
   error,
+  redirectMessage,
 }) => {
   const [formData, setFormData] = useState({
     email: '',
@@ -68,6 +70,11 @@ const LoginPage: React.FC<LoginPageProps> = ({
             </Button>
           )}
           <h1 className='text-3xl font-bold text-gray-900'>로그인</h1>
+          {redirectMessage && (
+            <div className='mt-2 rounded-md bg-blue-50 px-4 py-3 text-sm text-blue-700'>
+              {redirectMessage}
+            </div>
+          )}
           <p className='mt-2 text-sm text-gray-600'>
             계정이 없으신가요?{' '}
             <button

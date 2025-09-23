@@ -33,21 +33,38 @@ class AuthService {
    * 로그인
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = (await fetch(`${this.baseUrl}/login`, {
+    const response = await fetch(`${this.baseUrl}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(credentials),
-    }).then(res => res.json())) as ApiResponse<AuthResponse>;
+    });
 
-    if (!response.success || !response.data) {
-      throw new Error(response.error || '로그인에 실패했습니다');
+    const data = (await response.json()) as ApiResponse<AuthResponse>;
+
+    if (!response.ok) {
+      // HTTP 상태 코드에 따른 구체적인 오류 메시지
+      if (response.status === 401) {
+        throw new Error('이메일 또는 비밀번호가 올바르지 않습니다');
+      } else if (response.status === 404) {
+        throw new Error('존재하지 않는 사용자입니다');
+      } else if (response.status === 429) {
+        throw new Error(
+          '너무 많은 로그인 시도가 있었습니다. 잠시 후 다시 시도해주세요',
+        );
+      } else if (response.status >= 500) {
+        throw new Error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요');
+      } else {
+        throw new Error(data.error || '로그인에 실패했습니다');
+      }
     }
 
-    const tokenCandidates = resolveAuthTokenCandidates(
-      response.data ?? response,
-    );
+    if (!data.success || !data.data) {
+      throw new Error(data.error || '로그인에 실패했습니다');
+    }
+
+    const tokenCandidates = resolveAuthTokenCandidates(data.data ?? data);
     const candidateAccessToken = tokenCandidates.accessToken;
     const fallbackToken = tokenCandidates.fallbackToken;
     const rawRefreshToken = tokenCandidates.refreshToken;
@@ -77,7 +94,7 @@ class AuthService {
     });
 
     return {
-      user: response.data.user,
+      user: data.data.user,
       accessToken: storedTokens.accessToken,
       refreshToken: storedTokens.refreshToken,
       token: fallbackToken ?? storedTokens.accessToken,

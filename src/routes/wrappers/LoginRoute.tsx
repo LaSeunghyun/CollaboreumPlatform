@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import LoginPage from '@/components/LoginPage';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,14 +7,20 @@ import { authService } from '@/features/auth/services/authService';
 
 export const LoginRoute: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const [error, setError] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(false);
+
+  // 리다이렉트 메시지 가져오기
+  const redirectMessage = location.state?.message;
+  const redirectTo = location.state?.from || '/';
 
   return (
     <LoginPage
       error={error}
       isLoading={isLoading}
+      redirectMessage={redirectMessage}
       onBack={() => navigate(-1)}
       onLogin={async ({ email, password, remember }) => {
         try {
@@ -31,7 +37,7 @@ export const LoginRoute: React.FC = () => {
             localStorage.removeItem('rememberEmail');
           }
 
-          navigate('/');
+          navigate(redirectTo);
         } catch (err) {
           setError(
             err instanceof Error

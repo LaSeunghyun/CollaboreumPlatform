@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -43,8 +43,32 @@ const ERROR_MESSAGES = {
 
 export const CreatePostPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(false);
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login', {
+        state: {
+          from: '/community/create',
+          message: '게시글을 작성하려면 로그인이 필요합니다.',
+        },
+      });
+    }
+  }, [isAuthenticated, navigate]);
+
+  // 로그인되지 않은 경우 로딩 표시
+  if (!isAuthenticated) {
+    return (
+      <div className='flex min-h-screen items-center justify-center bg-gray-50 py-8'>
+        <div className='text-center'>
+          <div className='mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-primary'></div>
+          <p className='text-gray-600'>로그인 확인 중...</p>
+        </div>
+      </div>
+    );
+  }
   const [formData, setFormData] = useState({
     title: '',
     content: '',

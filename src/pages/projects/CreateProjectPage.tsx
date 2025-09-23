@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/shared/ui';
@@ -13,7 +13,32 @@ import { ProjectMediaSection } from '@/features/projects/create/components/Proje
 
 export const CreateProjectPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login', {
+        state: {
+          from: '/projects/create',
+          message: '프로젝트를 생성하려면 로그인이 필요합니다.',
+        },
+      });
+    }
+  }, [isAuthenticated, navigate]);
+
+  // 로그인되지 않은 경우 로딩 표시
+  if (!isAuthenticated) {
+    return (
+      <div className='flex min-h-screen items-center justify-center bg-surface py-8'>
+        <div className='text-center'>
+          <div className='mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-primary'></div>
+          <p className='text-muted-foreground'>로그인 확인 중...</p>
+        </div>
+      </div>
+    );
+  }
+
   const {
     formData,
     loading,

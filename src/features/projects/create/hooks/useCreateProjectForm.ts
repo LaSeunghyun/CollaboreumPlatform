@@ -115,8 +115,13 @@ export const useCreateProjectForm = ({
         return;
       }
 
-      if (Number.isNaN(duration) || duration < 1) {
-        window.alert('기간은 1일 이상이어야 합니다.');
+      if (Number.isNaN(duration) || duration < 7) {
+        window.alert('프로젝트 기간은 최소 7일 이상이어야 합니다.');
+        return;
+      }
+
+      if (duration > 90) {
+        window.alert('프로젝트 기간은 최대 90일까지 가능합니다.');
         return;
       }
 
