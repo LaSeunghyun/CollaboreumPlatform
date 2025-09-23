@@ -29,5 +29,7 @@ module.exports = {
     'import.meta': {
       env: process.env,
     },
+    TextEncoder: require('util').TextEncoder,
+    TextDecoder: require('util').TextDecoder,
   },
 };

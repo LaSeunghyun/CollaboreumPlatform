@@ -12,7 +12,7 @@ import {
 } from '../../types';
 
 // Mock apiCall
-jest.mock('../../../services/api');
+jest.mock('../../../services/api/base');
 const mockApiCall = apiCall as jest.MockedFunction<typeof apiCall>;
 
 // Mock 데이터

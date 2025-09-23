@@ -11,7 +11,7 @@ describe('Button', () => {
 
   it('다양한 variant를 올바르게 적용한다', () => {
     const { rerender } = render(<Button variant='solid'>Solid</Button>);
-    expect(screen.getByRole('button')).toHaveClass('bg-primary-600');
+    expect(screen.getByRole('button')).toHaveClass('!bg-blue-600');
 
     rerender(<Button variant='outline'>Outline</Button>);
     expect(screen.getByRole('button')).toHaveClass('border-border');

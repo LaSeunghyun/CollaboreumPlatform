@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -18,10 +18,10 @@ jest.mock('react-router-dom', () => ({
 const requests: any[] = [];
 
 const server = setupServer(
-  rest.post('*/funding/projects', async (req, res, ctx) => {
-    const body = await req.json();
+  http.post('*/funding/projects', async ({ request }) => {
+    const body = await request.json();
     requests.push(body);
-    return res(ctx.json({ success: true, data: { id: 1 } }));
+    return HttpResponse.json({ success: true, data: { id: 1 } });
   }),
 );
 

@@ -89,11 +89,11 @@ describe('MetricsCard 컴포넌트 테스트', () => {
     render(<MetricsCard title='테스트 제목' value='100' icon={Users} />);
 
     // 아이콘 컨테이너가 존재하는지 확인
-    const iconContainer = screen.getByRole('img', { hidden: true });
+    const iconContainer = screen.getByTestId('metrics-card-icon-container');
     expect(iconContainer).toBeInTheDocument();
 
     // 아이콘이 렌더링되었는지 확인
-    const svgIcon = screen.getByRole('img', { hidden: true });
+    const svgIcon = iconContainer.querySelector('svg');
     expect(svgIcon).toBeInTheDocument();
   });
 

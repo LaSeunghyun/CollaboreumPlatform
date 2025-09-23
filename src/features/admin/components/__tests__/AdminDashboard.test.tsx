@@ -109,42 +109,50 @@ jest.mock('../AdminLayout', () => ({
 
 // Mock PermissionGuard
 jest.mock('../PermissionGuard', () => ({
-  PermissionGuard: ({ children, permission }: any) =>
-    React.createElement(
+  PermissionGuard: ({ children, permission }: any) => {
+    const React = require('react');
+    return React.createElement(
       'div',
       { 'data-testid': `permission-guard-${permission}` },
       children,
-    ),
+    );
+  },
 }));
 
 // Mock NotificationCenter
 jest.mock('../NotificationCenter', () => ({
-  NotificationCenter: () =>
-    React.createElement(
+  NotificationCenter: () => {
+    const React = require('react');
+    return React.createElement(
       'div',
       { 'data-testid': 'notification-center' },
       'Notification Center',
-    ),
+    );
+  },
 }));
 
 // Mock RealTimeAlerts
 jest.mock('../RealTimeAlerts', () => ({
-  RealTimeAlerts: () =>
-    React.createElement(
+  RealTimeAlerts: () => {
+    const React = require('react');
+    return React.createElement(
       'div',
       { 'data-testid': 'real-time-alerts' },
       'Real Time Alerts',
-    ),
+    );
+  },
 }));
 
 // Mock LiveSystemMonitor
 jest.mock('../LiveSystemMonitor', () => ({
-  LiveSystemMonitor: () =>
-    React.createElement(
+  LiveSystemMonitor: () => {
+    const React = require('react');
+    return React.createElement(
       'div',
       { 'data-testid': 'live-system-monitor' },
       'Live System Monitor',
-    ),
+    );
+  },
 }));
 
 // Mock 데이터

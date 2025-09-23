@@ -108,7 +108,11 @@ const stripLeadingNoise = (value: string): string => {
     result = result.slice('bearer'.length).trimStart();
   }
 
+  // Remove leading noise including quotes
   result = result.replace(/^(?:undefined|null|["'])+/gi, '').trim();
+
+  // Remove trailing quotes
+  result = result.replace(/["']+$/g, '').trim();
 
   return result;
 };

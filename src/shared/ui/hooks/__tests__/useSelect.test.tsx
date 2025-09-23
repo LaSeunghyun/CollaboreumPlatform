@@ -179,7 +179,8 @@ describe('useSelect Hook', () => {
     const { result } = renderHook(() => useSelect(defaultProps));
 
     expect(result.current.renderedChildren).toBeDefined();
-    expect(React.Children.count(result.current.renderedChildren)).toBe(3);
+    expect(Array.isArray(result.current.renderedChildren)).toBe(true);
+    expect(result.current.renderedChildren).toHaveLength(3);
   });
 
   it('memoizes rendered children', () => {
