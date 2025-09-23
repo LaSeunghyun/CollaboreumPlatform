@@ -1,25 +1,39 @@
 const getImportMetaEnv = ():
   | Record<string, string | boolean | undefined>
   | undefined => {
-  try {
-    // Jest 환경에서는 import.meta를 사용하지 않음
-    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
-      return undefined;
-    }
+  // Jest 환경에서는 import.meta를 사용하지 않음
+  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+    return undefined;
+  }
 
-    // Jest 환경에서는 import.meta를 사용하지 않음
-    if (typeof process !== 'undefined' && process.env.JEST_WORKER_ID) {
-      return undefined;
-    }
+  // Jest 환경에서는 import.meta를 사용하지 않음
+  if (typeof process !== 'undefined' && process.env.JEST_WORKER_ID) {
+    return undefined;
+  }
 
-    if (
-      typeof import.meta !== 'undefined' &&
-      typeof import.meta.env !== 'undefined'
-    ) {
-      return import.meta.env as Record<string, string | boolean | undefined>;
+  // Jest 환경에서는 import.meta를 사용하지 않음
+  if (
+    typeof process !== 'undefined' &&
+    process.env.npm_lifecycle_event?.includes('test')
+  ) {
+    return undefined;
+  }
+
+  // Jest 환경에서는 import.meta를 사용하지 않음
+  if (
+    typeof process !== 'undefined' &&
+    process.env.npm_config_user_agent?.includes('jest')
+  ) {
+    return undefined;
+  }
+
+  // Vite 환경에서만 import.meta 사용
+  // Jest에서는 이 코드가 실행되지 않도록 위에서 체크
+  if (typeof globalThis !== 'undefined' && 'import' in globalThis) {
+    const importMeta = (globalThis as any).import?.meta;
+    if (importMeta && typeof importMeta.env !== 'undefined') {
+      return importMeta.env as Record<string, string | boolean | undefined>;
     }
-  } catch {
-    // ignore - accessing import.meta can throw in non-module contexts (e.g. Jest)
   }
 
   return undefined;
