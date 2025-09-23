@@ -101,6 +101,8 @@ router.post('/projects', auth, async (req, res) => {
       executionPlan,
     } = req.body;
 
+    const goalAmountValue = Number(goalAmount);
+
     // 필수 필드 검증
     if (
       !title ||
@@ -117,7 +119,7 @@ router.post('/projects', auth, async (req, res) => {
     }
 
     // 금액 유효성 검증
-    if (goalAmount < 100000) {
+    if (goalAmountValue < 100000) {
       return res.status(400).json({
         success: false,
         message: '목표 금액은 10만원 이상이어야 합니다.',
@@ -155,10 +157,10 @@ router.post('/projects', auth, async (req, res) => {
     // 집행 계획 검증
     if (executionPlan && executionPlan.stages) {
       const totalBudget = executionPlan.stages.reduce(
-        (sum, stage) => sum + stage.budget,
+        (sum, stage) => sum + Number(stage.budget || 0),
         0,
       );
-      if (totalBudget !== goalAmount) {
+      if (totalBudget !== goalAmountValue) {
         return res.status(400).json({
           success: false,
           message: '집행 계획의 총 예산이 목표 금액과 일치해야 합니다.',
@@ -171,12 +173,13 @@ router.post('/projects', auth, async (req, res) => {
       title,
       description,
       category,
-      goalAmount: parseInt(goalAmount),
+      goalAmount: goalAmountValue,
       startDate: start,
       endDate: end,
       rewards: rewards || [],
       tags: tags || [],
-      executionPlan: executionPlan || { stages: [], totalBudget: goalAmount },
+      executionPlan:
+        executionPlan || { stages: [], totalBudget: goalAmountValue },
       artist: req.user.id,
       artistName: req.user.name,
       status: '준비중',
@@ -565,7 +568,7 @@ router.put('/projects/:id/execution', auth, async (req, res) => {
     // 집행 계획 업데이트
     project.executionPlan.stages = stages;
     project.executionPlan.totalBudget = stages.reduce(
-      (sum, stage) => sum + stage.budget,
+      (sum, stage) => sum + Number(stage.budget || 0),
       0,
     );
     project.status = '집행중';
