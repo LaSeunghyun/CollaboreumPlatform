@@ -98,7 +98,9 @@ const FanMyPage: React.FC<FanMyPageProps> = ({
 
               <TabsContent value='following' className='mt-6'>
                 <div className='space-y-4'>
-                  <h3 className='text-lg font-semibold'>팔로잉 중인 아티스트</h3>
+                  <h3 className='text-lg font-semibold'>
+                    팔로잉 중인 아티스트
+                  </h3>
                   <FanProfileFollowingList
                     following={followingArtists}
                     onFollowArtist={onFollowArtist}

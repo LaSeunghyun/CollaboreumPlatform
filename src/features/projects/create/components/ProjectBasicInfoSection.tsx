@@ -16,12 +16,9 @@ interface ProjectBasicInfoSectionProps {
   onChange: (field: 'title' | 'description' | 'tags', value: string) => void;
 }
 
-export const ProjectBasicInfoSection: React.FC<ProjectBasicInfoSectionProps> = ({
-  title,
-  description,
-  tags,
-  onChange,
-}) => (
+export const ProjectBasicInfoSection: React.FC<
+  ProjectBasicInfoSectionProps
+> = ({ title, description, tags, onChange }) => (
   <Card>
     <CardHeader>
       <CardTitle className='flex items-center gap-2 text-foreground'>

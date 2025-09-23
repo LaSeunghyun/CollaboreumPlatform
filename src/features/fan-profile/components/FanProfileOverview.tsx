@@ -25,14 +25,18 @@ export const FanProfileOverview = ({
         <CardContent>
           {activities.length > 0 ? (
             <div className='space-y-4'>
-              {activities.map((activity) => (
+              {activities.map(activity => (
                 <div key={activity.id} className='flex items-center space-x-3'>
                   <div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary-100'>
                     <DollarSign className='h-4 w-4 text-primary-600' />
                   </div>
                   <div>
-                    <p className='text-sm font-medium'>{activity.description}</p>
-                    <p className='text-xs text-gray-500'>{activity.relativeTime}</p>
+                    <p className='text-sm font-medium'>
+                      {activity.description}
+                    </p>
+                    <p className='text-xs text-gray-500'>
+                      {activity.relativeTime}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -51,11 +55,15 @@ export const FanProfileOverview = ({
           <div className='space-y-4'>
             <div className='flex items-center justify-between'>
               <span className='text-sm text-gray-600'>후원 횟수</span>
-              <span className='font-semibold'>{monthlySummary.backingCount}회</span>
+              <span className='font-semibold'>
+                {monthlySummary.backingCount}회
+              </span>
             </div>
             <div className='flex items-center justify-between'>
               <span className='text-sm text-gray-600'>후원 금액</span>
-              <span className='font-semibold'>{monthlySummary.formattedBackingAmount}</span>
+              <span className='font-semibold'>
+                {monthlySummary.formattedBackingAmount}
+              </span>
             </div>
             <div className='flex items-center justify-between'>
               <span className='text-sm text-gray-600'>총 팔로잉</span>

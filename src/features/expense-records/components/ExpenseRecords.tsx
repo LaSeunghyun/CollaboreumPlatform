@@ -45,7 +45,8 @@ export const ExpenseRecords: React.FC<ExpenseRecordsProps> = props => {
         </div>
         {canEdit && (
           <Button onClick={handleAddExpense} disabled={isAdding}>
-            <Plus className='mr-2 h-4 w-4' />비용 내역 추가
+            <Plus className='mr-2 h-4 w-4' />
+            비용 내역 추가
           </Button>
         )}
       </div>

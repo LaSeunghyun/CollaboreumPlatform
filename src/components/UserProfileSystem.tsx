@@ -1,10 +1,6 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import {
-  AdminMyPage,
-  ArtistMyPage,
-  FanMyPage,
-} from '@/features/profile/views';
+import { AdminMyPage, ArtistMyPage, FanMyPage } from '@/features/profile/views';
 import type { UserRole } from '@/features/profile/types/profile';
 
 const roleToView: Record<UserRole, React.FC> = {

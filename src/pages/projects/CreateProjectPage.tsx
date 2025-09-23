@@ -38,9 +38,12 @@ export const CreateProjectPage: React.FC = () => {
             className='mb-4'
             onClick={() => navigate('/projects')}
           >
-            <ArrowLeft className='mr-2 h-4 w-4' />프로젝트 목록으로 돌아가기
+            <ArrowLeft className='mr-2 h-4 w-4' />
+            프로젝트 목록으로 돌아가기
           </Button>
-          <h1 className='text-3xl font-bold text-foreground'>새 프로젝트 등록</h1>
+          <h1 className='text-3xl font-bold text-foreground'>
+            새 프로젝트 등록
+          </h1>
           <p className='mt-2 text-base text-muted-foreground'>
             당신의 창작 프로젝트를 등록하고 후원을 받아보세요.
           </p>

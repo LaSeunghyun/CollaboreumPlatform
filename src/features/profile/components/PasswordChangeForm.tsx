@@ -67,12 +67,17 @@ export const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className='space-y-4'>
       <div>
-        <label className='mb-2 block text-sm font-medium'>현재 비밀번호 *</label>
+        <label className='mb-2 block text-sm font-medium'>
+          현재 비밀번호 *
+        </label>
         <Input
           type='password'
           value={formData.currentPassword}
           onChange={event =>
-            setFormData(prev => ({ ...prev, currentPassword: event.target.value }))
+            setFormData(prev => ({
+              ...prev,
+              currentPassword: event.target.value,
+            }))
           }
           className={errors.currentPassword ? 'border-red-500' : ''}
         />
@@ -97,12 +102,17 @@ export const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({
       </div>
 
       <div>
-        <label className='mb-2 block text-sm font-medium'>새 비밀번호 확인 *</label>
+        <label className='mb-2 block text-sm font-medium'>
+          새 비밀번호 확인 *
+        </label>
         <Input
           type='password'
           value={formData.confirmPassword}
           onChange={event =>
-            setFormData(prev => ({ ...prev, confirmPassword: event.target.value }))
+            setFormData(prev => ({
+              ...prev,
+              confirmPassword: event.target.value,
+            }))
           }
           className={errors.confirmPassword ? 'border-red-500' : ''}
         />

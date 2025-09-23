@@ -59,10 +59,7 @@ export class DynamicConstantsService {
 
   // 상태별 아이콘을 가져오기
   async getStatusIcons(): Promise<StatusIcons> {
-    if (
-      this.statusIconsCache &&
-      this.isCacheValid(this.statusIconsLastFetch)
-    ) {
+    if (this.statusIconsCache && this.isCacheValid(this.statusIconsLastFetch)) {
       return this.statusIconsCache;
     }
 

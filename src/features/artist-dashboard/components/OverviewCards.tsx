@@ -1,12 +1,34 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, DollarSign, TrendingUp, Users } from 'lucide-react';
-import { OverviewStat, OverviewStatKey } from '@/features/artist-dashboard/hooks/useArtistDashboard';
+import {
+  OverviewStat,
+  OverviewStatKey,
+} from '@/features/artist-dashboard/hooks/useArtistDashboard';
 
-const iconMap: Record<OverviewStatKey, { bgClass: string; iconClass: string; Icon: typeof TrendingUp }> = {
-  projects: { bgClass: 'bg-blue-100', iconClass: 'text-blue-600', Icon: TrendingUp },
-  funding: { bgClass: 'bg-green-100', iconClass: 'text-green-600', Icon: DollarSign },
-  followers: { bgClass: 'bg-purple-100', iconClass: 'text-purple-600', Icon: Users },
-  growth: { bgClass: 'bg-yellow-100', iconClass: 'text-yellow-600', Icon: Calendar },
+const iconMap: Record<
+  OverviewStatKey,
+  { bgClass: string; iconClass: string; Icon: typeof TrendingUp }
+> = {
+  projects: {
+    bgClass: 'bg-blue-100',
+    iconClass: 'text-blue-600',
+    Icon: TrendingUp,
+  },
+  funding: {
+    bgClass: 'bg-green-100',
+    iconClass: 'text-green-600',
+    Icon: DollarSign,
+  },
+  followers: {
+    bgClass: 'bg-purple-100',
+    iconClass: 'text-purple-600',
+    Icon: Users,
+  },
+  growth: {
+    bgClass: 'bg-yellow-100',
+    iconClass: 'text-yellow-600',
+    Icon: Calendar,
+  },
 };
 
 interface OverviewCardsProps {
@@ -27,7 +49,9 @@ export const OverviewCards = ({ stats }: OverviewCardsProps) => {
                   <p className='text-sm text-gray-600'>{stat.label}</p>
                   <p className='text-2xl font-bold'>{stat.value}</p>
                 </div>
-                <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${bgClass}`}>
+                <div
+                  className={`flex h-12 w-12 items-center justify-center rounded-lg ${bgClass}`}
+                >
                   <Icon className={`h-6 w-6 ${iconClass}`} />
                 </div>
               </div>

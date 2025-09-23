@@ -4,12 +4,7 @@ import { ko } from 'date-fns/locale';
 import { User, Lock, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PasswordChangeForm } from '../components/PasswordChangeForm';
 import { ProfileEditForm } from '../components/ProfileEditForm';
 import type { Backing, UserProfile } from '../types/profile';
@@ -140,7 +135,10 @@ export const FanMyPage: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ProfileEditForm profile={profile} onSave={handleProfileSave} />
+                  <ProfileEditForm
+                    profile={profile}
+                    onSave={handleProfileSave}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -215,9 +213,12 @@ export const FanMyPage: React.FC = () => {
                   <div key={backing.id} className='rounded-lg border p-4'>
                     <div className='flex items-start justify-between'>
                       <div className='flex-1'>
-                        <h3 className='font-semibold'>{backing.projectTitle}</h3>
+                        <h3 className='font-semibold'>
+                          {backing.projectTitle}
+                        </h3>
                         <p className='mt-1 text-sm text-gray-600'>
-                          후원일: {format(backing.backedAt, 'PPP', { locale: ko })}
+                          후원일:{' '}
+                          {format(backing.backedAt, 'PPP', { locale: ko })}
                         </p>
                         {backing.reward && (
                           <p className='mt-1 text-sm text-blue-600'>
@@ -236,7 +237,9 @@ export const FanMyPage: React.FC = () => {
                               : 'secondary'
                           }
                         >
-                          {backing.projectStatus === 'completed' ? '성공' : '진행중'}
+                          {backing.projectStatus === 'completed'
+                            ? '성공'
+                            : '진행중'}
                         </Badge>
                       </div>
                     </div>
@@ -272,7 +275,9 @@ export const FanMyPage: React.FC = () => {
                 <p className='mb-4 text-gray-600'>
                   계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
                 </p>
-                <Button variant='solid' tone='danger'>계정 삭제</Button>
+                <Button variant='solid' tone='danger'>
+                  계정 삭제
+                </Button>
               </CardContent>
             </Card>
           </div>

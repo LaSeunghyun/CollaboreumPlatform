@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { eventManagementAPI } from '@/services/api/events';
 import { dynamicConstantsService } from '@/services/constantsService';
-import {
-  Event,
-  EventCategoryOption,
-} from '@/features/events/types/event';
+import { Event, EventCategoryOption } from '@/features/events/types/event';
 
 const DEFAULT_CATEGORY: EventCategoryOption = { id: 'all', label: '전체' };
 

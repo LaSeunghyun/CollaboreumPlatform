@@ -1,5 +1,11 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Textarea } from '@/shared/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Textarea,
+} from '@/shared/ui';
 import { Label } from '@radix-ui/react-label';
 
 interface ProjectSecretPerksSectionProps {
@@ -7,10 +13,9 @@ interface ProjectSecretPerksSectionProps {
   onChange: (value: string) => void;
 }
 
-export const ProjectSecretPerksSection: React.FC<ProjectSecretPerksSectionProps> = ({
-  secretPerks,
-  onChange,
-}) => (
+export const ProjectSecretPerksSection: React.FC<
+  ProjectSecretPerksSectionProps
+> = ({ secretPerks, onChange }) => (
   <Card>
     <CardHeader>
       <CardTitle className='text-foreground'>비밀 혜택 구성</CardTitle>
@@ -30,7 +35,8 @@ export const ProjectSecretPerksSection: React.FC<ProjectSecretPerksSectionProps>
         rows={4}
       />
       <p className='text-sm text-muted-foreground'>
-        줄바꿈으로 여러 혜택을 구분할 수 있습니다. 이 정보는 후원 완료 시에만 공개됩니다.
+        줄바꿈으로 여러 혜택을 구분할 수 있습니다. 이 정보는 후원 완료 시에만
+        공개됩니다.
       </p>
     </CardContent>
   </Card>

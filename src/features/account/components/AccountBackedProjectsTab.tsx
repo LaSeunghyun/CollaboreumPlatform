@@ -11,11 +11,9 @@ interface AccountBackedProjectsTabProps {
   error: unknown;
 }
 
-export const AccountBackedProjectsTab: React.FC<AccountBackedProjectsTabProps> = ({
-  backings,
-  isLoading,
-  error,
-}) => {
+export const AccountBackedProjectsTab: React.FC<
+  AccountBackedProjectsTabProps
+> = ({ backings, isLoading, error }) => {
   if (isLoading) {
     return <SkeletonGrid count={3} cols={3} />;
   }
@@ -32,17 +30,21 @@ export const AccountBackedProjectsTab: React.FC<AccountBackedProjectsTabProps> =
             <Heart className='h-8 w-8 text-sky' />
           </div>
           <div>
-            <h3 className='mb-2 text-xl font-semibold'>아직 후원한 프로젝트가 없습니다</h3>
+            <h3 className='mb-2 text-xl font-semibold'>
+              아직 후원한 프로젝트가 없습니다
+            </h3>
             <p className='mb-6 text-muted-foreground'>
               마음에 드는 프로젝트를 찾아서 후원해보세요.
-              <br />창의적인 프로젝트들이 여러분을 기다리고 있습니다!
+              <br />
+              창의적인 프로젝트들이 여러분을 기다리고 있습니다!
             </p>
           </div>
           <Button
-            className='bg-sky hover:bg-sky/90'
+            className='hover:bg-sky/90 bg-sky'
             onClick={() => (window.location.href = '/funding')}
           >
-            <Heart className='mr-2 h-4 w-4' />프로젝트 둘러보기
+            <Heart className='mr-2 h-4 w-4' />
+            프로젝트 둘러보기
           </Button>
         </CardContent>
       </Card>

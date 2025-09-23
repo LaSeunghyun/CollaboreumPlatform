@@ -57,11 +57,7 @@ const getStatusText = (status: string) => {
   }
 };
 
-export type FanProfileStatusTone =
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'default';
+export type FanProfileStatusTone = 'success' | 'warning' | 'danger' | 'default';
 
 export interface FanProfileHookParams {
   userId?: string;
@@ -134,7 +130,8 @@ export const useFanProfile = ({
 
   const backingsQuery = useQuery({
     queryKey: ['fan', 'backings', userId],
-    queryFn: () => userProfileAPI.getUserBackings(userId as string, { limit: 20 }),
+    queryFn: () =>
+      userProfileAPI.getUserBackings(userId as string, { limit: 20 }),
     enabled: hasUser,
     staleTime: 5 * 60 * 1000,
   });
@@ -142,7 +139,8 @@ export const useFanProfile = ({
   const profile = useMemo<FanProfile | null>(() => {
     if (!hasUser) return null;
 
-    const apiProfile = (profileQuery.data as any)?.data ?? profileQuery.data ?? null;
+    const apiProfile =
+      (profileQuery.data as any)?.data ?? profileQuery.data ?? null;
 
     const resolved =
       apiProfile ??
@@ -218,19 +216,26 @@ export const useFanProfile = ({
 
   const processedBackings = useMemo<FanProfileBacking[]>(() => {
     return rawBackings.map((pledge: any, index: number) => {
-      const amount = toNumber(pledge.amount ?? pledge.totalAmount ?? pledge.price);
-      const pledgeDate = parseDate(pledge.pledgeDate ?? pledge.createdAt ?? pledge.date);
+      const amount = toNumber(
+        pledge.amount ?? pledge.totalAmount ?? pledge.price,
+      );
+      const pledgeDate = parseDate(
+        pledge.pledgeDate ?? pledge.createdAt ?? pledge.date,
+      );
       const projectId = String(
         pledge.projectId ?? pledge.project?.id ?? pledge.id ?? `${index}`,
       );
-      const status = String(pledge.status ?? pledge.state ?? 'completed').toLowerCase();
+      const status = String(
+        pledge.status ?? pledge.state ?? 'completed',
+      ).toLowerCase();
 
       return {
         id:
           String(pledge.id ?? pledge.backingId ?? pledge.pledgeId) ||
           `${projectId}-${pledgeDate?.toISOString() ?? index}`,
         projectId,
-        projectTitle: pledge.projectTitle ?? pledge.project?.title ?? '이름 없는 프로젝트',
+        projectTitle:
+          pledge.projectTitle ?? pledge.project?.title ?? '이름 없는 프로젝트',
         artistName:
           pledge.artistName ??
           pledge.project?.artist?.name ??
@@ -243,7 +248,9 @@ export const useFanProfile = ({
         statusText: getStatusText(status),
         statusColorClass: getStatusColor(status),
         pledgeDate,
-        pledgeDateLabel: pledgeDate ? pledgeDate.toLocaleDateString() : '정보 없음',
+        pledgeDateLabel: pledgeDate
+          ? pledgeDate.toLocaleDateString()
+          : '정보 없음',
       };
     });
   }, [rawBackings]);
@@ -267,19 +274,25 @@ export const useFanProfile = ({
   const followingArtists = useMemo<FanProfileFollowing[]>(() => {
     if (!aggregatedProfile) return [];
 
-    return (aggregatedProfile.followingArtists ?? []).map((artist: any, index: number) => ({
-      id: String(artist?.id ?? artist?.artistId ?? index),
-      name: artist?.name ?? artist?.username ?? '이름 없는 아티스트',
-      avatar: artist?.avatar ?? artist?.image ?? artist?.profileImage ?? undefined,
-      followers: toNumber(
-        artist?.followers ?? artist?.followersCount ?? artist?.followerCount ?? 0,
-      ),
-    }));
+    return (aggregatedProfile.followingArtists ?? []).map(
+      (artist: any, index: number) => ({
+        id: String(artist?.id ?? artist?.artistId ?? index),
+        name: artist?.name ?? artist?.username ?? '이름 없는 아티스트',
+        avatar:
+          artist?.avatar ?? artist?.image ?? artist?.profileImage ?? undefined,
+        followers: toNumber(
+          artist?.followers ??
+            artist?.followersCount ??
+            artist?.followerCount ??
+            0,
+        ),
+      }),
+    );
   }, [aggregatedProfile]);
 
   const monthlyBackings = useMemo(() => {
     const now = new Date();
-    return processedBackings.filter((pledge) => {
+    return processedBackings.filter(pledge => {
       if (!pledge.pledgeDate) return false;
       return differenceInCalendarDays(now, pledge.pledgeDate) <= 30;
     });
@@ -294,13 +307,19 @@ export const useFanProfile = ({
     return {
       backingCount: monthlyBackings.length,
       formattedBackingAmount: formatCurrency(backingAmount),
-      followingCount: aggregatedProfile?.following ?? followingArtists.length ?? 0,
+      followingCount:
+        aggregatedProfile?.following ?? followingArtists.length ?? 0,
       totalPledges: aggregatedProfile?.totalPledges ?? processedBackings.length,
     };
-  }, [aggregatedProfile, followingArtists.length, monthlyBackings, processedBackings.length]);
+  }, [
+    aggregatedProfile,
+    followingArtists.length,
+    monthlyBackings,
+    processedBackings.length,
+  ]);
 
   const recentActivities = useMemo<FanProfileActivity[]>(() => {
-    return processedBackings.slice(0, 3).map((pledge) => ({
+    return processedBackings.slice(0, 3).map(pledge => ({
       id: pledge.id,
       projectTitle: pledge.projectTitle,
       description: `${pledge.projectTitle}에 후원했습니다`,

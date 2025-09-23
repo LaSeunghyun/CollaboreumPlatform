@@ -1,7 +1,13 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { PieChart, TrendingUp } from 'lucide-react';
 import { ExpenseCategoryOption, ExecutionStage } from '../types';
 
@@ -34,7 +40,8 @@ export const ExpenseRecordsStats: React.FC<ExpenseRecordsStatsProps> = ({
         <Card>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
-              <PieChart className='h-5 w-5' />카테고리별 비용
+              <PieChart className='h-5 w-5' />
+              카테고리별 비용
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -70,7 +77,8 @@ export const ExpenseRecordsStats: React.FC<ExpenseRecordsStatsProps> = ({
         <Card>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
-              <TrendingUp className='h-5 w-5' />단계별 비용
+              <TrendingUp className='h-5 w-5' />
+              단계별 비용
             </CardTitle>
           </CardHeader>
           <CardContent>

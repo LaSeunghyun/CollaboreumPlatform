@@ -6,9 +6,9 @@ interface ExpenseRecordsEmptyStateProps {
   canEdit: boolean;
 }
 
-export const ExpenseRecordsEmptyState: React.FC<ExpenseRecordsEmptyStateProps> = ({
-  canEdit,
-}) => (
+export const ExpenseRecordsEmptyState: React.FC<
+  ExpenseRecordsEmptyStateProps
+> = ({ canEdit }) => (
   <Card>
     <CardContent className='p-8 text-center text-gray-500'>
       <Receipt className='mx-auto mb-4 h-12 w-12 opacity-50' />

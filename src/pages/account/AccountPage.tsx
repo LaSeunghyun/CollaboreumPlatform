@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/shared/ui/Button';
 import { Plus } from 'lucide-react';
 import { useAccountPage } from '@/features/account/hooks/useAccountPage';
@@ -57,7 +52,11 @@ export const AccountPage: React.FC = () => {
         backedProjects={backings.length}
       />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-6'>
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className='space-y-6'
+      >
         <TabsList>
           <TabsTrigger value='my-projects'>내 프로젝트</TabsTrigger>
           <TabsTrigger value='backed-projects'>후원한 프로젝트</TabsTrigger>

@@ -308,10 +308,7 @@ export function ArtistGallery({ onBack, onSelectArtwork }: ArtistGalleryProps) {
                 >
                   <Share className='h-4 w-4' />
                 </Button>
-                <Button
-                  size='sm'
-                  onClick={event => event.stopPropagation()}
-                >
+                <Button size='sm' onClick={event => event.stopPropagation()}>
                   {getMetricIcon(artwork.type)}
                 </Button>
               </div>

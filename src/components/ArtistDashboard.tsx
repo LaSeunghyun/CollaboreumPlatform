@@ -29,7 +29,9 @@ export function ArtistDashboard() {
     return (
       <div className='flex min-h-screen items-center justify-center bg-gray-50'>
         <div className='text-center'>
-          <p className='text-lg font-semibold text-red-600'>대시보드를 불러오지 못했습니다.</p>
+          <p className='text-lg font-semibold text-red-600'>
+            대시보드를 불러오지 못했습니다.
+          </p>
           <p className='mt-2 text-gray-600'>{error}</p>
         </div>
       </div>
@@ -40,8 +42,12 @@ export function ArtistDashboard() {
     <div className='min-h-screen bg-gray-50 py-8'>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         <div className='mb-8'>
-          <h1 className='mb-2 text-3xl font-bold text-gray-900'>아티스트 대시보드</h1>
-          <p className='text-gray-600'>안녕하세요, {greetingName}님! 현재 진행 상황을 확인해보세요.</p>
+          <h1 className='mb-2 text-3xl font-bold text-gray-900'>
+            아티스트 대시보드
+          </h1>
+          <p className='text-gray-600'>
+            안녕하세요, {greetingName}님! 현재 진행 상황을 확인해보세요.
+          </p>
         </div>
 
         <OverviewCards stats={overviewStats} />

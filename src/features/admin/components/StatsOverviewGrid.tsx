@@ -47,8 +47,14 @@ export function StatsOverviewGrid({
           const displayValue = loading
             ? '...'
             : formatter
-            ? formatter(value, { stats, loading, error, onRetry, formatCurrency })
-            : value.toLocaleString();
+              ? formatter(value, {
+                  stats,
+                  loading,
+                  error,
+                  onRetry,
+                  formatCurrency,
+                })
+              : value.toLocaleString();
 
           return (
             <Card key={key}>
@@ -57,7 +63,9 @@ export function StatsOverviewGrid({
                   {dashboardStatIcons[key]}
                   <div>
                     <p className='text-sm text-gray-600'>{label}</p>
-                    <p className='text-2xl font-bold text-gray-900'>{displayValue}</p>
+                    <p className='text-2xl font-bold text-gray-900'>
+                      {displayValue}
+                    </p>
                   </div>
                 </div>
               </CardContent>

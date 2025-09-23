@@ -34,7 +34,9 @@ export const AccountProjectsTab: React.FC<AccountProjectsTabProps> = ({
             <Plus className='h-8 w-8 text-indigo' />
           </div>
           <div>
-            <h3 className='mb-2 text-xl font-semibold'>아직 프로젝트가 없습니다</h3>
+            <h3 className='mb-2 text-xl font-semibold'>
+              아직 프로젝트가 없습니다
+            </h3>
             <p className='mb-6 text-muted-foreground'>
               창의적인 아이디어를 현실로 만들어보세요.
               <br />첫 번째 프로젝트를 시작해보세요!

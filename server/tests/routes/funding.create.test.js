@@ -120,6 +120,8 @@ describe('POST /api/funding/projects - string budget handling', () => {
 
     expect(response.status).toBe(201);
     expect(response.body.success).toBe(true);
-    expect(response.body.message).toContain('펀딩 프로젝트가 성공적으로 시작되었습니다');
+    expect(response.body.message).toContain(
+      '펀딩 프로젝트가 성공적으로 시작되었습니다',
+    );
   });
 });

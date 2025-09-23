@@ -15,12 +15,14 @@ export const FanProfileFollowingList = ({
   onFollowArtist,
 }: FanProfileFollowingListProps) => {
   if (following.length === 0) {
-    return <p className='text-sm text-gray-500'>팔로잉 중인 아티스트가 없습니다.</p>;
+    return (
+      <p className='text-sm text-gray-500'>팔로잉 중인 아티스트가 없습니다.</p>
+    );
   }
 
   return (
     <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
-      {following.map((artist) => (
+      {following.map(artist => (
         <Card key={artist.id} className='transition-shadow hover:shadow-md'>
           <CardContent className='p-4'>
             <div className='flex items-center space-x-3'>

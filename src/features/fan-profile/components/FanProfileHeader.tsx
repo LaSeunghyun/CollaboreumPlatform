@@ -49,7 +49,9 @@ export const FanProfileHeader = ({
             <div className='flex-1'>
               <div className='flex flex-col md:flex-row md:items-center md:justify-between'>
                 <div>
-                  <h1 className='text-2xl font-bold text-gray-900'>{profile.name}</h1>
+                  <h1 className='text-2xl font-bold text-gray-900'>
+                    {profile.name}
+                  </h1>
                   <p className='text-gray-600'>{profile.email}</p>
                   <p className='mt-2 text-gray-700'>
                     {profile.bio || '소개 정보가 없습니다.'}

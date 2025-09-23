@@ -36,10 +36,14 @@ export const PostHeader: FC<PostHeaderProps> = ({
       <div className='flex items-start justify-between gap-4'>
         <div className='flex-1'>
           <div className='mb-3 flex items-center gap-2'>
-            {post.category && <Badge variant='secondary'>{post.category}</Badge>}
+            {post.category && (
+              <Badge variant='secondary'>{post.category}</Badge>
+            )}
             {post.isHot && <Badge variant='destructive'>HOT</Badge>}
           </div>
-          <CardTitle className='mb-2 text-2xl'>{post.title || '제목 없음'}</CardTitle>
+          <CardTitle className='mb-2 text-2xl'>
+            {post.title || '제목 없음'}
+          </CardTitle>
           <div className='flex flex-wrap items-center gap-4 text-sm text-gray-500'>
             <span>작성자: {getUsername(post.author)}</span>
             <span>{post.timeAgo}</span>

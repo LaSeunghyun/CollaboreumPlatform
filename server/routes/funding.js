@@ -178,8 +178,10 @@ router.post('/projects', auth, async (req, res) => {
       endDate: end,
       rewards: rewards || [],
       tags: tags || [],
-      executionPlan:
-        executionPlan || { stages: [], totalBudget: goalAmountValue },
+      executionPlan: executionPlan || {
+        stages: [],
+        totalBudget: goalAmountValue,
+      },
       artist: req.user.id,
       artistName: req.user.name,
       status: '준비중',
@@ -504,6 +506,7 @@ router.post('/projects/:id/refund', auth, async (req, res) => {
           message: refundResult.message,
         });
       } catch (error) {
+        console.error('환불 처리 오류:', error);
         refundResults.push({
           backerId: backer.user,
           amount: backer.amount,

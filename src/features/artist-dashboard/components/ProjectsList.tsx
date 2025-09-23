@@ -24,13 +24,19 @@ export const ProjectsList = ({ projects }: ProjectsListProps) => {
             <div className='flex items-start justify-between'>
               <div>
                 <CardTitle className='mb-2'>{project.title}</CardTitle>
-                <Badge className={statusToneClassMap[project.statusTone]}>{project.status}</Badge>
+                <Badge className={statusToneClassMap[project.statusTone]}>
+                  {project.status}
+                </Badge>
               </div>
               <div className='flex gap-2'>
                 <Button variant='outline' size='sm'>
                   <Edit className='h-4 w-4' />
                 </Button>
-                <Button variant='outline' size='sm' className='border-red-600 text-red-600'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='border-red-600 text-red-600'
+                >
                   <Trash2 className='h-4 w-4' />
                 </Button>
               </div>
@@ -43,7 +49,9 @@ export const ProjectsList = ({ projects }: ProjectsListProps) => {
                   <div>
                     <div className='mb-2 flex items-center justify-between'>
                       <span className='text-sm text-gray-600'>펀딩 진행률</span>
-                      <span className='text-sm font-medium'>{project.progressLabel}</span>
+                      <span className='text-sm font-medium'>
+                        {project.progressLabel}
+                      </span>
                     </div>
                     <Progress value={project.progressValue} className='h-3' />
                   </div>
@@ -55,7 +63,9 @@ export const ProjectsList = ({ projects }: ProjectsListProps) => {
                     </div>
                     <div>
                       <p className='text-sm text-gray-600'>모금액</p>
-                      <p className='font-bold text-blue-600'>{project.raisedLabel}</p>
+                      <p className='font-bold text-blue-600'>
+                        {project.raisedLabel}
+                      </p>
                     </div>
                     <div>
                       <p className='text-sm text-gray-600'>후원자</p>
@@ -100,7 +110,9 @@ export const ProjectsList = ({ projects }: ProjectsListProps) => {
                     <div className='space-y-2 text-sm'>
                       <div className='flex justify-between'>
                         <span>총 매출:</span>
-                        <span>{project.completionSummary.totalRevenueLabel}</span>
+                        <span>
+                          {project.completionSummary.totalRevenueLabel}
+                        </span>
                       </div>
                       <div className='flex justify-between'>
                         <span>후원자 분배:</span>

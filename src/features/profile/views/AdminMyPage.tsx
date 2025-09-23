@@ -4,12 +4,7 @@ import { ko } from 'date-fns/locale';
 import { Shield, Lock, LogOut, TrendingUp, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PasswordChangeForm } from '../components/PasswordChangeForm';
 import { ProfileEditForm } from '../components/ProfileEditForm';
 import type { UserProfile } from '../types/profile';
@@ -91,7 +86,10 @@ export const AdminMyPage: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ProfileEditForm profile={profile} onSave={handleProfileSave} />
+                  <ProfileEditForm
+                    profile={profile}
+                    onSave={handleProfileSave}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -172,7 +170,9 @@ export const AdminMyPage: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className='mb-4 text-gray-600'>현재 세션에서 로그아웃합니다.</p>
+                <p className='mb-4 text-gray-600'>
+                  현재 세션에서 로그아웃합니다.
+                </p>
                 <Button variant='outline'>로그아웃</Button>
               </CardContent>
             </Card>

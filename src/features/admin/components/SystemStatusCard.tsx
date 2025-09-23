@@ -7,7 +7,8 @@ interface SystemStatusCardProps {
 }
 
 export function SystemStatusCard({ status, loading }: SystemStatusCardProps) {
-  const { systemHealth, activeUsers, completedProjects, monthlyGrowth } = status;
+  const { systemHealth, activeUsers, completedProjects, monthlyGrowth } =
+    status;
 
   return (
     <Card>
@@ -43,11 +44,12 @@ export function SystemStatusCard({ status, loading }: SystemStatusCardProps) {
           <div className='flex items-center justify-between'>
             <span className='text-sm text-gray-600'>월간 성장률</span>
             <span className='font-semibold text-green-600'>
-              {loading ? '...' : `${monthlyGrowth >= 0 ? '+' : ''}${monthlyGrowth.toFixed(1)}%`}
+              {loading
+                ? '...'
+                : `${monthlyGrowth >= 0 ? '+' : ''}${monthlyGrowth.toFixed(1)}%`}
             </span>
           </div>
         </div>
-
       </CardContent>
     </Card>
   );

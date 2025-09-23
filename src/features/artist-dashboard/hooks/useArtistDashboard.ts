@@ -173,7 +173,9 @@ export const useArtistDashboard = (): ArtistDashboardData => {
         };
 
         const nextArtist =
-          artistApiResponse.success && artistApiResponse.data ? artistApiResponse.data : null;
+          artistApiResponse.success && artistApiResponse.data
+            ? artistApiResponse.data
+            : null;
 
         const nextProjects =
           projectsApiResponse.success && Array.isArray(projectsApiResponse.data)
@@ -211,9 +213,11 @@ export const useArtistDashboard = (): ArtistDashboardData => {
 
   const overviewStats = useMemo<OverviewStat[]>(() => {
     const totalProjects = state.artist?.totalProjects ?? state.projects.length;
-    const totalFunding = state.artist?.totalFunding ?? state.projects.reduce((sum, project) => {
-      return sum + (project.raised ?? 0);
-    }, 0);
+    const totalFunding =
+      state.artist?.totalFunding ??
+      state.projects.reduce((sum, project) => {
+        return sum + (project.raised ?? 0);
+      }, 0);
     const followers = state.artist?.followers ?? 0;
     const monthlyGrowth = state.artist?.monthlyGrowth ?? 0;
 

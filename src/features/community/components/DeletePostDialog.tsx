@@ -30,7 +30,8 @@ export const DeletePostDialog: FC<DeletePostDialogProps> = ({
         <AlertDialogHeader>
           <AlertDialogTitle>게시글 삭제</AlertDialogTitle>
           <AlertDialogDescription>
-            이 게시글을 정말 삭제하시겠습니까? 삭제된 게시글은 복구할 수 없습니다.
+            이 게시글을 정말 삭제하시겠습니까? 삭제된 게시글은 복구할 수
+            없습니다.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

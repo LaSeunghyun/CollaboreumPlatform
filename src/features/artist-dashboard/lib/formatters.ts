@@ -15,21 +15,29 @@ export const formatInteger = (value?: number | null) => {
   return value.toLocaleString();
 };
 
-export const formatPercentage = (value?: number | null, options?: { includeSign?: boolean }) => {
+export const formatPercentage = (
+  value?: number | null,
+  options?: { includeSign?: boolean },
+) => {
   const percentage = value ?? 0;
   const prefix = options?.includeSign && percentage > 0 ? '+' : '';
 
   return `${prefix}${percentage}%`;
 };
 
-export const calculateProgress = (raised?: number | null, goal?: number | null) => {
+export const calculateProgress = (
+  raised?: number | null,
+  goal?: number | null,
+) => {
   if (!goal || goal <= 0 || !raised) {
     return 0;
   }
 
   const percentage = (raised / goal) * 100;
 
-  return Number.isFinite(percentage) ? Math.min(Math.max(percentage, 0), 100) : 0;
+  return Number.isFinite(percentage)
+    ? Math.min(Math.max(percentage, 0), 100)
+    : 0;
 };
 
 export const formatCountWithUnit = (value: number, unit: string) => {

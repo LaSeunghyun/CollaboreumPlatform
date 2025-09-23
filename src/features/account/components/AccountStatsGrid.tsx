@@ -16,7 +16,9 @@ export const AccountStatsGrid: React.FC<AccountStatsGridProps> = ({
       <CardContent className='p-4 text-center'>
         <div className='mb-2 flex items-center justify-center gap-2'>
           <BarChart3 className='h-4 w-4 text-indigo' />
-          <span className='text-sm text-muted-foreground'>진행 중인 프로젝트</span>
+          <span className='text-sm text-muted-foreground'>
+            진행 중인 프로젝트
+          </span>
         </div>
         <p className='text-2xl font-bold'>{ongoingProjects}개</p>
       </CardContent>

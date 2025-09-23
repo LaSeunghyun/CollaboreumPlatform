@@ -1,18 +1,15 @@
 import React from 'react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Input,
-} from '@/shared/ui';
+import { Card, CardContent, CardHeader, CardTitle, Input } from '@/shared/ui';
 import { Label } from '@radix-ui/react-label';
 
 interface ProjectFundingSectionProps {
   goal: string;
   duration: string;
   revenueShare: string;
-  onNumberChange: (field: 'goal' | 'duration' | 'revenueShare', value: string) => void;
+  onNumberChange: (
+    field: 'goal' | 'duration' | 'revenueShare',
+    value: string,
+  ) => void;
   onInputChange: (field: 'duration' | 'revenueShare', value: string) => void;
   formatNumber: (value: string) => string;
 }

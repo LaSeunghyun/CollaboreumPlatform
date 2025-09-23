@@ -12,11 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Eye, Save, X } from 'lucide-react';
-import {
-  ExpenseCategoryOption,
-  ExpenseRecord,
-  ExecutionStage,
-} from '../types';
+import { ExpenseCategoryOption, ExpenseRecord, ExecutionStage } from '../types';
 
 interface ExpenseRecordFormProps {
   expense: ExpenseRecord;
@@ -45,7 +41,9 @@ export const ExpenseRecordForm: React.FC<ExpenseRecordFormProps> = ({
     <Card className='border-2 border-blue-200'>
       <CardHeader>
         <CardTitle className='text-lg'>
-          {expense.id.startsWith('expense_') ? '새 비용 내역 추가' : '비용 내역 수정'}
+          {expense.id.startsWith('expense_')
+            ? '새 비용 내역 추가'
+            : '비용 내역 수정'}
         </CardTitle>
       </CardHeader>
       <CardContent className='space-y-4'>

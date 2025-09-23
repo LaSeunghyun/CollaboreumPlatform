@@ -19,9 +19,11 @@ const KNOWN_CATEGORY_LABELS = new Set(
   FALLBACK_CATEGORIES.map(category => category.value),
 );
 
-const normalizeCategory = (
-  category: { id: string; label: string; icon: string },
-): ExpenseCategoryOption => {
+const normalizeCategory = (category: {
+  id: string;
+  label: string;
+  icon: string;
+}): ExpenseCategoryOption => {
   const label = category.label as ExpenseRecord['category'];
   const value = KNOWN_CATEGORY_LABELS.has(label) ? label : '기타';
 
@@ -52,15 +54,12 @@ export const useExpenseRecords = ({
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [expenseCategories, setExpenseCategories] = useState<
-    ExpenseCategoryOption[]
-  >(FALLBACK_CATEGORIES);
+  const [expenseCategories, setExpenseCategories] =
+    useState<ExpenseCategoryOption[]>(FALLBACK_CATEGORIES);
   const [selectedCategory, setSelectedCategory] = useState<
     ExpenseRecord['category'] | '전체'
   >('전체');
-  const [selectedStage, setSelectedStage] = useState<string | '전체'>(
-    '전체',
-  );
+  const [selectedStage, setSelectedStage] = useState<string | '전체'>('전체');
 
   useEffect(() => {
     setExpenses(expenseRecords || []);
@@ -100,19 +99,25 @@ export const useExpenseRecords = ({
   );
 
   const categoryStats = useMemo(() => {
-    return expenses.reduce((acc, expense) => {
-      acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
-      return acc;
-    }, {} as Record<ExpenseRecord['category'], number>);
+    return expenses.reduce(
+      (acc, expense) => {
+        acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
+        return acc;
+      },
+      {} as Record<ExpenseRecord['category'], number>,
+    );
   }, [expenses]);
 
   const stageStats = useMemo(() => {
-    return expenses.reduce((acc, expense) => {
-      if (expense.stage) {
-        acc[expense.stage] = (acc[expense.stage] || 0) + expense.amount;
-      }
-      return acc;
-    }, {} as Record<string, number>);
+    return expenses.reduce(
+      (acc, expense) => {
+        if (expense.stage) {
+          acc[expense.stage] = (acc[expense.stage] || 0) + expense.amount;
+        }
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
   }, [expenses]);
 
   const filteredExpenses = useMemo(() => {
@@ -240,9 +245,7 @@ export const useExpenseRecords = ({
       }
 
       const errorMessage =
-        response &&
-        typeof response === 'object' &&
-        'message' in response
+        response && typeof response === 'object' && 'message' in response
           ? String(response.message)
           : '비용 내역 저장에 실패했습니다.';
 

@@ -30,7 +30,9 @@ export const ExpenseRecordItem: React.FC<ExpenseRecordItemProps> = ({
         <div className='mb-4 flex items-start justify-between'>
           <div className='flex-1'>
             <div className='mb-2 flex items-center gap-3'>
-              <Badge className='bg-blue-100 text-blue-800'>{expense.category}</Badge>
+              <Badge className='bg-blue-100 text-blue-800'>
+                {expense.category}
+              </Badge>
               {stageName && <Badge variant='outline'>{stageName}</Badge>}
               {expense.verified && (
                 <Badge className='bg-green-100 text-green-800'>검증완료</Badge>
@@ -85,10 +87,12 @@ export const ExpenseRecordItem: React.FC<ExpenseRecordItemProps> = ({
                 size='sm'
                 onClick={() => window.open(expense.receipt!, '_blank')}
               >
-                <Eye className='mr-2 h-4 w-4' />보기
+                <Eye className='mr-2 h-4 w-4' />
+                보기
               </Button>
               <Button variant='outline' size='sm'>
-                <Download className='mr-2 h-4 w-4' />다운로드
+                <Download className='mr-2 h-4 w-4' />
+                다운로드
               </Button>
             </div>
           </div>

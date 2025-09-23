@@ -12,7 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/shared/ui/Button';
 import {
@@ -26,7 +30,10 @@ interface EventCreationFormProps {
   categories: EventCategoryOption[];
   loading: boolean;
   loadingCategories: boolean;
-  onInputChange: (field: keyof EventFormState, value: string | number | Date) => void;
+  onInputChange: (
+    field: keyof EventFormState,
+    value: string | number | Date,
+  ) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   onCancel?: () => void;
 }
@@ -72,13 +79,17 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
                 rows={4}
               />
               {errors.description && (
-                <p className='mt-1 text-sm text-red-500'>{errors.description}</p>
+                <p className='mt-1 text-sm text-red-500'>
+                  {errors.description}
+                </p>
               )}
             </div>
 
             <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
               <div>
-                <label className='mb-2 block text-sm font-medium'>카테고리 *</label>
+                <label className='mb-2 block text-sm font-medium'>
+                  카테고리 *
+                </label>
                 <Select
                   value={formData.category}
                   onValueChange={value => onInputChange('category', value)}
@@ -108,7 +119,9 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
               </div>
 
               <div>
-                <label className='mb-2 block text-sm font-medium'>최대 참가자 수 *</label>
+                <label className='mb-2 block text-sm font-medium'>
+                  최대 참가자 수 *
+                </label>
                 <Input
                   type='number'
                   value={formData.maxParticipants}
@@ -123,7 +136,9 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
                   className={errors.maxParticipants ? 'border-red-500' : ''}
                 />
                 {errors.maxParticipants && (
-                  <p className='mt-1 text-sm text-red-500'>{errors.maxParticipants}</p>
+                  <p className='mt-1 text-sm text-red-500'>
+                    {errors.maxParticipants}
+                  </p>
                 )}
               </div>
             </div>
@@ -152,7 +167,9 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
 
             <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
               <div>
-                <label className='mb-2 block text-sm font-medium'>시작 날짜</label>
+                <label className='mb-2 block text-sm font-medium'>
+                  시작 날짜
+                </label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -167,7 +184,9 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
                     <Calendar
                       mode='single'
                       selected={formData.startDate}
-                      onSelect={date => date && onInputChange('startDate', date)}
+                      onSelect={date =>
+                        date && onInputChange('startDate', date)
+                      }
                       initialFocus
                     />
                   </PopoverContent>
@@ -175,7 +194,9 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
               </div>
 
               <div>
-                <label className='mb-2 block text-sm font-medium'>종료 날짜</label>
+                <label className='mb-2 block text-sm font-medium'>
+                  종료 날짜
+                </label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button

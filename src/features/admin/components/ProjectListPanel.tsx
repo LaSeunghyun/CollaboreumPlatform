@@ -43,7 +43,9 @@ export function ProjectListPanel({
                 className='flex items-center justify-between rounded-lg border border-gray-200 p-4'
               >
                 <div className='flex-1'>
-                  <h4 className='font-semibold text-gray-900'>{project.title}</h4>
+                  <h4 className='font-semibold text-gray-900'>
+                    {project.title}
+                  </h4>
                   <p className='text-sm text-gray-600'>by {project.artist}</p>
                   <div className='mt-2 flex items-center space-x-4 text-sm text-gray-500'>
                     <span>목표: {formatCurrency(project.targetAmount)}</span>

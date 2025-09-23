@@ -35,7 +35,7 @@ export const FanProfileBackingsTable = ({
 
   return (
     <div className='space-y-4'>
-      {backings.map((pledge) => (
+      {backings.map(pledge => (
         <Card key={pledge.id} className='transition-shadow hover:shadow-md'>
           <CardContent className='p-6'>
             <div className='flex items-start justify-between'>
@@ -43,14 +43,20 @@ export const FanProfileBackingsTable = ({
                 <h4 className='mb-2 text-lg font-semibold text-gray-900'>
                   {pledge.projectTitle}
                 </h4>
-                <p className='mb-2 text-sm text-gray-600'>by {pledge.artistName}</p>
+                <p className='mb-2 text-sm text-gray-600'>
+                  by {pledge.artistName}
+                </p>
                 {pledge.rewardTitle && (
-                  <p className='mb-2 text-sm text-gray-700'>{pledge.rewardTitle}</p>
+                  <p className='mb-2 text-sm text-gray-700'>
+                    {pledge.rewardTitle}
+                  </p>
                 )}
                 <div className='flex items-center space-x-4 text-sm text-gray-500'>
                   <span>후원일: {pledge.pledgeDateLabel}</span>
                   <span>•</span>
-                  <span className='font-medium text-gray-900'>{pledge.formattedAmount}</span>
+                  <span className='font-medium text-gray-900'>
+                    {pledge.formattedAmount}
+                  </span>
                 </div>
               </div>
               <div className='flex flex-col items-end space-y-2'>

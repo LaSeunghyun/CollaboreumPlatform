@@ -33,13 +33,15 @@ export const useCreateProjectForm = ({
   userId,
   onSuccess,
 }: UseCreateProjectFormOptions) => {
-  const [formData, setFormData] = useState<CreateProjectFormState>(
-    INITIAL_FORM_STATE,
-  );
+  const [formData, setFormData] =
+    useState<CreateProjectFormState>(INITIAL_FORM_STATE);
   const [loading, setLoading] = useState(false);
 
   const handleInputChange = useCallback(
-    <Key extends keyof CreateProjectFormState>(field: Key, value: CreateProjectFormState[Key]) => {
+    <Key extends keyof CreateProjectFormState>(
+      field: Key,
+      value: CreateProjectFormState[Key],
+    ) => {
       setFormData(prev => ({
         ...prev,
         [field]: value,
@@ -88,7 +90,9 @@ export const useCreateProjectForm = ({
         !formData.goal ||
         !formData.duration
       ) {
-        window.alert('제목, 설명, 카테고리, 목표 금액, 기간을 모두 입력해주세요.');
+        window.alert(
+          '제목, 설명, 카테고리, 목표 금액, 기간을 모두 입력해주세요.',
+        );
         return;
       }
 

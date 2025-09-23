@@ -18,10 +18,12 @@ export const AccountHeader: React.FC<AccountHeaderProps> = ({
     </div>
     <div className='flex items-center gap-3'>
       <Button variant='outline' size='sm' onClick={onOpenSettings}>
-        <Settings className='mr-2 h-4 w-4' />설정
+        <Settings className='mr-2 h-4 w-4' />
+        설정
       </Button>
       <Button variant='outline' size='sm' onClick={onLogout}>
-        <LogOut className='mr-2 h-4 w-4' />로그아웃
+        <LogOut className='mr-2 h-4 w-4' />
+        로그아웃
       </Button>
     </div>
   </div>

@@ -8,10 +8,9 @@ interface ProjectFundingModeSectionProps {
   onChange: (mode: FundingMode) => void;
 }
 
-export const ProjectFundingModeSection: React.FC<ProjectFundingModeSectionProps> = ({
-  fundingMode,
-  onChange,
-}) => (
+export const ProjectFundingModeSection: React.FC<
+  ProjectFundingModeSectionProps
+> = ({ fundingMode, onChange }) => (
   <Card>
     <CardContent>
       <FundingModeSelector value={fundingMode} onChange={onChange} />
