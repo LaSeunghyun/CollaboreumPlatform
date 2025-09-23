@@ -198,14 +198,22 @@ export const useAdminDashboardData = (): UseAdminDashboardDataResult => {
 
   const dashboardMetrics = useMemo(() => {
     if (!dashboardMetricsData) return {} as AdminDashboardMetrics;
-    if (typeof dashboardMetricsData === 'object' && 'data' in dashboardMetricsData) {
-      return ((dashboardMetricsData as UnknownRecord).data ?? {}) as AdminDashboardMetrics;
+    if (
+      typeof dashboardMetricsData === 'object' &&
+      'data' in dashboardMetricsData
+    ) {
+      return ((dashboardMetricsData as unknown as UnknownRecord).data ??
+        {}) as AdminDashboardMetrics;
     }
-    return (dashboardMetricsData as AdminDashboardMetrics) ?? ({} as AdminDashboardMetrics);
+    return (
+      (dashboardMetricsData as AdminDashboardMetrics) ??
+      ({} as AdminDashboardMetrics)
+    );
   }, [dashboardMetricsData]);
 
   const pendingReportsCount = useMemo(() => {
-    const raw = (reportedContentData as UnknownRecord)?.data ?? reportedContentData ?? [];
+    const raw =
+      (reportedContentData as UnknownRecord)?.data ?? reportedContentData ?? [];
 
     if (Array.isArray(raw)) {
       return raw.length;
@@ -227,7 +235,8 @@ export const useAdminDashboardData = (): UseAdminDashboardDataResult => {
       platformStats.totalUsers ?? dashboardMetrics.userMetrics?.totalUsers,
     );
     const totalProjects = safeNumber(
-      platformStats.totalProjects ?? dashboardMetrics.fundingMetrics?.activeProjects,
+      platformStats.totalProjects ??
+        dashboardMetrics.fundingMetrics?.activeProjects,
     );
     const totalRevenue = safeNumber(
       platformStats.totalFunding ??
@@ -245,7 +254,9 @@ export const useAdminDashboardData = (): UseAdminDashboardDataResult => {
     const pendingApprovals = safeNumber(
       dashboardMetrics.communityMetrics?.pendingReports ?? pendingReportsCount,
     );
-    const monthlyGrowth = safeNumber(dashboardMetrics.revenueMetrics?.growthRate);
+    const monthlyGrowth = safeNumber(
+      dashboardMetrics.revenueMetrics?.growthRate,
+    );
     const queueSize = safeNumber(
       dashboardMetrics.communityMetrics?.moderationQueue ?? pendingReportsCount,
     );
@@ -266,34 +277,52 @@ export const useAdminDashboardData = (): UseAdminDashboardDataResult => {
   const users = useMemo<DashboardUser[]>(() => {
     const raw = extractData(usersData, [] as unknown[]);
 
-    return (Array.isArray(raw) ? raw : (raw as UnknownRecord)?.users ?? [])
-      .map(user => (user ?? {}))
+    const userArray: any[] = Array.isArray(raw)
+      ? raw
+      : ((raw as UnknownRecord)?.users as any[]) || [];
+    return userArray
+      .map((user: any) => user ?? {})
       .map((user: any) => ({
-        id: String(user.id ?? user._id ?? user.userId ?? user.uuid ?? fallbackId()),
+        id: String(
+          user.id ?? user._id ?? user.userId ?? user.uuid ?? fallbackId(),
+        ),
         name: user.name ?? user.username ?? '이름 미상',
         email: user.email ?? '이메일 정보 없음',
         status: (user.status ?? 'active') as string,
         joinDate: user.joinDate ?? user.createdAt ?? undefined,
-        lastActive: user.lastActivity ?? user.lastLogin ?? user.updatedAt ?? undefined,
-        projects: safeNumber(user.fundingCount ?? user.projectCount ?? user.projects ?? 0),
+        lastActive:
+          user.lastActivity ?? user.lastLogin ?? user.updatedAt ?? undefined,
+        projects: safeNumber(
+          user.fundingCount ?? user.projectCount ?? user.projects ?? 0,
+        ),
       }));
   }, [usersData]);
 
   const projects = useMemo<DashboardProject[]>(() => {
     const raw = extractData(projectsData, [] as unknown[]);
 
-    return (Array.isArray(raw) ? raw : (raw as UnknownRecord)?.projects ?? [])
-      .map(project => (project ?? {}))
+    const projectArray: any[] = Array.isArray(raw)
+      ? raw
+      : ((raw as UnknownRecord)?.projects as any[]) || [];
+    return projectArray
+      .map((project: any) => project ?? {})
       .map((project: any) => ({
-        id: String(project.id ?? project._id ?? project.projectId ?? fallbackId()),
+        id: String(
+          project.id ?? project._id ?? project.projectId ?? fallbackId(),
+        ),
         title: project.title ?? '이름 없는 프로젝트',
         artist: project.artist?.name ?? project.artistName ?? '알 수 없음',
-        status: (project.approvalStatus ?? project.status ?? 'pending') as string,
+        status: (project.approvalStatus ??
+          project.status ??
+          'pending') as string,
         amount: safeNumber(
           project.currentAmount ?? project.amount ?? project.raisedAmount ?? 0,
         ),
         targetAmount: safeNumber(
-          project.goalAmount ?? project.targetAmount ?? project.fundingGoal ?? 0,
+          project.goalAmount ??
+            project.targetAmount ??
+            project.fundingGoal ??
+            0,
         ),
         backers: safeNumber(project.backerCount ?? project.backers ?? 0),
         createdAt: project.submissionDate ?? project.createdAt ?? undefined,
@@ -465,7 +494,10 @@ export const useAdminDashboardData = (): UseAdminDashboardDataResult => {
   };
 };
 
-export const dashboardStatIcons: Record<keyof DashboardStatsSummary, ReactNode> = {
+export const dashboardStatIcons: Record<
+  keyof DashboardStatsSummary,
+  ReactNode
+> = {
   totalUsers: <Users className='h-8 w-8 text-blue-600' />,
   totalRevenue: <DollarSign className='h-8 w-8 text-green-600' />,
   totalProjects: <BarChart3 className='h-8 w-8 text-purple-600' />,

@@ -4,7 +4,11 @@ import { ko } from 'date-fns/locale';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
-import { useCreateComment, useCreateReply, useDeleteComment } from '@/lib/api/useCommunityComments';
+import {
+  useCreateComment,
+  useCreateReply,
+  useDeleteComment,
+} from '@/lib/api/useCommunityComments';
 import { usePostReaction } from '@/lib/api/useCommunityReactions';
 import { communityPostAPI } from '@/services/api/community';
 import { useDeleteCommunityPost } from '@/features/community/hooks/useCommunityPosts';
@@ -83,10 +87,10 @@ const transformComments = (comments: unknown[]): CommunityCommentNode[] => {
         typeof authorField === 'string'
           ? authorField
           : typeof authorField === 'object' && authorField
-          ? (authorField as Record<string, unknown>).name ||
-            (authorField as Record<string, unknown>).username ||
-            toStringSafe((authorField as Record<string, unknown>).id)
-          : toStringSafe(commentRecord.authorName);
+            ? (authorField as Record<string, unknown>).name ||
+              (authorField as Record<string, unknown>).username ||
+              toStringSafe((authorField as Record<string, unknown>).id)
+            : toStringSafe(commentRecord.authorName);
 
       const authorId =
         toStringSafe(commentRecord.authorId) ||
@@ -107,7 +111,7 @@ const transformComments = (comments: unknown[]): CommunityCommentNode[] => {
         parentId: commentRecord.parentId
           ? toStringSafe(commentRecord.parentId)
           : undefined,
-      };
+      } as CommunityCommentNode;
     });
 };
 
@@ -123,13 +127,15 @@ const extractPostDetail = (
     typeof authorField === 'string'
       ? authorField
       : typeof authorField === 'object' && authorField
-      ? ((authorField as Record<string, unknown>).name as string) || 'Unknown'
-      : 'Unknown';
+        ? ((authorField as Record<string, unknown>).name as string) || 'Unknown'
+        : 'Unknown';
 
   const authorId =
     typeof authorField === 'string'
       ? authorField
-      : toStringSafe((authorField as Record<string, unknown>).id || authorField);
+      : toStringSafe(
+          (authorField as Record<string, unknown>).id || authorField,
+        );
 
   const likesRaw = data.likes;
   const dislikesRaw = data.dislikes;
@@ -137,14 +143,14 @@ const extractPostDetail = (
   const likes = Array.isArray(likesRaw)
     ? likesRaw.length
     : typeof likesRaw === 'number'
-    ? likesRaw
-    : 0;
+      ? likesRaw
+      : 0;
 
   const dislikes = Array.isArray(dislikesRaw)
     ? dislikesRaw.length
     : typeof dislikesRaw === 'number'
-    ? dislikesRaw
-    : 0;
+      ? dislikesRaw
+      : 0;
 
   const replies = Array.isArray(data.comments)
     ? (data.comments as unknown[]).length
@@ -157,9 +163,7 @@ const extractPostDetail = (
     author: authorName,
     authorId,
     content: toStringSafe(data.content),
-    images: Array.isArray(data.images)
-      ? (data.images as string[])
-      : [],
+    images: Array.isArray(data.images) ? (data.images as string[]) : [],
     timeAgo: formatDistanceToNow(createdAt, { addSuffix: true, locale: ko }),
     replies,
     likes,
@@ -266,7 +270,10 @@ export const useCommunityPostDetail = (
     fetchPostDetail();
   }, [fetchPostDetail]);
 
-  const refreshPost = useCallback(() => fetchPostDetail(false), [fetchPostDetail]);
+  const refreshPost = useCallback(
+    () => fetchPostDetail(false),
+    [fetchPostDetail],
+  );
 
   const handleBack = useCallback(() => {
     if (options.onBack) {
@@ -336,11 +343,11 @@ export const useCommunityPostDetail = (
               prev
                 ? {
                     ...prev,
-                    likes: data.likes,
-                    dislikes: data.dislikes,
-                    isLiked: data.isLiked,
-                    isDisliked: data.isDisliked,
-                    isHot: data.likes > 20,
+                    likes: data.likes ?? prev.likes,
+                    dislikes: data.dislikes ?? prev.dislikes,
+                    isLiked: data.isLiked ?? prev.isLiked,
+                    isDisliked: data.isDisliked ?? prev.isDisliked,
+                    isHot: (data.likes ?? prev.likes) > 20,
                   }
                 : prev,
             );
@@ -366,10 +373,10 @@ export const useCommunityPostDetail = (
               prev
                 ? {
                     ...prev,
-                    likes: data.likes,
-                    dislikes: data.dislikes,
-                    isLiked: data.isLiked,
-                    isDisliked: data.isDisliked,
+                    likes: data.likes ?? prev.likes,
+                    dislikes: data.dislikes ?? prev.dislikes,
+                    isLiked: data.isLiked ?? prev.isLiked,
+                    isDisliked: data.isDisliked ?? prev.isDisliked,
                   }
                 : prev,
             );
@@ -404,7 +411,15 @@ export const useCommunityPostDetail = (
         );
       });
     },
-    [comment, createCommentMutation, post, postId, refreshPost, requireAuth, user],
+    [
+      comment,
+      createCommentMutation,
+      post,
+      postId,
+      refreshPost,
+      requireAuth,
+      user,
+    ],
   );
 
   const handleCommentDelete = useCallback(
@@ -451,7 +466,15 @@ export const useCommunityPostDetail = (
         );
       });
     },
-    [createReplyMutation, post, postId, refreshPost, replyContent, requireAuth, user],
+    [
+      createReplyMutation,
+      post,
+      postId,
+      refreshPost,
+      replyContent,
+      requireAuth,
+      user,
+    ],
   );
 
   const cancelReply = useCallback(() => {
@@ -475,7 +498,9 @@ export const useCommunityPostDetail = (
   const canDeleteComment = useCallback(
     (commentAuthorId: string) => {
       return Boolean(
-        user && post && (user.id === commentAuthorId || user.id === post.authorId),
+        user &&
+          post &&
+          (user.id === commentAuthorId || user.id === post.authorId),
       );
     },
     [post, user],
@@ -533,4 +558,6 @@ export const useCommunityPostDetail = (
   };
 };
 
-export type UseCommunityPostDetailReturn = ReturnType<typeof useCommunityPostDetail>;
+export type UseCommunityPostDetailReturn = ReturnType<
+  typeof useCommunityPostDetail
+>;

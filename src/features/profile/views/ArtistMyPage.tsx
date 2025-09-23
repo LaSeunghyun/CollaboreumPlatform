@@ -1,21 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import {
-  User,
-  Lock,
-  Trash2,
-  Plus,
-  Eye,
-} from 'lucide-react';
+import { User, Lock, Trash2, Plus, Eye } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LoadingState, ErrorState } from '@/components/organisms/States';
 import { PasswordChangeForm } from '../components/PasswordChangeForm';
 import { ProfileEditForm } from '../components/ProfileEditForm';
@@ -39,7 +28,9 @@ export const ArtistMyPage: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [revenues, setRevenues] = useState<Revenue[]>([]);
   const [activeTab, setActiveTab] = useState('profile');
-  const [statusConfig, setStatusConfig] = useState<Record<string, StatusBadgeConfig>>({});
+  const [statusConfig, setStatusConfig] = useState<
+    Record<string, StatusBadgeConfig>
+  >({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -70,7 +61,7 @@ export const ArtistMyPage: React.FC = () => {
 
         const statusConfigData =
           await dynamicConstantsService.getProjectStatusConfig();
-        setStatusConfig(statusConfigData);
+        setStatusConfig(statusConfigData as Record<string, StatusBadgeConfig>);
       } catch (err) {
         console.error('아티스트 데이터 로드 실패:', err);
         setError('데이터를 불러오는데 실패했습니다.');
@@ -182,7 +173,10 @@ export const ArtistMyPage: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ProfileEditForm profile={profile} onSave={handleProfileSave} />
+                  <ProfileEditForm
+                    profile={profile}
+                    onSave={handleProfileSave}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -234,7 +228,11 @@ export const ArtistMyPage: React.FC = () => {
                   <div className='flex items-center justify-between'>
                     <span>성공한 프로젝트</span>
                     <span className='font-bold text-green-600'>
-                      {projects.filter(project => project.status === 'completed').length}
+                      {
+                        projects.filter(
+                          project => project.status === 'completed',
+                        ).length
+                      }
                     </span>
                   </div>
                   <div className='flex items-center justify-between'>
@@ -280,7 +278,8 @@ export const ArtistMyPage: React.FC = () => {
                             className='h-full rounded-full bg-blue-500'
                             style={{
                               width: `${Math.min(
-                                (project.currentAmount / project.goalAmount) * 100,
+                                (project.currentAmount / project.goalAmount) *
+                                  100,
                                 100,
                               )}%`,
                             }}
@@ -300,10 +299,12 @@ export const ArtistMyPage: React.FC = () => {
                         </div>
                         {getStatusBadge(project.status)}
                         <p className='mt-2 text-sm text-gray-500'>
-                          시작일: {format(project.createdAt, 'PPP', { locale: ko })}
+                          시작일:{' '}
+                          {format(project.createdAt, 'PPP', { locale: ko })}
                         </p>
                         <p className='text-sm text-gray-500'>
-                          마감일: {format(project.endDate, 'PPP', { locale: ko })}
+                          마감일:{' '}
+                          {format(project.endDate, 'PPP', { locale: ko })}
                         </p>
                       </div>
                     </div>
@@ -333,9 +334,12 @@ export const ArtistMyPage: React.FC = () => {
                   <div key={revenue.id} className='rounded-lg border p-4'>
                     <div className='flex items-start justify-between'>
                       <div>
-                        <h3 className='font-semibold'>{revenue.projectTitle}</h3>
+                        <h3 className='font-semibold'>
+                          {revenue.projectTitle}
+                        </h3>
                         <p className='mt-1 text-sm text-gray-600'>
-                          분배일: {format(revenue.distributedAt, 'PPP', { locale: ko })}
+                          분배일:{' '}
+                          {format(revenue.distributedAt, 'PPP', { locale: ko })}
                         </p>
                       </div>
                       <div className='text-right'>
@@ -344,7 +348,9 @@ export const ArtistMyPage: React.FC = () => {
                         </div>
                         <Badge
                           variant={
-                            revenue.status === 'completed' ? 'default' : 'secondary'
+                            revenue.status === 'completed'
+                              ? 'default'
+                              : 'secondary'
                           }
                         >
                           {revenue.status === 'completed' ? '완료' : '대기 중'}
@@ -383,7 +389,9 @@ export const ArtistMyPage: React.FC = () => {
                 <p className='mb-4 text-gray-600'>
                   계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
                 </p>
-                <Button variant='solid' tone='danger'>계정 삭제</Button>
+                <Button variant='solid' tone='danger'>
+                  계정 삭제
+                </Button>
               </CardContent>
             </Card>
           </div>
