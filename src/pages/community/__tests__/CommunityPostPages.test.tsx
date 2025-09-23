@@ -5,7 +5,7 @@ import { CreatePostPage } from '../CreatePostPage';
 import { EditPostPage } from '../EditPostPage';
 import { communityPostAPI } from '../../services/api/community';
 
-jest.mock('../../contexts/AuthContext', () => ({
+jest.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => ({
     user: {
       id: 'user-1',

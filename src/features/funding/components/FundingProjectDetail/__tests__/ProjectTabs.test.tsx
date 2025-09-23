@@ -1,11 +1,12 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import { ProjectTabs } from '../ProjectTabs';
-import { mapFundingProjectDetail } from '@/services/api/funding';
+import { mapFundingProjectDetail } from '@/services/fundingProjectMapper';
 
 describe('ProjectTabs detail view', () => {
-  it('renders safely with mapped project response and missing arrays', () => {
+  it('renders safely with mapped project response and missing arrays', async () => {
     const rawResponse = {
       id: 'mapped-project-1',
       title: '매핑된 프로젝트',
@@ -46,9 +47,15 @@ describe('ProjectTabs detail view', () => {
 
     expect(screen.getByText('프로젝트 소개')).toBeInTheDocument();
     expect(screen.getByText('등록된 리워드가 없습니다.')).toBeInTheDocument();
+
+    // 업데이트 탭 클릭
+    await userEvent.click(screen.getByText('업데이트'));
     expect(
       screen.getByText('아직 등록된 업데이트가 없습니다.'),
     ).toBeInTheDocument();
+
+    // 후원자 탭 클릭
+    await userEvent.click(screen.getByText('후원자'));
     expect(screen.getByText('아직 후원자가 없습니다.')).toBeInTheDocument();
   });
 });

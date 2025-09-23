@@ -174,7 +174,7 @@ describe('펀딩 시스템 기본 테스트', () => {
       expect(screen.getByText('₩500,000')).toBeInTheDocument();
     });
 
-    test('로딩 상태를 올바르게 표시해야 한다', () => {
+    test('로딩 상태를 올바르게 표시해야 한다', async () => {
       // useRetry 모킹 설정 (로딩 상태)
       const { useRetry } = await import('@/hooks/useRetry');
       (useRetry as jest.Mock).mockReturnValue({

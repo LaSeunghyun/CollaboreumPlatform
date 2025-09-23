@@ -26,16 +26,16 @@ export function VirtualizedList<T>({
       scrollTop,
       containerHeight,
       itemHeight,
-      items.length,
+      items?.length || 0,
       overscan,
     );
-  }, [scrollTop, containerHeight, itemHeight, items.length, overscan]);
+  }, [scrollTop, containerHeight, itemHeight, items?.length || 0, overscan]);
 
   const visibleItems = useMemo(() => {
-    return items.slice(startIndex, endIndex + 1);
+    return items?.slice(startIndex, endIndex + 1) || [];
   }, [items, startIndex, endIndex]);
 
-  const totalHeight = items.length * itemHeight;
+  const totalHeight = (items?.length || 0) * itemHeight;
   const offsetY = startIndex * itemHeight;
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {

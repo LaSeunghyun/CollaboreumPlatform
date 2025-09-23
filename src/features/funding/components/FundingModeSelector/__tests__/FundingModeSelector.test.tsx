@@ -10,15 +10,15 @@ describe('FundingModeSelector', () => {
     expect(screen.getByText('All-or-Nothing')).toBeInTheDocument();
     expect(screen.getByText('Flexible Funding')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByLabelText('Flexible Funding'));
+    await userEvent.click(screen.getByText('Flexible Funding'));
     expect(onChange).toHaveBeenCalledWith('flexible');
   });
 
   it('marks the selected option as checked', () => {
     render(<FundingModeSelector value='flexible' onChange={jest.fn()} />);
 
-    const flexibleOption = screen.getByLabelText(
-      'Flexible Funding',
+    const flexibleOption = screen.getByDisplayValue(
+      'flexible',
     ) as HTMLInputElement;
     expect(flexibleOption.checked).toBe(true);
   });

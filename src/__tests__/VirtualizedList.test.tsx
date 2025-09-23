@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { VirtualizedList } from '../components/ui/VirtualizedList';
+import { VirtualizedList } from '../shared/ui/VirtualizedList';
 
 describe('VirtualizedList', () => {
   const mockItems = Array.from({ length: 100 }, (_, i) => ({
@@ -27,7 +27,7 @@ describe('VirtualizedList', () => {
 
     // 화면에 보이는 아이템들만 렌더링되는지 확인
     const visibleItems = screen.getAllByTestId(/item-\d+/);
-    expect(visibleItems.length).toBeLessThanOrEqual(10); // 300px / 50px + overscan
+    expect(visibleItems.length).toBeLessThanOrEqual(12); // 300px / 50px + overscan (기본값 5)
   });
 
   it('빈 배열을 올바르게 처리한다', () => {
