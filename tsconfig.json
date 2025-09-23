@@ -30,7 +30,8 @@
       "@/features/*": ["features/*"],
       "@/components/*": ["components/*"],
       "@/pages/*": ["pages/*"],
-      "@/services/*": ["services/*"]
+      "@/services/*": ["services/*"],
+      "@/api/*": ["api/*"]
     },
     "types": ["jest", "node", "@testing-library/jest-dom", "vite/client"]
   },

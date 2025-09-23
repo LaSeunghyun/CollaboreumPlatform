@@ -21,8 +21,8 @@ import { PasswordChangeForm } from '../components/PasswordChangeForm';
 import { ProfileEditForm } from '../components/ProfileEditForm';
 import type { Project, Revenue, UserProfile } from '../types/profile';
 import { useAuth } from '@/contexts/AuthContext';
-import { artistAPI } from '@/services/api/artist';
-import { dynamicConstantsService } from '@/services/constantsService';
+import { artistAPI } from '@/api/modules/artist';
+import { dynamicConstantsService } from '@/api/services/constantsService';
 import { Button } from '@/shared/ui/Button';
 import type { ApiResponse } from '@/types';
 

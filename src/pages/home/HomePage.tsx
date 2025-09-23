@@ -7,7 +7,7 @@ import { useProjects } from '@/lib/api/useProjects';
 import { useNotices } from '@/lib/api/useNotices';
 import { useCategories } from '@/lib/api/useCategories';
 import { useCommunityPosts } from '@/features/community/hooks/useCommunityPosts';
-import { statsAPI } from '@/services/api/stats';
+import { statsAPI } from '@/api/modules/stats';
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import {
   HomeCommunitySection,

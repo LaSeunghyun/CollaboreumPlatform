@@ -12,8 +12,8 @@ import {
   XCircle,
   BarChart3,
 } from 'lucide-react';
-import { statsAPI } from '@/services/api/stats';
-import { adminAPI } from '@/services/api/admin';
+import { statsAPI } from '@/api/modules/stats';
+import { adminAPI } from '@/api/modules/admin';
 import { adminService } from '../services/adminService';
 import type { AdminNotification, AdminDashboardMetrics } from '../types';
 

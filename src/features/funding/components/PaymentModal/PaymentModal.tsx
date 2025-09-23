@@ -15,8 +15,8 @@ import {
 } from '@/components/ui/select';
 import { X, Lock, Shield, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { dynamicConstantsService } from '@/services/constantsService';
-import { fundingAPI } from '@/services/api/funding';
+import { dynamicConstantsService } from '@/api/services/constantsService';
+import { fundingAPI } from '@/api/modules/funding';
 
 interface PaymentModalProps {
   project: any;
