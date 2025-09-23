@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 import { ProjectTabs } from '../ProjectTabs';
-import { mapFundingProjectDetail } from '@/services/api/funding';
+import { mapFundingProjectDetail } from '@/api/mappers/fundingProjectMapper';
 
 describe('ProjectTabs detail view', () => {
   it('renders safely with mapped project response and missing arrays', () => {
