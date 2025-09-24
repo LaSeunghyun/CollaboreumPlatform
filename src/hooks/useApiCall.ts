@@ -45,8 +45,10 @@ export function useApiCall<T = any>(
   const [isError, setIsError] = useState(false);
 
   const retryCountRef = useRef(0);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isMountedRef = useRef(true);
+  const lastArgsRef = useRef<any[]>([]);
 
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {
@@ -55,20 +57,18 @@ export function useApiCall<T = any>(
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
     };
   }, []);
-
-  // 즉시 실행 옵션이 활성화된 경우
-  useEffect(() => {
-    if (immediate) {
-      execute();
-    }
-  }, [immediate]);
 
   // API 호출 실행
   const execute = useCallback(
     async (...args: any[]): Promise<T | null> => {
       if (!isMountedRef.current) return null;
+
+      lastArgsRef.current = args;
 
       setLoading(true);
       setError(null);
@@ -94,6 +94,10 @@ export function useApiCall<T = any>(
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
           timeoutRef.current = null;
+        }
+        if (retryTimeoutRef.current) {
+          clearTimeout(retryTimeoutRef.current);
+          retryTimeoutRef.current = null;
         }
 
         if (isMountedRef.current) {
@@ -127,7 +131,10 @@ export function useApiCall<T = any>(
         // 재시도 로직
         if (retryCountRef.current < retryCount) {
           retryCountRef.current++;
-          setTimeout(() => {
+          if (retryTimeoutRef.current) {
+            clearTimeout(retryTimeoutRef.current);
+          }
+          retryTimeoutRef.current = setTimeout(() => {
             if (isMountedRef.current) {
               execute(...args);
             }
@@ -151,7 +158,7 @@ export function useApiCall<T = any>(
   // 재시도
   const retry = useCallback(async (): Promise<T | null> => {
     retryCountRef.current = 0;
-    return execute();
+    return execute(...lastArgsRef.current);
   }, [execute]);
 
   // 상태 리셋
@@ -162,11 +169,23 @@ export function useApiCall<T = any>(
     setIsSuccess(false);
     setIsError(false);
     retryCountRef.current = 0;
+    lastArgsRef.current = [];
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
+    }
   }, []);
+
+  // 즉시 실행 옵션이 활성화된 경우
+  useEffect(() => {
+    if (immediate) {
+      void execute(...lastArgsRef.current);
+    }
+  }, [immediate, execute]);
 
   return {
     data,
