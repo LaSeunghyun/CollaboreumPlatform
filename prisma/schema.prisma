@@ -1,0 +1,1072 @@
+// Prisma schema for Collaboreum Platform relational data model
+// Generated to migrate from Mongoose models to PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ARTIST @map("artist")
+  ADMIN  @map("admin")
+  FAN    @map("fan")
+}
+
+enum ArtistCategory {
+  MUSIC       @map("음악")
+  ART         @map("미술")
+  VIDEO       @map("영상")
+  LITERATURE  @map("문학")
+  CRAFT       @map("공예")
+  DESIGN      @map("디자인")
+  OTHER       @map("기타")
+}
+
+enum ArtistGenre {
+  POP          @map("팝")
+  ROCK         @map("록")
+  RNB          @map("R&B")
+  JAZZ         @map("재즈")
+  CLASSICAL    @map("클래식")
+  HIPHOP       @map("힙합")
+  ELECTRONIC   @map("일렉트로닉")
+  INDIE        @map("인디")
+  ALTERNATIVE  @map("얼터너티브")
+  COUNTRY      @map("컨트리")
+  REGGAE       @map("레게")
+  BLUES        @map("블루스")
+  SOUL         @map("소울")
+  PUNK         @map("펑크")
+  METAL        @map("메탈")
+  OTHER        @map("기타")
+}
+
+enum ProjectCategory {
+  MUSIC        @map("음악")
+  VIDEO        @map("비디오")
+  PERFORMANCE  @map("공연")
+  BOOK         @map("도서")
+  GAME         @map("게임")
+  OTHER        @map("기타")
+}
+
+enum ProjectStatus {
+  PLANNING    @map("계획중")
+  IN_PROGRESS @map("진행중")
+  COMPLETED   @map("완료")
+  PENDING     @map("보류")
+  CANCELLED   @map("취소")
+}
+
+enum ProjectApprovalStatus {
+  PENDING   @map("pending")
+  APPROVED  @map("approved")
+  REJECTED  @map("rejected")
+}
+
+enum ProjectTaskStatus {
+  WAITING     @map("대기")
+  IN_PROGRESS @map("진행중")
+  COMPLETED   @map("완료")
+  PENDING     @map("보류")
+}
+
+enum ProjectMilestoneStatus {
+  SCHEDULED   @map("예정")
+  IN_PROGRESS @map("진행중")
+  COMPLETED   @map("완료")
+  DELAYED     @map("지연")
+}
+
+enum PriorityLevel {
+  LOW     @map("낮음")
+  MEDIUM  @map("보통")
+  HIGH    @map("높음")
+  URGENT  @map("긴급")
+}
+
+enum EventCategory {
+  FESTIVAL     @map("축제")
+  PERFORMANCE  @map("공연")
+  COMPETITION  @map("경연")
+  WORKSHOP     @map("워크샵")
+  SEMINAR      @map("세미나")
+  OTHER        @map("기타")
+}
+
+enum EventStatus {
+  SCHEDULED   @map("예정")
+  IN_PROGRESS @map("진행중")
+  COMPLETED   @map("완료")
+  CANCELLED   @map("취소")
+}
+
+enum EventTicketType {
+  REGULAR    @map("일반")
+  VIP        @map("VIP")
+  EARLY_BIRD @map("얼리버드")
+  STUDENT    @map("학생")
+}
+
+enum LiveStreamCategory {
+  MUSIC      @map("음악")
+  PERFORMANCE @map("공연")
+  TALK       @map("토크")
+  WORKSHOP   @map("워크샵")
+  OTHER      @map("기타")
+}
+
+enum LiveStreamStatus {
+  SCHEDULED @map("예정")
+  LIVE      @map("라이브")
+  ENDED     @map("종료")
+  CANCELLED @map("취소")
+}
+
+enum FundingProjectStatus {
+  PREPARING  @map("준비중")
+  IN_PROGRESS @map("진행중")
+  SUCCESS    @map("성공")
+  FAILED     @map("실패")
+  CANCELLED  @map("취소")
+  EXECUTING  @map("집행중")
+  COMPLETED  @map("완료")
+}
+
+enum FundingProjectType {
+  REGULAR              @map("일반")
+  EXECUTION_IN_PROGRESS @map("집행진행")
+  EXPENSE_PUBLIC       @map("비용공개")
+  REVENUE_DISTRIBUTION @map("수익분배")
+}
+
+enum FundingExecutionStatus {
+  PLANNED     @map("계획")
+  IN_PROGRESS @map("진행중")
+  COMPLETED   @map("완료")
+  DELAYED     @map("지연")
+}
+
+enum FundingExpenseCategory {
+  LABOR      @map("인건비")
+  MATERIAL   @map("재료비")
+  EQUIPMENT  @map("장비비")
+  MARKETING  @map("마케팅비")
+  OTHER      @map("기타")
+}
+
+enum FundingDistributionStatus {
+  WAITING      @map("대기")
+  DISTRIBUTED  @map("분배완료")
+  PAID         @map("지급완료")
+}
+
+enum FundingUpdateType {
+  GENERAL            @map("일반")
+  EXECUTION_PROGRESS @map("집행진행")
+  EXPENSE_PUBLIC     @map("비용공개")
+  REVENUE_SHARE      @map("수익분배")
+}
+
+enum DistributionStatus {
+  PENDING    @map("pending")
+  PROCESSING @map("processing")
+  COMPLETED  @map("completed")
+  FAILED     @map("failed")
+}
+
+enum ExpenseVerificationStatus {
+  PENDING    @map("pending")
+  VERIFIED   @map("verified")
+  REJECTED   @map("rejected")
+}
+
+enum TrackGenre {
+  INDIE_POP   @map("인디팝")
+  ROCK        @map("록")
+  ACOUSTIC    @map("어쿠스틱")
+  JAZZ        @map("재즈")
+  CLASSICAL   @map("클래식")
+  ELECTRONIC  @map("일렉트로닉")
+  HIPHOP      @map("힙합")
+  RNB         @map("R&B")
+  OTHER       @map("기타")
+}
+
+enum MusicMood {
+  EXCITING   @map("신나는")
+  EMOTIONAL  @map("감성적인")
+  CALM       @map("잔잔한")
+  INTENSE    @map("강렬한")
+  MELANCHOLY @map("우울한")
+  HOPEFUL    @map("희망적인")
+  ROMANTIC   @map("로맨틱한")
+  MYSTERIOUS @map("신비로운")
+}
+
+enum MusicKey {
+  C
+  C_SHARP  @map("C#")
+  D
+  D_SHARP  @map("D#")
+  E
+  F
+  F_SHARP  @map("F#")
+  G
+  G_SHARP  @map("G#")
+  A
+  A_SHARP  @map("A#")
+  B
+}
+
+enum LicenseType {
+  ALL_RIGHTS_RESERVED @map("All Rights Reserved")
+  CREATIVE_COMMONS    @map("Creative Commons")
+  PUBLIC_DOMAIN       @map("Public Domain")
+}
+
+enum ArtworkCategory {
+  MUSIC      @map("음악")
+  ART        @map("미술")
+  LITERATURE @map("문학")
+  PERFORMANCE @map("공연")
+}
+
+enum ArtworkType {
+  AUDIO @map("audio")
+  IMAGE @map("image")
+  VIDEO @map("video")
+  TEXT  @map("text")
+}
+
+enum ArtworkStatus {
+  DRAFT     @map("draft")
+  PUBLISHED @map("published")
+  ARCHIVED  @map("archived")
+}
+
+enum NotificationType {
+  FUNDING  @map("funding")
+  EVENT    @map("event")
+  POINT    @map("point")
+  FOLLOW   @map("follow")
+  PROJECT  @map("project")
+  COMMENT  @map("comment")
+  LIKE     @map("like")
+  SYSTEM   @map("system")
+}
+
+enum PaymentMethod {
+  CARD   @map("card")
+  BANK   @map("bank")
+  KAKAO  @map("kakao")
+  NAVER  @map("naver")
+}
+
+enum PaymentProvider {
+  TOSS    @map("toss")
+  IAMPORT @map("iamport")
+}
+
+enum PaymentStatus {
+  PENDING   @map("pending")
+  COMPLETED @map("completed")
+  FAILED    @map("failed")
+  CANCELLED @map("cancelled")
+  REFUNDED  @map("refunded")
+}
+
+enum CommunityPostCategory {
+  FREE      @map("자유")
+  QUESTION  @map("질문")
+  MUSIC     @map("음악")
+  ART       @map("미술")
+  LITERATURE @map("문학")
+  PERFORMANCE @map("공연")
+  PHOTOGRAPHY @map("사진")
+  TECHNOLOGY  @map("기술")
+  OTHER       @map("기타")
+}
+
+enum ReactionType {
+  LIKE
+  DISLIKE
+}
+
+model User {
+  id             String   @id @default(cuid())
+  name           String
+  username       String?  @unique
+  email          String   @unique
+  password       String
+  role           UserRole @default(FAN)
+  avatar         String   @default("/avatars/default.jpg")
+  bio            String?
+  isVerified     Boolean  @default(false)
+  isActive       Boolean  @default(true)
+  lastLogin      DateTime?
+  lastLoginAt    DateTime?
+  agreeTerms     Boolean  @default(false)
+  agreePrivacy   Boolean  @default(false)
+  agreeMarketing Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  artistProfile        Artist?
+  artistRecords        Artist[]
+  projects             Project[]         @relation("ProjectOwner")
+  approvedProjects     Project[]         @relation("ProjectApprover")
+  projectTeams         ProjectTeamMember[]
+  projectNotes         ProjectNote[]
+  projectTasks         ProjectTask[]     @relation("TaskAssignee")
+  fundingProjects      FundingProject[]  @relation("FundingProjectOwner")
+  pledges             Pledge[]
+  fundingDistributions FundingProjectDistribution[]
+  payments             Payment[]         @relation("PaymentBacker")
+  communityPosts       CommunityPost[]
+  communityComments    CommunityPostComment[]
+  communityReplies     CommunityPostReply[]
+  communityReactions   CommunityPostReaction[]
+  trackLikes           TrackLike[]
+  eventsCreated        Event[]
+  eventAttendances     EventAttendee[]
+  liveStreams          LiveStream[]
+  liveStreamAccess     LiveStreamAccess[]
+  notifications        Notification[]
+  artworks             Artwork[]
+  revenueDistributions RevenueDistribution[] @relation("RevenueCreator")
+  revenueManagements   RevenueDistribution[] @relation("RevenueManager")
+  creatorPayouts       CreatorPayout[]
+}
+
+model Artist {
+  id               String          @id @default(cuid())
+  userId           String          @unique
+  user             User            @relation(fields: [userId], references: [id])
+  category         ArtistCategory
+  location         String
+  rating           Float           @default(0)
+  tags             String[]
+  coverImage       String?
+  profileImage     String?
+  followers        Int             @default(0)
+  completedProjects Int            @default(0)
+  activeProjects   Int             @default(0)
+  totalEarned      Decimal         @default(0) @db.Decimal(18, 2)
+  genres           ArtistGenre[]
+  totalStreams     Int             @default(0)
+  monthlyListeners Int             @default(0)
+  socialLinks      Json?
+  isVerified       Boolean         @default(false)
+  verificationDate DateTime?
+  featured         Boolean         @default(false)
+  featuredDate     DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  achievements     ArtistAchievement[]
+  tracks           Track[]
+  events           Event[]
+  projects         Project[]
+  fundingProjects  FundingProject[]
+
+  @@index([category])
+  @@index([location])
+  @@index([rating])
+  @@index([followers])
+  @@index([totalStreams])
+  @@index([featured, featuredDate])
+}
+
+model ArtistAchievement {
+  id          String   @id @default(cuid())
+  artistId    String
+  artist      Artist   @relation(fields: [artistId], references: [id])
+  title       String
+  description String?
+  date        DateTime?
+  image       String?
+  createdAt   DateTime @default(now())
+
+  @@index([artistId, date])
+}
+
+model Project {
+  id             String                @id @default(cuid())
+  title          String
+  description    String
+  artistId       String
+  artist         User                  @relation("ProjectOwner", fields: [artistId], references: [id])
+  artistName     String
+  category       ProjectCategory
+  status         ProjectStatus         @default(PLANNING)
+  progress       Int                   @default(0)
+  startDate      DateTime
+  endDate        DateTime
+  budget         Decimal               @db.Decimal(18, 2)
+  spent          Decimal               @default(0) @db.Decimal(18, 2)
+  image          String?
+  approvalStatus ProjectApprovalStatus @default(PENDING)
+  approvalReason String?
+  approvedAt     DateTime?
+  approvedById   String?
+  approvedBy     User?                 @relation("ProjectApprover", fields: [approvedById], references: [id])
+  isActive       Boolean               @default(true)
+  isPublic       Boolean               @default(true)
+  priority       PriorityLevel         @default(MEDIUM)
+  tags           String[]
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  tasks          ProjectTask[]
+  milestones     ProjectMilestone[]
+  teamMembers    ProjectTeamMember[]
+  notes          ProjectNote[]
+  fundingProjects FundingProject[]
+
+  @@index([status, endDate])
+}
+
+model ProjectTask {
+  id          String            @id @default(cuid())
+  projectId   String
+  project     Project           @relation(fields: [projectId], references: [id])
+  taskNumber  Int
+  title       String
+  description String?
+  status      ProjectTaskStatus @default(WAITING)
+  progress    Int               @default(0)
+  assigneeId  String?
+  assignee    User?             @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  dueDate     DateTime?
+  completedAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@unique([projectId, taskNumber])
+  @@index([projectId, status])
+}
+
+model ProjectMilestone {
+  id              String                 @id @default(cuid())
+  projectId       String
+  project         Project                @relation(fields: [projectId], references: [id])
+  milestoneNumber Int
+  title           String
+  description     String?
+  scheduledDate   DateTime
+  status          ProjectMilestoneStatus @default(SCHEDULED)
+  completedAt     DateTime?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  @@unique([projectId, milestoneNumber])
+  @@index([projectId, status])
+}
+
+model ProjectTeamMember {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  role      String
+  joinedAt  DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, userId])
+  @@index([projectId, role])
+}
+
+model ProjectNote {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  authorId  String?
+  author    User?    @relation(fields: [authorId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([projectId, createdAt])
+}
+
+model FundingProject {
+  id                      String                        @id @default(cuid())
+  title                   String
+  description             String
+  artistId                String
+  artist                  User                          @relation("FundingProjectOwner", fields: [artistId], references: [id])
+  artistName              String
+  category                ProjectCategory
+  goalAmount              Decimal                       @db.Decimal(18, 2)
+  currentAmount           Decimal                       @default(0) @db.Decimal(18, 2)
+  startDate               DateTime
+  endDate                 DateTime
+  status                  FundingProjectStatus          @default(PREPARING)
+  progress                Int                           @default(0)
+  daysLeft                Int                           @default(0)
+  image                   String?
+  type                    FundingProjectType?
+  tags                    String[]
+  isActive                Boolean                       @default(true)
+  isVerified              Boolean                       @default(false)
+  featured                Boolean                       @default(false)
+  revenueTotal            Decimal?                      @db.Decimal(18, 2)
+  revenuePlatformFeeRate  Float                         @default(0.05)
+  revenueArtistShareRate  Float                         @default(0.7)
+  revenueBackerShareRate  Float                         @default(0.25)
+  createdAt               DateTime                      @default(now())
+  updatedAt               DateTime                      @updatedAt
+
+  executionPlan           FundingProjectExecutionPlan?
+  stages                  FundingProjectStage[]
+  expenseRecords          FundingProjectExpenseRecord[]
+  revenueDistributions    FundingProjectDistribution[]
+  pledges                 Pledge[]
+  rewards                 FundingProjectReward[]
+  updates                 FundingProjectUpdate[]
+  payments                Payment[]
+
+  @@index([status, endDate])
+  @@index([category, status])
+  @@index([artistId, createdAt])
+}
+
+model FundingProjectExecutionPlan {
+  id         String          @id @default(cuid())
+  projectId  String          @unique
+  project    FundingProject  @relation(fields: [projectId], references: [id])
+  totalBudget Decimal        @db.Decimal(18, 2)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  stages     FundingProjectStage[]
+}
+
+model FundingProjectStage {
+  id          String                 @id @default(cuid())
+  projectId   String
+  project     FundingProject         @relation(fields: [projectId], references: [id])
+  planId      String?
+  plan        FundingProjectExecutionPlan? @relation(fields: [planId], references: [id])
+  name        String
+  description String
+  budget      Decimal                @db.Decimal(18, 2)
+  startDate   DateTime
+  endDate     DateTime
+  status      FundingExecutionStatus @default(PLANNED)
+  progress    Int                    @default(0)
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  expenseRecords FundingProjectExpenseRecord[]
+
+  @@index([projectId, status])
+}
+
+model FundingProjectExpenseRecord {
+  id          String                  @id @default(cuid())
+  projectId   String
+  project     FundingProject          @relation(fields: [projectId], references: [id])
+  stageId     String?
+  stage       FundingProjectStage?    @relation(fields: [stageId], references: [id])
+  category    FundingExpenseCategory
+  title       String
+  description String
+  amount      Decimal                 @db.Decimal(18, 2)
+  receipt     String?
+  expenseDate DateTime
+  verified    Boolean                 @default(false)
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+
+  @@index([projectId, category])
+  @@index([stageId])
+}
+
+model FundingProjectDistribution {
+  id             String                     @id @default(cuid())
+  projectId      String
+  project        FundingProject             @relation(fields: [projectId], references: [id])
+  backerId       String?
+  backer         User?                      @relation(fields: [backerId], references: [id])
+  pledgeId       String?
+  pledge        Pledge?                   @relation(fields: [pledgeId], references: [id])
+  userName       String?
+  originalAmount Decimal                    @db.Decimal(18, 2)
+  profitShare    Decimal                    @default(0) @db.Decimal(18, 2)
+  totalReturn    Decimal                    @default(0) @db.Decimal(18, 2)
+  distributedAt  DateTime?
+  status         FundingDistributionStatus  @default(WAITING)
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+
+  @@index([projectId, status])
+  @@index([backerId, projectId])
+  @@index([pledgeId])
+}
+
+model Pledge {
+  id          String       @id @default(cuid())
+  projectId   String
+  project     FundingProject @relation(fields: [projectId], references: [id])
+  userId      String?
+  user        User?        @relation(fields: [userId], references: [id])
+  userName    String?
+  amount      Decimal      @db.Decimal(18, 2)
+  rewardId    String?
+  reward      FundingProjectReward? @relation(fields: [rewardId], references: [id])
+  backedAt    DateTime     @default(now())
+  isAnonymous Boolean      @default(false)
+  message     String?
+  createdAt   DateTime     @default(now())
+
+  payments    Payment[]
+  distributions FundingProjectDistribution[]
+
+  @@index([projectId, backedAt])
+  @@index([projectId, userId])
+}
+
+model FundingProjectReward {
+  id                String                 @id @default(cuid())
+  projectId         String
+  project           FundingProject         @relation(fields: [projectId], references: [id])
+  title             String
+  description       String
+  amount            Decimal                @db.Decimal(18, 2)
+  claimed           Int                    @default(0)
+  maxClaim          Int?
+  estimatedDelivery DateTime?
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+
+  pledges Pledge[]
+  payments Payment[]
+
+  @@index([projectId, amount])
+}
+
+model FundingProjectUpdate {
+  id        String             @id @default(cuid())
+  projectId String
+  project   FundingProject     @relation(fields: [projectId], references: [id])
+  title     String
+  content   String
+  type      FundingUpdateType  @default(GENERAL)
+  createdAt DateTime           @default(now())
+
+  @@index([projectId, type])
+}
+
+model Payment {
+  id              String           @id @default(cuid())
+  paymentId       String           @unique
+  orderId         String           @unique
+  projectId       String
+  project         FundingProject   @relation(fields: [projectId], references: [id])
+  backerId        String
+  backer          User             @relation("PaymentBacker", fields: [backerId], references: [id])
+  backerName      String
+  backerEmail     String
+  backerPhone     String
+  backerAddress   String?
+  rewardId        String?
+  reward          FundingProjectReward? @relation(fields: [rewardId], references: [id])
+  rewardName      String?
+  pledgeId        String?
+  pledge          Pledge?       @relation(fields: [pledgeId], references: [id])
+  amount          Decimal          @db.Decimal(18, 2)
+  paymentMethod   PaymentMethod
+  paymentProvider PaymentProvider  @default(TOSS)
+  status          PaymentStatus    @default(PENDING)
+  transactionId   String?
+  paymentKey      String?
+  message         String?
+  createdAt       DateTime         @default(now())
+  completedAt     DateTime?
+  cancelledAt     DateTime?
+  refundedAt      DateTime?
+  refundId        String?
+  refundAmount    Decimal          @default(0) @db.Decimal(18, 2)
+  refundReason    String?
+  metadata        Json?
+  updatedAt       DateTime         @updatedAt
+
+  @@index([projectId, status])
+  @@index([backerEmail, projectId])
+  @@index([status, createdAt])
+  @@index([backerId, createdAt])
+  @@index([pledgeId])
+}
+
+model CommunityPost {
+  id         String                 @id @default(cuid())
+  title      String
+  content    String
+  authorId   String
+  author     User                   @relation(fields: [authorId], references: [id])
+  authorName String
+  category   CommunityPostCategory
+  isReported Boolean                @default(false)
+  deletedAt  DateTime?
+  tags       String[]
+  images     String[]
+  isActive   Boolean                @default(true)
+  viewCount  Int                    @default(0)
+  createdAt  DateTime               @default(now())
+  updatedAt  DateTime               @updatedAt
+
+  comments   CommunityPostComment[]
+  reactions  CommunityPostReaction[]
+  reports    CommunityPostReport[]
+
+  @@index([category, createdAt])
+  @@index([authorId, createdAt])
+  @@index([title])
+  @@index([content])
+}
+
+model CommunityPostComment {
+  id         String         @id @default(cuid())
+  postId     String
+  post       CommunityPost  @relation(fields: [postId], references: [id])
+  authorId   String
+  author     User           @relation(fields: [authorId], references: [id])
+  authorName String
+  content    String
+  createdAt  DateTime       @default(now())
+
+  replies    CommunityPostReply[]
+
+  @@index([postId, createdAt])
+}
+
+model CommunityPostReply {
+  id         String        @id @default(cuid())
+  commentId  String
+  comment    CommunityPostComment @relation(fields: [commentId], references: [id])
+  authorId   String
+  author     User          @relation(fields: [authorId], references: [id])
+  authorName String
+  content    String
+  createdAt  DateTime      @default(now())
+
+  @@index([commentId, createdAt])
+}
+
+model CommunityPostReaction {
+  id        String        @id @default(cuid())
+  postId    String
+  post      CommunityPost @relation(fields: [postId], references: [id])
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  type      ReactionType
+  createdAt DateTime      @default(now())
+
+  @@unique([postId, userId, type])
+}
+
+model CommunityPostReport {
+  id         String        @id @default(cuid())
+  postId     String
+  post       CommunityPost @relation(fields: [postId], references: [id])
+  reporterId String
+  reporter   User          @relation(fields: [reporterId], references: [id])
+  reason     String
+  reportedAt DateTime      @default(now())
+
+  @@index([postId, reportedAt])
+}
+
+model Track {
+  id            String      @id @default(cuid())
+  title         String
+  artistId      String
+  artist        User        @relation(fields: [artistId], references: [id])
+  artistName    String
+  album         String
+  duration      String
+  genre         TrackGenre
+  releaseDate   DateTime
+  plays         Int         @default(0)
+  image         String?
+  audioUrl      String?
+  lyrics        String?
+  credits       Json?
+  tags          String[]
+  isActive      Boolean     @default(true)
+  isPublic      Boolean     @default(true)
+  isExplicit    Boolean     @default(false)
+  bpm           Int?
+  key           MusicKey?
+  moods         MusicMood[]
+  instruments   String[]
+  language      String       @default("한국어")
+  copyright     String?
+  license       LicenseType  @default(ALL_RIGHTS_RESERVED)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  likes         TrackLike[]
+
+  @@index([artistId, releaseDate])
+  @@index([genre, releaseDate])
+  @@index([album, releaseDate])
+}
+
+model TrackLike {
+  id        String   @id @default(cuid())
+  trackId   String
+  track     Track    @relation(fields: [trackId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([trackId, userId])
+  @@index([userId, createdAt])
+}
+
+model Event {
+  id                String        @id @default(cuid())
+  title             String
+  description       String
+  category          EventCategory
+  startDate         DateTime
+  endDate           DateTime
+  time              String
+  location          String
+  address           String?
+  maxAttendees      Int
+  currentAttendees  Int           @default(0)
+  image             String?
+  status            EventStatus   @default(SCHEDULED)
+  isActive          Boolean       @default(true)
+  createdById       String
+  createdBy         User          @relation(fields: [createdById], references: [id])
+  tags              String[]
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  attendees         EventAttendee[]
+  tickets           EventTicket[]
+  performers        EventPerformer[]
+
+  @@index([startDate, status])
+  @@index([category, startDate])
+  @@index([location, startDate])
+}
+
+model EventAttendee {
+  id           String   @id @default(cuid())
+  eventId      String
+  event        Event    @relation(fields: [eventId], references: [id])
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id])
+  userName     String?
+  registeredAt DateTime @default(now())
+
+  @@index([eventId, registeredAt])
+  @@unique([eventId, userId])
+}
+
+model EventTicket {
+  id        String          @id @default(cuid())
+  eventId   String
+  event     Event           @relation(fields: [eventId], references: [id])
+  type      EventTicketType
+  price     Decimal         @db.Decimal(18, 2)
+  available Int
+  sold      Int             @default(0)
+
+  @@index([eventId, type])
+}
+
+model EventPerformer {
+  id          String @id @default(cuid())
+  eventId     String
+  event       Event   @relation(fields: [eventId], references: [id])
+  name        String
+  genre       String?
+  description String?
+
+  @@index([eventId, name])
+}
+
+model LiveStream {
+  id               String            @id @default(cuid())
+  title            String
+  description      String
+  artistId         String
+  artist           User              @relation(fields: [artistId], references: [id])
+  artistName       String
+  category         LiveStreamCategory
+  thumbnail        String?
+  streamUrl        String?
+  isLive           Boolean           @default(false)
+  status           LiveStreamStatus  @default(SCHEDULED)
+  scheduledAt      DateTime?
+  startedAt        DateTime?
+  endedAt          DateTime?
+  duration         Int               @default(0)
+  viewerCount      Int               @default(0)
+  maxViewers       Int               @default(0)
+  tags             String[]
+  isActive         Boolean           @default(true)
+  isPrivate        Boolean           @default(false)
+  chatEnabled      Boolean           @default(true)
+  recordingEnabled Boolean           @default(false)
+  recordingUrl     String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  allowedViewers   LiveStreamAccess[]
+
+  @@index([status, startedAt])
+  @@index([artistId, createdAt])
+  @@index([category, status])
+}
+
+model LiveStreamAccess {
+  id          String     @id @default(cuid())
+  liveStreamId String
+  liveStream  LiveStream @relation(fields: [liveStreamId], references: [id])
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+  createdAt   DateTime   @default(now())
+
+  @@unique([liveStreamId, userId])
+}
+
+model Artwork {
+  id          String         @id @default(cuid())
+  title       String
+  artistId    String
+  artist      User           @relation(fields: [artistId], references: [id])
+  category    ArtworkCategory
+  type        ArtworkType
+  thumbnail   String
+  description String
+  duration    String?
+  dimensions  String?
+  plays       Int            @default(0)
+  views       Int            @default(0)
+  likes       Int            @default(0)
+  tags        String[]
+  status      ArtworkStatus  @default(PUBLISHED)
+  metadata    Json?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([artistId, category])
+  @@index([category, createdAt])
+  @@index([likes, createdAt])
+}
+
+model Category {
+  id        String   @id
+  label     String
+  icon      String?
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  type      NotificationType
+  title     String
+  message   String
+  read      Boolean          @default(false)
+  url       String?
+  data      Json?
+  isActive  Boolean          @default(true)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([userId, read])
+}
+
+model RevenueDistribution {
+  id                 String             @id @default(cuid())
+  projectId          String
+  project            FundingProject     @relation(fields: [projectId], references: [id])
+  creatorId          String
+  creator            User               @relation("RevenueCreator", fields: [creatorId], references: [id])
+  creatorName        String
+  managerId          String?
+  manager            User?              @relation("RevenueManager", fields: [managerId], references: [id])
+  totalRevenue       Decimal            @db.Decimal(18, 2)
+  platformFee        Decimal            @db.Decimal(18, 2)
+  creatorRevenue     Decimal            @db.Decimal(18, 2)
+  platformFeeRate    Float              @default(0.05)
+  creatorRevenueRate Float              @default(0.95)
+  status             DistributionStatus @default(PENDING)
+  distributionDate   DateTime
+  processedAt        DateTime?
+  payoutId           String?
+  payoutStatus       DistributionStatus @default(PENDING)
+  payoutProcessedAt  DateTime?
+  failureReason      String?
+  retryCount         Int                @default(0)
+  lastRetryAt        DateTime?
+  backerCount        Int
+  averageBackAmount  Decimal            @db.Decimal(18, 2)
+  metadata           Json?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  creatorPayouts     CreatorPayout[]
+
+  @@index([projectId, status])
+  @@index([creatorId, status])
+  @@index([distributionDate])
+  @@index([status, distributionDate])
+}
+
+model CreatorPayout {
+  id                     String             @id @default(cuid())
+  creatorId              String
+  creator                User               @relation(fields: [creatorId], references: [id])
+  creatorName            String
+  projectId              String
+  project                FundingProject     @relation(fields: [projectId], references: [id])
+  projectTitle           String
+  revenueDistributionId  String
+  revenueDistribution    RevenueDistribution @relation(fields: [revenueDistributionId], references: [id])
+  payoutId               String             @unique
+  amount                 Decimal            @db.Decimal(18, 2)
+  bankCode               String
+  bankName               String
+  accountNumber          String
+  accountHolder          String
+  status                 DistributionStatus @default(PENDING)
+  requestedAt            DateTime           @default(now())
+  processedAt            DateTime?
+  completedAt            DateTime?
+  bankTransactionId      String?
+  bankResponseCode       String?
+  bankResponseMessage    String?
+  failureReason          String?
+  retryCount             Int                @default(0)
+  lastRetryAt            DateTime?
+  processingFee          Decimal            @default(0) @db.Decimal(18, 2)
+  netAmount              Decimal            @db.Decimal(18, 2)
+  metadata               Json?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  @@index([creatorId, status])
+  @@index([projectId, status])
+  @@index([requestedAt])
+  @@index([status, requestedAt])
+}
+
