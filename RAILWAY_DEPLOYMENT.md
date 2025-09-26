@@ -9,9 +9,11 @@ Railway 대시보드에서 다음 환경 변수들을 설정해야 합니다:
 #### 필수 환경 변수
 
 ```
-MONGODB_URI=mongodb+srv://rmwl2356_db_user:실제비밀번호@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/collaboreum?schema=public
 JWT_SECRET=your-super-secret-jwt-key-here
 NODE_ENV=production
+PRISMA_MAX_RETRIES=5
+PRISMA_RETRY_DELAY_MS=2000
 ```
 
 #### 선택적 환경 변수
@@ -23,12 +25,12 @@ MAX_FILE_SIZE=10485760
 UPLOAD_PATH=./uploads
 ```
 
-### 2. MongoDB Atlas 설정
+### 2. Railway PostgreSQL 데이터베이스 설정
 
-1. [MongoDB Atlas](https://www.mongodb.com/atlas)에서 클러스터 생성
-2. 데이터베이스 사용자 생성
-3. 네트워크 액세스에서 모든 IP 허용 (0.0.0.0/0)
-4. 연결 문자열을 `MONGODB_URI`로 설정
+1. Railway 대시보드에서 **Add Plugin** → **PostgreSQL** 선택
+2. 자동으로 생성된 데이터베이스의 연결 정보를 확인
+3. `DATABASE_URL` 값을 복사하여 서비스 환경 변수에 추가
+4. 필요 시 Prisma 스키마(`prisma/schema.prisma`)를 기반으로 `npx prisma migrate deploy` 실행
 
 ### 3. Railway 프로젝트 설정
 
@@ -51,10 +53,10 @@ UPLOAD_PATH=./uploads
 1. **환경 변수 누락**
    - Railway 대시보드에서 모든 필수 환경 변수가 설정되었는지 확인
 
-2. **MongoDB 연결 실패**
-   - MongoDB Atlas 클러스터가 실행 중인지 확인
-   - 네트워크 액세스 설정 확인
-   - 연결 문자열 형식 확인
+2. **PostgreSQL 연결 실패**
+   - Railway PostgreSQL 인스턴스가 실행 중인지 확인
+   - `DATABASE_URL` 값이 정확한지 검증 (비밀번호, 포트, 데이터베이스 이름)
+   - Prisma 연결 재시도 환경 변수(`PRISMA_MAX_RETRIES`, `PRISMA_RETRY_DELAY_MS`)를 조정
 
 3. **포트 문제**
    - Railway는 자동으로 PORT 환경 변수를 설정

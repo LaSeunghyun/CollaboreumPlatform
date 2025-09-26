@@ -1,53 +1,43 @@
 #!/usr/bin/env node
 
 const { spawn } = require('child_process');
-const path = require('path');
+const { PrismaClient } = require('@prisma/client');
 
 console.log('🚀 Collaboreum MVP Platform 서버를 시작합니다...\n');
 
 // 환경 변수 설정
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
-// MongoDB 연결 확인
-const checkMongoDB = () => {
-  return new Promise(resolve => {
-    const mongoCheck = spawn('mongosh', ['--eval', 'db.runCommand("ping")'], {
-      stdio: 'pipe',
-      shell: true,
-    });
+const checkPostgreSQL = async () => {
+  const prisma = new PrismaClient();
 
-    mongoCheck.on('close', code => {
-      if (code === 0) {
-        console.log('✅ MongoDB 연결 확인됨');
-        resolve(true);
-      } else {
-        console.log(
-          '⚠️  MongoDB 연결 실패 - 로컬 MongoDB가 실행 중인지 확인하세요',
-        );
-        console.log('   MongoDB 설치 및 실행 방법:');
-        console.log(
-          '   1. https://www.mongodb.com/try/download/community 에서 다운로드',
-        );
-        console.log('   2. mongod 명령어로 서비스 시작');
-        console.log(
-          '   3. 또는 Docker 사용: docker run -d -p 27017:27017 --name mongodb mongo:latest\n',
-        );
-        resolve(false);
-      }
+  try {
+    await prisma.$connect();
+    await prisma.$queryRaw`SELECT 1`;
+    console.log('✅ PostgreSQL 연결 확인됨');
+    return true;
+  } catch (error) {
+    console.log('⚠️  PostgreSQL 연결 실패 - DATABASE_URL 환경변수를 확인하세요');
+    console.log(`   세부정보: ${error.message}`);
+    console.log('   예시: postgresql://USER:PASSWORD@HOST:5432/collaboreum?schema=public');
+    return false;
+  } finally {
+    await prisma.$disconnect().catch(disconnectError => {
+      console.log('⚠️  Prisma 연결 종료 중 문제가 발생했습니다:', disconnectError.message);
     });
-  });
+  }
 };
 
 // 서버 시작
 const startServer = async () => {
   try {
-    // MongoDB 연결 확인
-    const mongoAvailable = await checkMongoDB();
+    // PostgreSQL 연결 확인
+    const databaseAvailable = await checkPostgreSQL();
 
-    if (!mongoAvailable) {
-      console.log('📝 .env 파일을 생성하고 MongoDB 연결 정보를 설정하세요:');
-      console.log('   MONGODB_URI=mongodb://localhost:27017/collaboreum');
-      console.log('   또는 MongoDB Atlas 클라우드 서비스 사용\n');
+    if (!databaseAvailable) {
+      console.log('📝 .env 파일을 생성하고 PostgreSQL 연결 정보를 설정하세요:');
+      console.log('   DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/collaboreum?schema=public');
+      console.log('   Prisma 스키마는 prisma/schema.prisma 에 정의되어 있습니다.\n');
     }
 
     console.log('🌐 서버를 시작합니다...');

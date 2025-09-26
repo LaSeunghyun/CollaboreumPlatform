@@ -1,84 +1,83 @@
-const mongoose = require('mongoose');
+const { PrismaClient } = require('@prisma/client');
 const { logger } = require('../src/logger');
 
-const connectDB = async () => {
-  const maxRetries = 5;
-  let retryCount = 0;
+const prisma = new PrismaClient();
 
-  const connectWithRetry = async () => {
-    try {
-      const mongoURI =
-        process.env.MONGODB_URI ||
-        'mongodb+srv://rmwl2356_db_user:<db_password>@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster';
-      logger.info(
-        {
-          attempt: retryCount + 1,
-          maxRetries,
-          mongoURI: mongoURI.replace(/\/\/.*@/, '//***:***@'),
-        },
-        'Connecting to MongoDB',
-      );
-
-      const conn = await mongoose.connect(mongoURI, {
-        serverSelectionTimeoutMS: 5000, // 5초 타임아웃
-        socketTimeoutMS: 45000, // 45초 소켓 타임아웃
-        bufferCommands: false, // 버퍼링 비활성화
-        maxPoolSize: 10, // 최대 연결 풀 크기
-        minPoolSize: 5, // 최소 연결 풀 크기
-        maxIdleTimeMS: 30000, // 30초 후 유휴 연결 종료
-        connectTimeoutMS: 10000, // 10초 연결 타임아웃
-      });
-
-      logger.info({ host: conn.connection.host }, 'MongoDB Connected');
-
-      // 연결 이벤트 리스너
-      mongoose.connection.on('error', err => {
-        logger.error({ error: err }, 'MongoDB connection error');
-      });
-
-      mongoose.connection.on('disconnected', () => {
-        logger.warn('MongoDB disconnected');
-      });
-
-      mongoose.connection.on('reconnected', () => {
-        logger.info('MongoDB reconnected');
-      });
-
-      return conn;
-    } catch (error) {
-      retryCount++;
-      logger.error(
-        {
-          attempt: retryCount,
-          maxRetries,
-          error: error.message,
-        },
-        'MongoDB connection failed',
-      );
-
-      if (retryCount < maxRetries) {
-        logger.info('Retrying in 5 seconds...');
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        return connectWithRetry();
-      } else {
-        logger.error('MongoDB connection failed after all retries');
-        throw error;
-      }
-    }
-  };
+const maskConnectionString = connectionString => {
+  if (!connectionString) {
+    return 'undefined';
+  }
 
   try {
-    await connectWithRetry();
-  } catch (error) {
-    logger.error({ error }, 'Final MongoDB connection failed');
-    // 프로덕션에서는 서버를 종료하지 않고 계속 시도
-    if (process.env.NODE_ENV === 'production') {
-      logger.info('Running in production mode, will retry connection...');
-      setTimeout(connectDB, 10000); // 10초 후 재시도
-    } else {
-      process.exit(1);
+    const url = new URL(connectionString);
+    if (url.password) {
+      url.password = '****';
     }
+    if (url.username) {
+      url.username = '****';
+    }
+    return url.toString();
+  } catch (error) {
+    return connectionString;
   }
 };
 
-module.exports = connectDB;
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+const connectDatabase = async () => {
+  const maxRetries = Number(process.env.PRISMA_MAX_RETRIES || 5);
+  const baseDelay = Number(process.env.PRISMA_RETRY_DELAY_MS || 2000);
+  let attempt = 0;
+  let lastError;
+
+  while (attempt < maxRetries) {
+    attempt += 1;
+
+    try {
+      await prisma.$connect();
+      logger.info(
+        {
+          attempt,
+          datasource: maskConnectionString(process.env.DATABASE_URL),
+        },
+        'Connected to PostgreSQL via Prisma',
+      );
+
+      return prisma;
+    } catch (error) {
+      lastError = error;
+      logger.error(
+        {
+          attempt,
+          maxRetries,
+          error: error.message,
+        },
+        'Failed to connect to PostgreSQL via Prisma',
+      );
+
+      if (attempt < maxRetries) {
+        const delay = Math.min(baseDelay * attempt, 15000);
+        logger.warn({ delay }, 'Retrying Prisma connection');
+        await wait(delay);
+      }
+    }
+  }
+
+  logger.error('Prisma connection failed after maximum retries');
+  throw lastError;
+};
+
+const disconnectDatabase = async () => {
+  try {
+    await prisma.$disconnect();
+    logger.info('Prisma client disconnected cleanly');
+  } catch (error) {
+    logger.error({ error }, 'Error disconnecting Prisma client');
+  }
+};
+
+module.exports = {
+  prisma,
+  connectDatabase,
+  disconnectDatabase,
+};

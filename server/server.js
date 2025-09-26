@@ -39,7 +39,7 @@ dotenv.config();
 const { logger } = require('./src/logger');
 
 // Validate required environment variables
-const requiredEnvVars = ['MONGODB_URI', 'JWT_SECRET'];
+const requiredEnvVars = ['DATABASE_URL', 'JWT_SECRET'];
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {
@@ -53,9 +53,9 @@ if (missingEnvVars.length > 0) {
   } else {
     logger.warn('Using default values for missing environment variables');
     // Railway 환경에서 기본값 설정
-    if (!process.env.MONGODB_URI) {
-      logger.error('MONGODB_URI 환경변수가 설정되지 않았습니다.');
-      logger.error('Railway에서 MongoDB 연결 정보를 확인해주세요.');
+    if (!process.env.DATABASE_URL) {
+      logger.error('DATABASE_URL 환경변수가 설정되지 않았습니다.');
+      logger.error('Railway에서 PostgreSQL 연결 정보를 확인해주세요.');
       process.exit(1);
     }
     if (!process.env.JWT_SECRET) {
@@ -71,31 +71,14 @@ const clientAssetsPath = path.join(clientBuildPath, 'assets');
 const clientIndexPath = path.join(clientBuildPath, 'index.html');
 
 // Database connection
-const connectDB = require('./config/database');
+const { connectDatabase, disconnectDatabase, prisma } = require('./config/database');
 
-// Connect to MongoDB
-connectDB()
-  .then(async () => {
-    // 데이터베이스 연결 후 카테고리 초기화
-    try {
-      const Category = require('./models/Category');
-      const categoryCount = await Category.countDocuments();
-
-      if (categoryCount === 0) {
-        logger.info('카테고리가 없습니다. 기본 카테고리를 생성합니다...');
-        const { seedCategories } = require('./scripts/seed-categories');
-        await seedCategories();
-        logger.info('기본 카테고리 생성 완료');
-      } else {
-        logger.info({ categoryCount }, '기존 카테고리 확인됨');
-      }
-    } catch (error) {
-      logger.error({ error }, '카테고리 초기화 실패');
-    }
+connectDatabase()
+  .then(() => {
+    logger.info('Prisma connection established');
   })
   .catch(error => {
-    logger.error({ error }, 'Failed to connect to database');
-    // Railway 환경에서는 데이터베이스 연결 실패 시에도 서버를 계속 실행
+    logger.error({ error }, 'Failed to connect to PostgreSQL database');
     if (
       process.env.NODE_ENV !== 'production' &&
       !process.env.RAILWAY_ENVIRONMENT
@@ -201,11 +184,24 @@ app.use('/api/search', searchRoutes);
 app.use(errorHandler);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.status(200).json({
-    status: 'OK',
+app.get('/api/health', async (req, res) => {
+  let databaseStatus = 'unknown';
+
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    databaseStatus = 'connected';
+  } catch (error) {
+    databaseStatus = 'unavailable';
+    logger.error({ error }, 'Database health check failed');
+  }
+
+  const statusCode = databaseStatus === 'connected' ? 200 : 503;
+
+  res.status(statusCode).json({
+    status: statusCode === 200 ? 'OK' : 'DEGRADED',
     message: 'Server is running',
     timestamp: new Date().toISOString(),
+    database: databaseStatus,
   });
 });
 
@@ -233,15 +229,27 @@ app.get('*', (req, res, next) => {
 });
 
 // Graceful shutdown handling
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received, shutting down gracefully');
-  process.exit(0);
-});
+const shutdown = signal => {
+  logger.info({ signal }, 'Shutdown signal received, closing server gracefully');
 
-process.on('SIGINT', () => {
-  logger.info('SIGINT received, shutting down gracefully');
-  process.exit(0);
-});
+  server.close(async error => {
+    if (error) {
+      logger.error({ error }, 'Error while closing HTTP server');
+    }
+
+    try {
+      await disconnectDatabase();
+    } catch (disconnectError) {
+      logger.error({ error: disconnectError }, 'Error disconnecting Prisma during shutdown');
+    } finally {
+      process.exit(error ? 1 : 0);
+    }
+  });
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+
+process.on('SIGINT', () => shutdown('SIGINT'));
 
 // 프로젝트 상태 업데이트 크론 작업 설정
 const { updateProjectStatuses } = require('./scripts/updateProjectStatuses');
@@ -290,12 +298,24 @@ server.on('error', error => {
 });
 
 // Handle uncaught exceptions
-process.on('uncaughtException', error => {
+process.on('uncaughtException', async error => {
   logger.error({ error }, 'Uncaught Exception');
-  process.exit(1);
+  try {
+    await disconnectDatabase();
+  } catch (disconnectError) {
+    logger.error({ error: disconnectError }, 'Error disconnecting Prisma after uncaught exception');
+  } finally {
+    process.exit(1);
+  }
 });
 
-process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', async (reason, promise) => {
   logger.error({ reason, promise }, 'Unhandled Rejection');
-  process.exit(1);
+  try {
+    await disconnectDatabase();
+  } catch (disconnectError) {
+    logger.error({ error: disconnectError }, 'Error disconnecting Prisma after unhandled rejection');
+  } finally {
+    process.exit(1);
+  }
 });

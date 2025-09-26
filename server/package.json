@@ -29,9 +29,10 @@
     "env:verify": "node scripts/verify-env.js",
     "update-project-statuses": "node scripts/updateProjectStatuses.js",
     "build:server": "tsc && node --conditions=production ./dist/index.js || echo 'Build server (tsc) only'",
-    "setup": "node -e \"console.log('MongoDB 설치 및 설정:'); console.log('1. https://www.mongodb.com/try/download/community'); console.log('2. .env 파일 생성'); console.log('3. npm run start:check')\""
+    "setup": "node -e \"console.log('PostgreSQL 설정:'); console.log('1. Railway PostgreSQL 플러그인 또는 로컬 PostgreSQL 준비'); console.log('2. .env 파일에 DATABASE_URL 추가'); console.log('3. npm run start:check')\""
   },
   "dependencies": {
+    "@prisma/client": "^6.2.1",
     "axios": "^1.6.0",
     "bcryptjs": "^2.4.3",
     "bullmq": "^4.15.4",
@@ -48,13 +49,13 @@
     "ioredis": "^5.3.2",
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.0.3",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
     "pino": "^8.21.0",
     "pino-http": "^10.5.0",
     "pino-pretty": "^10.3.1",
+    "pg": "^8.13.1",
     "sharp": "^0.32.6",
     "uuid": "^9.0.1",
     "winston": "^3.11.0",
@@ -62,6 +63,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@pact-foundation/pact": "^13.0.0",
     "@types/pino": "^7.0.5",
     "@types/pino-http": "^6.1.0",
     "@typescript-eslint/eslint-plugin": "^8.42.0",
@@ -74,8 +76,8 @@
     "jest-junit": "^16.0.0",
     "nodemon": "^3.0.2",
     "prettier": "^3.3.0",
+    "prisma": "^6.2.1",
     "semgrep": "^1.0.0",
-    "@pact-foundation/pact": "^13.0.0",
     "dotenv-safe": "^9.0.0",
     "depcheck": "^1.4.7",
     "husky": "^9.0.11",
@@ -90,5 +92,8 @@
     "artists"
   ],
   "author": "Collaboreum Team",
-  "license": "MIT"
+  "license": "MIT",
+  "prisma": {
+    "schema": "../prisma/schema.prisma"
+  }
 }

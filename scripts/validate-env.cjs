@@ -18,7 +18,6 @@ const EnvSchema = z.object({
   VITE_JWT_SECRET: z.string().min(32).optional(),
 
   // 데이터베이스 관련
-  MONGODB_URI: z.string().url().optional(),
   DATABASE_URL: z.string().url().optional(),
 
   // 외부 서비스

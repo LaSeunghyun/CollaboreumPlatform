@@ -1,82 +1,83 @@
 # 데이터베이스 설정
 
-## 🗄️ MongoDB URI
+## 🗄️ PostgreSQL 연결 정보
 
 ### 프로덕션 데이터베이스 (Railway)
 
 ```
-mongodb+srv://rmwl2356_db_user:f8NaljAJhfZpTc7J@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster
+postgresql://USER:PASSWORD@HOST:5432/collaboreum?schema=public
 ```
+
+> 실제 자격 증명은 Railway PostgreSQL 플러그인에서 제공됩니다. 비밀번호는 안전하게 보관하고, 문서나 이슈에 그대로 공유하지 마세요.
 
 ### 연결 정보
 
-- **호스트**: Railway MongoDB Atlas 클러스터
-- **데이터베이스명**: test
-- **컬렉션 수**: 14개
-- **상태**: ✅ 연결 성공
+- **호스트**: Railway PostgreSQL 인스턴스
+- **데이터베이스명**: `collaboreum`
+- **스키마**: `public`
+- **상태**: ✅ Prisma로 연결 확인 완료
 
-## 📊 현재 데이터 현황
-
-### 컬렉션 목록
-
-1. `events` - 이벤트 데이터
-2. `livestreams` - 라이브 스트림 데이터
-3. `users` - 사용자 데이터
-4. `payments` - 결제 데이터
-5. `artists` - 아티스트 프로필 데이터
-6. `fundingprojects` - 펀딩 프로젝트 데이터
-7. `artworks` - 작품 데이터
-8. `communityposts` - 커뮤니티 게시글 데이터
-9. `projects` - 일반 프로젝트 데이터
-10. `creatorpayouts` - 크리에이터 지급 데이터
-11. `revenuedistributions` - 수익 분배 데이터
-12. `tracks` - 트랙 데이터
-13. `notifications` - 알림 데이터
-14. `categories` - 카테고리 데이터
-
-### 데이터 통계
-
-- **커뮤니티 게시글**: 3개
-- **사용자**: 2명
-- **아티스트**: 1명
-
-## 🔧 연결 설정
+## 🔌 Prisma 연결 설정
 
 ### 환경 변수
 
 ```bash
-MONGODB_URI=mongodb+srv://rmwl2356_db_user:f8NaljAJhfZpTc7J@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/collaboreum?schema=public
+PRISMA_MAX_RETRIES=5
+PRISMA_RETRY_DELAY_MS=2000
 ```
 
-### 연결 옵션
+### Prisma Client 초기화
 
 ```javascript
-const mongoose = require('mongoose');
+const { PrismaClient } = require('@prisma/client');
 
-await mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+const prisma = new PrismaClient();
+
+await prisma.$connect();
 ```
 
-## 📝 주의사항
+### 연결 해제
 
-1. **보안**: URI에 포함된 비밀번호는 절대 공개하지 마세요
-2. **백업**: 정기적인 데이터 백업을 권장합니다
-3. **모니터링**: Railway 대시보드에서 연결 상태를 모니터링하세요
-4. **확장성**: 사용자 증가에 따라 클러스터 확장을 고려하세요
+```javascript
+await prisma.$disconnect();
+```
+
+## 🛠️ 마이그레이션 및 스키마 관리
+
+- Prisma 스키마 파일은 `prisma/schema.prisma`에 위치합니다.
+- 마이그레이션 적용: `npx prisma migrate deploy`
+- 스키마 동기화: `npx prisma db push` (개발 환경에서만 권장)
+- 클라이언트 생성: `npx prisma generate`
+
+## 📊 데이터 상태 확인
+
+Prisma 또는 PostgreSQL 클라이언트 툴(예: psql, TablePlus)을 사용해 데이터 상태를 확인할 수 있습니다. 샘플 쿼리:
+
+```sql
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public';
+```
+
+## 📝 운영 시 주의사항
+
+1. **보안**: `DATABASE_URL`에는 비밀번호가 포함되어 있으므로 반드시 환경 변수로만 관리하세요.
+2. **백업**: Railway에서 제공하는 스냅샷 또는 외부 백업 전략을 수립하세요.
+3. **모니터링**: Railway 대시보드에서 연결 상태와 리소스 사용량을 주기적으로 확인하세요.
+4. **확장성**: 동시 연결이 많아질 경우 Prisma 풀 설정이나 Railway 플랜 업그레이드를 고려하세요.
 
 ## 🚀 배포 시 고려사항
 
-- 모든 CRUD 작업은 이 URI를 사용합니다
-- 로컬 개발 시에도 이 데이터베이스를 사용할 수 있습니다
-- 프로덕션 환경에서는 연결 풀링을 고려하세요
+- `start.js`에서 Prisma를 사용해 사전 헬스체크를 수행합니다.
+- `/api/health` 엔드포인트는 PostgreSQL 연결 상태를 포함하여 보고합니다.
+- CI/CD 파이프라인에서 마이그레이션 적용 명령을 실행하는 것을 권장합니다.
 
 ## 📞 문제 해결
 
-연결 문제가 발생하면:
+연결 문제가 발생하면 다음 항목을 순서대로 확인하세요.
 
-1. Railway 대시보드에서 클러스터 상태 확인
-2. 네트워크 연결 확인
-3. 인증 정보 확인
-4. 방화벽 설정 확인
+1. Railway PostgreSQL 인스턴스가 실행 중인지 확인
+2. `DATABASE_URL`의 자격 증명과 호스트, 포트가 정확한지 검증
+3. Prisma 재시도 환경 변수를 조정하여 일시적인 네트워크 오류에 대비
+4. 로그(`server/logs` 또는 Railway Deployments 탭)를 확인해 구체적인 에러 메시지 파악
