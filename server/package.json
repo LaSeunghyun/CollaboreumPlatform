@@ -28,6 +28,7 @@
     "pact:test": "jest pact",
     "env:verify": "node scripts/verify-env.js",
     "update-project-statuses": "node scripts/updateProjectStatuses.js",
+    "migrate:prisma": "node scripts/migrate-mongo-to-prisma.js",
     "build:server": "tsc && node --conditions=production ./dist/index.js || echo 'Build server (tsc) only'",
     "setup": "node -e \"console.log('MongoDB 설치 및 설정:'); console.log('1. https://www.mongodb.com/try/download/community'); console.log('2. .env 파일 생성'); console.log('3. npm run start:check')\""
   },
