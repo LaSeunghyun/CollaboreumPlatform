@@ -1,13 +1,14 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const communityController = require('../src/controllers/communityController');
 
+const isValidId = value => typeof value === 'string' && value.trim().length > 0;
+
 const validateObjectIdParam = (param, message) => (req, res, next) => {
   const value = req.params[param];
 
-  if (!mongoose.Types.ObjectId.isValid(value)) {
+  if (!isValidId(value)) {
     return res.status(400).json({
       success: false,
       message,
