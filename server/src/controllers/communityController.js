@@ -50,7 +50,10 @@ const getRecentPosts = handleController(async (req, res) => {
 });
 
 const getPostById = handleController(async (req, res) => {
-  const post = await communityService.getPostById(req.params.id);
+  const post = await communityService.getPostById(
+    req.params.id,
+    req.user?._id ?? null,
+  );
   res.json({
     success: true,
     data: post,
@@ -141,6 +144,7 @@ const getComments = handleController(async (req, res) => {
   const { comments, pagination } = await communityService.getComments(
     req.params.id,
     req.query,
+    req.user?._id ?? null,
   );
   res.json({
     success: true,

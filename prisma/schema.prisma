@@ -740,8 +740,10 @@ model CommunityPostComment {
   authorName String
   content    String
   createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
 
   replies    CommunityPostReply[]
+  reactions  CommunityCommentReaction[]
 
   @@index([postId, createdAt])
 }
@@ -755,6 +757,9 @@ model CommunityPostReply {
   authorName String
   content    String
   createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  reactions  CommunityCommentReaction[]
 
   @@index([commentId, createdAt])
 }
@@ -781,6 +786,22 @@ model CommunityPostReport {
   reportedAt DateTime      @default(now())
 
   @@index([postId, reportedAt])
+}
+
+model CommunityCommentReaction {
+  id        String        @id @default(cuid())
+  commentId String?
+  comment   CommunityPostComment? @relation(fields: [commentId], references: [id])
+  replyId   String?
+  reply     CommunityPostReply?   @relation(fields: [replyId], references: [id])
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  type      ReactionType
+  createdAt DateTime      @default(now())
+
+  @@unique([commentId, userId])
+  @@unique([replyId, userId])
+  @@index([userId, createdAt])
 }
 
 model Track {

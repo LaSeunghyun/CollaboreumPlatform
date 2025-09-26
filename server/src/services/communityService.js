@@ -17,6 +17,34 @@ const DEFAULT_CATEGORIES = [
   { value: '기타', label: '기타', color: 'bg-gray-100 text-gray-700' },
 ];
 
+const CATEGORY_TO_ENUM = {
+  자유: 'FREE',
+  질문: 'QUESTION',
+  음악: 'MUSIC',
+  미술: 'ART',
+  문학: 'LITERATURE',
+  공연: 'PERFORMANCE',
+  사진: 'PHOTOGRAPHY',
+  기술: 'TECHNOLOGY',
+  기타: 'OTHER',
+};
+
+const CATEGORY_FROM_ENUM = Object.entries(CATEGORY_TO_ENUM).reduce(
+  (acc, [label, enumValue]) => {
+    acc[enumValue] = label;
+    return acc;
+  },
+  {},
+);
+
+const normalizeId = value => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  return typeof value === 'string' ? value : value.toString();
+};
+
 const parsePositiveInt = (value, defaultValue) => {
   const parsed = parseInt(value, 10);
   if (Number.isNaN(parsed) || parsed <= 0) {
@@ -25,12 +53,9 @@ const parsePositiveInt = (value, defaultValue) => {
   return parsed;
 };
 
-const ensureActivePost = (
-  post,
-  notFoundMessage = '포스트를 찾을 수 없습니다.',
-) => {
+const ensureActivePost = (post, message = '포스트를 찾을 수 없습니다.') => {
   if (!post || !post.isActive) {
-    throw new NotFoundError(notFoundMessage);
+    throw new NotFoundError(message);
   }
 };
 
@@ -45,49 +70,25 @@ const getPosts = async ({
 }) => {
   const parsedPage = parsePositiveInt(page, 1);
   const parsedLimit = parsePositiveInt(limit, 20);
-
-  const query = { isActive: true };
-
-  if (search) {
-    query.$or = [
-      { title: { $regex: search, $options: 'i' } },
-      { content: { $regex: search, $options: 'i' } },
-      { tags: { $in: [new RegExp(search, 'i')] } },
-    ];
-  }
-
-  if (category && category !== 'all') {
-    query.category = category;
-  }
-
   const skip = (parsedPage - 1) * parsedLimit;
-
-  let sortQuery = { createdAt: -1 };
-  switch (sortBy) {
-    case 'popular':
-      sortQuery = { likes: -1, viewCount: -1 };
-      break;
-    case 'oldest':
-      sortQuery = { createdAt: 1 };
-      break;
-    case 'latest':
-    default:
-      sortQuery = { createdAt: -1 };
-      break;
-  }
 
   const [posts, total] = await Promise.all([
     communityRepository.findPosts({
-      query,
-      sort: sortQuery,
+      search,
+      category: CATEGORY_TO_ENUM[category] || category,
+      sortBy,
       skip,
       limit: parsedLimit,
+      currentUserId: null,
     }),
-    communityRepository.countPosts(query),
+    communityRepository.countPosts({ search, category }),
   ]);
 
   return {
-    posts,
+    posts: posts.map(post => ({
+      ...post,
+      category: CATEGORY_FROM_ENUM[post.category] || post.category,
+    })),
     pagination: {
       page: parsedPage,
       limit: parsedLimit,
@@ -97,53 +98,63 @@ const getPosts = async ({
   };
 };
 
-const getPopularPosts = async ({ limit = 10 }) => {
+const getPopularPosts = async ({ limit = 10 } = {}) => {
   const parsedLimit = parsePositiveInt(limit, 10);
-  return communityRepository.findPopularPosts(parsedLimit);
+  const posts = await communityRepository.findPopularPosts({
+    limit: parsedLimit,
+    currentUserId: null,
+  });
+  return posts.map(post => ({
+    ...post,
+    category: CATEGORY_FROM_ENUM[post.category] || post.category,
+  }));
 };
 
-const getRecentPosts = async ({ limit = 10 }) => {
+const getRecentPosts = async ({ limit = 10 } = {}) => {
   const parsedLimit = parsePositiveInt(limit, 10);
-  return communityRepository.findRecentPosts(parsedLimit);
+  const posts = await communityRepository.findRecentPosts({
+    limit: parsedLimit,
+    currentUserId: null,
+  });
+  return posts.map(post => ({
+    ...post,
+    category: CATEGORY_FROM_ENUM[post.category] || post.category,
+  }));
 };
 
-const getPostById = async id => {
+const getPostById = async (id, currentUserId = null) => {
   const post = await communityRepository.findPostById(id, {
     includeComments: true,
+    currentUserId: normalizeId(currentUserId),
   });
   ensureActivePost(post, '포스트를 찾을 수 없습니다.');
 
-  post.viewCount += 1;
-  await communityRepository.savePost(post);
+  const nextViewCount = await communityRepository.incrementPostView(id);
 
-  return post;
+  return {
+    ...post,
+    category: CATEGORY_FROM_ENUM[post.category] || post.category,
+    viewCount: nextViewCount,
+  };
 };
 
 const incrementPostView = async id => {
-  const post = await communityRepository.findPostDocumentById(id);
-  ensureActivePost(post, '포스트를 찾을 수 없습니다.');
-
-  post.viewCount += 1;
-  await communityRepository.savePost(post);
-
-  return post.viewCount;
+  ensureActivePost(await communityRepository.findPostById(id));
+  return communityRepository.incrementPostView(id);
 };
 
 const getPostReactions = async (id, userId) => {
-  const post = await communityRepository.findPostDocumentById(id);
+  const post = await communityRepository.findPostById(id, {
+    includeComments: false,
+    currentUserId: normalizeId(userId),
+  });
   ensureActivePost(post, '포스트를 찾을 수 없습니다.');
 
-  const userIdString = userId.toString();
-  const isLiked = post.likes.some(like => like.toString() === userIdString);
-  const isDisliked = post.dislikes.some(
-    dislike => dislike.toString() === userIdString,
-  );
-
   return {
-    isLiked,
-    isDisliked,
-    likes: post.likes.length,
-    dislikes: post.dislikes.length,
+    isLiked: post.userReaction === 'LIKE',
+    isDisliked: post.userReaction === 'DISLIKE',
+    likes: post.likeCount,
+    dislikes: post.dislikeCount,
   };
 };
 
@@ -160,56 +171,56 @@ const createPost = async ({
     throw new ValidationError('제목, 내용, 카테고리는 필수입니다.');
   }
 
-  const createdPost = await communityRepository.createPost({
+  const post = await communityRepository.createPost({
     title,
     content,
-    category,
+    category: CATEGORY_TO_ENUM[category] || category,
     tags,
     images,
-    author,
+    authorId: author,
     authorName: authorName || '사용자',
   });
 
-  return communityRepository.findPostById(createdPost._id, {
-    includeComments: false,
-  });
+  return {
+    ...post,
+    category: CATEGORY_FROM_ENUM[post.category] || post.category,
+  };
 };
 
-const updatePost = async (id, user, { title, content, category, tags }) => {
-  const post = await communityRepository.findPostDocumentById(id);
-  if (!post) {
-    throw new NotFoundError('포스트를 찾을 수 없습니다.');
-  }
-
-  if (post.author.toString() !== user._id && user.role !== 'admin') {
+const assertCanMutatePost = (post, user) => {
+  const userId = normalizeId(user._id);
+  if (post.authorId !== userId && user.role !== 'admin') {
     throw new AuthorizationError('포스트를 수정할 권한이 없습니다.');
   }
+};
 
-  post.title = title || post.title;
-  post.content = content || post.content;
-  post.category = category || post.category;
-  post.tags = tags || post.tags;
-  post.updatedAt = new Date();
+const updatePost = async (id, user, { title, content, category, tags, images }) => {
+  const post = await communityRepository.findPostById(id);
+  ensureActivePost(post, '포스트를 찾을 수 없습니다.');
+  assertCanMutatePost(post, user);
 
-  await communityRepository.savePost(post);
+  const updated = await communityRepository.updatePost(id, {
+    title: title ?? post.title,
+    content: content ?? post.content,
+    category: category
+      ? CATEGORY_TO_ENUM[category] || category
+      : post.category,
+    tags: tags ?? post.tags,
+    images: images ?? post.images,
+  });
 
-  return communityRepository.findPostById(id, { includeComments: false });
+  return {
+    ...updated,
+    category: CATEGORY_FROM_ENUM[updated.category] || updated.category,
+  };
 };
 
 const deletePost = async (id, user) => {
-  const post = await communityRepository.findPostDocumentById(id);
-  if (!post) {
-    throw new NotFoundError('포스트를 찾을 수 없습니다.');
-  }
+  const post = await communityRepository.findPostById(id);
+  ensureActivePost(post, '포스트를 찾을 수 없습니다.');
+  assertCanMutatePost(post, user);
 
-  if (post.author.toString() !== user._id && user.role !== 'admin') {
-    throw new AuthorizationError('포스트를 삭제할 권한이 없습니다.');
-  }
-
-  post.isActive = false;
-  post.deletedAt = new Date();
-
-  await communityRepository.savePost(post);
+  await communityRepository.softDeletePost(id);
 };
 
 const updatePostReaction = async (id, userId, reaction) => {
@@ -217,50 +228,36 @@ const updatePostReaction = async (id, userId, reaction) => {
     throw new ValidationError('유효하지 않은 반응 타입입니다.');
   }
 
-  const post = await communityRepository.findPostDocumentById(id);
+  const normalizedUserId = normalizeId(userId);
+
+  const post = await communityRepository.findPostById(id, {
+    includeComments: false,
+    currentUserId: normalizedUserId,
+  });
   ensureActivePost(post, '포스트를 찾을 수 없습니다.');
 
-  const userIdString = userId.toString();
-  const isLiked = post.likes.some(like => like.toString() === userIdString);
-  const isDisliked = post.dislikes.some(
-    dislike => dislike.toString() === userIdString,
-  );
+  const currentReaction = post.userReaction;
+  let stats;
 
   if (reaction === 'like') {
-    if (isLiked) {
-      post.likes = post.likes.filter(like => like.toString() !== userIdString);
-    } else {
-      post.likes.push(userId);
-      post.dislikes = post.dislikes.filter(
-        dislike => dislike.toString() !== userIdString,
-      );
-    }
+    stats =
+      currentReaction === 'LIKE'
+        ? await communityRepository.removePostReaction(id, normalizedUserId)
+        : await communityRepository.upsertPostReaction(id, normalizedUserId, 'like');
   } else if (reaction === 'dislike') {
-    if (isDisliked) {
-      post.dislikes = post.dislikes.filter(
-        dislike => dislike.toString() !== userIdString,
-      );
-    } else {
-      post.dislikes.push(userId);
-      post.likes = post.likes.filter(like => like.toString() !== userIdString);
-    }
-  } else if (reaction === 'unlike') {
-    post.likes = post.likes.filter(like => like.toString() !== userIdString);
-  } else if (reaction === 'undislike') {
-    post.dislikes = post.dislikes.filter(
-      dislike => dislike.toString() !== userIdString,
-    );
+    stats =
+      currentReaction === 'DISLIKE'
+        ? await communityRepository.removePostReaction(id, normalizedUserId)
+        : await communityRepository.upsertPostReaction(id, normalizedUserId, 'dislike');
+  } else {
+    stats = await communityRepository.removePostReaction(id, normalizedUserId);
   }
 
-  await communityRepository.savePost(post);
-
   return {
-    likes: post.likes.length,
-    dislikes: post.dislikes.length,
-    isLiked: post.likes.some(like => like.toString() === userIdString),
-    isDisliked: post.dislikes.some(
-      dislike => dislike.toString() === userIdString,
-    ),
+    likes: stats.likeCount,
+    dislikes: stats.dislikeCount,
+    isLiked: stats.userReaction === 'LIKE',
+    isDisliked: stats.userReaction === 'DISLIKE',
   };
 };
 
@@ -269,75 +266,51 @@ const reportPost = async (id, userId, reason) => {
     throw new ValidationError('신고 사유를 입력해주세요.');
   }
 
-  const post = await communityRepository.findPostDocumentById(id);
+  const normalizedUserId = normalizeId(userId);
+
+  const post = await communityRepository.findPostById(id);
   ensureActivePost(post, '포스트를 찾을 수 없습니다.');
 
-  const alreadyReported = post.reports.some(
-    report => report.reporter.toString() === userId.toString(),
+  const alreadyReported = await communityRepository.hasUserReportedPost(
+    id,
+    normalizedUserId,
   );
   if (alreadyReported) {
     throw new ValidationError('이미 신고한 포스트입니다.');
   }
 
-  post.reports.push({
-    reporter: userId,
-    reason,
-    reportedAt: new Date(),
-  });
-
-  if (post.reports.length >= 5) {
-    post.isActive = false;
-    post.isReported = true;
-  }
-
-  await communityRepository.savePost(post);
+  await communityRepository.createPostReport(id, normalizedUserId, reason);
 };
 
 const getComments = async (
   id,
-  { page = 1, limit = 20, sortBy = 'createdAt', order = 'desc' },
+  { page = 1, limit = 20, order = 'desc' },
+  currentUserId = null,
 ) => {
-  const post = await communityRepository.findPostDocumentById(id);
+  const post = await communityRepository.findPostById(id);
   ensureActivePost(post, '포스트를 찾을 수 없습니다.');
 
   const parsedPage = parsePositiveInt(page, 1);
   const parsedLimit = parsePositiveInt(limit, 20);
 
-  const commentsDocument = await communityRepository.findCommentsByPostId(id);
+  const sortOrder = order === 'asc' ? 'asc' : 'desc';
+  const skip = (parsedPage - 1) * parsedLimit;
 
-  if (!commentsDocument) {
-    return {
-      comments: [],
-      pagination: {
-        page: parsedPage,
-        limit: parsedLimit,
-        total: 0,
-        pages: 0,
-      },
-    };
-  }
-
-  const sortOrder = order === 'desc' ? -1 : 1;
-  const sortedComments = [...commentsDocument.comments].sort((a, b) => {
-    if (sortBy === 'createdAt') {
-      return sortOrder === -1
-        ? new Date(b.createdAt) - new Date(a.createdAt)
-        : new Date(a.createdAt) - new Date(b.createdAt);
-    }
-
-    return 0;
+  const { comments, total } = await communityRepository.findCommentsByPostId({
+    postId: id,
+    skip,
+    take: parsedLimit,
+    order: sortOrder,
+    currentUserId: normalizeId(currentUserId),
   });
 
-  const skip = (parsedPage - 1) * parsedLimit;
-  const paginatedComments = sortedComments.slice(skip, skip + parsedLimit);
-
   return {
-    comments: paginatedComments,
+    comments,
     pagination: {
       page: parsedPage,
       limit: parsedLimit,
-      total: commentsDocument.comments.length,
-      pages: Math.ceil(commentsDocument.comments.length / parsedLimit),
+      total,
+      pages: Math.ceil(total / parsedLimit),
     },
   };
 };
@@ -347,43 +320,30 @@ const addComment = async (id, user, { content, parentId }) => {
     throw new ValidationError('댓글 내용을 입력해주세요.');
   }
 
-  const post = await communityRepository.findPostDocumentById(id);
+  const trimmedContent = content.trim();
+  const post = await communityRepository.findPostById(id);
   ensureActivePost(post, '포스트를 찾을 수 없습니다.');
 
-  const newComment = {
-    author: user._id,
-    authorName: user.name || '사용자',
-    content: content.trim(),
-    parentId: parentId || null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    likes: [],
-    dislikes: [],
-    replies: [],
-  };
-
   if (parentId) {
-    const parentComment = post.comments.id(parentId);
-    if (!parentComment) {
+    const parent = await communityRepository.findCommentRecordById(parentId);
+    if (!parent || parent.postId !== id) {
       throw new NotFoundError('상위 댓글을 찾을 수 없습니다.');
     }
-    parentComment.replies.push(newComment);
-  } else {
-    post.comments.push(newComment);
+
+    return communityRepository.createReply({
+      commentId: parentId,
+      authorId: normalizeId(user._id),
+      authorName: user.name || '사용자',
+      content: trimmedContent,
+    });
   }
 
-  await communityRepository.savePost(post);
-
-  const populatedPost = await communityRepository.findPostById(id, {
-    includeComments: true,
+  return communityRepository.createComment({
+    postId: id,
+    authorId: normalizeId(user._id),
+    authorName: user.name || '사용자',
+    content: trimmedContent,
   });
-
-  if (parentId) {
-    const parent = populatedPost.comments.id(parentId);
-    return parent.replies[parent.replies.length - 1];
-  }
-
-  return populatedPost.comments[populatedPost.comments.length - 1];
 };
 
 const updateComment = async (id, commentId, user, content) => {
@@ -391,74 +351,59 @@ const updateComment = async (id, commentId, user, content) => {
     throw new ValidationError('댓글 내용을 입력해주세요.');
   }
 
-  const post = await communityRepository.findPostDocumentById(id);
-  ensureActivePost(post, '포스트를 찾을 수 없습니다.');
+  const trimmedContent = content.trim();
 
-  let comment = post.comments.id(commentId);
-  let parentComment = null;
+  const commentRecord = await communityRepository.findCommentRecordById(commentId);
+  const userId = normalizeId(user._id);
 
-  if (!comment) {
-    for (const current of post.comments) {
-      const reply = current.replies.id(commentId);
-      if (reply) {
-        comment = reply;
-        parentComment = current;
-        break;
-      }
+  if (commentRecord) {
+    if (commentRecord.postId !== id) {
+      throw new NotFoundError('댓글을 찾을 수 없습니다.');
     }
+    if (commentRecord.authorId !== userId && user.role !== 'admin') {
+      throw new AuthorizationError('댓글을 수정할 권한이 없습니다.');
+    }
+
+    return communityRepository.updateCommentContent(commentId, trimmedContent);
   }
 
-  if (!comment) {
+  const replyRecord = await communityRepository.findReplyRecordById(commentId);
+  if (!replyRecord || replyRecord.comment.postId !== id) {
     throw new NotFoundError('댓글을 찾을 수 없습니다.');
   }
 
-  if (comment.author.toString() !== user._id && user.role !== 'admin') {
+  if (replyRecord.authorId !== userId && user.role !== 'admin') {
     throw new AuthorizationError('댓글을 수정할 권한이 없습니다.');
   }
 
-  comment.content = content.trim();
-  comment.updatedAt = new Date();
-
-  await communityRepository.savePost(post);
-
-  return parentComment
-    ? parentComment.replies.id(commentId)
-    : post.comments.id(commentId);
+  return communityRepository.updateReplyContent(commentId, trimmedContent);
 };
 
 const deleteComment = async (id, commentId, user) => {
-  const post = await communityRepository.findPostDocumentById(id);
-  ensureActivePost(post, '포스트를 찾을 수 없습니다.');
-
-  let comment = post.comments.id(commentId);
-  let parentComment = null;
-
-  if (!comment) {
-    for (const current of post.comments) {
-      const reply = current.replies.id(commentId);
-      if (reply) {
-        comment = reply;
-        parentComment = current;
-        break;
-      }
+  const userId = normalizeId(user._id);
+  const commentRecord = await communityRepository.findCommentRecordById(commentId);
+  if (commentRecord) {
+    if (commentRecord.postId !== id) {
+      throw new NotFoundError('댓글을 찾을 수 없습니다.');
     }
+    if (commentRecord.authorId !== userId && user.role !== 'admin') {
+      throw new AuthorizationError('댓글을 삭제할 권한이 없습니다.');
+    }
+
+    await communityRepository.deleteComment(commentId);
+    return;
   }
 
-  if (!comment) {
+  const replyRecord = await communityRepository.findReplyRecordById(commentId);
+  if (!replyRecord || replyRecord.comment.postId !== id) {
     throw new NotFoundError('댓글을 찾을 수 없습니다.');
   }
 
-  if (comment.author.toString() !== user._id && user.role !== 'admin') {
+  if (replyRecord.authorId !== userId && user.role !== 'admin') {
     throw new AuthorizationError('댓글을 삭제할 권한이 없습니다.');
   }
 
-  if (parentComment) {
-    parentComment.replies.pull(commentId);
-  } else {
-    post.comments.pull(commentId);
-  }
-
-  await communityRepository.savePost(post);
+  await communityRepository.deleteReply(commentId);
 };
 
 const reactToComment = async (id, commentId, userId, reaction) => {
@@ -466,50 +411,61 @@ const reactToComment = async (id, commentId, userId, reaction) => {
     throw new ValidationError('유효하지 않은 반응 타입입니다.');
   }
 
-  const post = await communityRepository.findPostDocumentById(id);
-  ensureActivePost(post, '포스트를 찾을 수 없습니다.');
+  const normalizedUserId = normalizeId(userId);
 
-  let comment = post.comments.id(commentId);
-  if (!comment) {
-    for (const current of post.comments) {
-      const reply = current.replies.id(commentId);
-      if (reply) {
-        comment = reply;
-        break;
-      }
+  const commentRecord = await communityRepository.findCommentRecordById(commentId);
+
+  if (commentRecord) {
+    if (commentRecord.postId !== id) {
+      throw new NotFoundError('댓글을 찾을 수 없습니다.');
     }
+
+    if (reaction === 'unlike') {
+      const stats = await communityRepository.removeCommentReaction({
+        commentId,
+        userId: normalizedUserId,
+      });
+      return {
+        likes: stats.likeCount,
+        dislikes: stats.dislikeCount,
+      };
+    }
+
+    const stats = await communityRepository.upsertCommentReaction({
+      commentId,
+      userId: normalizedUserId,
+      reaction,
+    });
+    return {
+      likes: stats.likeCount,
+      dislikes: stats.dislikeCount,
+    };
   }
 
-  if (!comment) {
+  const replyRecord = await communityRepository.findReplyRecordById(commentId);
+  if (!replyRecord || replyRecord.comment.postId !== id) {
     throw new NotFoundError('댓글을 찾을 수 없습니다.');
   }
 
-  const userIdString = userId.toString();
-
-  if (reaction === 'like') {
-    if (comment.likes.some(like => like.toString() === userIdString)) {
-      comment.likes.pull(userId);
-    } else {
-      comment.likes.push(userId);
-      comment.dislikes.pull(userId);
-    }
-  } else if (reaction === 'dislike') {
-    if (comment.dislikes.some(dislike => dislike.toString() === userIdString)) {
-      comment.dislikes.pull(userId);
-    } else {
-      comment.dislikes.push(userId);
-      comment.likes.pull(userId);
-    }
-  } else if (reaction === 'unlike') {
-    comment.likes.pull(userId);
-    comment.dislikes.pull(userId);
+  if (reaction === 'unlike') {
+    const stats = await communityRepository.removeCommentReaction({
+      replyId: commentId,
+      userId: normalizedUserId,
+    });
+    return {
+      likes: stats.likeCount,
+      dislikes: stats.dislikeCount,
+    };
   }
 
-  await communityRepository.savePost(post);
-
+  const stats = await communityRepository.upsertCommentReaction({
+    replyId: commentId,
+    userId: normalizedUserId,
+    reaction,
+  });
   return {
-    likes: comment.likes.length,
-    dislikes: comment.dislikes.length,
+    likes: stats.likeCount,
+    dislikes: stats.dislikeCount,
   };
 };
 
