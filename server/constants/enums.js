@@ -1,213 +1,80 @@
+const { Prisma } = require('@prisma/client');
+
+const mapEnum = enumObject => ({ ...enumObject });
+
 // 시스템 전체에서 사용되는 enum 값들을 중앙 집중식으로 관리
 const ENUMS = {
   // 사용자 역할
-  USER_ROLES: {
-    ARTIST: 'artist',
-    ADMIN: 'admin',
-    FAN: 'fan',
-  },
+  USER_ROLES: mapEnum(Prisma.UserRole),
 
   // 아티스트 카테고리
-  ARTIST_CATEGORIES: {
-    MUSIC: '음악',
-    ART: '미술',
-    VIDEO: '영상',
-    LITERATURE: '문학',
-    CRAFT: '공예',
-    DESIGN: '디자인',
-    OTHER: '기타',
-  },
+  ARTIST_CATEGORIES: mapEnum(Prisma.ArtistCategory),
 
   // 아티스트 장르 (음악)
-  ARTIST_GENRES: {
-    POP: '팝',
-    ROCK: '록',
-    RNB: 'R&B',
-    JAZZ: '재즈',
-    CLASSICAL: '클래식',
-    HIPHOP: '힙합',
-    ELECTRONIC: '일렉트로닉',
-    INDIE: '인디',
-    ALTERNATIVE: '얼터너티브',
-    COUNTRY: '컨트리',
-    REGGAE: '레게',
-    BLUES: '블루스',
-    SOUL: '소울',
-    PUNK: '펑크',
-    METAL: '메탈',
-    OTHER: '기타',
-  },
+  ARTIST_GENRES: mapEnum(Prisma.ArtistGenre),
 
   // 프로젝트 카테고리
-  PROJECT_CATEGORIES: {
-    MUSIC: '음악',
-    VIDEO: '비디오',
-    PERFORMANCE: '공연',
-    BOOK: '도서',
-    GAME: '게임',
-    OTHER: '기타',
-  },
+  PROJECT_CATEGORIES: mapEnum(Prisma.ProjectCategory),
 
   // 프로젝트 상태
-  PROJECT_STATUSES: {
-    PLANNING: '계획중',
-    IN_PROGRESS: '진행중',
-    COMPLETED: '완료',
-    PENDING: '보류',
-    CANCELLED: '취소',
-  },
+  PROJECT_STATUSES: mapEnum(Prisma.ProjectStatus),
 
   // 태스크 상태
-  TASK_STATUSES: {
-    WAITING: '대기',
-    IN_PROGRESS: '진행중',
-    COMPLETED: '완료',
-    PENDING: '보류',
-  },
+  TASK_STATUSES: mapEnum(Prisma.ProjectTaskStatus),
 
   // 이벤트 카테고리
-  EVENT_CATEGORIES: {
-    FESTIVAL: '축제',
-    PERFORMANCE: '공연',
-    COMPETITION: '경연',
-    WORKSHOP: '워크샵',
-    SEMINAR: '세미나',
-    OTHER: '기타',
-  },
+  EVENT_CATEGORIES: mapEnum(Prisma.EventCategory),
 
   // 이벤트 상태
-  EVENT_STATUSES: {
-    SCHEDULED: '예정',
-    IN_PROGRESS: '진행중',
-    COMPLETED: '완료',
-    CANCELLED: '취소',
-  },
+  EVENT_STATUSES: mapEnum(Prisma.EventStatus),
 
   // 라이브스트림 카테고리
-  LIVESTREAM_CATEGORIES: {
-    MUSIC: '음악',
-    PERFORMANCE: '공연',
-    TALK: '토크',
-    WORKSHOP: '워크샵',
-    OTHER: '기타',
-  },
+  LIVESTREAM_CATEGORIES: mapEnum(Prisma.LiveStreamCategory),
 
   // 라이브스트림 상태
-  LIVESTREAM_STATUSES: {
-    SCHEDULED: '예정',
-    LIVE: '라이브',
-    ENDED: '종료',
-    CANCELLED: '취소',
-  },
+  LIVESTREAM_STATUSES: mapEnum(Prisma.LiveStreamStatus),
 
   // 펀딩 프로젝트 상태
-  FUNDING_PROJECT_STATUSES: {
-    PREPARING: '준비중',
-    IN_PROGRESS: '진행중',
-    SUCCESS: '성공',
-    FAILED: '실패',
-    CANCELLED: '취소',
-    EXECUTING: '집행중',
-    COMPLETED: '완료',
-  },
+  FUNDING_PROJECT_STATUSES: mapEnum(Prisma.FundingProjectStatus),
 
-  // 수익 분배 상태
-  DISTRIBUTION_STATUSES: {
-    WAITING: '대기',
-    DISTRIBUTED: '분배완료',
-    PAID: '지급완료',
-  },
+  // 수익 분배 상태 (펀딩 프로젝트 내부 분배용)
+  DISTRIBUTION_STATUSES: mapEnum(Prisma.FundingDistributionStatus),
+
+  // 수익 분배 엔티티 상태
+  REVENUE_DISTRIBUTION_STATUSES: mapEnum(Prisma.DistributionStatus),
 
   // 비용 카테고리
-  EXPENSE_CATEGORIES: {
-    LABOR: '인건비',
-    MATERIAL: '재료비',
-    EQUIPMENT: '장비비',
-    MARKETING: '마케팅비',
-    OTHER: '기타',
-  },
+  EXPENSE_CATEGORIES: mapEnum(Prisma.FundingExpenseCategory),
 
   // 트랙 장르
-  TRACK_GENRES: {
-    INDIE_POP: '인디팝',
-    ROCK: '록',
-    ACOUSTIC: '어쿠스틱',
-    JAZZ: '재즈',
-    CLASSICAL: '클래식',
-    ELECTRONIC: '일렉트로닉',
-    HIPHOP: '힙합',
-    RNB: 'R&B',
-    OTHER: '기타',
-  },
+  TRACK_GENRES: mapEnum(Prisma.TrackGenre),
 
   // 음악 키
-  MUSIC_KEYS: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
+  MUSIC_KEYS: Object.values(Prisma.MusicKey),
 
   // 음악 분위기
-  MUSIC_MOODS: {
-    EXCITING: '신나는',
-    EMOTIONAL: '감성적인',
-    CALM: '잔잔한',
-    INTENSE: '강렬한',
-    MELANCHOLY: '우울한',
-    HOPEFUL: '희망적인',
-    ROMANTIC: '로맨틱한',
-    MYSTERIOUS: '신비로운',
-  },
+  MUSIC_MOODS: mapEnum(Prisma.MusicMood),
 
   // 라이센스
-  LICENSES: {
-    ALL_RIGHTS_RESERVED: 'All Rights Reserved',
-    CREATIVE_COMMONS: 'Creative Commons',
-    PUBLIC_DOMAIN: 'Public Domain',
-  },
+  LICENSES: mapEnum(Prisma.LicenseType),
 
   // 아트워크 타입
-  ARTWORK_TYPES: {
-    AUDIO: 'audio',
-    IMAGE: 'image',
-    VIDEO: 'video',
-    TEXT: 'text',
-  },
+  ARTWORK_TYPES: mapEnum(Prisma.ArtworkType),
 
   // 아트워크 상태
-  ARTWORK_STATUSES: {
-    DRAFT: 'draft',
-    PUBLISHED: 'published',
-    ARCHIVED: 'archived',
-  },
+  ARTWORK_STATUSES: mapEnum(Prisma.ArtworkStatus),
 
   // 이벤트 티켓 타입
-  EVENT_TICKET_TYPES: {
-    REGULAR: '일반',
-    VIP: 'VIP',
-    EARLY_BIRD: '얼리버드',
-    STUDENT: '학생',
-  },
+  EVENT_TICKET_TYPES: mapEnum(Prisma.EventTicketType),
 
   // 마일스톤 상태
-  MILESTONE_STATUSES: {
-    SCHEDULED: '예정',
-    IN_PROGRESS: '진행중',
-    COMPLETED: '완료',
-    DELAYED: '지연',
-  },
+  MILESTONE_STATUSES: mapEnum(Prisma.ProjectMilestoneStatus),
 
   // 우선순위
-  PRIORITIES: {
-    LOW: '낮음',
-    MEDIUM: '보통',
-    HIGH: '높음',
-    URGENT: '긴급',
-  },
+  PRIORITIES: mapEnum(Prisma.PriorityLevel),
 
   // 펀딩 프로젝트 타입
-  FUNDING_PROJECT_TYPES: {
-    REGULAR: '일반',
-    EXECUTION_IN_PROGRESS: '집행진행',
-    EXPENSE_PUBLIC: '비용공개',
-    REVENUE_DISTRIBUTION: '수익분배',
-  },
+  FUNDING_PROJECT_TYPES: mapEnum(Prisma.FundingProjectType),
 };
 
 // CSV 헤더 상수
