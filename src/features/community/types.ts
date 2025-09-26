@@ -1,10 +1,12 @@
+import type { UserRole } from '@/shared/types';
+
 // 커뮤니티 도메인 타입 정의
 export interface CommunityUser {
   id: string;
   name: string;
   username: string;
   avatar?: string;
-  role: 'admin' | 'artist' | 'fan';
+  role: UserRole;
   isVerified?: boolean;
 }
 

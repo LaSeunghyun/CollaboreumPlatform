@@ -1,3 +1,5 @@
+import type { UserRole } from '@/shared/types';
+
 // Admin 관련 타입 정의
 export interface AdminUser {
   id: string;
@@ -86,7 +88,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  role: 'fan' | 'artist' | 'admin';
+  role: UserRole;
   avatar?: string;
   joinDate: string;
   lastActivity: string;

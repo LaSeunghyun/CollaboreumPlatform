@@ -1,14 +1,12 @@
 import { z } from 'zod';
 import { commonSchemas } from '../../../shared/utils/validation';
 import {
-  FundingProjectStatus,
-  PledgeStatus,
-  ExecutionStatus,
-  DistributionStatus,
-  DistributionRuleType,
-  EventType,
-  EventStatus,
-} from '../types';
+  DISTRIBUTION_RULE_TYPE_VALUES,
+  EXECUTION_STATUS_VALUES,
+  FUNDING_PROJECT_STATUS_VALUES,
+  PLEDGE_STATUS_VALUES,
+} from '../../../shared/types';
+import { EventStatus, EventType } from '../types';
 
 // 펀딩 프로젝트 생성 스키마
 export const createFundingProjectSchema = z
@@ -125,7 +123,7 @@ export const createPledgeSchema = z.object({
 
 // 후원 상태 업데이트 스키마
 export const updatePledgeStatusSchema = z.object({
-  status: z.nativeEnum(PledgeStatus),
+  status: z.enum(PLEDGE_STATUS_VALUES),
   refundAmount: z.number().int().min(0).optional(),
   refundReason: z.string().max(500).optional(),
   metadata: z.record(z.any()).optional(),
@@ -156,7 +154,7 @@ export const createExecutionSchema = z.object({
 
 // 집행 승인 스키마
 export const approveExecutionSchema = z.object({
-  status: z.nativeEnum(ExecutionStatus),
+  status: z.enum(EXECUTION_STATUS_VALUES),
   actualAmount: z.number().int().min(0).optional(),
   metadata: z.record(z.any()).optional(),
 });
@@ -178,7 +176,7 @@ export const uploadReceiptSchema = z.object({
 // 분배 규칙 스키마
 export const distributionRuleSchema = z
   .object({
-    type: z.nativeEnum(DistributionRuleType),
+    type: z.enum(DISTRIBUTION_RULE_TYPE_VALUES),
     percentage: z.number().min(0).max(100).optional(),
     fixedAmount: z.number().int().min(0).optional(),
     recipient: z.string().min(1, '수령자는 필수입니다'),
@@ -209,7 +207,7 @@ export const executeDistributionSchema = z.object({
 
 // 펀딩 프로젝트 필터 스키마
 export const fundingProjectFilterSchema = z.object({
-  status: z.array(z.nativeEnum(FundingProjectStatus)).optional(),
+  status: z.array(z.enum(FUNDING_PROJECT_STATUS_VALUES)).optional(),
   categoryId: commonSchemas.id.optional(),
   ownerId: commonSchemas.id.optional(),
   search: commonSchemas.search,
@@ -238,7 +236,7 @@ export const fundingProjectSortSchema = z.object({
 
 // 펀딩 프로젝트 상태 변경 스키마
 export const changeProjectStatusSchema = z.object({
-  status: z.nativeEnum(FundingProjectStatus),
+  status: z.enum(FUNDING_PROJECT_STATUS_VALUES),
   reason: z.string().max(500).optional(),
   metadata: z.record(z.any()).optional(),
 });

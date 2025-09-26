@@ -1,5 +1,6 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import type { UserRole } from '@/shared/types';
 
 /**
  * 인증이 필요한 액션을 처리하는 훅
@@ -20,7 +21,7 @@ export const useAuthRedirect = () => {
   const requireAuth = (
     action: () => void,
     redirectTo?: string,
-    requireRole?: 'artist' | 'admin' | 'fan',
+    requireRole?: UserRole,
   ) => {
     // 인증되지 않은 경우
     if (!isAuthenticated) {
@@ -48,7 +49,7 @@ export const useAuthRedirect = () => {
   const requireAuthAsync = async (
     action: () => Promise<void>,
     redirectTo?: string,
-    requireRole?: 'artist' | 'admin' | 'fan',
+    requireRole?: UserRole,
   ) => {
     // 인증되지 않은 경우
     if (!isAuthenticated) {
@@ -71,7 +72,7 @@ export const useAuthRedirect = () => {
    * 인증 상태를 확인하고 boolean 반환
    * @param requireRole - 특정 역할이 필요한 경우
    */
-  const checkAuth = (requireRole?: 'artist' | 'admin' | 'fan'): boolean => {
+  const checkAuth = (requireRole?: UserRole): boolean => {
     if (!isAuthenticated) {
       return false;
     }
@@ -112,7 +113,7 @@ export const useAuthRedirect = () => {
 };
 
 // 역할 표시명 변환 함수
-const getRoleDisplayName = (role: string): string => {
+const getRoleDisplayName = (role: UserRole): string => {
   switch (role) {
     case 'artist':
       return '아티스트';

@@ -1,82 +1,42 @@
-# 데이터베이스 설정
+# 데이터베이스 설정 (PostgreSQL + Prisma)
 
-## 🗄️ MongoDB URI
+## 📦 개요
 
-### 프로덕션 데이터베이스 (Railway)
+프로젝트는 PostgreSQL을 표준 데이터베이스로 사용하며 Prisma ORM을 통해 스키마와 타입을 관리합니다. 기존 MongoDB 컬렉션 기반 모델은 `server/models`에 남아있지만, 새로운 개발은 `prisma/schema.prisma`를 기준으로 진행합니다.
 
-```
-mongodb+srv://rmwl2356_db_user:f8NaljAJhfZpTc7J@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster
-```
+## 🔌 연결 정보
 
-### 연결 정보
+- **기본 호스트**: `localhost`
+- **기본 포트**: `5432`
+- **기본 데이터베이스명**: `collaboreum`
+- **권장 인코딩**: `UTF8`
+- **드라이버**: PostgreSQL (Prisma `postgresql` provider)
 
-- **호스트**: Railway MongoDB Atlas 클러스터
-- **데이터베이스명**: test
-- **컬렉션 수**: 14개
-- **상태**: ✅ 연결 성공
+로컬 개발 시 `docker compose` 또는 로컬 PostgreSQL 인스턴스를 사용하세요.
 
-## 📊 현재 데이터 현황
+## 🔐 환경 변수
 
-### 컬렉션 목록
-
-1. `events` - 이벤트 데이터
-2. `livestreams` - 라이브 스트림 데이터
-3. `users` - 사용자 데이터
-4. `payments` - 결제 데이터
-5. `artists` - 아티스트 프로필 데이터
-6. `fundingprojects` - 펀딩 프로젝트 데이터
-7. `artworks` - 작품 데이터
-8. `communityposts` - 커뮤니티 게시글 데이터
-9. `projects` - 일반 프로젝트 데이터
-10. `creatorpayouts` - 크리에이터 지급 데이터
-11. `revenuedistributions` - 수익 분배 데이터
-12. `tracks` - 트랙 데이터
-13. `notifications` - 알림 데이터
-14. `categories` - 카테고리 데이터
-
-### 데이터 통계
-
-- **커뮤니티 게시글**: 3개
-- **사용자**: 2명
-- **아티스트**: 1명
-
-## 🔧 연결 설정
-
-### 환경 변수
+루트 `.env` 또는 `server/.env`에 다음 값을 정의합니다.
 
 ```bash
-MONGODB_URI=mongodb+srv://rmwl2356_db_user:f8NaljAJhfZpTc7J@collaboreum-cluster.tdwqiwn.mongodb.net/?retryWrites=true&w=majority&appName=collaboreum-cluster
+DATABASE_URL="postgresql://<USER>:<PASSWORD>@<HOST>:<PORT>/<DATABASE>?schema=public"
 ```
 
-### 연결 옵션
+> ✅ `DATABASE_URL`은 Prisma와 서버 레이어가 공유하므로, 환경 별로 (개발/스테이징/프로덕션) 각기 다른 값을 설정하세요.
 
-```javascript
-const mongoose = require('mongoose');
+## 🛠️ Prisma 워크플로우
 
-await mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-```
+1. **스키마 업데이트**: `prisma/schema.prisma`에서 모델과 enum을 수정합니다.
+2. **타입 생성**: 루트에서 `npm run prisma:generate`를 실행하면 Prisma Client와 타입이 생성됩니다.
+3. **타입 공유**: 프런트엔드는 `src/shared/types`에서 Prisma enum과 타입을 재사용합니다.
+4. **마이그레이션 (추가 예정)**: 현재는 초기 스키마 정의만 포함되어 있으며, 추후 `prisma migrate` 기반 마이그레이션이 추가될 예정입니다.
 
-## 📝 주의사항
+## 📄 참고 자료
 
-1. **보안**: URI에 포함된 비밀번호는 절대 공개하지 마세요
-2. **백업**: 정기적인 데이터 백업을 권장합니다
-3. **모니터링**: Railway 대시보드에서 연결 상태를 모니터링하세요
-4. **확장성**: 사용자 증가에 따라 클러스터 확장을 고려하세요
+- [Prisma Docs](https://www.prisma.io/docs/)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- `src/shared/types/index.ts` — 프런트엔드에서 사용하는 Prisma 기반 타입 정의
 
-## 🚀 배포 시 고려사항
+## 🧭 레거시 참고
 
-- 모든 CRUD 작업은 이 URI를 사용합니다
-- 로컬 개발 시에도 이 데이터베이스를 사용할 수 있습니다
-- 프로덕션 환경에서는 연결 풀링을 고려하세요
-
-## 📞 문제 해결
-
-연결 문제가 발생하면:
-
-1. Railway 대시보드에서 클러스터 상태 확인
-2. 네트워크 연결 확인
-3. 인증 정보 확인
-4. 방화벽 설정 확인
+`server/models`와 여러 스크립트는 MongoDB/Mongoose 기반 레거시 코드입니다. 점진적으로 Prisma + PostgreSQL로 이전할 계획이며, 신규 기능은 반드시 Prisma 모델을 기준으로 설계해 주세요.

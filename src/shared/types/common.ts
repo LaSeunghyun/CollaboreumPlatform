@@ -1,16 +1,18 @@
+import type {
+  BaseEntity,
+  NotificationType,
+  UserRole,
+} from './index';
+
 /**
  * 공통 타입 정의
  */
 
 // 기본 엔티티 인터페이스
-export interface BaseEntity {
-  id: string | number;
-  createdAt: string;
-  updatedAt: string;
-}
+export type { BaseEntity };
 
 // 사용자 역할 타입
-export type UserRole = 'admin' | 'artist' | 'fan';
+export type { UserRole };
 
 // 사용자 상태 타입
 export type UserStatus = 'active' | 'inactive' | 'suspended' | 'pending';
@@ -42,17 +44,7 @@ export type PaymentMethod =
   | 'naver';
 
 // 알림 타입
-export type NotificationType =
-  | 'project_approved'
-  | 'project_rejected'
-  | 'project_completed'
-  | 'project_failed'
-  | 'payment_received'
-  | 'payment_failed'
-  | 'comment_received'
-  | 'like_received'
-  | 'follow_received'
-  | 'system_announcement';
+export type { NotificationType };
 
 // 파일 타입
 export type FileType =

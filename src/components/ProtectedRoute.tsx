@@ -1,11 +1,12 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import type { UserRole } from '@/shared/types';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
   requireAuth?: boolean;
-  requiredRole?: 'artist' | 'admin' | 'fan';
+  requiredRole?: UserRole;
   onNavigateToLogin?: () => void;
   onNavigateToSignup?: () => void;
 }
@@ -145,7 +146,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 };
 
 // 역할 표시명 변환 함수
-const getRoleDisplayName = (role: string): string => {
+const getRoleDisplayName = (role: UserRole): string => {
   switch (role) {
     case 'artist':
       return '아티스트';

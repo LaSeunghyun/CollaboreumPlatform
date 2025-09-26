@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminUserAPI } from '../../services/api/admin';
-import type { ApiResponse } from '@/shared/types';
+import type { ApiResponse, UserRole } from '@/shared/types';
 
-type AdminUserRole = 'admin' | 'artist' | 'fan';
+type AdminUserRole = UserRole;
 type AdminUserStatus = 'active' | 'inactive' | 'suspended';
 
 export interface AdminUser {
@@ -189,7 +189,13 @@ export const useUpdateUserRole = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
+    mutationFn: async ({
+      userId,
+      role,
+    }: {
+      userId: string;
+      role: AdminUserRole;
+    }) => {
       return await adminUserAPI.updateUserRole(userId, role);
     },
     onSuccess: () => {

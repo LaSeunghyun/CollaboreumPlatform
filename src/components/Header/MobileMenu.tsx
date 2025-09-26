@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { User, Search, Bell } from 'lucide-react';
 import { NAVIGATION_ITEMS } from './constants';
 import { getRoleBadge, getUserAvatar } from './utils';
-import { UserRole } from '../../utils/auth';
+import type { UserRole } from '@/shared/types';
 
 interface MobileMenuProps {
   isLoggedIn: boolean;

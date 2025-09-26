@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { UserRole } from '../../../shared/types';
+import { UserRole, USER_ROLE_VALUES } from '../../../shared/types';
 import { commonSchemas } from '../../../shared/utils/validation';
 
 // 로그인 스키마
@@ -16,7 +16,7 @@ export const signupSchema = z
     confirmPassword: z.string().min(1, '비밀번호 확인은 필수입니다'),
     username: commonSchemas.username,
     displayName: commonSchemas.displayName,
-    role: z.nativeEnum(UserRole).default(UserRole.FAN),
+    role: z.enum(USER_ROLE_VALUES).default(UserRole.FAN),
   })
   .refine(data => data.password === data.confirmPassword, {
     message: '비밀번호가 일치하지 않습니다',

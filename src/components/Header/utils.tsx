@@ -1,8 +1,7 @@
 import React from 'react';
 import { Badge } from '../ui/badge';
 import { USER_AVATARS } from './constants';
-
-import { UserRole } from '../../utils/auth';
+import type { UserRole } from '@/shared/types';
 
 export const getRoleBadge = (userRole: UserRole) => {
   switch (userRole) {

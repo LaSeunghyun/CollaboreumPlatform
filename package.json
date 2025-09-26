@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
+    "@prisma/client": "^5.22.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.7",
@@ -76,6 +77,7 @@
     "cypress:ci": "echo 'Cypress not installed'",
     "env:verify": "node scripts/verify-env.js",
     "openapi:gen": "openapi-typescript ./openapi.yaml -o ./src/types/api.d.ts || echo 'OpenAPI file not found'",
+    "prisma:generate": "prisma generate",
     "check:types": "tsc -p tsconfig.json --noEmit",
     "check:build": "vite build",
     "check:lint": "eslint \"src/**/*.{js,jsx}\" --max-warnings 0",
@@ -159,6 +161,7 @@
     "postcss": "^8.4.31",
     "prettier": "^3.3.0",
     "prettier-plugin-tailwindcss": "^0.6.8",
+    "prisma": "^5.22.0",
     "semgrep": "^1.0.0",
     "tailwindcss": "^3.4.0",
     "ts-node": "^10.9.1",

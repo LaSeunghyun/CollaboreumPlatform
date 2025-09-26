@@ -1,15 +1,22 @@
-import { BaseEntity, User } from '../../../shared/types';
+import type {
+  BaseEntity,
+  DistributionItemStatus,
+  DistributionRuleType,
+  DistributionStatus,
+  ExecutionStatus,
+  FundingProjectStatus,
+  PledgeStatus,
+  User,
+} from '../../../shared/types';
 
-// 펀딩 프로젝트 상태
-export enum FundingProjectStatus {
-  DRAFT = 'draft', // 초안
-  COLLECTING = 'collecting', // 모금 중
-  SUCCEEDED = 'succeeded', // 성공
-  FAILED = 'failed', // 실패
-  EXECUTING = 'executing', // 집행 중
-  DISTRIBUTING = 'distributing', // 분배 중
-  CLOSED = 'closed', // 종료
-}
+export {
+  DistributionItemStatus,
+  DistributionRuleType,
+  DistributionStatus,
+  ExecutionStatus,
+  FundingProjectStatus,
+  PledgeStatus,
+} from '../../../shared/types';
 
 // 펀딩 프로젝트
 export interface FundingProject {
@@ -77,16 +84,6 @@ export interface Pledge extends BaseEntity {
   metadata: Record<string, any>;
 }
 
-// 후원 상태
-export enum PledgeStatus {
-  PENDING = 'pending', // 대기 중
-  AUTHORIZED = 'authorized', // 승인됨
-  CAPTURED = 'captured', // 결제 완료
-  REFUNDED = 'refunded', // 환불됨
-  FAILED = 'failed', // 실패
-  CANCELLED = 'cancelled', // 취소됨
-}
-
 // 집행 (Execution)
 export interface Execution extends BaseEntity {
   projectId: string;
@@ -99,14 +96,6 @@ export interface Execution extends BaseEntity {
   approvedAt?: Date;
   receipts: Receipt[];
   metadata: Record<string, any>;
-}
-
-// 집행 상태
-export enum ExecutionStatus {
-  PENDING = 'pending', // 대기 중
-  APPROVED = 'approved', // 승인됨
-  REJECTED = 'rejected', // 거부됨
-  COMPLETED = 'completed', // 완료됨
 }
 
 // 영수증
@@ -149,14 +138,6 @@ export interface Distribution extends BaseEntity {
   metadata: Record<string, any>;
 }
 
-// 분배 상태
-export enum DistributionStatus {
-  PENDING = 'pending', // 대기 중
-  CALCULATED = 'calculated', // 계산 완료
-  EXECUTED = 'executed', // 실행 완료
-  FAILED = 'failed', // 실패
-}
-
 // 분배 규칙
 export interface DistributionRule {
   type: DistributionRuleType;
@@ -165,15 +146,6 @@ export interface DistributionRule {
   recipient: string; // 수령자 (사용자 ID 또는 역할)
   description: string;
   priority: number; // 우선순위
-}
-
-// 분배 규칙 타입
-export enum DistributionRuleType {
-  OWNER = 'owner', // 프로젝트 소유자
-  PLATFORM = 'platform', // 플랫폼 수수료
-  ARTIST = 'artist', // 아티스트
-  CONTRIBUTOR = 'contributor', // 기여자
-  CUSTOM = 'custom', // 사용자 정의
 }
 
 // 분배 항목
@@ -186,14 +158,6 @@ export interface DistributionItem {
   executedAt?: Date;
   transactionId?: string;
   metadata: Record<string, any>;
-}
-
-// 분배 항목 상태
-export enum DistributionItemStatus {
-  PENDING = 'pending', // 대기 중
-  PROCESSING = 'processing', // 처리 중
-  COMPLETED = 'completed', // 완료됨
-  FAILED = 'failed', // 실패
 }
 
 // 카테고리

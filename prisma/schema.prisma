@@ -1,0 +1,281 @@
+// Prisma schema aligned with Collaboreum domain models
+// Datasource definition assumes PostgreSQL with DATABASE_URL environment variable.
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  admin
+  artist
+  fan
+}
+
+enum NotificationType {
+  info
+  success
+  warning
+  error
+  funding_update
+  project_update
+  community_update
+}
+
+enum FundingProjectStatus {
+  draft
+  collecting
+  succeeded
+  failed
+  executing
+  distributing
+  closed
+}
+
+enum PledgeStatus {
+  pending
+  authorized
+  captured
+  refunded
+  failed
+  cancelled
+}
+
+enum ExecutionStatus {
+  pending
+  approved
+  rejected
+  completed
+}
+
+enum DistributionStatus {
+  pending
+  calculated
+  executed
+  failed
+}
+
+enum DistributionRuleType {
+  owner
+  platform
+  artist
+  contributor
+  custom
+}
+
+enum DistributionItemStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+model User {
+  id          String         @id @default(uuid())
+  email       String         @unique
+  username    String         @unique
+  displayName String
+  name        String
+  role        UserRole       @default(fan)
+  avatar      String?
+  bio         String?
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  notifications Notification[]
+  projects       FundingProject[] @relation("ProjectOwner")
+  pledges        Pledge[]
+}
+
+model Notification {
+  id        String          @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      NotificationType @default(info)
+  isRead    Boolean          @default(false)
+  data      Json?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Category {
+  id          String           @id @default(uuid())
+  name        String
+  slug        String           @unique
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  projects FundingProject[]
+}
+
+model FundingProject {
+  id               String                @id @default(uuid())
+  title            String
+  description      String
+  shortDescription String?
+  targetAmount     Int
+  currentAmount    Int                 @default(0)
+  status           FundingProjectStatus @default(draft)
+  startDate        DateTime?
+  endDate          DateTime?
+  ownerId          String?
+  categoryId       String?
+  images           String[]             @default([])
+  tags             String[]             @default([])
+  progress         Int                  @default(0)
+  backerCount      Int                  @default(0)
+  isActive         Boolean              @default(true)
+  isFeatured       Boolean              @default(false)
+  metadata         Json?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  owner      User?     @relation("ProjectOwner", fields: [ownerId], references: [id])
+  category   Category? @relation(fields: [categoryId], references: [id])
+  rewards    Reward[]
+  pledges    Pledge[]
+  executions Execution[]
+  distributions Distribution[]
+}
+
+model Reward {
+  id            String          @id @default(uuid())
+  projectId     String
+  title         String
+  description   String
+  amount        Int
+  deliveryDate  DateTime?
+  stock         Int
+  soldCount     Int             @default(0)
+  isLimited     Boolean         @default(false)
+  isActive      Boolean         @default(true)
+  images        String[]        @default([])
+  metadata      Json?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  project FundingProject @relation(fields: [projectId], references: [id])
+  pledges Pledge[]
+}
+
+model Pledge {
+  id             String       @id @default(uuid())
+  projectId      String
+  userId         String
+  rewardId       String?
+  amount         Int
+  status         PledgeStatus @default(pending)
+  paymentMethod  String
+  paymentId      String?
+  idempotencyKey String       @unique
+  authorizedAt   DateTime?
+  capturedAt     DateTime?
+  refundedAt     DateTime?
+  refundAmount   Int?
+  refundReason   String?
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  project FundingProject @relation(fields: [projectId], references: [id])
+  user    User           @relation(fields: [userId], references: [id])
+  reward  Reward?        @relation(fields: [rewardId], references: [id])
+}
+
+model Execution {
+  id           String          @id @default(uuid())
+  projectId    String
+  title        String
+  description  String
+  budgetAmount Int
+  actualAmount Int?
+  status       ExecutionStatus @default(pending)
+  approvedBy   String?
+  approvedAt   DateTime?
+  metadata     Json?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  project  FundingProject @relation(fields: [projectId], references: [id])
+  receipts Receipt[]
+}
+
+model Receipt {
+  id           String   @id @default(uuid())
+  executionId  String
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  url          String
+  amount       Int
+  date         DateTime
+  description  String
+  isVerified   Boolean  @default(false)
+  verifiedBy   String?
+  verifiedAt   DateTime?
+  ocrData      Json?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  execution Execution @relation(fields: [executionId], references: [id])
+}
+
+model Distribution {
+  id          String             @id @default(uuid())
+  projectId   String
+  totalAmount Int
+  status      DistributionStatus @default(pending)
+  executedAt  DateTime?
+  executedBy  String?
+  metadata    Json?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  project FundingProject   @relation(fields: [projectId], references: [id])
+  rules   DistributionRule[]
+  items   DistributionItem[]
+}
+
+model DistributionRule {
+  id             String                @id @default(uuid())
+  distributionId String
+  type           DistributionRuleType
+  percentage     Float?
+  fixedAmount    Int?
+  recipient      String
+  description    String
+  priority       Int
+  metadata       Json?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  distribution Distribution @relation(fields: [distributionId], references: [id])
+  items        DistributionItem[]
+}
+
+model DistributionItem {
+  id             String                 @id @default(uuid())
+  distributionId String
+  ruleId         String?
+  recipientId    String
+  amount         Int
+  status         DistributionItemStatus @default(pending)
+  executedAt     DateTime?
+  transactionId  String?
+  metadata       Json?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  distribution Distribution    @relation(fields: [distributionId], references: [id])
+  rule         DistributionRule? @relation(fields: [ruleId], references: [id])
+}

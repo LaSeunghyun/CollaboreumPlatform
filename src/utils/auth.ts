@@ -1,6 +1,5 @@
 import { getStoredAccessToken } from '@/features/auth/services/tokenStorage';
-
-export type UserRole = 'fan' | 'artist' | 'admin';
+import type { UserRole } from '@/shared/types';
 
 export interface SignupData {
   email: string;
@@ -105,7 +104,7 @@ export const isAuthenticated = (): boolean => {
 };
 
 // 사용자 역할 확인
-export const getUserRole = (): string | null => {
+export const getUserRole = (): UserRole | null => {
   const user = getCurrentUser();
   return user?.role || null;
 };

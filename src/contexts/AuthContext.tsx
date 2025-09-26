@@ -13,12 +13,13 @@ import {
   persistTokens,
 } from '@/features/auth/services/tokenStorage';
 import { authAPI } from '../services/api/auth';
+import type { UserRole } from '@/shared/types';
 
 interface User {
   id: string;
   email: string;
   name: string;
-  role: 'fan' | 'artist' | 'admin';
+  role: UserRole;
   avatar?: string;
   bio?: string;
   isVerified?: boolean;

@@ -62,7 +62,7 @@
 ### Backend
 
 - **Node.js** + **Express.js**
-- **MongoDB** + **Mongoose** ODM
+- **PostgreSQL** + **Prisma ORM**
 - **JWT** 인증 시스템
 - **Multer** 파일 업로드
 
@@ -88,9 +88,9 @@ Collaboreum MVP Platform/
 │   ├── services/                 # API 서비스
 │   ├── types/                    # TypeScript 타입 정의
 │   └── utils/                    # 유틸리티 함수
+├── prisma/                       # Prisma 스키마 및 마이그레이션 정의
 ├── server/                       # Backend 서버 코드
-│   ├── models/                   # MongoDB 모델
-│   │   └── FundingProject.js     # 펀딩 프로젝트 모델
+│   ├── models/                   # (레거시) MongoDB 모델
 │   ├── routes/                   # API 라우트
 │   │   └── funding.js            # 펀딩 관련 API
 │   ├── middleware/               # 미들웨어
@@ -149,14 +149,15 @@ cd ..
 cp server/env.example server/.env
 
 # 필요한 환경 변수 설정
-MONGODB_URI=your_mongodb_connection_string
+DATABASE_URL=postgresql://user:password@localhost:5432/collaboreum
 JWT_SECRET=your_jwt_secret
 PORT=5000
 ```
 
 ### 4. 데이터베이스 설정
 
-MongoDB 데이터베이스를 설정하고 연결 문자열을 환경 변수에 추가하세요.
+PostgreSQL 인스턴스를 준비하고 `DATABASE_URL` 환경 변수에 연결 문자열을 설정하세요.
+Prisma 스키마가 변경되면 `npm run prisma:generate`를 실행해 공유 타입을 갱신합니다.
 
 ### 5. 개발 서버 실행
 
