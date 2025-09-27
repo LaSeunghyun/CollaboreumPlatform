@@ -8,6 +8,10 @@ import {
   BackProjectRequest,
 } from '../types/funding.types';
 import { FundingProjectStatus } from '../types';
+import {
+  FundingProjectStatus as PrismaFundingProjectStatusEnum,
+  type FundingProjectStatus as PrismaFundingProjectStatus,
+} from '@/types/prisma';
 
 type FundingProjectsResponse = {
   projects: FundingProjectApi[];
@@ -42,7 +46,33 @@ type FundingProjectApi = {
   updatedAt?: string;
 };
 
+const PRISMA_STATUS_MAP: Record<
+  PrismaFundingProjectStatus,
+  FundingProjectStatus
+> = {
+  [PrismaFundingProjectStatusEnum.PREPARING]: FundingProjectStatus.DRAFT,
+  [PrismaFundingProjectStatusEnum.IN_PROGRESS]:
+    FundingProjectStatus.COLLECTING,
+  [PrismaFundingProjectStatusEnum.SUCCESS]:
+    FundingProjectStatus.SUCCEEDED,
+  [PrismaFundingProjectStatusEnum.FAILED]: FundingProjectStatus.FAILED,
+  [PrismaFundingProjectStatusEnum.CANCELLED]: FundingProjectStatus.CLOSED,
+  [PrismaFundingProjectStatusEnum.EXECUTING]:
+    FundingProjectStatus.EXECUTING,
+  [PrismaFundingProjectStatusEnum.COMPLETED]: FundingProjectStatus.CLOSED,
+};
+
+const NORMALIZED_PRISMA_STATUS_MAP = Object.entries(PRISMA_STATUS_MAP).reduce(
+  (acc, [key, value]) => {
+    acc[key] = value;
+    acc[key.toLowerCase()] = value;
+    return acc;
+  },
+  {} as Record<string, FundingProjectStatus>,
+);
+
 const STATUS_MAP: Record<string, FundingProjectStatus> = {
+  ...NORMALIZED_PRISMA_STATUS_MAP,
   collecting: FundingProjectStatus.COLLECTING,
   진행중: FundingProjectStatus.COLLECTING,
   succeeded: FundingProjectStatus.SUCCEEDED,
@@ -51,7 +81,7 @@ const STATUS_MAP: Record<string, FundingProjectStatus> = {
   failed: FundingProjectStatus.FAILED,
   failure: FundingProjectStatus.FAILED,
   실패: FundingProjectStatus.FAILED,
-  취소: FundingProjectStatus.FAILED,
+  취소: FundingProjectStatus.CLOSED,
   executing: FundingProjectStatus.EXECUTING,
   집행중: FundingProjectStatus.EXECUTING,
   distributing: FundingProjectStatus.DISTRIBUTING,
