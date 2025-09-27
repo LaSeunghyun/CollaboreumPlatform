@@ -147,7 +147,7 @@ export class DynamicConstantsService {
 
       // 프로젝트 상태별 설정
       Object.values(enums.PROJECT_STATUSES || {}).forEach(status => {
-        const statusKey = status.toLowerCase().replace('_', '');
+        const statusKey = status.toLowerCase().replace(/_/g, '');
         statusConfig[statusKey] = {
           label: this.getStatusLabel(status),
           variant: this.getStatusVariant(status),
@@ -175,7 +175,7 @@ export class DynamicConstantsService {
 
       // 펀딩 프로젝트 상태별 설정
       Object.values(enums.FUNDING_PROJECT_STATUSES || {}).forEach(status => {
-        const statusKey = status.toLowerCase().replace('_', '');
+        const statusKey = status.toLowerCase().replace(/_/g, '');
         statusConfig[statusKey] = {
           label: this.getFundingStatusLabel(status),
           variant: this.getFundingStatusVariant(status),
@@ -203,7 +203,7 @@ export class DynamicConstantsService {
 
       // 이벤트 상태별 설정
       Object.values(enums.EVENT_STATUSES || {}).forEach(status => {
-        const statusKey = status.toLowerCase().replace('_', '');
+        const statusKey = status.toLowerCase().replace(/_/g, '');
         statusConfig[statusKey] = {
           label: this.getEventStatusLabel(status),
           variant: this.getEventStatusVariant(status),
